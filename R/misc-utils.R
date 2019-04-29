@@ -1,0 +1,143 @@
+
+
+#' Repeat a vector as a rows of an array
+#'
+#' @param v a vector of length \code{m}
+#' @param n number of times to repeat
+#' @return returns an array of size \code{n} x \code{m}
+repvec <- function(v, n){
+  m <- length(v)
+  A <- matrix(rep(v,n), n, m, byrow = TRUE)
+  return(as.array(A))
+}
+
+
+#' Convert the Stan likelihood encoding to a string
+#'
+#' @param LH an integer
+#' @return a string
+likelihood_as_str <- function(LH){
+  if(LH==1 || LH==-1){
+    str <- "Gaussian"
+  }else if(LH==0){
+    str <- "none"
+  }else if(LH==2){
+    str <- "Poisson"
+  }else if(LH==3){
+    str <- "Negative Binomial"
+  }else{
+    str <- "Unknown likelihood"
+  }
+  return(str)
+}
+
+
+#' Get names of model components
+#'
+#' @param stan_dat The data that was passed to \code{rstan::sampling}
+#' @return names of model components
+lgp_component_names <- function(stan_dat){
+  D        <- stan_dat$D
+  compnam  <- rownames(stan_dat$X)
+  idvar    <- compnam[1]
+  timevar  <- compnam[2]
+  
+  compnam[1] <- paste(idvar,'*', timevar, sep="")
+  idx      <- rep(1, length(compnam))
+  idx[1:2] <- c(D[1],D[2])
+  types    <- c(1,2, rep(3,D[3]), rep(4,D[4]), rep(5, D[5]), rep(6, D[6]))
+  i_inter <- which(types==5)
+  for(j in 1:length(i_inter)){
+    ind <- i_inter[j]
+    compnam[ind] <- paste(compnam[ind],"*",timevar,sep="")
+  }
+  cn  <- compnam[which(idx==1)]
+  cn  <- gsub("\\*", ", ", cn)
+  cn  <- paste("f_",1:length(cn),"(",cn,")", sep="")
+  return(cn)
+}
+
+
+#' Get names of model covariates
+#'
+#' @param stan_dat The data that was passed to \code{rstan::sampling}
+#' @return names of model components
+lgp_covariate_names <- function(stan_dat){
+  D        <- stan_dat$D
+  covnam   <- rownames(stan_dat$X)
+  idx      <- rep(1, length(covnam))
+  idx[1:2] <- c(D[1],D[2])
+  covnam  <- covnam[which(idx==1)]
+  return(covnam)
+}
+
+
+#' Matrix to data frame without editing column names
+#'
+#' @param M a matrix
+#' @return a data frame
+matrix_to_df <- function(M){
+  cn  <- colnames(M)
+  df  <- data.frame(M)
+  colnames(df) <- cn
+  return(df)
+}
+
+
+#' Get model info
+#'
+#' @param object an object of class \code{lgpmodel} or \code{lgpfit}
+#' @param print should this print the info?
+#' @return the info as a string
+model_info <- function(object, print = TRUE){
+  if(class(object)=="lgpfit"){
+    object <- object@model
+  }
+  info  <- object@info
+  
+  # Model formula and likelihood
+  str   <- paste('  Model:\n    f = ', paste(info$component_names, collapse=" + "), sep = "")
+  LH    <- object@stan_dat$LH
+  yvar  <- info$varInfo$response_variable
+  if(LH==1){
+    str <- paste(str, "\n    ", yvar, " ~ N(f, sigma^2*I)\n", sep="")
+  }else{
+    str <- paste(str, "    g = exp(C + f), C = ", object@stan_dat$C_hat, sep = " ")
+    if(LH==2){
+      str <- paste(str, "\n    ", yvar, " ~ Poisson(g) \n")
+    }else if(LH==3){
+      str <- paste(str, "\n    ", yvar, " ~ NB(g, phi) \n")
+    }
+  }
+  
+  # Covariate types
+  t1 <- info$varInfo$id_variable
+  t2 <- info$varInfo$time_variable
+  t3 <- info$varInfo$disAge_variable
+  t4 <- info$varInfo$continuous_vars
+  t5 <- info$varInfo$categorical_vars
+  t6 <- info$varInfo$offset_vars
+  
+  str <- paste(str, "  Variable types:\n", sep="")
+  str <- paste(str, "    - Identifier variable: ", t1, "\n", sep = "")
+  str <- paste(str, "    - Time variable: ", t2, "\n", sep ="")
+  if(!is.null(t3)){
+    str <- paste(str, "    - Disease-related age variable: ", t3, "\n", sep="")
+  }
+  if(!is.null(t4)){
+    str <- paste(str, "    - Other continuous variables: ", paste(t4, collapse = ", "), "\n", sep="")
+  }
+  if(!is.null(t5)){
+    str <- paste(str, "    - Other categorical variables: ", paste(t5, collapse = ", "), "\n", sep="")
+  }
+  if(!is.null(t6)){
+    str <- paste(str, "    - Group offset variables: ", paste(t6, collapse = ", "), "\n", sep="")
+  }
+
+  # Print info
+  if(print){
+    cat(str)
+  }
+  return(invisible(str))
+}
+

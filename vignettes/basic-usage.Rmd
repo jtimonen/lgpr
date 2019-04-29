@@ -1,0 +1,38 @@
+---
+title: "Basic usage of the lgpr package"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+#  pdf_document:
+#    toc: true     
+vignette: >
+  %\VignetteIndexEntry{Basic usage of the lgpr package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette demonstrates how to model a longitudinal data set and perform covariate selection using the `lgp` function of the `lgpr` package. In the example cases, the number of data points is small enough so that the experiments can be run in just a few seconds.
+
+```{r load}
+library("lgpr")
+set.seed(123)
+```
+
+## An example case using Gaussian likelihood
+
+First, lets simulate some data with Gaussian noise.
+```{r simulate, results="hide"}
+#simData <- simulateData(N = 4, k = 4, grid = 40)
+#data <- simData$data
+```
+
+## asd

@@ -1,0 +1,39 @@
+Package: lgpr
+Title: Longitudinal Gaussian Process Regression modeling and covariate selection
+Version: 0.19.1
+Authors@R: 
+    person(given = "Juho",
+           family = "Timonen",
+           role = c("aut", "cre"),
+           email = "juho.timonen@aalto.fi")
+Description: Interpretable nonparametric modeling and covariate selection for longitudinal data 
+             using additive Gaussian processes.
+License: GPL (>=3)
+Depends: 
+    methods,
+    R (>= 3.4.0),
+    Rcpp (>= 0.12.0)
+Imports: 
+    bayesplot (>= 1.6),
+    rstan (>= 2.18.1),
+    rstantools (>= 1.5.1),
+    MASS (>= 7.3-50),
+    stats (>= 3.4),
+    ggplot2 (>= 3.1.0)
+LinkingTo: 
+    StanHeaders (>= 2.18.0),
+    rstan (>= 2.18.1),
+    BH (>= 1.66.0),
+    Rcpp (>= 0.12.0),
+    RcppEigen (>= 0.3.3.3.0)
+Encoding: UTF-8
+LazyData: true
+NeedsCompilation: yes
+SystemRequirements: GNU make
+RoxygenNote: 6.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat,
+    covr
+VignetteBuilder: knitr
