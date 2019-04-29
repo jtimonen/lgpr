@@ -269,10 +269,12 @@ plot_predictions <- function(fit,
     facet_var    <- "component"
     DF$facet_var <- DF[[facet_var]]
     ptitle       <- "Componentwise predictions"
+    ylab         <- " "
   }else{
     facet_var    <- idvar
     DF$facet_var <- DF[[facet_var]]
     ptitle       <- "Model predictions"
+    ylab         <- respvar
   }
   
   # Create ggplot object
@@ -292,7 +294,7 @@ plot_predictions <- function(fit,
     ptitle <- paste(title, ": ", ptitle, sep="")
   }
   h <- h + ggplot2::ggtitle(label = ptitle)
-  h <- h + ggplot2::labs(y = "value")
+  h <- h + ggplot2::labs(y = ylab)
   
   # Lines and ribbons
   if(plot_ribbon && !info$sample_F){

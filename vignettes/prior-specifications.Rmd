@@ -20,47 +20,9 @@ knitr::opts_chunk$set(
 )
 ```
   
-## The sampled parameters
+## Default priors
   
-All parameters that are sampled have default priors which can be replaced by user-supplied priors. The sampled parameters can be
-  
-* the magnitude parameters $\alpha$ of different components
-* the lengthscale parameters $\rho$ of different components
-* the steepness parameter $\tau$ of the input warping function for a nonstationary component
-* noise standard deviation $\sigma_n$ for Gaussian likelihood model
-* the uncertain disease onset $t_d$ for diseased individuals (only the default uniform prior allowed)
-
-## Defining the priors
-### Default priors
-In the simplest case, the `prior` argument for the `lgp` function can be ignored, in which case default priors are used. [insert here what they are]
-
-### User-defined priors for each parameter type
-
-The prior can be supplied as a list containing the priors for each parameter type separately. The elements of the list must be named `magnitude`, `lengthscale`, `noise` or `steepness`, and be themselves lists, that contain the type of the prior distribution, as well as its hyperparameters.
-
-```r
-my_prior <- list()
-my_prior$magnitude    <- list(type="student_t", nu=1)
-my_prior$lengthscale  <- list(type="inv_gamma", alpha=3, beta=3)
-my_prior$noise        <- list(type="normal", mu=0, sigma=1)
-my_prior$steepness    <- list(type="normal", mu=10, sigma=5)
-```
-
-If any of the possible fields of the list is missing, the corresponding default prior will be used.
-
-### Different user-defined priors for each model component type
-In some cases, the user may want to use a different prior for example for the magnitudes of different components. This can be done by defining the `magnitude` field as a list, that can contain six possible fields, which are demonsrated in the below example:
-
-```r
-my_prior$magnitude$idAge         <- list(type="student_t", nu=4)
-my_prior$magnitude$sharedAge     <- list(type="student_t", nu=20)
-my_prior$magnitude$diseaseAge    <- list(type="student_t", nu=20)
-my_prior$magnitude$continuous    <- list(type="normal", mu=0, sigma=1)
-my_prior$magnitude$categorical   <- list(type="uniform")
-my_prior$magnitude$offset        <- list(type="gamma", alpha=5, beta=2)
-```
-
-This can be done also for the fields `lengthscale`, but with the exception that the field `offset` must be skipped, since offset components do not have a lengthscale parameter. If any of the possible fields are missing, the corresponding default prior will be used.
+All parameters that are sampled have default priors which can be replaced by user-supplied priors. In the simplest case, the `prior` argument for the `lgp` function can be ignored, in which case default priors are used. [insert here what they are]
 
 ## Prior distributions
 The possible types of prior distributions are
@@ -73,10 +35,10 @@ The possible types of prior distributions are
 6. Log-normal (`log-normal`)
 7. Beta (`beta`)
   
-In addition, all kernel parameters $\alpha, \rho, \sigma_n, \tau$ are constrained to be non-negative, so only the positive part of the defined prior will matter. The hyperparameters of the prior (for example the mean and standard deviation of the normal prior) can be given by the user. Below, we will look at each of the different distributions in detail. In the graphics::plots $x$ is a general parameter, which could be any of the ones listed above. The red curves represent the probability density functions of different distributions.
+In addition, all kernel parameters like $\alpha, \ell, \sigma_n$ are constrained to be non-negative, so only the positive part of the defined prior will matter. The hyperparameters of the prior (for example the mean and standard deviation of the normal prior) can be given by the user.
   
 ### 1. Uniform distribution
-This means that we have no prior information about the parameter. All non-negative values of the parameter are equally likely 'a priori'. There are no hyperparameters. This is not a recommended prior to set for any parameter.
+There are no hyperparameters.
   
 ### 2. Normal distribution $N(\mu,\sigma)$
 The normal prior has two hyperparameters, $\mu$ and $\sigma$. The first one defines the location and second one defines the width of the distribution.
@@ -201,65 +163,15 @@ for(idx in c(1:2)){
 ```
 
 ## Transforms
-In the usual case, the prior for a parameter $X$ is defined to be the distribution $p_{X}(x)$, which is one of the distiributions listed above. However, in some cases we may want to define the prior so that $f(X) \sim p_{X}$, where $f$ is an invertible mapping. In this case, the log Jacobian of the transform is utomatically added to the logarithm of the target density inside the Stan model. The user does not need to worry about this, and the can specify the prior transformation as explained below. The supported transformations and the corresponding log Jacobians are listed in the below table.
+In the usual case, the prior for a parameter $X$ is defined to be the distribution $p_{X}(x)$, which is one of the distiributions listed above. However, in some cases we may want to define the prior so that $f(X) \sim p_{X}$, where $f$ is an invertible mapping. In this case, the log Jacobian of the transform is automatically added to the logarithm of the target density inside the Stan model. The user does not need to worry about this, and the can specify the prior transformation as explained below. The supported transformations and the corresponding log Jacobians are listed in the below table.
 
 ```{r, echo = FALSE, results = 'asis'}
-transforms <- c("scaling", "square", "exponentiation")
-f <- c("$c \\cdot x$", "$x^2$", "$\\exp(x)$")
-J <- c("constant","$\\log|2y|$","$y$")
+transforms <- c("square")
+f <- c("$x^2$")
+J <- c("$\\log|2y|$")
 T <- cbind(transforms, f, J)
 colnames(T) <- c(" ", "$f(x)$", "$\\log \\left| \\frac{\\partial}{\\partial y} f(y) \\right|$") 
 knitr::kable(T)
 ```
 
 [insert how to define the transforms in the lgp function]
-
-## Calibrating the magnitude priors
-Let $\bf{f}$ = $[f_1, \ldots, f_n]^\top$ be a vector containing the signal values at $n$ measurement points. If the model has $D$ components, the additive GP prior then specifies the prior distribution of these function values as the multivariate normal
-$$
-\bf{f} \sim \mathcal{N}\left(\bf{0}, \bf{K}\right), 
-$$
-where $\bf{K} = \alpha_1^2 \bf{K}_1 + \ldots + \alpha_D^2 \bf{K}_D$. This means that the magnitude parameters $\alpha_j^2$, $j = 1, \ldots, D$ of the additive components define how large variations the different signal components can experience. Their priors should therefore be specified according to beliefs about the variance of different components. On the other hand, at the same time we would like our entire prior formulation to reflect our beliefs about the observed measurements $\bf{y}$. 
-
-### Gaussian observation model
-In the Gaussian observation model we assume 
-$$
-y_i = f_i + \epsilon_i,
-$$
-where $\epsilon_i \sim \mathcal{N}(0, \sigma_n^2)$ independently for all $i=1,\ldots, n$. 
-
-```{r, results = "hide"}
-set.seed(123)
-library(lgpr)
-
-# Define a prior for the magnitude parameters
-my_prior <- list()
-#my_prior$magnitude$idAge         <- list(type="student_t", nu=4)
-#my_prior$magnitude$sharedAge     <- list(type="student_t", nu=20)
-#my_prior$magnitude$diseaseAge    <- list(type="student_t", nu=20)
-#my_prior$magnitude$continuous    <- list(type="normal", mu=0, sigma=1)
-#my_prior$magnitude$categorical   <- list(type="uniform")
-#my_prior$magnitude$offset        <- list(type="gamma", alpha=5, beta=2)
-my_prior$sigma_n                 <- list(type="normal", mu=5, sigma=0.5, transform = "square")
-
-# Draw samples from the prior
-#out <- validatePrior(prior = my_prior,
-#                      n_diseaseAge = 0, 
-#                      n_categorical = 2)
-
-```
-
-We can graphics::plot a kernel density estimates of the prior distributions using the drawn samples.
-```{r, fig.show='hold', fig.width = 7, fig.height = 4, fig.align="center"}
-# Visualize the prior samples
-#graphics::plotMagnitudes(out$lgp_fit, noisepar = "sigma_n")
-
-```
-
-```{r, fig.show='hold', fig.width = 7, fig.height = 7/3, fig.align="center"}
-# Visualize the realizations of f and y
-#validatePriorsgraphics::plot(out, opacity = 0.1)
-```
-
-
-### Non-Gaussian observation model

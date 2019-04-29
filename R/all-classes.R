@@ -130,7 +130,7 @@ setMethod(f = "show",
             
             rel          <- object@covariate_relevances$average
             DF           <- round(rbind(rel),3)
-            rownames(DF) <- c("PEV")
+            rownames(DF) <- c("relevance")
             print(DF)
             cat("\n")
           }

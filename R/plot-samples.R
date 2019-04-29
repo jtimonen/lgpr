@@ -103,9 +103,9 @@ plot_relevances <- function(object, color_scheme = "red")
     ggplot2::geom_bar(stat = "identity", color = color, fill = fill) +
     ggplot2::theme_minimal()
   h <- h + ggplot2::labs(
-    y = "Proportion of explained variance",
+    y = "Relevance",
     subtitle = paste("Model:", info$formula),
-    title = "Proportion of variance explained by each covariate"
+    title = "Covariate relevances"
   )
   return(h)
 }

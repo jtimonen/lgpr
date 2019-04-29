@@ -16,7 +16,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "##"
 )
 ```
 
@@ -27,12 +27,43 @@ library("lgpr")
 set.seed(123)
 ```
 
-## An example case using Gaussian likelihood
+## Example
 
-First, lets simulate some data with Gaussian noise.
-```{r simulate, results="hide"}
-#simData <- simulateData(N = 4, k = 4, grid = 40)
-#data <- simData$data
+```{r example, fig.width=6.6, fig.height=4}
+
+# generate artificial data --------------------------------------------------
+
+simData <- simulate_data(N           = 10,
+                        t_data       = seq(6, 30, by = 6),
+                        covariates   = c(    2,2),
+                        lengthscales = c(6,6,6,6),
+                        relevances   = c(1,1,1,0),
+                        names        = c("sex", "location"),
+                        t_jitter     = 0.5,
+                        snr          = 5)
+
+data <- simData$data
+plot_simdata(simData, componentwise = F)
+plot_simdata(simData, componentwise = T)
+
+# create and fit a model --------------------------------------------------
+
+fit <- lgp(formula  = y ~ id + age + sex + location,
+           data     = data,
+           iter     = 1000, 
+           chains   = 1)
+
+# visualization -----------------------------------------------------------
+
+plot(fit)
+plot_components(fit)
+
+# prediction --------------------------------------------------------------
+
+t_test <- seq(0, 40, length.out = 60)
+X_test <- create_test_points(fit, t_test)
+PRED   <- lgp_predict(fit, X_test, samples = "mean")
+plot_predictions(fit, PRED, componentwise = F)
+
 ```
 
-## asd
