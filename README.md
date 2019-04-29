@@ -22,4 +22,4 @@ devtools::install_github('jtimonen/lgpr', build_vignettes = TRUE)
 ~~~
 
 ## Basic usage
-See vignettes and demos. To be updated soon.
+To be updated.
