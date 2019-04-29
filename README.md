@@ -15,11 +15,12 @@ To avoid problems, we recommend first installing the `rstan` package using these
 https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 
 ### 2. Install lgpr
-The development version can be installed using the `devtools` package.
-~~~r
-require(devtools)
-devtools::install_github('jtimonen/lgpr', build_vignettes = TRUE)
-~~~
+Instructions:
+* download or clone this repository
+* put it in directory `lgpr-pkg` under parent directory `lgpr`
+* go to `lgpr` and run `R CMD build lgpr-pkg`
+* this will build the package into file `lgpr_X.Y.Z.tar.gz`
+* install the package using `R CMD install lgpr_X.Y.Z.tar.gz`
 
 ## Basic usage
 To be updated.
