@@ -20,7 +20,7 @@ Instructions:
 * put it in directory `lgpr-pkg` under parent directory `lgpr`
 * go to `lgpr` and run `R CMD build lgpr-pkg`
 * this will build the package into file `lgpr_X.Y.Z.tar.gz`
-* install the package using `R CMD install lgpr_X.Y.Z.tar.gz`
+* install the package using `R CMD INSTALL lgpr_X.Y.Z.tar.gz`
 
 ## Basic usage
 To be updated.
