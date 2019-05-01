@@ -102,11 +102,11 @@ model_info <- function(object, print = TRUE){
   if(LH==1){
     str <- paste(str, "\n    ", yvar, " ~ N(f, sigma^2*I)\n", sep="")
   }else{
-    str <- paste(str, "    g = exp(C + f), C = ", object@stan_dat$C_hat, sep = " ")
+    str <- paste(str, "\n    g = exp(C + f), C = ", round(object@stan_dat$C_hat, 4), sep = "")
     if(LH==2){
-      str <- paste(str, "\n    ", yvar, " ~ Poisson(g) \n")
+      str <- paste(str, "\n    ", yvar, " ~ Poisson(g) \n", sep="")
     }else if(LH==3){
-      str <- paste(str, "\n    ", yvar, " ~ NB(g, phi) \n")
+      str <- paste(str, "\n    ", yvar, " ~ NB(g, phi) \n", sep="")
     }
   }
   
