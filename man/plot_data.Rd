@@ -6,7 +6,7 @@
 \usage{
 plot_data(data, highlight_col = NULL, highlight_lty = NULL,
   highlight_cont = NULL, response = "y", palette = "Set1",
-  psize = 2, title = NULL)
+  colgrad = "gray", psize = 2, title = NULL, lwd = 0.5)
 }
 \arguments{
 \item{data}{A data frame. Must contain columns \code{id} and \code{age}.}
@@ -21,9 +21,14 @@ plot_data(data, highlight_col = NULL, highlight_lty = NULL,
 
 \item{palette}{Name of a ColorBrewer palette.}
 
+\item{colgrad}{A colour gradient type, must be either \code{"gray"}
+(default), or \code{"diverging"}.}
+
 \item{psize}{Point}
 
 \item{title}{optional prefix to plot title}
+
+\item{lwd}{line width}
 }
 \value{
 a ggplot object

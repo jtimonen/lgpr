@@ -141,3 +141,28 @@ model_info <- function(object, print = TRUE){
   return(invisible(str))
 }
 
+
+#' Extract inferred disease onset times
+#'
+#' @param id the id covariate, vector of length \code{n}
+#' @param age the age covariate, vector of length \code{n}
+#' @param disAge the observed disease-related age covariate, vector of length \code{n}
+#' @return vector of observed onset times
+get_onset_times <- function(id, age, disAge){
+  uid   <- unique(id)
+  t_ons <- rep(0, length(uid))
+  names(t_ons) <- uid
+  j <- 0
+  for(i in uid){
+    j    <- j + 1
+    inds <- which(id==i)
+    i1   <- inds[1]
+    if(is.nan(disAge[i1])){
+      t_ons[j] <- NaN
+    }else{
+      t_ons[j] <- age[i1] - disAge[i1]
+    }
+     
+  }
+  return(t_ons)
+}

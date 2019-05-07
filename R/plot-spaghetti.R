@@ -5,9 +5,12 @@
 #' @param highlight_lty Name of a categorical covariate to be highlighted with line style.
 #' @param highlight_cont Name of a continuous covariate to be highlighted.
 #' @param response Name of the response variable (\code{default ="y"}).
+#' @param colgrad A colour gradient type, must be either \code{"gray"}
+#' (default), or \code{"diverging"}.
 #' @param palette Name of a ColorBrewer palette.
 #' @param psize Point 
 #' @param title optional prefix to plot title
+#' @param lwd line width
 #' @return a ggplot object
 plot_data <- function(data, 
                       highlight_col = NULL,
@@ -15,8 +18,10 @@ plot_data <- function(data,
                       highlight_cont = NULL,
                       response = "y", 
                       palette = "Set1",
+                      colgrad = "gray",
                       psize = 2,
-                      title = NULL)
+                      title = NULL,
+                      lwd = 0.5)
 {
   data$id  <- as.factor(data$id)
   iresp    <- which(colnames(data)==response)
@@ -40,7 +45,7 @@ plot_data <- function(data,
   if(!is.null(highlight_col) && is.null(highlight_lty)){
     p <- p + ggplot2::labs(colour = highlight_col)
     p <- p + ggplot2::scale_color_brewer(palette = palette)
-    p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Z1'))
+    p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Z1'), size = lwd)
     if(psize > 0){
       p <- p + ggplot2::geom_point(ggplot2::aes_string(color = 'Z1'), size = psize)
     }
@@ -49,7 +54,7 @@ plot_data <- function(data,
   # ii)
   if(is.null(highlight_col) && !is.null(highlight_lty)){
     p <- p + ggplot2::labs(linetype = highlight_lty)
-    p <- p + ggplot2::geom_line(ggplot2::aes_string(linetype = 'Z2'))
+    p <- p + ggplot2::geom_line(ggplot2::aes_string(linetype = 'Z2'), size = lwd)
     if(psize > 0){
       p <- p + ggplot2::geom_point(size = psize)
     }
@@ -59,7 +64,7 @@ plot_data <- function(data,
   if(!is.null(highlight_col) && !is.null(highlight_lty)){
     p <- p + ggplot2::labs(colour = highlight_col, linetype = highlight_lty)
     p <- p + ggplot2::scale_color_brewer(palette = palette)
-    p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Z1', linetype = 'Z2'))
+    p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Z1', linetype = 'Z2'), size = lwd)
     if(psize > 0){
       p <- p + ggplot2::geom_point(ggplot2::aes_string(color = 'Z1'), size = psize)
     }
@@ -68,13 +73,17 @@ plot_data <- function(data,
   # Highligh continuous
   if(!is.null(highlight_cont)){
     if(is.null(highlight_col) && is.null(highlight_lty)){
-      p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Value'))
-      colgrad <- ggplot2::scale_colour_gradient(low = "#c8e2ed", 
-                                                high = "#1e2a30",
-                                                space = "Lab", 
-                                                na.value = "firebrick3", 
-                                                guide = "colourbar",
-                                                aesthetics = "colour")
+      p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Value'), size = lwd)
+      if(colgrad!="diverging"){
+        colgrad <- ggplot2::scale_colour_gradient(low = "#c8e2ed", 
+                                                  high = "#1e2a30",
+                                                  space = "Lab", 
+                                                  na.value = "firebrick3", 
+                                                  guide = "colourbar",
+                                                  aesthetics = "colour")
+      }else{
+        colgrad <- ggplot2::scale_colour_gradient2()
+      }
       p <- p + colgrad
       p <- p + ggplot2::labs(colour = highlight_cont)
     }else{
@@ -84,7 +93,7 @@ plot_data <- function(data,
   
   # Normal line
   if(is.null(highlight_col) && is.null(highlight_lty) && is.null(highlight_cont)){
-    p <- p + ggplot2::geom_line() 
+    p <- p + ggplot2::geom_line(size = lwd) 
     if(psize > 0){
       p <- p + ggplot2::geom_point(size = psize) 
     }
@@ -320,8 +329,8 @@ plot_predictions <- function(fit,
     dat  <- model@data
     X_id <- as.numeric(model@stan_dat$X[1,])
     df   <- data.frame(idvar   = as.factor(X_id), 
-                      timevar  = as.numeric(dat[[timevar]]), 
-                      y        = as.numeric(dat[[respvar]]))
+                       timevar  = as.numeric(dat[[timevar]]), 
+                       y        = as.numeric(dat[[respvar]]))
     colnames(df)[1] <- idvar
     colnames(df)[2] <- timevar
     colnames(df)[3] <- respvar
