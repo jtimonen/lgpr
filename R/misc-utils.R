@@ -166,3 +166,13 @@ get_onset_times <- function(id, age, disAge){
   }
   return(t_ons)
 }
+
+
+#' Extract inferred components for one sample
+#'
+#' @param fit an object of class \code{lgpfit}
+#' @param sample_idx sample index
+#' @return a list
+extract_components_onesample <- function(fit, sample_idx){
+   return(postproc(fit, threshold = 0.95, FALSE, sample_idx))  
+}

@@ -14,8 +14,9 @@
 #' @param fit An (incomplete) object of class \code{lgpfit}.
 #' @param threshold Covariate selection threshold.
 #' @param average_before_variance Should the variances be computed using average components?
+#' @param sample_idx If supplied, this just returns the inferred components for one sample.
 #' @return An updated object of class \code{lgpfit}.
-postproc <- function(fit, threshold, average_before_variance){
+postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL){
   
   cat("* Begin postprocessing. \n")
   model  <- fit@model
@@ -28,11 +29,13 @@ postproc <- function(fit, threshold, average_before_variance){
   NAMES1 <- c(info$component_names, "noise")
   NAMES2 <- c(info$covariate_names, "noise")
   
-  # Get average inferred components
+  # Get function component samples
   FFF      <- get_function_component_samples(fit, only_at_datapoints = TRUE)
   n_smp    <- dim(FFF)[1]
   n_dat    <- dim(FFF)[2]
   n_cmp    <- dim(FFF)[3] - 2
+  
+  # Get average inferred components
   FFF_avg  <- apply(FFF, c(2,3), mean)
   FFF_avg  <- matrix_to_df(FFF_avg)
   
@@ -42,65 +45,76 @@ postproc <- function(fit, threshold, average_before_variance){
   
   # Get shared age covariate and its lengthscale samples
   if(D[2]>0){
-    ELL    <- rstan::extract(fit@stan_fit, pars = "lengthscale_sharedAge")[[1]]
-    x_age  <- as.numeric(sdat$X[2,])
+    ELL   <- rstan::extract(fit@stan_fit, pars = "lengthscale_sharedAge")[[1]]
+    x_age <- as.numeric(sdat$X[2,])
   }else{
     ELL   <- NULL
     x_age <- NULL
   }
   
-  # Covariate and component relevance computations
-  if(average_before_variance){
-
-    # If F was sampled, compute relevances using average F's
-    if(D[2]>0){ell <- mean(ELL)} else {ell <- NULL}
-    REL          <- compute_relevances(FFF_avg, y_data, info, D, ell, x_age)
-    FFF_cor_avg  <- REL$FFF_cor
-    p_comp       <- REL$p_comp
-    p_cov        <- REL$p_cov
-    p_signal     <- REL$p_signal
-    svar         <- REL$svar
-    evar         <- REL$evar
+  if(is.null(sample_idx)){
     
-  }else{
-    
-    # If F was computed analytically, compute relevances for each sample
-    p_comp   <- matrix(0, n_smp, n_cmp + 1)
-    p_cov    <- matrix(0, n_smp, n_cmp + 1)
-    p_signal <- rep(0, n_smp)
-    svar     <- rep(0, n_smp)
-    evar     <- rep(0, n_smp)
-    FFF_cor_avg <- matrix(0, n, n_cmp + 2)
-    for(i in 1:n_smp){
-      if(D[2]>0){ell <- ELL[i]} else {ell <- NULL}
-      FFF_i           <- data.frame(FFF[i,,])
-      colnames(FFF_i) <- colnames(FFF_avg)
-      REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
-      p_comp[i,]      <- REL$p_comp
-      p_cov[i,]       <- REL$p_cov
-      p_signal[i]     <- REL$p_signal
-      svar[i]         <- REL$svar
-      evar[i]         <- REL$evar
-      FFF_cor_avg     <- FFF_cor_avg + 1/n_smp*REL$FFF_cor
+    # Covariate and component relevance computations
+    if(average_before_variance){
+      
+      # Compute relevances using average F's
+      if(D[2]>0){ell <- mean(ELL)} else {ell <- NULL}
+      REL          <- compute_relevances(FFF_avg, y_data, info, D, ell, x_age)
+      FFF_cor_avg  <- REL$FFF_cor
+      p_comp       <- REL$p_comp
+      p_cov        <- REL$p_cov
+      p_signal     <- REL$p_signal
+      svar         <- REL$svar
+      evar         <- REL$evar
+      
+    }else{
+      
+      # Compute relevances for each sample
+      p_comp   <- matrix(0, n_smp, n_cmp + 1)
+      p_cov    <- matrix(0, n_smp, n_cmp + 1)
+      p_signal <- rep(0, n_smp)
+      svar     <- rep(0, n_smp)
+      evar     <- rep(0, n_smp)
+      FFF_cor_avg <- matrix(0, n, n_cmp + 2)
+      for(i in 1:n_smp){
+        if(D[2]>0){ell <- ELL[i]} else {ell <- NULL}
+        FFF_i           <- data.frame(FFF[i,,])
+        colnames(FFF_i) <- colnames(FFF_avg)
+        REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
+        p_comp[i,]      <- REL$p_comp
+        p_cov[i,]       <- REL$p_cov
+        p_signal[i]     <- REL$p_signal
+        svar[i]         <- REL$svar
+        evar[i]         <- REL$evar
+        FFF_i_cor       <- REL$FFF_cor
+        FFF_cor_avg     <- FFF_cor_avg + 1/n_smp*FFF_i_cor
+      }
+      colnames(FFF_cor_avg) <- colnames(FFF_i_cor)
+      colnames(p_comp)      <- NAMES1
+      colnames(p_cov)       <- NAMES2
     }
-    colnames(FFF_cor_avg) <- colnames(REL$FFF_cor)
-    colnames(p_comp)      <- NAMES1
-    colnames(p_cov)       <- NAMES2
+    
+    cat("\n")
+    # Set slot values
+    fit@components           <- FFF_avg
+    fit@components_corrected <- FFF_cor_avg
+    fit@component_relevances <- list(samples = p_comp, average = colMeans(p_comp))
+    fit@covariate_relevances <- list(samples = p_cov, average = colMeans(p_cov))
+    fit@signal_variance      <- svar
+    fit@residual_variance    <- evar
+    fit@covariate_selection  <- varsel(fit, threshold)
+    return(fit)
+  }else{
+    # Just get one sample
+    if(average_before_variance){stop("Should not average if taking one sample!")}
+    FFF_i           <- data.frame(FFF[sample_idx,,])
+    colnames(FFF_i) <- colnames(FFF_avg)
+    REL             <- compute_relevances(FFF_i, y_data, info, D, ELL[sample_idx], x_age)
+    FFF_i_cor       <- REL$FFF_cor
+    out             <- list(components = FFF_i, corrected = FFF_i_cor)
+    return(out)
   }
   
-  # Set slot values
-  fit@components           <- FFF_avg
-  fit@components_corrected <- FFF_cor_avg
-  fit@component_relevances <- list(samples = p_comp, average = colMeans(p_comp))
-  fit@covariate_relevances <- list(samples = p_cov, average = colMeans(p_cov))
-  fit@signal_variance      <- svar
-  fit@residual_variance    <- evar
-  fit@covariate_selection  <- varsel(fit, threshold)
-  
-  
-  # Return
-  cat("\n")
-  return(fit)
 }
 
 

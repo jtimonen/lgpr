@@ -139,24 +139,36 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
   timevar <- info$varInfo$time_variable
   
   # Get components and relevances
-  if(corrected){
-    names  <- info$covariate_names
-    ptitle <- "Averaged covariate effects [relevance]"
-    yname  <- "(corrected) component"
-    EFF    <- fit@components_corrected
-    relev  <- fit@covariate_relevances$average
+  if(is.null(sample_idx)){
+    if(corrected){
+      names  <- info$covariate_names
+      ptitle <- "Averaged covariate effects [relevance]"
+      yname  <- "(corrected) component"
+      EFF    <- fit@components_corrected
+      relev  <- fit@covariate_relevances$average
+    }else{
+      names  <- info$component_names
+      ptitle <- "Average inferred components [relevance]"
+      yname  <- "component"
+      EFF    <- fit@components
+      relev  <- fit@component_relevances$average
+    }
   }else{
-    names  <- info$component_names
-    ptitle <- "Average inferred components [relevance]"
-    yname  <- "component"
-    EFF    <- fit@components
-    relev  <- fit@component_relevances$average
+    if(corrected){
+      names  <- info$covariate_names
+      ptitle <- paste("Covariate effects for sample ", sample_idx, " [relevance]", sep="")
+      yname  <- "(corrected) component"
+      EFF    <- extract_components_onesample(fit, sample_idx)$corrected
+      relev  <- fit@covariate_relevances$samples[sample_idx,]
+    }else{
+      names  <- info$component_names
+      ptitle <- paste("Inferred components for sample ", sample_idx, " [relevance]", sep="")
+      yname  <- "component"
+      EFF    <- extract_components_onesample(fit, sample_idx)$components
+      relev  <- fit@component_relevances$samples[sample_idx,]
+    }
   }
   
-  # One sample or average?
-  if(!is.null(sample_idx)){
-    stop("plotting one sample not implemented!")
-  }
   
   # Remove f, g, and residual
   dp2 <- dim(EFF)[2]

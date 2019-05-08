@@ -4,7 +4,7 @@
 \alias{postproc}
 \title{Finalize the lgpfit object after sampling}
 \usage{
-postproc(fit, threshold, average_before_variance)
+postproc(fit, threshold, average_before_variance, sample_idx = NULL)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
@@ -12,6 +12,8 @@ postproc(fit, threshold, average_before_variance)
 \item{threshold}{Covariate selection threshold.}
 
 \item{average_before_variance}{Should the variances be computed using average components?}
+
+\item{sample_idx}{If supplied, this just returns the inferred components for one sample.}
 }
 \value{
 An updated object of class \code{lgpfit}.
