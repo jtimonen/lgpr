@@ -47,8 +47,14 @@
 
   // DiseaseAge uncertainty prior
   if(UNCRT){
+    real tx;
     for(k in 1:N_cases){
-      target += log_prior(T_onset[1,k], t_ONS[k,1:2], p_ONS[k,1:3]);
+      if(backwards==1){
+        tx = T_observed[k] - T_onset[1,k];
+      }else{
+        tx = T_onset[1,k];
+      }
+      target += log_prior(tx, t_ONS[k,1:2], p_ONS[k,1:3]);
     }
   }
   

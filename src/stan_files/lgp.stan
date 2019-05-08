@@ -76,7 +76,8 @@ data {
   vector[N_cases] T_observed;      // observed disease onset times
   vector[N_cases] L_ons[UNCRT];    // lower bounds for sampled disease onset
   vector[N_cases] U_ons[UNCRT];    // upper bounds for sampled disease onset
-
+  int<lower=0,upper=1> backwards;  // is the prior for onset "backwards"
+  
   // Other
   real DELTA;       // jitter to ensure pos. def. kernel matrices
   real C_hat;       // GP mean (constant value)

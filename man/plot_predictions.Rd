@@ -9,7 +9,7 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
   plot_ribbon = TRUE, title = NULL, theme = ggplot2::theme_gray(),
   original_y_scale = TRUE, plot_ribbon_edge = !componentwise,
   plot_pred = TRUE, alpha_line = alpha, ylim = NULL,
-  plot_obs_onset = FALSE, alpha2 = 0.5, color_scheme_onset = "red",
+  plot_obs_onset = FALSE, alpha2 = 0.5, color_scheme_onset = "gray",
   plot_onset_samples = FALSE, ypos_dens = NULL)
 }
 \arguments{
@@ -53,5 +53,5 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
 a ggplot object
 }
 \description{
-Plot computed predictions componentwise
+NOTE: currently assumes that the case individuals come first!
 }

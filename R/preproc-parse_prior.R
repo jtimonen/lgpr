@@ -110,7 +110,8 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
                       t_ONS = ONSET$t_ONS,
                       p_ONS = ONSET$p_ONS, 
                       L_ons = ONSET$L_ons,
-                      U_ons = ONSET$U_ons
+                      U_ons = ONSET$U_ons,
+                      backwards = ONSET$backwards
   )
   
   return(stan_priors)
@@ -128,9 +129,6 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
 #' @return a list with things to be given to Stan
 parse_prior_onset <- function(dist, N_cases, T_observed, T_last, UNCRT){
   
-  # The parameter bound if it should not actually be bounded
-  LARGE_NUMBER <- 10000
-  
   # Check type
   if(is.null(dist$type)){
     stop("The onset prior must have a field 'type'!")
@@ -139,64 +137,47 @@ parse_prior_onset <- function(dist, N_cases, T_observed, T_last, UNCRT){
   
   # Parse type
   if(is.character(type)){
-    if(type == "uniform_whole"){
-      t_ONS <- repvec(c(1,0),   N_cases)
-      p_ONS <- repvec(c(0,0,1), N_cases)
-      L_ons  <- rep(0, N_cases)
-      U_ons  <- T_last 
-    }else if(type == "uniform_before"){
-      t_ONS  <- repvec(c(1,0),   N_cases)
-      p_ONS  <- repvec(c(0,0,1), N_cases)
-      L_ons  <- rep(0, N_cases)
-      U_ons  <- T_observed 
-    }else{
-      add <- c()
-      LB     <- dist$LB
-      UB     <- dist$UB
-      if(!is.null(LB)){ add <- c(add, "LB")}
-      if(!is.null(UB)){ add <- c(add, "UB")}
-      tons   <- parse_prior_distribution(dist, add_correct = add)$typ
-      pons   <- parse_prior_distribution(dist, add_correct = add)$par
-      t_ONS  <- repvec(tons, N_cases)
-      p_ONS  <- repvec(pons, N_cases)
-
-      # Set lower bound
-      if(!is.null(LB)){
-        if(length(LB)==1){
-          L_ons <- rep(LB, N_cases)
-        }else{
-          if(length(LB)!=N_cases){stop("Length of LB must be 1 or ", N_cases)}
-          L_ons <- LB
-        }
+    parts <- strsplit(type,"_")[[1]]
+    backwards <- FALSE
+    if(length(parts)>2){
+      if(parts[3]=="backwards"){
+        backwards <- TRUE
       }else{
-        L_ons  <- rep(0, N_cases)
-      }
-      
-      # Set upper bound
-      if(!is.null(UB)){
-        if(length(UB)==1){
-          U_ons <- rep(UB, N_cases)
-        }else{
-          if(length(UB)!=N_cases){stop("Length of UB must be 1 or ", N_cases)}
-          U_ons <- UB
-        }
-      }else{
-        U_ons  <- rep(LARGE_NUMBER, N_cases)
+        stop("Unknown third keyword '", parts[3],"'! ")
       }
     }
+    if(length(parts) > 1){
+      if(parts[2]=="whole"){
+        L_ons  <- rep(0, N_cases)
+        U_ons  <- T_last 
+      }else if(parts[2]=="before"){
+        L_ons  <- rep(0, N_cases)
+        U_ons  <- T_observed 
+      }else{
+        stop("Unknown second keyword '", parts[2],"'! ")
+      }
+    }else{
+      L_ons  <- rep(0, N_cases)
+      U_ons  <- T_last 
+    }
+    dist$type <- parts[1]
+    tons   <- parse_prior_distribution(dist)$typ
+    pons   <- parse_prior_distribution(dist)$par
+    t_ONS  <- repvec(tons, N_cases)
+    p_ONS  <- repvec(pons, N_cases)
   }else{
-    print(dist)
-    stop("Onset prior unknown!")
+    stop("The field 'type' must be a string!")
   }
-
+  
   L_ons <- repvec(L_ons, UNCRT)
   U_ons <- repvec(U_ons, UNCRT)
   
   # Return a list
-  ret <- list(t_ONS = t_ONS,
-              p_ONS = p_ONS,
-              L_ons = L_ons,
-              U_ons = U_ons)
+  ret <- list(t_ONS     = t_ONS,
+              p_ONS     = p_ONS,
+              L_ons     = L_ons,
+              U_ons     = U_ons,
+              backwards = as.numeric(backwards))
   return(ret)
 }
 

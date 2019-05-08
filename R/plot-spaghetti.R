@@ -220,6 +220,7 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
 
 #' Plot computed predictions componentwise
 #' @export
+#' @description NOTE: currently assumes that the case individuals come first!
 #' @param fit An object of class \code{lgpfit}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param componentwise Should the predictions be plotted componentwise?
@@ -254,7 +255,7 @@ plot_predictions <- function(fit,
                              ylim             = NULL,
                              plot_obs_onset   = FALSE,
                              alpha2           = 0.5,
-                             color_scheme_onset = "red",
+                             color_scheme_onset = "gray",
                              plot_onset_samples = FALSE,
                              ypos_dens        = NULL)
 {
@@ -408,7 +409,11 @@ plot_predictions <- function(fit,
       ypos_dens <- min(df[[yvar]]) - 1.5*dens_scale
     }
     
+    # This part assumes that case individuals come first
     uid   <- unique(df[[idvar]])
+    N     <- length(uid)
+    Nc    <- model@stan_dat$N_cases
+    t_smp <- c(t_smp, rep(NaN, (N-Nc)*n_smp))
     fv    <- as.factor(rep(uid, each = n_smp))
     dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
     h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 
