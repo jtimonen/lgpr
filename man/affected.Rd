@@ -4,15 +4,17 @@
 \alias{affected}
 \title{Select the affected individuals}
 \usage{
-affected(object, medians.return = FALSE)
+affected(object, medians.return = FALSE, threshold = 0.5)
 }
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}
 
 \item{medians.return}{Should the medians of beta parameters also be returned?}
+
+\item{threshold}{A value that the median of beta has to exceed}
 }
 \value{
-A binary vector indicating the individuals for which the disease effect is inferred as
+A binary vector indicating the individuals for which the disease effect is inferred
 to exist.
 }
 \description{

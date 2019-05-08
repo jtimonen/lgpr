@@ -5,10 +5,12 @@
 \title{Plot computed predictions componentwise}
 \usage{
 plot_predictions(fit, PRED = NULL, componentwise = FALSE,
-  color_scheme = "red", alpha = 1 - 0.9 * as.numeric(componentwise),
+  color_scheme = "red", alpha = 0.5 - 0.4 * as.numeric(componentwise),
   plot_ribbon = TRUE, title = NULL, theme = ggplot2::theme_gray(),
   original_y_scale = TRUE, plot_ribbon_edge = !componentwise,
-  plot_pred = TRUE, alpha_line = alpha, ylim = NULL)
+  plot_pred = TRUE, alpha_line = alpha, ylim = NULL,
+  plot_obs_onset = FALSE, alpha2 = 0.5, color_scheme_onset = "red",
+  plot_onset_samples = FALSE, ypos_dens = NULL)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -36,6 +38,16 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
 \item{alpha_line}{Line opacity}
 
 \item{ylim}{y axis limits}
+
+\item{plot_obs_onset}{should the observed disease onset be plotted by a vertical line}
+
+\item{alpha2}{alpha of t_onset density}
+
+\item{color_scheme_onset}{color scheme name for onset density plotting}
+
+\item{plot_onset_samples}{should a distribution of sampled onsets be plotted}
+
+\item{ypos_dens}{y-position of the density plot}
 }
 \value{
 a ggplot object

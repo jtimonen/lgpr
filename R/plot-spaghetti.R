@@ -233,12 +233,17 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
 #' @param original_y_scale should the predictions be scaled back to the original data y scale
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
+#' @param plot_obs_onset should the observed disease onset be plotted by a vertical line
+#' @param plot_onset_samples should a distribution of sampled onsets be plotted
+#' @param alpha2 alpha of t_onset density
+#' @param color_scheme_onset color scheme name for onset density plotting
+#' @param ypos_dens y-position of the density plot
 #' @return a ggplot object
 plot_predictions <- function(fit, 
                              PRED             = NULL, 
                              componentwise    = FALSE,
                              color_scheme     = "red",
-                             alpha            = 1-0.9*as.numeric(componentwise), 
+                             alpha            = 0.5-0.4*as.numeric(componentwise), 
                              plot_ribbon      = TRUE,
                              title            = NULL,
                              theme            = ggplot2::theme_gray(),
@@ -246,7 +251,12 @@ plot_predictions <- function(fit,
                              plot_ribbon_edge = !componentwise,
                              plot_pred        = TRUE,
                              alpha_line       = alpha,
-                             ylim             = NULL)
+                             ylim             = NULL,
+                             plot_obs_onset   = FALSE,
+                             alpha2           = 0.5,
+                             color_scheme_onset = "red",
+                             plot_onset_samples = FALSE,
+                             ypos_dens        = NULL)
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
@@ -261,10 +271,13 @@ plot_predictions <- function(fit,
   if(class(color_scheme)=="character"){
     color_scheme <- bayesplot::color_scheme_get(color_scheme)
   }
-  linecolor <- color_scheme$dark_highlight
+  if(class(color_scheme_onset)=="character"){
+    color_scheme_onset <- bayesplot::color_scheme_get(color_scheme_onset)
+  }
+  linecolor <- color_scheme$dark
   if(!componentwise){
-    fill      <- color_scheme$light
-    hlcolor   <- color_scheme$light_highlight
+    fill      <- color_scheme$mid
+    hlcolor   <- color_scheme$mid_highlight
   }else{
     fill      <- color_scheme$dark
     hlcolor   <- color_scheme$dark_highlight
@@ -326,11 +339,11 @@ plot_predictions <- function(fit,
   }
   if(!is.null(hlcolor) && plot_ribbon_edge && !info$sample_F){
     h <- h + ggplot2::geom_line(ggplot2::aes_string(x = timevar, y = 'lower'),
-                                color = hlcolor, 
-                                alpha = alpha_line)
+                                color = fill, 
+                                alpha = alpha)
     h <- h + ggplot2::geom_line(ggplot2::aes_string(x = timevar, y = 'upper'),
-                                color = hlcolor, 
-                                alpha = alpha_line)
+                                color = fill, 
+                                alpha = alpha)
   }
   if(plot_pred){
     h <- h + ggplot2::geom_line(color = linecolor, alpha = alpha_line)
@@ -362,6 +375,51 @@ plot_predictions <- function(fit,
   # Y limits
   if(!is.null(ylim)){
     h <- h + ggplot2::coord_cartesian(ylim = ylim)
+  }
+  
+  # Plot observed onsets
+  D <- model@stan_dat$D
+  if(D[3]==1 && !componentwise && plot_obs_onset){
+    df <- model@data
+    davar <- fit@model@info$varInfo$disAge_variable
+    t_ons <- get_onset_times(id = df[[idvar]], age = df[[timevar]], disAge = df[[davar]])
+    vline.data <- data.frame(zzz = t_ons, facet_var = names(t_ons))
+    
+    h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
+                                 na.rm    = TRUE,
+                                 data     = vline.data, 
+                                 color    = "black",
+                                 linetype = 3)
+    
+  }
+  
+  # Plot onset samples
+  UNCRT <- model@stan_dat$UNCRT
+  if(UNCRT==1 && !componentwise && D[3]==1 & plot_onset_samples){
+
+    T_smp <- extract_t_onset_samples(fit)
+    n_smp <- dim(T_smp)[1]
+    t_smp <- as.numeric(T_smp)
+    df    <- model@data
+    yvar  <- model@info$varInfo$response_variable
+    ystd  <- stats::sd(df[[yvar]])
+    dens_scale <- ystd
+    if(is.null(ypos_dens)){
+      ypos_dens <- min(df[[yvar]]) - 1.5*dens_scale
+    }
+    
+    uid   <- unique(df[[idvar]])
+    fv    <- as.factor(rep(uid, each = n_smp))
+    dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
+    h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 
+                                 na.rm    = TRUE,
+                                 data     = dens.data, 
+                                 color    = color_scheme_onset$mid_highlight,
+                                 fill     = color_scheme_onset$mid,
+                                 alpha    = alpha2,
+                                 inherit.aes = F, 
+                                 position = ggplot2::position_nudge(x=0, y=ypos_dens),
+                                 trim     = TRUE)
   }
   
   return(h)

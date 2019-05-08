@@ -133,7 +133,7 @@ model_info <- function(object, print = TRUE){
   if(!is.null(t6)){
     str <- paste(str, "    - Group offset variables: ", paste(t6, collapse = ", "), "\n", sep="")
   }
-
+  
   # Print info
   if(print){
     cat(str)
@@ -162,7 +162,7 @@ get_onset_times <- function(id, age, disAge){
     }else{
       t_ons[j] <- age[i1] - disAge[i1]
     }
-     
+    
   }
   return(t_ons)
 }
@@ -174,5 +174,22 @@ get_onset_times <- function(id, age, disAge){
 #' @param sample_idx sample index
 #' @return a list
 extract_components_onesample <- function(fit, sample_idx){
-   return(postproc(fit, threshold = 0.95, FALSE, sample_idx))  
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  return(postproc(fit, threshold = 0.95, FALSE, sample_idx))  
 }
+
+
+#' Extract samples of T_onset
+#'
+#' @param fit an object of class \code{lgpfit}
+#' @return a matrix
+extract_t_onset_samples <- function(fit){
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  if(fit@model@stan_dat$UNCRT==0){
+    stop("uncertainty wa not modeled!")
+  }else{
+    SMP <- rstan::extract(fit@stan_fit, pars = "T_onset")$T_onset[,1,]
+    return(SMP)  
+  }
+}
+

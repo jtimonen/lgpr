@@ -185,6 +185,7 @@ assess_convergence <- function(fit, verbose = TRUE, recompute = F){
   
   rmax <- max(Rhat)
   imax <- which(Rhat == rmax)
+  imax <- imax[1]
   rmax <- round(rmax, 3)
   if(rmax > 1.1){
     if(rmax < 1.2){

@@ -285,9 +285,10 @@ get_runtime <- function(object){
 #' @export
 #' @param object An object of class \code{lgpfit}.
 #' @param medians.return Should the medians of beta parameters also be returned?
-#' @return A binary vector indicating the individuals for which the disease effect is inferred as
+#' @param threshold A value that the median of beta has to exceed 
+#' @return A binary vector indicating the individuals for which the disease effect is inferred
 #' to exist.
-affected <- function(object, medians.return = FALSE){
+affected <- function(object, medians.return = FALSE, threshold = 0.5){
   DF <- as.data.frame(object@stan_fit)
   i_beta <- grep("beta", names(DF))
   if(length(i_beta)==0){
@@ -295,7 +296,7 @@ affected <- function(object, medians.return = FALSE){
   }
   BET <- DF[i_beta]
   b50 <- apply(BET, 2, stats::median)
-  affected <- (b50 >= 0.5)
+  affected <- (b50 >= threshold)
   names(affected) <- 1:length(affected)
   if(medians.return){
     return(list(affected = affected, medians = b50))
