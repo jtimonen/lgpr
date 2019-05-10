@@ -9,8 +9,8 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   sum(covariates \%in\% c(2, 3))), t_jitter = 0, lengthscales = rep(12,
   2 + sum(covariates \%in\% c(0, 1, 2))), f_var = 1,
   noise_type = "Gaussian", snr = 3, phi = 1,
-  N_affected = round(N/2), onset_range = range(t_data), rho = 0,
-  C_hat = 0, deterministic_disease_component = FALSE,
+  N_affected = round(N/2), onset_range = range(t_data),
+  t_observed = "after_0", C_hat = 0, dis_fun = NULL,
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
   1)))
 }
@@ -62,12 +62,13 @@ contains a zero.}
 
 \item{onset_range}{Time interval from which the disease onsets are sampled uniformly.}
 
-\item{rho}{Proportional to the probability of false negative diagnosis.}
+\item{t_observed}{Determines how the disease onset is observed. Must have the form \code{"after_n"}
+or \code{"random_p"}}
 
 \item{C_hat}{A constant added to f}
 
-\item{deterministic_disease_component}{Should the disease component be drawn from a 
-parametric form?}
+\item{dis_fun}{A function that defines the disease effect. If NULL, the effect
+is is drawn from a nonstationary GP prior.}
 
 \item{continuous_info}{Info for generating continuous covariates. Must be a list
 containing fields \code{lambda} and \code{mu}, which have length 3. The continuous

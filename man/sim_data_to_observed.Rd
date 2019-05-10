@@ -4,12 +4,13 @@
 \alias{sim_data_to_observed}
 \title{Real generated disease ages to observed ones}
 \usage{
-sim_data_to_observed(dat, p = 0)
+sim_data_to_observed(dat, t_observed)
 }
 \arguments{
 \item{dat}{data frame}
 
-\item{p}{decay factor}
+\item{t_observed}{Determines how the disease onset is observed. Must have the form \code{"after_n"}
+or \code{"random_p"}}
 }
 \value{
 a new data frame and observed onsets

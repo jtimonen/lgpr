@@ -8,7 +8,8 @@
 #' @param N_affected Number of diseased individuals that are affected by the disease. This defaults
 #' to the number of diseased individuals. This argument can only be given if \code{covariates}
 #' contains a zero.
-#' @param rho Proportional to the probability of false negative diagnosis.
+#' @param t_observed Determines how the disease onset is observed. Must have the form \code{"after_n"}
+#' or \code{"random_p"}
 #' @param f_var variance of f
 #' @param C_hat A constant added to f
 #' @return A list \code{out}, where 
@@ -27,21 +28,21 @@
 #' dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB", phi = 2)
 simulate_data <- function(N,
                          t_data,
-                         covariates     = c(),
-                         names          = NULL,
-                         relevances     = c(1,1, rep(1, length(covariates)) ),
-                         n_categs       = rep(2, sum(covariates %in% c(2,3))),
-                         t_jitter       = 0,
-                         lengthscales   = rep(12, 2 + sum(covariates %in% c(0,1,2))),
-                         f_var          = 1,
-                         noise_type     = "Gaussian",
-                         snr            = 3,
-                         phi            = 1,
-                         N_affected     = round(N/2),
-                         onset_range    = range(t_data),
-                         rho            = 0,
-                         C_hat          = 0,
-                         deterministic_disease_component = FALSE,
+                         covariates      = c(),
+                         names           = NULL,
+                         relevances      = c(1,1, rep(1, length(covariates)) ),
+                         n_categs        = rep(2, sum(covariates %in% c(2,3))),
+                         t_jitter        = 0,
+                         lengthscales    = rep(12, 2 + sum(covariates %in% c(0,1,2))),
+                         f_var           = 1,
+                         noise_type      = "Gaussian",
+                         snr             = 3,
+                         phi             = 1,
+                         N_affected      = round(N/2),
+                         onset_range     = range(t_data),
+                         t_observed      = "after_0",
+                         C_hat           = 0,
+                         dis_fun         = NULL,
                          continuous_info = list(mu = c(pi/8,pi,-0.5), lambda = c(pi/8,pi,1))
 )
 {
@@ -76,7 +77,7 @@ simulate_data <- function(N,
                   relevances,
                   lengthscales,
                   X_affected,
-                  deterministic_disease_component
+                  dis_fun
   )
   
   # Total signal f is a (scaled) sum of the components plus a constant
@@ -96,7 +97,7 @@ simulate_data <- function(N,
   comp    <- cbind(FFF, f, g, noise, y)
   
   # Real diseaseAges to observed ones
-  OBSERVED <- sim_data_to_observed(dat, rho)
+  OBSERVED <- sim_data_to_observed(dat, t_observed)
   
   # Signal and noise sums of squares
   SSR <- sum((g-mean(g))^2)
@@ -240,13 +241,15 @@ sim_generate_names <- function(covariates){
 
 #' Real generated disease ages to observed ones
 #' @param dat data frame
-#' @param p decay factor
+#' @param t_observed Determines how the disease onset is observed. Must have the form \code{"after_n"}
+#' or \code{"random_p"}
 #' @return a new data frame and observed onsets
-sim_data_to_observed <- function(dat, p = 0){
+sim_data_to_observed <- function(dat, t_observed){
   flag <- !("diseaseAge" %in% colnames(dat))
   id     <- dat$id
   uid    <- unique(id)
   N      <- length(uid)
+  parsed <- sim_parse_t_obs(t_observed)
   onsets_observed <- rep(NaN, N)
   if(flag){
     # No modifications to data frame needed
@@ -270,7 +273,14 @@ sim_data_to_observed <- function(dat, p = 0){
          rem  <- age_i[irem]
          
          # sample the observed onset t0
-         idx0 <- rtgeom(length(irem), p)
+         if(parsed$type=="random"){
+            idx0 <- rtgeom(length(irem), parsed$value)
+         }else{
+           idx0 <- parsed$value + 1
+         }
+         if(idx0 > length(rem)){
+           stop("Not enough data points to go that far!")
+         }
          t0   <- rem[idx0]
          onsets_observed[j] <- t0
          
@@ -294,3 +304,20 @@ rtgeom <- function(s, p, n = 1){
   return(r)
 }
 
+
+#' Parse the t_observed argument of \code{simulate_data}
+#' @param t_observed a string
+#' @return a list with a name and number
+sim_parse_t_obs <- function(t_observed){
+  
+  parts <- strsplit(t_observed, "_")[[1]]
+  if(parts[1]=="after"){
+    type <- "after"
+  }else if(parts[1]=="random"){
+    type <- "random"
+  }else{
+    stop("unknown keyword ", parts[1])
+  }
+  value <- as.numeric(parts[2])
+  return(list(type=type, value=value))
+}

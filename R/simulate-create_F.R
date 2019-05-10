@@ -18,8 +18,8 @@
 #' @param lengthscales A vector so that \cr \code{length(lengthscales) = }
 #' \code{2 + sum(covariates \%in\% c(0,1,2))}.
 #' @param X_affected which individuals are affected by the disease
-#' @param deterministic_disease_component Should the disease component be drawn from a 
-#' parametric form?
+#' @param dis_fun A function that defines the disease effect. If NULL, the effect
+#' is is drawn from a nonstationary GP prior.
 #' @param useBinKernel Should the binary kernel be used for categorical covariates? 
 #' If this is \code{TRUE}, the effect will exist only for group 1.
 #' @return a data frame FFF where one column corresponds to one additive data component
@@ -28,16 +28,16 @@ create_F <- function(X,
                      relevances,
                      lengthscales,
                      X_affected,
-                     deterministic_disease_component,
+                     dis_fun,
                      useBinKernel = TRUE)
 {
   D     <- c(1, 2, covariates + 3)
   KK    <- simulate_kernels(X, D, lengthscales, X_affected, useBinKernel)
   labs  <- nameComponents(D, colnames(X))
   FFF   <- drawLatentComponents(KK)
-  if(sum(D==3)==1 && deterministic_disease_component){
+  if(sum(D==3)==1 && !is.null(dis_fun)){
     icol <- which(labs=="diseaseAge")
-    FFF[,icol] <- disease_peaks(X[,1],X[,3])
+    FFF[,icol] <- disease_effect(X[,1],X[,3],dis_fun)
   }
   FFF   <- scaleRelevances(FFF, relevances)
   colnames(FFF) <- labs
@@ -193,8 +193,9 @@ drawLatentComponents <- function(KK){
 #'
 #' @param X_id the id covariate
 #' @param X_disAge the diseaseAge covariate
+#' @param dis_fun the disease age effect function
 #' @return a vector
-disease_peaks <- function(X_id, X_disAge){
+disease_effect <- function(X_id, X_disAge, dis_fun){
   n        <- length(X_id)
   uid      <- unique(X_id)
   F_disAge <- rep(0, n)
@@ -202,7 +203,7 @@ disease_peaks <- function(X_id, X_disAge){
     inds <- which(X_id==id)
     da <- X_disAge[inds]
     if(!is.nan(da[1])){
-      F_disAge[inds] <- -1/2 + 1/(1 + exp(-da))
+      F_disAge[inds] <- dis_fun(da)
     }
   }
   return(F_disAge)

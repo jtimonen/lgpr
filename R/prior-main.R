@@ -355,8 +355,15 @@ prior_stan_to_readable <- function(stan_dat){
         TYP <- stan_dat$t_ONS[k,]
         P   <- stan_dat$p_ONS[k,]
         pname <- paste("T_onset[1,",k,"]",sep="")
+        if(stan_dat$backwards==1){
+          pn_base <- pname
+          pname <- paste("T_obs[",k,"] - ", pname, sep="")
+        }
         ps  <- prior_statement(pname, TYP[1:2], P[1:3], dist, FALSE)
         str <- paste("[lower=", LB[k], ", upper=", UB[k], "]", sep="")
+        if(stan_dat$backwards==1){
+          str <- paste(str, " (bound is for ", pn_base, ")", sep="")
+        }
         ps <- paste(ps, str, sep = "")
         ps <- paste(ps, "\n")
         info_oth <- paste(info_oth, ps)
