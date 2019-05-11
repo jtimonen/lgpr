@@ -7,7 +7,8 @@
 plot_samples(object, pars = character(), regex_pars = character(),
   type = "intervals", prob = 0.5, prob_outer = 0.9,
   color_scheme = "red", point_est = "median", binwidth = NULL,
-  transformations = list(), off_diag_args = list(size = 1))
+  transformations = list(), off_diag_args = list(size = 1),
+  facet_args = list())
 }
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}
@@ -32,6 +33,8 @@ plot_samples(object, pars = character(), regex_pars = character(),
 \item{transformations}{the parameter transformations}
 
 \item{off_diag_args}{Additional argument list for the pairs plot.}
+
+\item{facet_args}{additional facetting arguments}
 }
 \value{
 a ggplot object

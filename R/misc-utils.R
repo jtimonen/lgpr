@@ -193,3 +193,17 @@ extract_t_onset_samples <- function(fit){
   }
 }
 
+
+#' Get case ids in original data
+#'
+#' @param fit an object of class \code{lgpfit}
+#' @return a character vector
+get_case_ids <- function(fit){
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  sd  <- fit@model@stan_dat
+  id  <- as.numeric(sd$X_id)
+  i1  <- sd$caseID_to_rows[,1]
+  cid <- id[i1]
+  return(cid)
+}
+

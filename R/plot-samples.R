@@ -14,6 +14,7 @@
 #' @param off_diag_args Additional argument list for the pairs plot.
 #' @param type Visualization type. Must be either \code{"dens"}, \code{"areas"},
 #' \code{"intervals"}(default) or \code{"hist"}.
+#' @param facet_args additional facetting arguments
 #' @return a ggplot object
 plot_samples <- function(object,
                          pars         = character(),
@@ -25,7 +26,8 @@ plot_samples <- function(object,
                          point_est    = "median",
                          binwidth     = NULL,
                          transformations = list(),
-                         off_diag_args   = list(size = 1)
+                         off_diag_args   = list(size = 1),
+                         facet_args   = list()
 )
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
@@ -52,7 +54,8 @@ plot_samples <- function(object,
     h <- bayesplot::mcmc_dens(posterior,
                               pars            = pars,
                               regex_pars      = regex_pars,
-                              transformations = transformations)
+                              transformations = transformations,
+                              facet_args      = facet_args)
   }else if(type=="intervals"){
     h <- bayesplot::mcmc_intervals(posterior,
                                    pars       = pars,
@@ -66,7 +69,8 @@ plot_samples <- function(object,
                               pars       = pars,
                               regex_pars = regex_pars,
                               binwidth   = binwidth,
-                              transformations = transformations)
+                              transformations = transformations,
+                              facet_args = facet_args)
   }else if(type=="pairs"){
     h <- bayesplot::mcmc_pairs(posterior, 
                                pars            = pars,
@@ -191,6 +195,10 @@ plot_onset <- function(fit,
 {
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   ptitle <- "Posterior distribution of the inferred disease onset"
+  sd <- fit@model@stan_dat
+  if(sd$UNCRT==0){
+    stop("The disease onset was not modeled as uncertain!")
+  }
   p <- plot_samples(fit, 
                     regex_pars   = "T_onset", 
                     type         = "areas", 
@@ -202,6 +210,41 @@ plot_onset <- function(fit,
   form <- fit@model@info$formula
   p <- p + ggplot2::labs(
     subtitle = paste("Model:", form),
+    title = ptitle
+  )
+  return(p)
+}
+
+
+#' Visualize posterior samples of individual-specific disease effect magnitude
+#' parameters
+#' 
+#' @export
+#' @description Can only be used if the disease effect was modeled heterogeneously.
+#' @param fit An object of class \code{lgpfit}.
+#' @param color_scheme Name of bayesplot color scheme.
+#' @param threshold Threshold for median.
+#' @return a ggplot object
+plot_beta <- function(fit, 
+                      color_scheme = "red",
+                      threshold    = 0.5)
+{
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  ptitle <- "Posterior distribution of individual-specific disease effect magnitudes"
+  
+  aff   <- affected(fit, threshold = threshold)
+  df    <- as.data.frame(fit@stan_fit)
+  ibeta <- grep("beta", names(df))
+  df    <- df[, ibeta]
+  colnames(df) <- paste("id = ", names(aff), sep="")
+  p <- bayesplot::mcmc_dens(df)
+  beta <- "beta" # avoid note from R CMD check
+  p <- p + ggplot2::xlab(expression(beta))
+  
+  str <- paste("Affected individuals: ", paste(names(which(aff)), collapse = ", "), sep="")
+  form <- fit@model@info$formula
+  p <- p + ggplot2::labs(
+    subtitle = str,
     title = ptitle
   )
   return(p)

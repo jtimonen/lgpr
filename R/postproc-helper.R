@@ -292,12 +292,13 @@ affected <- function(object, medians.return = FALSE, threshold = 0.5){
   DF <- as.data.frame(object@stan_fit)
   i_beta <- grep("beta", names(DF))
   if(length(i_beta)==0){
-    stop("Beta parameters not found. Was the disease effect modeled homogeneously?")
+    stop("The disease effect was not modeled heterogeneously!")
   }
-  BET <- DF[i_beta]
-  b50 <- apply(BET, 2, stats::median)
+  BET      <- DF[i_beta]
+  b50      <- apply(BET, 2, stats::median)
   affected <- (b50 >= threshold)
-  names(affected) <- 1:length(affected)
+  cid      <- get_case_ids(object)
+  names(affected) <- cid
   if(medians.return){
     return(list(affected = affected, medians = b50))
   }else{
