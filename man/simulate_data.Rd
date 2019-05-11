@@ -60,10 +60,14 @@ only with \cr
 to the number of diseased individuals. This argument can only be given if \code{covariates}
 contains a zero.}
 
-\item{onset_range}{Time interval from which the disease onsets are sampled uniformly.}
+\item{onset_range}{Time interval from which the disease onsets are sampled uniformly.
+Alternatively, This can any function that returns the (possibly randomly generated)
+real disease onset time for one individual.}
 
-\item{t_observed}{Determines how the disease onset is observed. Must have the form \code{"after_n"}
-or \code{"random_p"}}
+\item{t_observed}{Determines how the disease onset is observed. This can be any function 
+that takes the real disease onset as an argument and returns the (possibly randomly generated)
+observed onset time. Alternatively, this can be a string of the form \code{"after_n"}
+or \code{"random_p"}.}
 
 \item{C_hat}{A constant added to f}
 

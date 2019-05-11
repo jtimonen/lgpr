@@ -8,8 +8,10 @@
 #' @param N_affected Number of diseased individuals that are affected by the disease. This defaults
 #' to the number of diseased individuals. This argument can only be given if \code{covariates}
 #' contains a zero.
-#' @param t_observed Determines how the disease onset is observed. Must have the form \code{"after_n"}
-#' or \code{"random_p"}
+#' @param t_observed Determines how the disease onset is observed. This can be any function 
+#' that takes the real disease onset as an argument and returns the (possibly randomly generated)
+#' observed onset time. Alternatively, this can be a string of the form \code{"after_n"}
+#' or \code{"random_p"}.
 #' @param f_var variance of f
 #' @param C_hat A constant added to f
 #' @return A list \code{out}, where 
@@ -27,23 +29,23 @@
 #' # Generate negative binomially distributed count data
 #' dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB", phi = 2)
 simulate_data <- function(N,
-                         t_data,
-                         covariates      = c(),
-                         names           = NULL,
-                         relevances      = c(1,1, rep(1, length(covariates)) ),
-                         n_categs        = rep(2, sum(covariates %in% c(2,3))),
-                         t_jitter        = 0,
-                         lengthscales    = rep(12, 2 + sum(covariates %in% c(0,1,2))),
-                         f_var           = 1,
-                         noise_type      = "Gaussian",
-                         snr             = 3,
-                         phi             = 1,
-                         N_affected      = round(N/2),
-                         onset_range     = range(t_data),
-                         t_observed      = "after_0",
-                         C_hat           = 0,
-                         dis_fun         = NULL,
-                         continuous_info = list(mu = c(pi/8,pi,-0.5), lambda = c(pi/8,pi,1))
+                          t_data,
+                          covariates      = c(),
+                          names           = NULL,
+                          relevances      = c(1,1, rep(1, length(covariates)) ),
+                          n_categs        = rep(2, sum(covariates %in% c(2,3))),
+                          t_jitter        = 0,
+                          lengthscales    = rep(12, 2 + sum(covariates %in% c(0,1,2))),
+                          f_var           = 1,
+                          noise_type      = "Gaussian",
+                          snr             = 3,
+                          phi             = 1,
+                          N_affected      = round(N/2),
+                          onset_range     = range(t_data),
+                          t_observed      = "after_0",
+                          C_hat           = 0,
+                          dis_fun         = NULL,
+                          continuous_info = list(mu = c(pi/8,pi,-0.5), lambda = c(pi/8,pi,1))
 )
 {
   if(N < 2) stop("There must be at least 2 individuals!")
@@ -102,7 +104,7 @@ simulate_data <- function(N,
   # Signal and noise sums of squares
   SSR <- sum((g-mean(g))^2)
   SSE <- sum(noise^2)
-
+  
   # Return 
   out <- list(data            = OBSERVED$dat,
               components      = comp,
@@ -241,15 +243,14 @@ sim_generate_names <- function(covariates){
 
 #' Real generated disease ages to observed ones
 #' @param dat data frame
-#' @param t_observed Determines how the disease onset is observed. Must have the form \code{"after_n"}
-#' or \code{"random_p"}
+#' @param t_observed Determines how the disease onset is observed. See documentation
+#' of \code{\link{simulate_data}}.
 #' @return a new data frame and observed onsets
 sim_data_to_observed <- function(dat, t_observed){
   flag <- !("diseaseAge" %in% colnames(dat))
   id     <- dat$id
   uid    <- unique(id)
   N      <- length(uid)
-  parsed <- sim_parse_t_obs(t_observed)
   onsets_observed <- rep(NaN, N)
   if(flag){
     # No modifications to data frame needed
@@ -260,34 +261,47 @@ sim_data_to_observed <- function(dat, t_observed){
     disAge <- dat$diseaseAge
     j      <- 0 
     for(ID in uid){
-       j     <- j + 1
-       inds  <- which(id==ID)
-       age_i <- age[inds]
-       dag_i <- disAge[inds]
-       if(is.nan(dag_i[1])){
-         # not a diseased individual
-       }else{
-         
-         # how many points are there after the real onset?
-         irem <- which(dag_i > 0) 
-         rem  <- age_i[irem]
-         
-         # sample the observed onset t0
-         if(parsed$type=="random"){
+      j     <- j + 1
+      inds  <- which(id==ID)
+      age_i <- age[inds]
+      dag_i <- disAge[inds]
+      if(is.nan(dag_i[1])){
+        # not a diseased individual
+      }else{
+        
+        # how many points are there after the real onset?
+        irem <- which(dag_i > 0) 
+        rem  <- age_i[irem]
+        t0_real <- -dag_i[1] + age_i[1]
+        print(t0_real)
+        
+        # sample the observed onset t0
+        if(is.function(t_observed)){
+          t_possible <- t_observed(t0_real)
+          inds0 <- which(rem > t_possible)
+          if(length(inds0)<1){
+            stop("There are no data points after t = ", t_possible,"!")
+          }
+          idx0  <- inds0[1]
+        }else{
+          parsed <- sim_parse_t_obs(t_observed)
+          
+          if(parsed$type=="random"){
             idx0 <- rtgeom(length(irem), parsed$value)
-         }else{
-           idx0 <- parsed$value + 1
-         }
-         if(idx0 > length(rem)){
-           stop("Not enough data points to go that far!")
-         }
-         t0   <- rem[idx0]
-         onsets_observed[j] <- t0
-         
-         # update the diseaseAge covariate
-         dat$diseaseAge[inds] <- age_i - t0
-       }
-       
+          }else{
+            idx0 <- parsed$value + 1
+          }
+          if(idx0 > length(rem)){
+            stop("Not enough data points to go that far!")
+          }
+        }
+        t0   <- rem[idx0]
+        onsets_observed[j] <- t0
+        
+        # update the diseaseAge covariate
+        dat$diseaseAge[inds] <- age_i - t0
+      }
+      
     }
     ret <- list(dat=dat, onsets_observed = onsets_observed)
     return(ret)

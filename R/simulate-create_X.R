@@ -17,6 +17,8 @@
 #' @param t_data Measurement times.
 #' @param t_jitter Standard deviation of the jitter added to the given measurement times.
 #' @param onset_range Time interval from which the disease onsets are sampled uniformly.
+#' Alternatively, This can any function that returns the (possibly randomly generated)
+#' real disease onset time for one individual.
 #' @param continuous_info Info for generating continuous covariates. Must be a list
 #' containing fields \code{lambda} and \code{mu}, which have length 3. The continuous
 #' covariates are generated so that \code{x <- sin(a*t + b) + c}, where
@@ -52,7 +54,14 @@ create_X <- function(N,
   age <- drawMeasurementTimes(N, t_data, t_jitter)
   if(D[1] > 0){
     N_cases <- round(N/2)
-    onsets  <- stats::runif(N_cases, min = onset_range[1], max = onset_range[2])
+    if(is.function(onset_range)){
+      onsets <- rep(0, N_cases)
+      for(j in 1:N_cases){
+        onsets[j] <- onset_range()
+      }
+    }else{
+      onsets  <- stats::runif(N_cases, min = onset_range[1], max = onset_range[2])
+    }
     onsets  <- c(onsets, rep(NaN, N - N_cases))
     disAge  <- onsetsToDiseaseAge(onsets, age, k)
   }else{

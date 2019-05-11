@@ -9,8 +9,8 @@ sim_data_to_observed(dat, t_observed)
 \arguments{
 \item{dat}{data frame}
 
-\item{t_observed}{Determines how the disease onset is observed. Must have the form \code{"after_n"}
-or \code{"random_p"}}
+\item{t_observed}{Determines how the disease onset is observed. See documentation
+of \code{\link{simulate_data}}.}
 }
 \value{
 a new data frame and observed onsets
