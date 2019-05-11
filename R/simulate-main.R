@@ -273,7 +273,6 @@ sim_data_to_observed <- function(dat, t_observed){
         irem <- which(dag_i > 0) 
         rem  <- age_i[irem]
         t0_real <- -dag_i[1] + age_i[1]
-        print(t0_real)
         
         # sample the observed onset t0
         if(is.function(t_observed)){
