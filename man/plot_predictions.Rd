@@ -10,7 +10,8 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
   original_y_scale = TRUE, plot_ribbon_edge = !componentwise,
   plot_pred = TRUE, alpha_line = alpha, ylim = NULL,
   plot_obs_onset = FALSE, alpha2 = 0.5, color_scheme_onset = "gray",
-  plot_onset_samples = FALSE, ypos_dens = NULL)
+  plot_onset_samples = FALSE, ypos_dens = NULL, test_data = NULL,
+  color_test = "steelblue4", pch_test = 8, size_test = 2)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -48,6 +49,14 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
 \item{plot_onset_samples}{should a distribution of sampled onsets be plotted}
 
 \item{ypos_dens}{y-position of the density plot}
+
+\item{test_data}{Test data frame}
+
+\item{color_test}{test point color}
+
+\item{pch_test}{test point marker}
+
+\item{size_test}{test point size}
 }
 \value{
 a ggplot object

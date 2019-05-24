@@ -207,3 +207,44 @@ get_case_ids <- function(fit){
   return(cid)
 }
 
+
+#' Split data into training and test data according to given individuals
+#'
+#' @param data a data frame
+#' @param test_ids test data individual identifiers
+#' @param id_variable name of id variable
+#' @return a \code{list(train, test)}
+split_data_by_id <- function(data, test_ids, id_variable="id"){
+  id     <- data[[id_variable]]
+  i_test <- which(id %in% test_ids)
+  ret    <- split_data(data, i_test)
+  return(ret)
+}
+
+#' Split data into training and test data randomly
+#'
+#' @param data a data frame
+#' @param p_test desired proportion of data
+#' @return a \code{list(train, test)}
+split_data_random <- function(data, p_test = 0.1){
+  n_total <- dim(data)[1]
+  n_test  <- round(p_test*n_total)
+  i_test  <- sample.int(n_total, size = n_test)
+  ret     <- split_data(data, i_test)
+  return(ret)
+}
+
+#' Split data into training and test data according to given row indices
+#'
+#' @param data a data frame
+#' @param i_test test data row indices
+#' @return a \code{list(train, test)}
+split_data <- function(data, i_test){
+  n_total    <- dim(data)[1]
+  i_train    <- setdiff(1:n_total, i_test)
+  data_train <- data[i_train, ]
+  data_test  <- data[i_test, ]
+  ret        <- list(train = data_train,  test = data_test,  i_train = i_train, i_test = i_test)
+  return(ret)
+}
+

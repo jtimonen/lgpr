@@ -239,6 +239,10 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
 #' @param alpha2 alpha of t_onset density
 #' @param color_scheme_onset color scheme name for onset density plotting
 #' @param ypos_dens y-position of the density plot
+#' @param test_data Test data frame
+#' @param color_test test point color
+#' @param pch_test test point marker
+#' @param size_test test point size
 #' @return a ggplot object
 plot_predictions <- function(fit, 
                              PRED             = NULL, 
@@ -257,7 +261,11 @@ plot_predictions <- function(fit,
                              alpha2           = 0.5,
                              color_scheme_onset = "gray",
                              plot_onset_samples = FALSE,
-                             ypos_dens        = NULL)
+                             ypos_dens        = NULL,
+                             test_data        = NULL,
+                             color_test       = "steelblue4",
+                             pch_test         = 8,
+                             size_test        = 2)
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
@@ -425,6 +433,24 @@ plot_predictions <- function(fit,
                                  inherit.aes = F, 
                                  position = ggplot2::position_nudge(x=0, y=ypos_dens),
                                  trim     = TRUE)
+  }
+  
+  # Plot test data
+  if(!is.null(test_data)){
+    id_test    <- test_data[[idvar]]
+    age_test   <- test_data[[timevar]]
+    y_test     <- test_data[[respvar]]
+    point.data <- data.frame(xxx = age_test,
+                             yyy = y_test,
+                             facet_var = id_test)
+    
+    h <- h + ggplot2::geom_point(mapping  = ggplot2::aes_string(x = "xxx", y = "yyy"), 
+                                 na.rm    = TRUE,
+                                 inherit.aes = F,
+                                 data     = point.data, 
+                                 color    = color_test,
+                                 pch      = pch_test,
+                                 size     = size_test)
   }
   
   return(h)

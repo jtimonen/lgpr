@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @description This is a wrapper for \code{plot_simdata_by_individual} and
-#' \code{plot_simdata_by_component} 
+#' \code{plot_simdata_by_component}
 #' @param simData a list returned by \code{\link{simulate_data}}
 #' @param componentwise should each component be plotted separately?
 #' @param color_scheme name of bayesplot color scheme
@@ -11,6 +11,8 @@
 #' @param plot_point should \code{geom_point} be used also for the underlying signal?
 #' @param vlinecolors colors to plot the real and observed disease onsets if they exist
 #' @param vlinetypes line types to use for the real and observed disease onsets if they exist
+#' @param i_test test point indices
+#' @param color_test test point color
 #' @return a ggplot object
 plot_simdata <- function(simData, 
                          componentwise = FALSE,
@@ -18,8 +20,10 @@ plot_simdata <- function(simData,
                          nrow          = NULL, 
                          ncol          = NULL,
                          plot_point    = componentwise,
-                         vlinecolors    = rep("steelblue4",2),
-                         vlinetypes     = c(1,2))
+                         vlinecolors   = rep("steelblue4",2),
+                         vlinetypes    = c(1,2),
+                         i_test        = NULL,
+                         color_test    = "steelblue2")
 {
   
   # Color
@@ -27,9 +31,15 @@ plot_simdata <- function(simData,
   linecolor    <- color_scheme$mid
   pointcolor   <- color_scheme$mid_highlight
   if(componentwise){
-    h <- plot_simdata_by_component(simData, linecolor, nrow, ncol, plot_point, pointcolor)
+    if(!is.null(i_test)){
+      stop("cannot specify test points when plotting componentwise")
+    }
+    h <- plot_simdata_by_component(simData, linecolor, nrow, ncol, 
+                                   plot_point, pointcolor)
   }else{
-    h <- plot_simdata_by_individual(simData, linecolor, nrow, ncol, plot_point, vlinecolors, vlinetypes)
+    h <- plot_simdata_by_individual(simData, linecolor, nrow, ncol, 
+                                    plot_point, vlinecolors, vlinetypes,
+                                    i_test, color_test)
   }
   return(h)
 }
@@ -44,6 +54,8 @@ plot_simdata <- function(simData,
 #' @param plot_point should \code{geom_point} be used also for the underlying signal?
 #' @param vlinecolors colors to plot the real and observed disease onsets if they exist
 #' @param vlinetypes line types to use for the real and observed disease onsets if they exist
+#' @param i_test test point indices
+#' @param color_test test point color
 #' @return a ggplot object
 plot_simdata_by_individual <- function(simData, 
                                        linecolor   = "firebrick3", 
@@ -51,7 +63,9 @@ plot_simdata_by_individual <- function(simData,
                                        ncol        = NULL,
                                        plot_point  = FALSE,
                                        vlinecolors = rep("steelblue4",2),
-                                       vlinetypes  = c(1,2)){
+                                       vlinetypes  = c(1,2),
+                                       i_test      = NULL,
+                                       color_test  = "steelblue2"){
   
   dat  <- simData$data
   comp <- simData$components
@@ -67,12 +81,18 @@ plot_simdata_by_individual <- function(simData,
   n    <- length(dat$id)
   
   if(plot_point){
-    stop("plot_point option not implemented for this function")
+    stop("points must be plotted in this mode! set plot_point = TRUE")
   }
   
-  DF <- data.frame(id, age, yval, leg)
-  DF$age <- as.numeric(age)
+  DF      <- data.frame(id, age, yval, leg)
+  DF$age  <- as.numeric(age)
   DF$yval <- as.numeric(yval)
+  is_test <- rep("y_train", n)
+  if(!is.null(i_test)){
+    is_test[i_test] <- "y_test"
+  }
+  it <- rep(is_test, 2)
+  DF$is_test <- as.factor(it)
   
   # Create ggplot object
   h <- ggplot2::ggplot(data = DF, ggplot2::aes_string(x='age', y='yval', group='leg'))
@@ -112,15 +132,18 @@ plot_simdata_by_individual <- function(simData,
     ggplot2::scale_shape_manual(values=c(NA, 16)) +
     ggplot2::scale_linetype_manual(values=c(1, 0))
   
-  h <- h + ggplot2::geom_point(ggplot2::aes_string(shape = 'leg'), na.rm = TRUE)
+  h <- h + ggplot2::geom_point(ggplot2::aes_string(shape = 'leg', color = "is_test"), na.rm = TRUE)
   h <- h + ggplot2::labs(x = "Age", y = "y")
   
   # Theme and titles
-  
   h <- h + ggplot2::ggtitle("Simulated data", subtitle = subt)
   h <- h + ggplot2::theme_bw()
   h <- h + ggplot2::theme(legend.title=ggplot2::element_blank())
   
+  # Point color and type
+  if(!is.null(i_test)){
+    h <- h + ggplot2::scale_color_manual(values=c(color_test, "black"))
+  }
   return(h)
 }
 

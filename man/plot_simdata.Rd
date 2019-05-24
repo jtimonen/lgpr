@@ -6,7 +6,8 @@
 \usage{
 plot_simdata(simData, componentwise = FALSE, color_scheme = "red",
   nrow = NULL, ncol = NULL, plot_point = componentwise,
-  vlinecolors = rep("steelblue4", 2), vlinetypes = c(1, 2))
+  vlinecolors = rep("steelblue4", 2), vlinetypes = c(1, 2),
+  i_test = NULL, color_test = "steelblue2")
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
@@ -24,6 +25,10 @@ plot_simdata(simData, componentwise = FALSE, color_scheme = "red",
 \item{vlinecolors}{colors to plot the real and observed disease onsets if they exist}
 
 \item{vlinetypes}{line types to use for the real and observed disease onsets if they exist}
+
+\item{i_test}{test point indices}
+
+\item{color_test}{test point color}
 }
 \value{
 a ggplot object
