@@ -2,16 +2,17 @@
 % Please edit documentation in R/plot-spaghetti.R
 \name{plot_predictions}
 \alias{plot_predictions}
-\title{Plot computed predictions componentwise}
+\title{Plot computed predictions}
 \usage{
 plot_predictions(fit, PRED = NULL, componentwise = FALSE,
   color_scheme = "red", alpha = 0.5 - 0.4 * as.numeric(componentwise),
-  plot_ribbon = TRUE, title = NULL, theme = ggplot2::theme_gray(),
-  original_y_scale = TRUE, plot_ribbon_edge = !componentwise,
-  plot_pred = TRUE, alpha_line = alpha, ylim = NULL,
-  plot_obs_onset = FALSE, alpha2 = 0.5, color_scheme_onset = "gray",
+  plot_uncertainty = TRUE, title = NULL,
+  theme = ggplot2::theme_gray(), original_y_scale = TRUE,
+  alpha_line = alpha, ylim = NULL, plot_obs_onset = FALSE,
+  alpha2 = 0.5, color_scheme_onset = "gray",
   plot_onset_samples = FALSE, ypos_dens = NULL, test_data = NULL,
-  color_test = "steelblue4", pch_test = 8, size_test = 2)
+  color_test = "deepskyblue2", pch_test = 21, size_test = 2,
+  error_bar = FALSE)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -24,17 +25,13 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
 
 \item{alpha}{Ribbon fill opacity.}
 
-\item{plot_ribbon}{Should an uncertainty ribbon be plotted?}
+\item{plot_uncertainty}{Should an uncertainty ribbon be plotted?}
 
 \item{title}{optional prefix to plot title}
 
 \item{theme}{ggplot theme}
 
 \item{original_y_scale}{should the predictions be scaled back to the original data y scale}
-
-\item{plot_ribbon_edge}{Should an uncertainty ribbon edge be plotted?}
-
-\item{plot_pred}{should the (mean) predictions line be plotted?}
 
 \item{alpha_line}{Line opacity}
 
@@ -57,10 +54,12 @@ plot_predictions(fit, PRED = NULL, componentwise = FALSE,
 \item{pch_test}{test point marker}
 
 \item{size_test}{test point size}
+
+\item{error_bar}{should uncertainty be plotted using error bars instead of a ribbon}
 }
 \value{
 a ggplot object
 }
 \description{
-NOTE: currently assumes that the case individuals come first!
+NOTE: currently some options assume that the case individuals come first!
 }

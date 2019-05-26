@@ -114,3 +114,14 @@ create_test_points <- function(object, t_test){
   return(X_test)
 }
 
+#' Compute log-posterior predictive density at test points
+#'
+#' @export
+#' @param PRED predictions
+#' @param test_data test data
+#' @return A data frame.
+compute_lppd <- function(PRED, test_data){
+  print(PRED)
+  print(test_data)
+  return("Loiko morko sisaan? Loiko morko sisaan??")
+}

@@ -218,18 +218,16 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
 }
 
 
-#' Plot computed predictions componentwise
+#' Plot computed predictions
 #' @export
-#' @description NOTE: currently assumes that the case individuals come first!
+#' @description NOTE: currently some options assume that the case individuals come first!
 #' @param fit An object of class \code{lgpfit}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param componentwise Should the predictions be plotted componentwise?
 #' @param color_scheme Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.
 #' @param alpha Ribbon fill opacity.
 #' @param alpha_line Line opacity
-#' @param plot_pred should the (mean) predictions line be plotted?
-#' @param plot_ribbon Should an uncertainty ribbon be plotted?
-#' @param plot_ribbon_edge Should an uncertainty ribbon edge be plotted?
+#' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @param theme ggplot theme
 #' @param original_y_scale should the predictions be scaled back to the original data y scale
 #' @param title optional prefix to plot title
@@ -243,18 +241,17 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
 #' @param color_test test point color
 #' @param pch_test test point marker
 #' @param size_test test point size
+#' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
 #' @return a ggplot object
 plot_predictions <- function(fit, 
                              PRED             = NULL, 
                              componentwise    = FALSE,
                              color_scheme     = "red",
                              alpha            = 0.5-0.4*as.numeric(componentwise), 
-                             plot_ribbon      = TRUE,
+                             plot_uncertainty = TRUE,
                              title            = NULL,
                              theme            = ggplot2::theme_gray(),
                              original_y_scale = TRUE,
-                             plot_ribbon_edge = !componentwise,
-                             plot_pred        = TRUE,
                              alpha_line       = alpha,
                              ylim             = NULL,
                              plot_obs_onset   = FALSE,
@@ -263,9 +260,10 @@ plot_predictions <- function(fit,
                              plot_onset_samples = FALSE,
                              ypos_dens        = NULL,
                              test_data        = NULL,
-                             color_test       = "steelblue4",
-                             pch_test         = 8,
-                             size_test        = 2)
+                             color_test       = "deepskyblue2",
+                             pch_test         = 21,
+                             size_test        = 2,
+                             error_bar        = FALSE)
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
@@ -328,9 +326,12 @@ plot_predictions <- function(fit,
     group_var <- idvar
     y_var <- "mu"
   }
-  h  <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, 
-                                                y = y_var, 
-                                                group = group_var))
+  if(error_bar){
+    h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var))
+  }else{
+    h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
+  }
+  
   
   # Edit plot title
   if(!is.null(title)){
@@ -339,23 +340,22 @@ plot_predictions <- function(fit,
   h <- h + ggplot2::ggtitle(label = ptitle)
   h <- h + ggplot2::labs(y = ylab)
   
-  # Lines and ribbons
-  if(plot_ribbon && !info$sample_F){
-    h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = 'lower', 
-                                                      ymax = 'upper'),
-                                  fill  = fill, 
-                                  alpha = alpha)
-  }
-  if(!is.null(hlcolor) && plot_ribbon_edge && !info$sample_F){
-    h <- h + ggplot2::geom_line(ggplot2::aes_string(x = timevar, y = 'lower'),
-                                color = fill, 
-                                alpha = alpha)
-    h <- h + ggplot2::geom_line(ggplot2::aes_string(x = timevar, y = 'upper'),
-                                color = fill, 
-                                alpha = alpha)
-  }
-  if(plot_pred){
-    h <- h + ggplot2::geom_line(color = linecolor, alpha = alpha_line)
+  # Plot prediction and uncertainty ribbon or errorbars
+  if(plot_uncertainty && !info$sample_F){
+    if(error_bar){
+      h <- h + ggplot2::geom_errorbar(ggplot2::aes_string(ymin = 'lower', 
+                                                        ymax = 'upper'),
+                                      color = hlcolor,
+                                      width = 1)
+      h <- h + ggplot2::geom_point(color = hlcolor)
+    }else{
+      h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = 'lower', 
+                                                        ymax = 'upper'),
+                                    fill  = fill, 
+                                    alpha = alpha)
+      h <- h + ggplot2::geom_line(color = linecolor, alpha = alpha_line)
+    }
+
   }
   
   # Plot also the data
@@ -372,8 +372,7 @@ plot_predictions <- function(fit,
     
     h   <- h + ggplot2::geom_point(data    = df, 
                                    mapping = ggplot2::aes_string(x = timevar,
-                                                                 y = respvar,
-                                                                 group = idvar))
+                                                                 y = respvar))
   }
   # Faceting
   h <- h + ggplot2::facet_wrap(. ~ facet_var)
@@ -444,13 +443,19 @@ plot_predictions <- function(fit,
                              yyy = y_test,
                              facet_var = id_test)
     
+    if(pch_test > 20){
+      edgecol <- "black"
+    }else{
+      edgecol <- color_test
+    }
     h <- h + ggplot2::geom_point(mapping  = ggplot2::aes_string(x = "xxx", y = "yyy"), 
                                  na.rm    = TRUE,
                                  inherit.aes = F,
                                  data     = point.data, 
-                                 color    = color_test,
+                                 color    = edgecol,
                                  pch      = pch_test,
-                                 size     = size_test)
+                                 size     = size_test,
+                                 fill     = color_test)
   }
   
   return(h)
