@@ -407,3 +407,43 @@ lgp_predict <- function(fit,
   
 }
 
+
+#' Compute predictions and log-posterior predictive density at test points
+#'
+#' @export
+#' @description This is a convenience function that wraps \code{\link{lgp_predict}},
+#' \code{\link{compute_lppd}} and \code{\link{plot_predictions}}.
+#' @param fit an object of class \code{lgpfit}
+#' @param test_data a test data matrix
+#' @param reduction must be either "mean", "sum" or "none"
+#' @param samples The predictions can be computed either by using only the posterior mean
+#' \cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or by averaging over
+#' all parameter samples (\code{samples="all"}). This can also be a set of indices, for example 
+#' \code{samples=c(1:10)} gives the averaged predictions over the parameter samples 1...10.
+#' @param plot should this plot the data and predictions?
+#' @return a ggplot object or lppd
+lgp_test <- function(fit, test_data, plot = FALSE, reduction = "mean", samples = "mean"){
+  
+  # predict only at test points
+  info    <- fit@model@info
+  yname   <- info$response_name
+  xnames  <- info$covariate_names
+  idvar   <- info$varInfo$id_variable
+  tvar    <- info$varInfo$time_variable
+  xnames  <- union(c(idvar, tvar), xnames)
+  dat     <- data.frame(test_data)
+  X_test  <- dat[,xnames]
+  y_test  <- dat[,yname]
+  PRED    <- lgp_predict(fit, X_test, samples = samples)
+  lppd    <- compute_lppd(PRED, y_test, reduction = reduction)
+  if(plot){
+    p    <- plot_predictions(fit, PRED, test_data = test_data, error_bar = TRUE)
+    mlp  <- compute_lppd(PRED, y_test, reduction = "mean")
+    subt <- paste("Mean log-posterior predictive density:", round(mlp, 5))
+    p    <- p + ggplot2::ggtitle(label = "Predictions at test points",
+                              subtitle = subt)
+    return(p)
+  }else{
+    return(lppd)
+  }
+}

@@ -118,10 +118,48 @@ create_test_points <- function(object, t_test){
 #'
 #' @export
 #' @param PRED predictions
-#' @param test_data test data
-#' @return A data frame.
-compute_lppd <- function(PRED, test_data){
-  print(PRED)
-  print(test_data)
-  return("Loiko morko sisaan? Loiko morko sisaan??")
+#' @param y_test values of the response variable at the test points
+#' @param reduction must be either "mean", "sum" or "none"
+#' @return a vector
+compute_lppd <- function(PRED, y_test, reduction = "mean"){
+  D  <- dim(PRED$F_mu)
+  mu <- PRED$F_mu[, D[2]]
+  s2 <- PRED$F_var[, D[2]]
+  n  <- length(y_test)
+  n1 <- length(mu)
+  n2 <- length(s2)
+  if(n!=n1 || n!=n2){
+    stop("mu, sd and y_test must all have the same length! (", n, ", ", n1, ", ", n2, ")")
+  }
+  
+  # Compute lppd for all points separately
+  LPPD <- rep(0, n)
+  for(i in 1:n){
+    LPPD[i] <- log_gaussian_density(y_test[i], mu[i], s2[i])
+  }
+  
+  # Return options
+  if(reduction=="mean"){
+    out <- mean(LPPD)
+  }else if(reduction=="sum"){
+    out <- sum(LPPD)
+  }else if(reduction=="none"){
+    out <- LPPD
+  }else{
+    stop("invalid value for reduction (", reduction, ")")
+  }
+  
+  return(out)
+}
+
+#' Compute log-density for gaussian distribution
+#'
+#' @param x point x
+#' @param mu mean
+#' @param s2 variance
+#' @return a number
+log_gaussian_density <- function(x, mu, s2){
+  p <- log(2*pi*s2) + 1/s2*(x-mu)^2
+  p <- -0.5*p
+  return(p)
 }

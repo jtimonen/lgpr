@@ -4,15 +4,17 @@
 \alias{compute_lppd}
 \title{Compute log-posterior predictive density at test points}
 \usage{
-compute_lppd(PRED, test_data)
+compute_lppd(PRED, y_test, reduction = "mean")
 }
 \arguments{
 \item{PRED}{predictions}
 
-\item{test_data}{test data}
+\item{y_test}{values of the response variable at the test points}
+
+\item{reduction}{must be either "mean", "sum" or "none"}
 }
 \value{
-A data frame.
+a vector
 }
 \description{
 Compute log-posterior predictive density at test points
