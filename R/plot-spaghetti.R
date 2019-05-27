@@ -13,15 +13,15 @@
 #' @param lwd line width
 #' @return a ggplot object
 plot_data <- function(data, 
-                      highlight_col = NULL,
-                      highlight_lty = NULL,
+                      highlight_col  = NULL,
+                      highlight_lty  = NULL,
                       highlight_cont = NULL,
-                      response = "y", 
-                      palette = "Set1",
-                      colgrad = "gray",
-                      psize = 2,
-                      title = NULL,
-                      lwd = 0.5)
+                      response       = "y", 
+                      palette        = "Set1",
+                      colgrad        = "gray",
+                      psize          = 2,
+                      title          = NULL,
+                      lwd            = 0.5)
 {
   data$id  <- as.factor(data$id)
   iresp    <- which(colnames(data)==response)
@@ -75,11 +75,11 @@ plot_data <- function(data,
     if(is.null(highlight_col) && is.null(highlight_lty)){
       p <- p + ggplot2::geom_line(ggplot2::aes_string(color = 'Value'), size = lwd)
       if(colgrad!="diverging"){
-        colgrad <- ggplot2::scale_colour_gradient(low = "#c8e2ed", 
-                                                  high = "#1e2a30",
-                                                  space = "Lab", 
-                                                  na.value = "firebrick3", 
-                                                  guide = "colourbar",
+        colgrad <- ggplot2::scale_colour_gradient(low        = "#c8e2ed", 
+                                                  high       = "#1e2a30",
+                                                  space      = "Lab", 
+                                                  na.value   = "firebrick3", 
+                                                  guide      = "colourbar",
                                                   aesthetics = "colour")
       }else{
         colgrad <- ggplot2::scale_colour_gradient2()
@@ -244,26 +244,26 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
 #' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
 #' @return a ggplot object
 plot_predictions <- function(fit, 
-                             PRED             = NULL, 
-                             componentwise    = FALSE,
-                             color_scheme     = "red",
-                             alpha            = 0.5-0.4*as.numeric(componentwise), 
-                             plot_uncertainty = TRUE,
-                             title            = NULL,
-                             theme            = ggplot2::theme_gray(),
-                             original_y_scale = TRUE,
-                             alpha_line       = alpha,
-                             ylim             = NULL,
-                             plot_obs_onset   = FALSE,
-                             alpha2           = 0.5,
+                             PRED               = NULL, 
+                             componentwise      = FALSE,
+                             color_scheme       = "red",
+                             alpha              = 0.5-0.4*as.numeric(componentwise), 
+                             plot_uncertainty   = TRUE,
+                             title              = NULL,
+                             theme              = ggplot2::theme_gray(),
+                             original_y_scale   = TRUE,
+                             alpha_line         = 1,
+                             ylim               = NULL,
+                             plot_obs_onset     = FALSE,
+                             alpha2             = 0.5,
                              color_scheme_onset = "gray",
                              plot_onset_samples = FALSE,
-                             ypos_dens        = NULL,
-                             test_data        = NULL,
-                             color_test       = "deepskyblue2",
-                             pch_test         = 21,
-                             size_test        = 2,
-                             error_bar        = FALSE)
+                             ypos_dens          = NULL,
+                             test_data          = NULL,
+                             color_test         = "deepskyblue2",
+                             pch_test           = 21,
+                             size_test          = 2,
+                             error_bar          = FALSE)
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
@@ -273,6 +273,9 @@ plot_predictions <- function(fit,
   idvar   <- info$varInfo$id_variable
   timevar <- info$varInfo$time_variable
   respvar <- info$varInfo$response_variable
+  if(componentwise && !is.null(test_data)){
+    stop("componentwise must be FALSE if test data is given!")
+  }
   
   # Get color
   if(class(color_scheme)=="character"){
@@ -324,10 +327,6 @@ plot_predictions <- function(fit,
     ylab         <- respvar
   }
   
-  # Get all ids
-  
-  
-  
   # Create ggplot object
   if(info$sample_F){
     group_var <- "idx"
@@ -349,30 +348,35 @@ plot_predictions <- function(fit,
   h <- h + ggplot2::ggtitle(label = ptitle)
   h <- h + ggplot2::labs(y = ylab)
   
-  # Plot prediction and uncertainty ribbon or errorbars
+  # Plot uncertainty ribbon or errorbars
   if(plot_uncertainty && !info$sample_F){
     if(error_bar){
       h <- h + ggplot2::geom_errorbar(ggplot2::aes_string(ymin = 'lower', 
                                                         ymax = 'upper'),
                                       color = hlcolor,
                                       width = 1)
-      h <- h + ggplot2::geom_point(color = hlcolor)
     }else{
       h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = 'lower', 
                                                         ymax = 'upper'),
                                     fill  = fill, 
                                     alpha = alpha)
-      h <- h + ggplot2::geom_line(color = linecolor, alpha = alpha_line)
+      
     }
-
+  }
+  
+  # Plot mean prediction
+  if(error_bar){
+    h <- h + ggplot2::geom_point(color = hlcolor)
+  }else{
+    h <- h + ggplot2::geom_line(color = linecolor, alpha = alpha_line)
   }
   
   # Plot also the data
   if(!componentwise){
     dat  <- model@data
     df   <- data.frame(idvar   = as.factor(X_id), 
-                       timevar  = as.numeric(dat[[timevar]]), 
-                       y        = as.numeric(dat[[respvar]]))
+                       timevar = as.numeric(dat[[timevar]]), 
+                       y       = as.numeric(dat[[respvar]]))
     colnames(df)[1] <- idvar
     colnames(df)[2] <- timevar
     colnames(df)[3] <- respvar
