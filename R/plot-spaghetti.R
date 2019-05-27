@@ -306,6 +306,7 @@ plot_predictions <- function(fit,
                                       componentwise = componentwise)
   }
   
+  X_id <- as.numeric(model@stan_dat$X[1,])
   if(componentwise){
     facet_var    <- "component"
     DF$facet_var <- DF[[facet_var]]
@@ -313,10 +314,19 @@ plot_predictions <- function(fit,
     ylab         <- " "
   }else{
     facet_var    <- idvar
+    id_train     <- unique(X_id)
     DF$facet_var <- DF[[facet_var]]
+    id_test      <- unique(as.numeric(DF$facet_var))
+    all_ids      <- union(id_train, id_test)
+    all_ids      <- sort(all_ids, decreasing = FALSE)
+    DF$facet_var <- as.numeric(factor(DF$facet_var, levels = all_ids))
     ptitle       <- "Model predictions"
     ylab         <- respvar
   }
+  
+  # Get all ids
+  
+  
   
   # Create ggplot object
   if(info$sample_F){
@@ -331,7 +341,6 @@ plot_predictions <- function(fit,
   }else{
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
   }
-  
   
   # Edit plot title
   if(!is.null(title)){
@@ -361,7 +370,6 @@ plot_predictions <- function(fit,
   # Plot also the data
   if(!componentwise){
     dat  <- model@data
-    X_id <- as.numeric(model@stan_dat$X[1,])
     df   <- data.frame(idvar   = as.factor(X_id), 
                        timevar  = as.numeric(dat[[timevar]]), 
                        y        = as.numeric(dat[[respvar]]))

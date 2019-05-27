@@ -46,8 +46,10 @@ compute_kernel_matrices <- function(X1, X2, D,
     disAge2 <- X2[,3]
     xnn1    <- as.numeric(!is.nan(disAge1))
     xnn2    <- as.numeric(!is.nan(disAge2))
-    row_to_caseID_1 <- get_case_row_mappings(xnn1, id1)$row_to_caseID
-    row_to_caseID_2 <- get_case_row_mappings(xnn2, id2)$row_to_caseID
+    row_to_caseID_1 <- get_case_row_mappings(xnn1, id1, only_R2C = TRUE)
+    row_to_caseID_2 <- get_case_row_mappings(xnn2, id2, only_R2C = TRUE)
+    #print(row_to_caseID_1)
+    #print(row_to_caseID_2)
     if(info$HMGNS==0){
       K_beta <- compute_K_beta(beta, row_to_caseID_1, row_to_caseID_2)
     }else{

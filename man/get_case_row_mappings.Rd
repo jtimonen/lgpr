@@ -4,12 +4,14 @@
 \alias{get_case_row_mappings}
 \title{Create case ID to rows and back mappings}
 \usage{
-get_case_row_mappings(X_notnan, X_id)
+get_case_row_mappings(X_notnan, X_id, only_R2C = FALSE)
 }
 \arguments{
 \item{X_notnan}{binary vector indicating if diseaseAge is available for that measurement}
 
 \item{X_id}{the id covariate in X}
+
+\item{only_R2C}{should this return only the rows-to-caseID mapping}
 }
 \value{
 a list

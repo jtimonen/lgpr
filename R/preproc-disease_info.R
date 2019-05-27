@@ -39,15 +39,17 @@ get_diseased_info <- function(D, X, X_notnan, uncertain_diagnosis, equal_effect,
 #' }
 #' @param X_notnan binary vector indicating if diseaseAge is available for that measurement
 #' @param X_id the id covariate in X
+#' @param only_R2C should this return only the rows-to-caseID mapping
 #' @return a list
-get_case_row_mappings <- function(X_notnan, X_id){
+get_case_row_mappings <- function(X_notnan, X_id, only_R2C = FALSE){
   UNI     <- unique(cbind(X_id, X_notnan))
   uid     <- UNI[,1]
   is_case <- UNI[,2]
   N       <- length(uid)
   N_cases <- sum(is_case)
   inn     <- which(X_notnan==1)
-  nrows   <- as.numeric(table(X_id[inn]))
+  tab     <- table(X_id[inn])
+  nrows   <- as.numeric(tab)
   M_max   <- max(table(X_id))
   
   # Create mappings 
@@ -62,17 +64,22 @@ get_case_row_mappings <- function(X_notnan, X_id){
     if(is_case[j]==1){
       i_case <- i_case + 1
       i_rows <- which(X_id==id)
-      C2R[i_case,1:nrows[i_case]] <- i_rows
+      if(!only_R2C){
+        C2R[i_case,1:nrows[i_case]] <- i_rows
+      }
       R2C[i_rows] <- i_case
     }
   }
-
- 
+  
   # Return  
-  ret <- list(caseID_to_rows  = C2R,
-              caseID_nrows    = nrows,
-              row_to_caseID   = R2C)
-  return(ret)
+  if(only_R2C){
+    return(R2C)
+  }else{
+    ret <- list(caseID_to_rows  = C2R,
+                caseID_nrows    = nrows,
+                row_to_caseID   = R2C)
+    return(ret)
+  }
 }
 
 

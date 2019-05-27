@@ -210,6 +210,7 @@ get_case_ids <- function(fit){
 
 #' Split data into training and test data according to given individuals
 #'
+#' @export
 #' @param data a data frame
 #' @param test_ids test data individual identifiers
 #' @param id_variable name of id variable
@@ -223,8 +224,9 @@ split_data_by_id <- function(data, test_ids, id_variable="id"){
 
 #' Split data into training and test data randomly
 #'
+#' @export
 #' @param data a data frame
-#' @param p_test desired proportion of data
+#' @param p_test desired proportion of test data
 #' @return a \code{list(train, test)}
 split_data_random <- function(data, p_test = 0.1){
   n_total <- dim(data)[1]

@@ -9,7 +9,7 @@ split_data_random(data, p_test = 0.1)
 \arguments{
 \item{data}{a data frame}
 
-\item{p_test}{desired proportion of data}
+\item{p_test}{desired proportion of test data}
 }
 \value{
 a \code{list(train, test)}
