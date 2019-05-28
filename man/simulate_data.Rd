@@ -67,7 +67,7 @@ real disease onset time for one individual.}
 \item{t_observed}{Determines how the disease onset is observed. This can be any function 
 that takes the real disease onset as an argument and returns the (possibly randomly generated)
 observed onset time. Alternatively, this can be a string of the form \code{"after_n"}
-or \code{"random_p"}.}
+or \code{"random_p"} or \code{"exact"}.}
 
 \item{C_hat}{A constant added to f}
 

@@ -329,17 +329,15 @@ lgp_test <- function(fit, test_data, plot = FALSE, reduction = "mean", samples =
   X_test  <- dat[,xnames]
   y_test  <- dat[,yname]
   PRED    <- lgp_predict(fit, X_test, samples = samples)
-  #lppd    <- compute_lppd(PRED, y_test, reduction = reduction)
-  lppd <- "TODO"
-  mlp <- 0
+  LPPD    <- compute_lppd(PRED, y_test)
+  mlppd   <- mean(as.numeric(LPPD))
   if(plot){
     p    <- plot_posterior_y(fit, PRED, test_data = test_data, uncertainty = "errorbar")
-    #mlp  <- compute_lppd(PRED, y_test, reduction = "mean")
-    subt <- paste("Mean log-posterior predictive density:", round(mlp, 5))
+    subt <- paste("Mean log-posterior predictive density:", round(mlppd, 5))
     p    <- p + ggplot2::ggtitle(label = "Predictive distribution of y at test points",
                               subtitle = subt)
     return(p)
   }else{
-    return(lppd)
+    return(LPPD)
   }
 }

@@ -11,7 +11,7 @@
 #' @param t_observed Determines how the disease onset is observed. This can be any function 
 #' that takes the real disease onset as an argument and returns the (possibly randomly generated)
 #' observed onset time. Alternatively, this can be a string of the form \code{"after_n"}
-#' or \code{"random_p"}.
+#' or \code{"random_p"} or \code{"exact"}.
 #' @param f_var variance of f
 #' @param C_hat A constant added to f
 #' @return A list \code{out}, where 
@@ -284,17 +284,18 @@ sim_data_to_observed <- function(dat, t_observed){
           idx0  <- inds0[1]
         }else{
           parsed <- sim_parse_t_obs(t_observed)
-          
           if(parsed$type=="random"){
             idx0 <- rtgeom(length(irem), parsed$value)
-          }else{
+            if(idx0 > length(rem)){stop("Not enough data points to go that far!")}
+            t0   <- rem[idx0]
+          }else if(parsed$type=="after"){
             idx0 <- parsed$value + 1
-          }
-          if(idx0 > length(rem)){
-            stop("Not enough data points to go that far!")
+            if(idx0 > length(rem)){stop("Not enough data points to go that far!")}
+            t0   <- rem[idx0]
+          }else{
+            t0   <- t0_real
           }
         }
-        t0   <- rem[idx0]
         onsets_observed[j] <- t0
         
         # update the diseaseAge covariate
@@ -328,6 +329,8 @@ sim_parse_t_obs <- function(t_observed){
     type <- "after"
   }else if(parts[1]=="random"){
     type <- "random"
+  }else if(parts[1]=="exact"){
+    type <- "exact"
   }else{
     stop("unknown keyword ", parts[1])
   }
