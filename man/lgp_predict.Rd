@@ -4,8 +4,7 @@
 \alias{lgp_predict}
 \title{Compute predictions for a fitted model}
 \usage{
-lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE,
-  print_parameters = FALSE)
+lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -13,16 +12,14 @@ lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE,
 \item{X_test}{The test points where the predictions should be computed.}
 
 \item{samples}{The predictions can be computed either by using only the posterior mean
-\cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or by averaging over
-all parameter samples (\code{samples="all"}). This can also be a set of indices, for example 
-\code{samples=c(1:10)} gives the averaged predictions over the parameter samples 1...10.}
+\cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or for
+all parameter samples (\code{samples="all"}). This can also be a set of indices, 
+for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.}
 
 \item{print_progress}{Should progress be printed (if there is more than one sample)?}
-
-\item{print_parameters}{Should the parameters be printed?}
 }
 \value{
-A data frame.
+A list.
 }
 \description{
 Compute predictions for a fitted model. Only possible for models with

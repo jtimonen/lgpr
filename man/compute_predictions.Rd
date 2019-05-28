@@ -22,7 +22,7 @@ compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
 \item{cnames}{Names of the model components.}
 }
 \value{
-A list containing predicted means and variances.
+A list.
 }
 \description{
 Used by \code{\link{lgp_predict}}.

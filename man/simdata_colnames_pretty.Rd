@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-helper.R
 \name{simdata_colnames_pretty}
 \alias{simdata_colnames_pretty}
-\title{Simulated data column names  in a prettier form}
+\title{Simulated data column names in a prettier form}
 \usage{
 simdata_colnames_pretty(cn)
 }
@@ -13,5 +13,5 @@ simdata_colnames_pretty(cn)
 names of model components
 }
 \description{
-Simulated data column names  in a prettier form
+Simulated data column names in a prettier form
 }

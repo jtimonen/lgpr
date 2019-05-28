@@ -235,12 +235,11 @@ lgp_fit <- function(model, threshold, parallel = FALSE, skip_postproc = FALSE, .
 #' @param fit An object of class \code{lgpfit}.
 #' @param X_test The test points where the predictions should be computed.
 #' @param samples The predictions can be computed either by using only the posterior mean
-#' \cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or by averaging over
-#' all parameter samples (\code{samples="all"}). This can also be a set of indices, for example 
-#' \code{samples=c(1:10)} gives the averaged predictions over the parameter samples 1...10.
+#' \cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or for
+#' all parameter samples (\code{samples="all"}). This can also be a set of indices, 
+#' for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.
 #' @param print_progress Should progress be printed (if there is more than one sample)?
-#' @param print_parameters Should the parameters be printed?
-#' @return A data frame.
+#' @return A list.
 #' @seealso 
 #' \itemize{
 #' \item For creating an \code{lgpfit} object, see \code{\link{lgp_fit}}.
@@ -248,142 +247,45 @@ lgp_fit <- function(model, threshold, parallel = FALSE, skip_postproc = FALSE, .
 #' }
 lgp_predict <- function(fit, 
                         X_test, 
-                        samples = "mean",
-                        print_progress = TRUE,
-                        print_parameters = FALSE)
+                        samples        = "mean",
+                        print_progress = TRUE)
 {
   
-  # Check input correctness
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  model <- fit@model
-  if(class(model)!="lgpmodel") stop("Class of 'fit@model' must be 'lgpmodel'!")
-  info     <- model@info
-  cnames   <- info$component_names
-  stan_dat <- model@stan_dat
-  n        <- stan_dat$n
-  X_sd     <- t(stan_dat$X)
-  X_sd     <- X_sd[1:n,]
-  Xnn_sd   <- t(stan_dat$X_notnan)
-  Xnn_sd   <- Xnn_sd[1:n] 
-  D        <- stan_dat$D
-  LH       <- stan_dat$LH
-  
-  
-  # Other model info
-  fields   <- c("HMGNS", "UNCRT", "caseID_to_rows", "row_to_caseID", "DELTA")
-  info     <- stan_dat[fields]
-  
-  if(info$UNCRT==1){
-    stop("lgp_predict not implemented to work with UNCRT=1 yet!")
-  }
-  
-  # Input checking
-  if(LH!=1){
-    stop("Computing predictions outside the data is possible only for models",
-         " with Gaussian likelihood.")
-  }
-  cn1  <- colnames(X_test)
-  cn2  <- colnames(X_sd)
-  if(length(cn1) != length(cn2)){
-    cn_str <- paste(colnames(X_sd), collapse=", ")
-    stop("X_test must be a data frame with column names {", cn_str, "} (in this order).", sep="")
-  }
-  if(!all(cn1==cn2)){
-    cn_str <- paste(colnames(X_sd), collapse=", ")
-    stop("X_test must be a data frame with column names {", cn_str, "} (in this order).", sep="")
-  }
-  if(class(model)!="lgpmodel"){
-    stop("model must be an object of class lgpmodel!")
-  }
-  if(class(fit)!="lgpfit"){
-    stop("fit must be an object of class lgpfit!")
-  }
-  
-  # Edit X_test so that we are working the same scale as with X_sd
-  # (continuous covariates scaled to have zero mean and unit variance)
-  TSCL <- model@scalings$TSCL
-  X_test[,2] <- TSCL$fun(X_test[,2])
-  if(D[3]==1){
-    inan <- which(Xnn_sd==0)
-    X_sd[inan,3] <- NaN
-  }
-  
-  # Scale also other continuous variables to same scale
-  if(D[4]>0){
-    CSCL <- model@scalings$CSCL
-    for(j in 1:D[4]){
-      cscl <- CSCL[[j]]
-      ix <- 2 + D[3] + j
-      X_test[,ix] <- cscl$fun(X_test[,ix])
-    }
-  }
-  
-  # X_data and y_data
-  X_data <- X_sd
-  y_data <- as.numeric(stan_dat$y)
-  
-  # All option to sample indicides
-  if(is.character(samples)){
-    if(samples=="all"){
-      PAR <- hyperparam_samples(fit)
-      samples <- 1:dim(PAR)[1]
-    }
-  }
-  
-  # Get parameters and compute predictions
+  # Run some input checks and scale data correctly
+  PP      <- predict_preproc(fit, X_test, samples)
+  X_data  <- PP$X_data
+  X_test  <- PP$X_test
+  y_data  <- PP$y_data
+  samples <- PP$samples
+  info    <- PP$info
+  D       <- PP$D
+  cnames  <- PP$cnames
+  LIST    <- list()
   cat("* Computing predictions ")
   
   if(is.character(samples)){
     
     # Predictions using a single parameter estimate
     if(samples %in% c("mean", "median")){
-      
-      # Get parameter estimate
-      params <- hyperparam_estimate(fit, samples)
       cat("using posterior ", samples, " parameters. \n", sep = "")
-      if(print_parameters){print(params)}
-      
-      # Computation
-      F_test <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
-      F_mu   <- F_test$F_mu
-      F_var  <- F_test$F_var
-      
+      params    <- hyperparam_estimate(fit, samples)
+      LIST[[1]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
     }else{
-      stop("\ninvalid 'samples' input for lgp_predict!")
+      stop("\ninvalid 'samples' input for lgp_predict! (", samples, ")")
     }
-    
   }else{
-    # Averaged predictions using multiple samples
+    
+    # Predictions using multiple samples
     cat("using ", length(samples), " parameter samples. \n\n", sep = "")
-    PAR <- hyperparam_samples(fit, samples)
-    
-    # Print parameters
-    if(print_parameters){print(PAR)}
-    
-    # Dimensions and sanity check
-    ns  <- dim(PAR)[1]
-    if(ns!=length(samples)){stop('sanity check failed!')}
-    p <- dim(X_test)[1]
-    d <- dim(X_test)[2]
+    PAR    <- hyperparam_samples(fit, samples)
+    pnames <- colnames(PAR)
+    ns     <- dim(PAR)[1]
     
     for(i_smp in 1:ns){
-      
-      # Get current parameter sample
-      tmp <- colnames(PAR)
-      params <- as.numeric(PAR[i_smp,])
-      names(params) <- tmp
-      
-      # Computation
-      F_test <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
-      
-      # Averaging
-      if(i_smp==1){
-        F_mu   <- 1/ns * F_test$F_mu
-        F_var  <- 1/ns * F_test$F_var
-      }else{
-        F_mu   <- F_mu + 1/ns * F_test$F_mu
-        F_var  <- F_var + 1/ns * F_test$F_var
-      }
+      # Predict with current parameter sample
+      params        <- as.numeric(PAR[i_smp,])
+      names(params) <- pnames
+      LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
       
       # Print  progress
       if(print_progress){
@@ -398,13 +300,8 @@ lgp_predict <- function(fit,
   }
   
   # Return
-  cat("* Done!\n\n")
-  ret <- list(F_mu   = F_mu, 
-              F_var  = F_var, 
-              X_test_scaled = X_test,
-              params = params)
+  ret <- list(LIST = LIST, X_test_scaled = X_test)
   return(ret)
-  
 }
 
 
@@ -416,10 +313,7 @@ lgp_predict <- function(fit,
 #' @param fit an object of class \code{lgpfit}
 #' @param test_data a test data matrix
 #' @param reduction must be either "mean", "sum" or "none"
-#' @param samples The predictions can be computed either by using only the posterior mean
-#' \cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or by averaging over
-#' all parameter samples (\code{samples="all"}). This can also be a set of indices, for example 
-#' \code{samples=c(1:10)} gives the averaged predictions over the parameter samples 1...10.
+#' @param samples Sample indices.
 #' @param plot should this plot the data and predictions?
 #' @return a ggplot object or lppd
 lgp_test <- function(fit, test_data, plot = FALSE, reduction = "mean", samples = "mean"){
@@ -435,12 +329,14 @@ lgp_test <- function(fit, test_data, plot = FALSE, reduction = "mean", samples =
   X_test  <- dat[,xnames]
   y_test  <- dat[,yname]
   PRED    <- lgp_predict(fit, X_test, samples = samples)
-  lppd    <- compute_lppd(PRED, y_test, reduction = reduction)
+  #lppd    <- compute_lppd(PRED, y_test, reduction = reduction)
+  lppd <- "TODO"
+  mlp <- 0
   if(plot){
-    p    <- plot_predictions(fit, PRED, test_data = test_data, error_bar = TRUE)
-    mlp  <- compute_lppd(PRED, y_test, reduction = "mean")
+    p    <- plot_posterior_y(fit, PRED, test_data = test_data, uncertainty = "errorbar")
+    #mlp  <- compute_lppd(PRED, y_test, reduction = "mean")
     subt <- paste("Mean log-posterior predictive density:", round(mlp, 5))
-    p    <- p + ggplot2::ggtitle(label = "Predictions at test points",
+    p    <- p + ggplot2::ggtitle(label = "Predictive distribution of y at test points",
                               subtitle = subt)
     return(p)
   }else{

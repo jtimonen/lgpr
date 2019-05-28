@@ -8,7 +8,7 @@
 #' @param D A vector of length 6.
 #' @param info Other model info.
 #' @param cnames Names of the model components.
-#' @return A list containing predicted means and variances.
+#' @return A list.
 compute_predictions <- function(X_data, y_data, X_test, params, D, info, cnames){
   
   nam    <- names(params)
@@ -39,7 +39,22 @@ compute_predictions <- function(X_data, y_data, X_test, params, D, info, cnames)
   F_var <- PRED$F_var
   colnames(F_mu)  <- c(cnames, "f")
   colnames(F_var) <- c(cnames, "f")
-  ret <- list(F_mu = F_mu, F_var = F_var)
+  d  <- dim(F_mu)[2]
+  
+  # Predictions into return format
+  mu_cmp <- F_mu[,1:(d-1)]
+  s2_cmp <- F_var[,1:(d-1)]
+  mu_f   <- F_mu[,d]
+  s2_f   <- F_var[,d]
+  s2_y   <- s2_f + sigma_n^2
+  
+  # Return
+  ret <- list(mu_cmp = mu_cmp,
+              s2_cmp = s2_cmp,
+              mu_f   = mu_f,  
+              s2_f   = s2_f,
+              s2_y   = s2_y,
+              pars   = params)
   return(ret)
 }
 

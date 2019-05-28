@@ -33,7 +33,7 @@ set.seed(123)
 
 # generate artificial data --------------------------------------------------
 
-simData <- simulate_data(N           = 10,
+simData <- simulate_data(N           = 8,
                         t_data       = seq(6, 30, by = 6),
                         covariates   = c(    2,2),
                         lengthscales = c(6,6,6,6),
@@ -63,7 +63,7 @@ plot_components(fit)
 t_test <- seq(0, 40, length.out = 60)
 X_test <- create_test_points(fit, t_test)
 PRED   <- lgp_predict(fit, X_test, samples = "mean")
-plot_predictions(fit, PRED, componentwise = F)
+plot_posterior_y(fit, PRED, uncertainty = "errorbar")
 
 ```
 

@@ -16,10 +16,7 @@ lgp_test(fit, test_data, plot = FALSE, reduction = "mean",
 
 \item{reduction}{must be either "mean", "sum" or "none"}
 
-\item{samples}{The predictions can be computed either by using only the posterior mean
-\cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or by averaging over
-all parameter samples (\code{samples="all"}). This can also be a set of indices, for example 
-\code{samples=c(1:10)} gives the averaged predictions over the parameter samples 1...10.}
+\item{samples}{Sample indices.}
 }
 \value{
 a ggplot object or lppd
