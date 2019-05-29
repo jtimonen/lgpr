@@ -29,7 +29,7 @@ The package enables
     \item \code{\link[lgpr]{plot_data}}
     \item \code{\link[lgpr]{plot_samples}}
     \item \code{\link[lgpr]{plot_components}}
-    \item \code{\link[lgpr]{plot_predictions}}
+    \item \code{\link[lgpr]{plot_posterior_y}}
     \item \code{\link[lgpr]{plot_simdata}}
   }
 }

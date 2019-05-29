@@ -309,7 +309,7 @@ lgp_predict <- function(fit,
 #'
 #' @export
 #' @description This is a convenience function that wraps \code{\link{lgp_predict}},
-#' \code{\link{compute_lppd}} and \code{\link{plot_predictions}}.
+#' \code{\link{compute_lppd}} and \code{\link{plot_posterior_y}}.
 #' @param fit an object of class \code{lgpfit}
 #' @param test_data a test data matrix
 #' @param reduction must be either "mean", "sum" or "none"

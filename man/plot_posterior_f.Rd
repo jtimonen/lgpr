@@ -4,18 +4,22 @@
 \alias{plot_posterior_f}
 \title{Plot posterior of f}
 \usage{
-plot_posterior_f(fit, componentwise = FALSE, PRED = NULL)
+plot_posterior_f(fit, PRED = NULL, componentwise = FALSE,
+  plot_uncertainty = TRUE)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
+\item{PRED}{Predictions computed using \code{lgp_predict}.}
+
 \item{componentwise}{A boolean value.}
 
-\item{PRED}{Predictions computed using \code{lgp_predict}.}
+\item{plot_uncertainty}{Should an uncertainty ribbon be plotted?}
 }
 \value{
 a ggplot object
 }
 \description{
-Plot posterior of f
+This is a wrapper for \code{\link{plot_posterior_components}}.
+and \code{\link{plot_posterior_predictions}}.
 }

@@ -246,8 +246,29 @@ add_test_caseIDs <- function(X_test, X_data){
 #' @param D A vector of length 6.
 #' @param info Other model info.
 #' @param cnames Names of the model components.
+#' @param handle_extra What to do if test data contains individuals that are
+#' not in the training data? Must be 'silent', 'warning' or 'error'.
 #' @return A list.
-compute_predictions <- function(X_data, y_data, X_test, params, D, info, cnames){
+compute_predictions <- function(X_data, y_data, X_test, params, D, info, cnames, 
+                                handle_extra = "warning"){
+  
+  # Check that the IDs are same
+  uid1 <- unique(X_data[,1])
+  uid2 <- unique(X_test[,1])
+  extra <- setdiff(uid2, uid1)
+  if(length(extra)>0){
+    msg <- "The test data contains individuals that are not in the training data! {"
+    msg <- paste(msg, paste(extra, collapse = ", "), "}", sep = "")
+    if(handle_extra=="warning"){
+      warning(msg)
+    }else if(handle_extra=="error"){
+      stop(msg)
+    }else if(handle_extra=="silent"){
+      #do nothing
+    }else{
+      stop("unknown keyword for handle_extra (", handle_extra, ")")
+    }
+  }
   
   # Get kernel hyperparameters and other needed parameters
   nam   <- names(params)

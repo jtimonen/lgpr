@@ -23,5 +23,5 @@ a ggplot object or lppd
 }
 \description{
 This is a convenience function that wraps \code{\link{lgp_predict}},
-\code{\link{compute_lppd}} and \code{\link{plot_predictions}}.
+\code{\link{compute_lppd}} and \code{\link{plot_posterior_y}}.
 }

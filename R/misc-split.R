@@ -36,7 +36,6 @@ split_data_by_timepoint <- function(data, test_idx, id_variable = "id", time_var
   return(ret)
 }
 
-
 #' Split data into training and test data randomly
 #'
 #' @export
@@ -54,6 +53,30 @@ split_data_random <- function(data, p_test = 0.1, n_test = NULL){
   return(ret)
 }
 
+
+#' Split data into training and test data by selecting randomly k points from each individual
+#'
+#' @export
+#' @param data a data frame
+#' @param n_test desired number of test data points per individual
+#' @param id_variable name of id variable
+#' @param time_variable name of time variable
+#' @return a \code{list(train, test)}
+split_data_random_each <- function(data, n_test = 1, id_variable = "id", time_variable = "age"){
+  id  <- data[[id_variable]]
+  age <- data[[time_variable]]
+  uid <- unique(id)
+  N   <- length(uid)
+  i_test <- c()
+  for(i in uid){
+    inds   <- which(id==i)
+    L      <- length(inds)
+    i_sel  <- sample.int(L, n_test)
+    i_test <- c(i_test, inds[i_sel])
+  }
+  ret <- split_data(data, i_test)
+  return(ret)
+}
 
 #' Split data into training and test data according to given row indices
 #'

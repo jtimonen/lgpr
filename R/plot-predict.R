@@ -1,22 +1,29 @@
 #' Plot posterior of f
 #' 
 #' @export
+#' @description This is a wrapper for \code{\link{plot_posterior_components}}.
+#' and \code{\link{plot_posterior_predictions}}.
 #' @param fit An object of class \code{lgpfit}.
 #' @param componentwise A boolean value.
 #' @param PRED Predictions computed using \code{lgp_predict}.
+#' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @return a ggplot object
-plot_posterior_f <- function(fit, componentwise = FALSE, PRED = NULL){
-  if(class(componentwise)!="logical"){
-    stop("componentwise must be a logical argument!")
+plot_posterior_f <- function(fit, PRED = NULL, componentwise = FALSE, plot_uncertainty = TRUE){
+  if(componentwise){
+    h <- plot_posterior_components(fit, PRED = PRED, plot_uncertainty = plot_uncertainty)
+  }else{
+    h <- plot_posterior_predictions(fit, 
+                                    mode = "posterior", 
+                                    PRED = PRED, 
+                                    plot_uncertainty = plot_uncertainty)
   }
-  h <- plot_predictions(fit, componentwise = componentwise, 
-                        mode = "posterior", PRED)
   return(h)
 }
 
 #' Plot posterior predictive distribution
 #' 
 #' @export
+#' @description This is a wrapper for \code{\link{plot_posterior_predictions}}.
 #' @param fit An object of class \code{lgpfit}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param uncertainty Either "none", "ribbon" or "errorbar".
@@ -27,14 +34,14 @@ plot_posterior_y <- function(fit, PRED, uncertainty = "ribbon", test_data = NULL
     stop("You must specify the PRED argument!")
   }
   if(uncertainty=="ribbon"){
-    h <- plot_predictions(fit, mode = "predictive", PRED = PRED,
-                          test_data = test_data)
+    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
+                                    test_data = test_data)
   }else if(uncertainty=="errorbar"){
-    h <- plot_predictions(fit, mode = "predictive", PRED = PRED, 
-                          error_bar = TRUE, test_data = test_data)
+    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
+                                    error_bar = TRUE, test_data = test_data)
   }else{
-    h <- plot_predictions(fit, mode = "predictive", PRED = PRED, 
-                          plot_uncertainty = FALSE, test_data = test_data) 
+    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
+                                    plot_uncertainty = FALSE, test_data = test_data) 
   }
   return(h)
 }
@@ -46,18 +53,16 @@ plot_posterior_y <- function(fit, PRED, uncertainty = "ribbon", test_data = NULL
 #' @param fit An object of class \code{lgpfit}.
 #' @param mode Must be either "posterior" or "predictive".
 #' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param componentwise Should the predictions be plotted componentwise?
 #' @param color_scheme Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.
 #' @param alpha Ribbon fill opacity.
-#' @param alpha_line Line opacity
+#' @param alpha_line Line opacity.
+#' @param alpha2 alpha of t_onset density
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
-#' @param theme ggplot theme
 #' @param original_y_scale should the predictions be scaled back to the original data y scale
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
 #' @param plot_obs_onset should the observed disease onset be plotted by a vertical line
 #' @param plot_onset_samples should a distribution of sampled onsets be plotted
-#' @param alpha2 alpha of t_onset density
 #' @param color_scheme_onset color scheme name for onset density plotting
 #' @param ypos_dens y-position of the density plot
 #' @param test_data Test data frame
@@ -66,33 +71,33 @@ plot_posterior_y <- function(fit, PRED, uncertainty = "ribbon", test_data = NULL
 #' @param size_test test point size
 #' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
 #' @return a ggplot object
-plot_predictions <- function(fit, 
-                             mode,
-                             PRED               = NULL, 
-                             componentwise      = FALSE,
-                             color_scheme       = "red",
-                             alpha              = 0.5-0.4*as.numeric(componentwise), 
-                             plot_uncertainty   = TRUE,
-                             title              = NULL,
-                             theme              = ggplot2::theme_gray(),
-                             original_y_scale   = TRUE,
-                             alpha_line         = 1,
-                             ylim               = NULL,
-                             plot_obs_onset     = FALSE,
-                             alpha2             = 0.5,
-                             color_scheme_onset = "gray",
-                             plot_onset_samples = FALSE,
-                             ypos_dens          = NULL,
-                             test_data          = NULL,
-                             color_test         = "deepskyblue2",
-                             pch_test           = 21,
-                             size_test          = 2,
-                             error_bar          = FALSE)
+plot_posterior_predictions <- function(fit, 
+                                       mode,
+                                       PRED               = NULL, 
+                                       color_scheme       = "red",
+                                       color_scheme_onset = "gray",
+                                       alpha              = 0.5, 
+                                       alpha_line         = 1,
+                                       alpha2             = 0.5,
+                                       plot_uncertainty   = TRUE,
+                                       title              = NULL,
+                                       original_y_scale   = TRUE,
+                                       ylim               = NULL,
+                                       plot_obs_onset     = FALSE,
+                                       plot_onset_samples = FALSE,
+                                       ypos_dens          = NULL,
+                                       test_data          = NULL,
+                                       color_test         = "deepskyblue2",
+                                       pch_test           = 21,
+                                       size_test          = 2,
+                                       error_bar          = FALSE)
 {
   
   # Input checks and options
-  OPT <- plot_predictions_options(fit, color_scheme, componentwise,
-                                  original_y_scale, PRED, test_data, color_scheme_onset, mode)
+  cwise <- FALSE
+  OPT <- plot_predictions_options(fit, color_scheme, cwise,
+                                  original_y_scale, PRED, test_data, 
+                                  color_scheme_onset, mode)
   DF      <- OPT$DF
   idvar   <- OPT$idvar
   timevar <- OPT$timevar
@@ -100,29 +105,17 @@ plot_predictions <- function(fit,
   model   <- fit@model
   info    <- model@info
   
-  # Facet variable and labels
-  X_id <- as.numeric(model@stan_dat$X[1,])
-  if(componentwise){
-    facet_var    <- "component"
-    DF$facet_var <- DF[[facet_var]]
-    ptitle       <- "Posteriors of components of f"
-    ylab         <- " "
+  # Function for formatting the IDs
+  formatter <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
+  id_pred   <- as.numeric(as.vector(DF[[idvar]]))
+  DF$facet_var <- formatter(id_pred)
+  # Set title
+  if(mode == "posterior"){
+    ptitle <- "Posterior distribution of f"
   }else{
-    facet_var    <- idvar
-    id_train     <- unique(X_id)
-    DF$facet_var <- DF[[facet_var]]
-    id_test      <- unique(as.numeric(DF$facet_var))
-    all_ids      <- union(id_train, id_test)
-    all_ids      <- sort(all_ids, decreasing = FALSE)
-    DF$facet_var <- as.numeric(factor(DF$facet_var, levels = all_ids))
-    if(mode == "posterior"){
-      ptitle <- "Posterior distribution of f"
-    }else{
-      ptitle <- "Posterior predictive distribution"
-    }
-    
-    ylab <- respvar
+    ptitle <- "Posterior predictive distribution"
   }
+  ylab <- respvar
   
   # Create ggplot object
   if(info$sample_F){
@@ -170,41 +163,32 @@ plot_predictions <- function(fit,
   }
   
   # Plot also the data
-  if(!componentwise){
-    dat  <- model@data
-    df   <- data.frame(idvar   = as.factor(X_id), 
-                       timevar = as.numeric(dat[[timevar]]),
-                       y       = as.numeric(dat[[respvar]]))
-    colnames(df)[1] <- idvar
-    colnames(df)[2] <- timevar
-    colnames(df)[3] <- respvar
-    df$facet_var    <- df[[facet_var]]
-    h <- h + ggplot2::geom_point(data = df, mapping = ggplot2::aes_string(
-      x = timevar,
-      y = respvar)
-    )
-  }
-  
-  # Faceting, theme and limits
-  h <- h + ggplot2::facet_wrap(. ~ facet_var)
-  h <- h + theme
-  if(!is.null(ylim)){h <- h + ggplot2::coord_cartesian(ylim = ylim)}
+  dat  <- model@data
+  X_id <- as.numeric(dat[[idvar]])
+  df   <- data.frame(idvar   = X_id, 
+                     timevar = as.numeric(dat[[timevar]]),
+                     y       = as.numeric(dat[[respvar]]),
+                     facet_var = formatter(X_id))
+  colnames(df)[1] <- idvar
+  colnames(df)[2] <- timevar
+  colnames(df)[3] <- respvar
+  h <- h + ggplot2::geom_point(data = df, mapping = ggplot2::aes_string(
+    x = timevar,
+    y = respvar)
+  )
   
   # Add onsets
-  if(!componentwise){
-    h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
-                                     idvar, timevar, ypos_dens, OPT$cs_onset)
-  }
+  h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
+                                   idvar, timevar, ypos_dens, OPT$cs_onset)
   
   # Plot test data
   if(!is.null(test_data)){
-    id_test    <- test_data[[idvar]]
+    id_test    <- formatter(test_data[[idvar]])
     age_test   <- test_data[[timevar]]
     y_test     <- test_data[[respvar]]
     point.data <- data.frame(xxx       = age_test,
                              yyy       = y_test,
                              facet_var = id_test)
-    
     if(pch_test > 20){
       edgecol <- "black"
     }else{
@@ -220,7 +204,92 @@ plot_predictions <- function(fit,
                                  fill     = color_test)
   }
   
+  # Faceting, theme and limits
+  h <- h + ggplot2::facet_wrap(. ~ facet_var)
+  if(!is.null(ylim)){h <- h + ggplot2::coord_cartesian(ylim = ylim)}
+  
   # Return modified ggplot object
+  return(h)
+}
+
+
+
+#' Plot posterior of the components of f
+#' 
+#' @param fit An object of class \code{lgpfit}.
+#' @param PRED Predictions computed using \code{lgp_predict}.
+#' @param color_scheme Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.
+#' @param alpha Ribbon fill opacity.
+#' @param alpha_line Line opacity
+#' @param plot_uncertainty Should an uncertainty ribbon be plotted?
+#' @param original_y_scale should the predictions be scaled back to the original data y scale
+#' @param title optional prefix to plot title
+#' @param ylim y axis limits
+#' @return a ggplot object
+plot_posterior_components <- function(fit, 
+                                      PRED               = NULL, 
+                                      color_scheme       = "red",
+                                      alpha              = 0.1,
+                                      alpha_line         = 1,
+                                      plot_uncertainty   = TRUE,
+                                      title              = NULL,
+                                      original_y_scale   = TRUE,
+                                      ylim               = NULL)
+{
+  
+  # Input checks and options
+  cwise     <- TRUE
+  test_data <- NULL
+  cs_onset  <- color_scheme
+  mode      <- "posterior"
+  OPT       <- plot_predictions_options(fit, color_scheme,
+                                        cwise, original_y_scale, 
+                                        PRED, test_data, cs_onset, mode)
+  
+  # Make some variables easily accessible
+  DF      <- OPT$DF
+  idvar   <- OPT$idvar
+  timevar <- OPT$timevar
+  respvar <- OPT$respvar
+  model   <- fit@model
+  info    <- model@info
+  
+  # Title and labels
+  ptitle  <- "Posteriors of components of f"
+  ylab    <- " "
+  
+  # Create ggplot object
+  if(info$sample_F){
+    group_var <- "idx"
+    y_var     <- "pred"
+  }else{
+    group_var <- idvar
+    y_var     <- "mu"
+  }
+  h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
+  
+  # Edit plot title
+  if(!is.null(title)){
+    ptitle <- paste(title, ": ", ptitle, sep="")
+  }
+  h <- h + ggplot2::ggtitle(label = ptitle)
+  h <- h + ggplot2::labs(y = ylab)
+  
+  # Plot uncertainty ribbon or error bars
+  if(plot_uncertainty && !info$sample_F){
+    h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = 'lower', ymax = 'upper'),
+                                  fill  = OPT$fill, 
+                                  alpha = alpha)
+  }
+  
+  # Plot mean prediction
+  h <- h + ggplot2::geom_line(color = OPT$linecolor, alpha = alpha_line)
+  
+  # Faceting and limits
+  h <- h + ggplot2::facet_wrap(. ~ component)
+  if(!is.null(ylim)){h <- h + ggplot2::coord_cartesian(ylim = ylim)}
+  
+  # Return ggplot object
   return(h)
 }
 
@@ -262,7 +331,7 @@ plot_predictions_options <- function(fit,
   if(class(color_scheme_onset)=="character"){
     color_scheme_onset <- bayesplot::color_scheme_get(color_scheme_onset)
   }
-  linecolor <- color_scheme$dark
+  linecolor <- color_scheme$dark_highlight
   if(!componentwise){
     fill      <- color_scheme$mid
     hlcolor   <- color_scheme$mid_highlight

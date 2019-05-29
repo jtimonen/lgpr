@@ -19,5 +19,5 @@ plot_posterior_y(fit, PRED, uncertainty = "ribbon", test_data = NULL)
 a ggplot object
 }
 \description{
-Plot posterior predictive distribution
+This is a wrapper for \code{\link{plot_posterior_predictions}}.
 }

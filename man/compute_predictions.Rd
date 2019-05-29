@@ -4,7 +4,8 @@
 \alias{compute_predictions}
 \title{Compute component-wise predictions at test points}
 \usage{
-compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
+compute_predictions(X_data, y_data, X_test, params, D, info, cnames,
+  handle_extra = "warning")
 }
 \arguments{
 \item{X_data}{Covariate matrix (data points).}
@@ -20,6 +21,9 @@ compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
 \item{info}{Other model info.}
 
 \item{cnames}{Names of the model components.}
+
+\item{handle_extra}{What to do if test data contains individuals that are
+not in the training data? Must be 'silent', 'warning' or 'error'.}
 }
 \value{
 A list.
