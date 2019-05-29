@@ -121,7 +121,7 @@ plot_predictions <- function(fit,
       ptitle <- "Posterior predictive distribution"
     }
     
-    ylab         <- respvar
+    ylab <- respvar
   }
   
   # Create ggplot object
@@ -148,9 +148,13 @@ plot_predictions <- function(fit,
   # Plot uncertainty ribbon or error bars
   if(plot_uncertainty && !info$sample_F){
     if(error_bar){
+      age_train <- as.numeric(model@data[[timevar]])
+      age_test  <- c(DF[[timevar]])
+      trange    <- range(c(age_test, age_train))
+      width     <- 0.035*(trange[2]-trange[1])
       h <- h + ggplot2::geom_errorbar(ggplot2::aes_string(ymin = 'lower', ymax = 'upper'),
                                       color = OPT$hlcolor,
-                                      width = 1)
+                                      width = width)
     }else{
       h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = 'lower', ymax = 'upper'),
                                     fill  = OPT$fill, 

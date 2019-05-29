@@ -185,6 +185,36 @@ predict_preproc <- function(fit, X_test, samples){
   return(ret)
 }
 
+
+#' Average predictions over samples
+#'
+#' @param LIST a list over samples
+#' @return a list
+average_predictions <- function(LIST){
+  L      <- length(LIST)
+  p1     <- LIST[[1]]
+  mu_cmp <- 1/L * p1$mu_cmp
+  s2_cmp <- 1/L * p1$s2_cmp
+  mu_f   <- 1/L * p1$mu_f
+  s2_f   <- 1/L * p1$s2_f
+  s2_y   <- 1/L * p1$s2_y
+  for(i in 2:L){
+    p      <- LIST[[i]]
+    mu_cmp <- mu_cmp + 1/L * p$mu_cmp
+    s2_cmp <- s2_cmp + 1/L * p$s2_cmp
+    mu_f   <- mu_f   + 1/L * p$mu_f
+    s2_f   <- s2_f   + 1/L * p$s2_f
+    s2_y   <- s2_y   + 1/L * p$s2_y
+  }
+  ret <- list(mu_cmp = mu_cmp,
+              s2_cmp = s2_cmp,
+              mu_f   = mu_f,
+              s2_f   = s2_f,
+              s2_y   = s2_y)
+  return(ret)
+}
+
+
 #' Add case IDs to test data frame
 #'
 #' @param X_test test data frame
