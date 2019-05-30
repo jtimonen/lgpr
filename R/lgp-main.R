@@ -281,19 +281,28 @@ lgp_predict <- function(fit,
     pnames <- colnames(PAR)
     ns     <- dim(PAR)[1]
     
+    # Progress bar top
+    if(print_progress){
+      str    <- paste("|   ", seq(10,100,by=10), "%", sep="")
+      top    <- paste(formatC(str, width = 4), collapse = " ")
+      top    <- paste(top, "|")
+      barlen <- nchar(top) - 1
+      iprint <- ceiling(seq(1, ns, length.out = barlen))
+      if(ns >=100){
+        cat(top, "\n ")
+      }
+    }
+    
     for(i_smp in 1:ns){
       # Predict with current parameter sample
       params        <- as.numeric(PAR[i_smp,])
       names(params) <- pnames
       LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
       
-      # Print  progress
+      # Print progress
       if(print_progress){
-        cat('.')
-        if(i_smp %% 10 == 0){ cat(' ')  }
-        if(i_smp %% 50 == 0){ cat(i_smp, '\n') }
-        if(i_smp %% 200 == 0){ cat('\n')}
-        if(i_smp == ns){ cat('\n')}
+        if(i_smp %in% iprint){cat('=')}
+        if(i_smp == ns){ cat('\n\n')}
       }
     }
     
@@ -312,11 +321,11 @@ lgp_predict <- function(fit,
 #' \code{\link{compute_lppd}} and \code{\link{plot_posterior_y}}.
 #' @param fit an object of class \code{lgpfit}
 #' @param test_data a test data matrix
-#' @param reduction must be either "mean", "sum" or "none"
-#' @param samples Sample indices.
-#' @param plot should this plot the data and predictions?
+#' @param verbose Should this print progress?
+#' @param samples Sample indices or a keyword "mean", "median" or "all".
+#' @param plot should this return also a plot of the data and predictions?
 #' @return a ggplot object or lppd
-lgp_test <- function(fit, test_data, plot = FALSE, reduction = "mean", samples = "mean"){
+lgp_test <- function(fit, test_data, plot = FALSE, verbose = TRUE, samples = "mean"){
   
   # predict only at test points
   info    <- fit@model@info
@@ -328,16 +337,16 @@ lgp_test <- function(fit, test_data, plot = FALSE, reduction = "mean", samples =
   dat     <- data.frame(test_data)
   X_test  <- dat[,xnames]
   y_test  <- dat[,yname]
-  PRED    <- lgp_predict(fit, X_test, samples = samples)
+  PRED    <- lgp_predict(fit, X_test, samples = samples, print_progress = verbose)
   LPPD    <- compute_lppd(PRED, y_test)
   mlppd   <- mean(as.numeric(LPPD))
+  ret     <- list(lppd = LPPD, mlppd = mlppd)
   if(plot){
     p    <- plot_posterior_y(fit, PRED, test_data = test_data, uncertainty = "errorbar")
     subt <- paste("Mean log-posterior predictive density:", round(mlppd, 5))
     p    <- p + ggplot2::ggtitle(label = "Predictive distribution of y at test points",
                               subtitle = subt)
-    return(p)
-  }else{
-    return(LPPD)
+    ret$plot <- p
   }
+  return(ret)
 }

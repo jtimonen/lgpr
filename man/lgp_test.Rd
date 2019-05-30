@@ -4,7 +4,7 @@
 \alias{lgp_test}
 \title{Compute predictions and log-posterior predictive density at test points}
 \usage{
-lgp_test(fit, test_data, plot = FALSE, reduction = "mean",
+lgp_test(fit, test_data, plot = FALSE, verbose = TRUE,
   samples = "mean")
 }
 \arguments{
@@ -12,11 +12,11 @@ lgp_test(fit, test_data, plot = FALSE, reduction = "mean",
 
 \item{test_data}{a test data matrix}
 
-\item{plot}{should this plot the data and predictions?}
+\item{plot}{should this return also a plot of the data and predictions?}
 
-\item{reduction}{must be either "mean", "sum" or "none"}
+\item{verbose}{Should this print progress?}
 
-\item{samples}{Sample indices.}
+\item{samples}{Sample indices or a keyword "mean", "median" or "all".}
 }
 \value{
 a ggplot object or lppd
