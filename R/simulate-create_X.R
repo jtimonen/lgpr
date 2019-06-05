@@ -52,6 +52,20 @@ create_X <- function(N,
   k   <- length(t_data)
   id  <- rep(1:N, each = k)
   age <- drawMeasurementTimes(N, t_data, t_jitter)
+  
+  # Parse onset range
+  if(is.character(onset_range)){
+    if(onset_range =="auto"){
+      ran <- range(t_data)
+      mrn <- mean(ran)
+      onset_range <- c(mrn, mrn)
+      cat("Onset range set to [", onset_range[1], ", ", onset_range[2], "]. \n", sep="")
+    }else{
+      stop("invalid onset range!")
+    }
+  }
+  
+  # Id and onsets
   if(D[1] > 0){
     N_cases <- round(N/2)
     if(is.function(onset_range)){
@@ -69,6 +83,8 @@ create_X <- function(N,
     disAge  <- c()
     N_cases <- NaN
   }
+  
+  # Other
   if(D[2] > 0){
     CONT <- drawContinuous(N, k, D[2], continuous_info$mu, continuous_info$lambda)
     cont <- CONT$C

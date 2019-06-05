@@ -68,16 +68,17 @@ kernel_bin <- function(x1,x2=NULL,alpha=1,pos_class=1){
 #' @param a steepness of the warping function rise
 #' @param b location of the effective time window
 #' @param c maximum range
+#' @param nan_replace the value to use for replacing NaN values
 #' @return A kernel matrix of size n x m
-kernel_ns <- function(x1,x2=NULL,alpha=1,ell,a,b,c){
+kernel_ns <- function(x1,x2=NULL,alpha=1,ell,a,b,c, nan_replace = 0){
   if(a <= 0){
     stop("a must be positive")
   }
   if(c <= 0){
     stop("c must be positive")
   }
-  x1[is.nan(x1)] <- 0
-  x2[is.nan(x2)] <- 0
+  x1[is.nan(x1)] <- nan_replace
+  x2[is.nan(x2)] <- nan_replace
   w1 <- warp_input(x1,a,b,c)
   w2 <- warp_input(x2,a,b,c)
   K  <- kernel_se(w1,w2,alpha,ell)
@@ -106,19 +107,24 @@ warp_input <- function(t,a,b,c){
 compute_K_beta <- function(beta, row_to_caseID_1, row_to_caseID_2){
   n1   <- length(row_to_caseID_1)
   n2   <- length(row_to_caseID_2)
-  BETA <- matrix(1, n1, n2)
+  BETA <- matrix(0, n1, n2)
   for(i in 1:n1){
     i_case <- row_to_caseID_1[i]
     if(i_case > 0){
-      for(j in 1:n2){
-        j_case    <- row_to_caseID_2[j]
-        if(j_case > 0){
-          b1        <- beta[i_case]
-          b2        <- beta[j_case]
-          BETA[i,j] <- sqrt(b1*b2)
-        }
-      } 
+      b1 <- beta[i_case]
+    }else{
+      b1 <- 0
     }
+    for(j in 1:n2){
+      j_case    <- row_to_caseID_2[j]
+      if(j_case > 0){
+        b2 <- beta[j_case]
+      }else{
+        b2 <- 0
+      }
+      BETA[i,j] <- sqrt(b1*b2)
+    } 
   }
   return(BETA)
 }
+

@@ -9,7 +9,7 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   sum(covariates \%in\% c(2, 3))), t_jitter = 0, lengthscales = rep(12,
   2 + sum(covariates \%in\% c(0, 1, 2))), f_var = 1,
   noise_type = "Gaussian", snr = 3, phi = 1,
-  N_affected = round(N/2), onset_range = range(t_data),
+  N_affected = round(N/2), onset_range = "auto",
   t_observed = "after_0", C_hat = 0, dis_fun = NULL,
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
   1)))

@@ -5,7 +5,7 @@
 \title{Plot each component of a simulated longitudinal data set separately}
 \usage{
 plot_simdata_by_component(simData, linecolor = "black", nrow = NULL,
-  ncol = NULL, plot_point = TRUE, pointcolor = "black")
+  ncol = NULL, plot_point = TRUE)
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
@@ -16,9 +16,7 @@ plot_simdata_by_component(simData, linecolor = "black", nrow = NULL,
 
 \item{ncol}{an argument for \code{ggplot2::facet_wrap}}
 
-\item{plot_point}{should also \code{geom_point} be used?}
-
-\item{pointcolor}{point color}
+\item{plot_point}{should points be plotted also}
 }
 \value{
 a ggplot object

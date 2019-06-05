@@ -4,10 +4,8 @@
 \alias{plot_simdata_by_individual}
 \title{Plot a simulated longitudinal data set for each individual separately}
 \usage{
-plot_simdata_by_individual(simData, linecolor = "firebrick3",
-  nrow = NULL, ncol = NULL, plot_point = FALSE,
-  vlinecolors = rep("steelblue4", 2), vlinetypes = c(1, 2),
-  i_test = NULL, color_test = "steelblue2")
+plot_simdata_by_individual(simData, linecolor = "gray70", nrow = NULL,
+  ncol = NULL, i_test = NULL, color_test = "steelblue2")
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
@@ -17,12 +15,6 @@ plot_simdata_by_individual(simData, linecolor = "firebrick3",
 \item{nrow}{an argument for \code{ggplot2::facet_wrap}}
 
 \item{ncol}{an argument for \code{ggplot2::facet_wrap}}
-
-\item{plot_point}{should \code{geom_point} be used also for the underlying signal?}
-
-\item{vlinecolors}{colors to plot the real and observed disease onsets if they exist}
-
-\item{vlinetypes}{line types to use for the real and observed disease onsets if they exist}
 
 \item{i_test}{test point indices}
 

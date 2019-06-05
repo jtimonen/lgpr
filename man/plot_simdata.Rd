@@ -4,27 +4,17 @@
 \alias{plot_simdata}
 \title{Plot simulated data for each individual separately}
 \usage{
-plot_simdata(simData, componentwise = FALSE, color_scheme = "red",
-  nrow = NULL, ncol = NULL, plot_point = componentwise,
-  vlinecolors = rep("steelblue4", 2), vlinetypes = c(1, 2),
-  i_test = NULL, color_test = "steelblue2")
+plot_simdata(simData, componentwise = FALSE, nrow = NULL,
+  ncol = NULL, i_test = NULL, color_test = "steelblue2")
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
 
 \item{componentwise}{should each component be plotted separately?}
 
-\item{color_scheme}{name of bayesplot color scheme}
-
 \item{nrow}{an argument for \code{ggplot2::facet_wrap}}
 
 \item{ncol}{an argument for \code{ggplot2::facet_wrap}}
-
-\item{plot_point}{should \code{geom_point} be used also for the underlying signal?}
-
-\item{vlinecolors}{colors to plot the real and observed disease onsets if they exist}
-
-\item{vlinetypes}{line types to use for the real and observed disease onsets if they exist}
 
 \item{i_test}{test point indices}
 

@@ -409,7 +409,7 @@ K_beta(const Eigen::Matrix<T0__, Eigen::Dynamic,1>& beta,
                 } else {
 
                     current_statement_begin__ = 83;
-                    stan::math::assign(tmp, 1);
+                    stan::math::assign(tmp, 0);
                 }
                 current_statement_begin__ = 85;
                 stan::model::assign(BETA, 
@@ -435,7 +435,7 @@ K_beta(const Eigen::Matrix<T0__, Eigen::Dynamic,1>& beta,
                 current_statement_begin__ = 92;
                 stan::model::assign(BETA, 
                             stan::model::cons_list(stan::model::index_uni(i), stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list())), 
-                            1, 
+                            0, 
                             "assigning variable BETA");
             }
         }
@@ -454,7 +454,7 @@ K_beta(const Eigen::Matrix<T0__, Eigen::Dynamic,1>& beta,
             current_statement_begin__ = 100;
             stan::model::assign(BETA, 
                         stan::model::cons_list(stan::model::index_uni(n), stan::model::cons_list(stan::model::index_uni(n), stan::model::nil_index_list())), 
-                        1, 
+                        0, 
                         "assigning variable BETA");
         }
         current_statement_begin__ = 102;

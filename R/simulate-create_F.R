@@ -35,11 +35,16 @@ create_F <- function(X,
   KK    <- simulate_kernels(X, D, lengthscales, X_affected, useBinKernel)
   labs  <- nameComponents(D, colnames(X))
   FFF   <- drawLatentComponents(KK)
-  if(sum(D==3)==1 && !is.null(dis_fun)){
-    icol <- which(labs=="diseaseAge")
-    FFF[,icol] <- disease_effect(X[,1],X[,3],dis_fun)
+  if(sum(D==3)==1){
+    i_dis <- which(labs=="diseaseAge") 
+  }else{
+    i_dis <- -1
   }
-  FFF   <- scaleRelevances(FFF, relevances)
+  if(i_dis > 0 && !is.null(dis_fun)){
+    FFF[,i_dis] <- disease_effect(X[,1],X[,3],dis_fun)
+  }
+  
+  FFF   <- scaleRelevances(FFF, relevances, force_zero_mean = TRUE, i_dis)
   colnames(FFF) <- labs
   return(data.frame(FFF))
 }
@@ -86,6 +91,7 @@ simulate_kernels <- function(X, types, lengthscales, X_affected, useBinKernel=TR
     }else if(types[j]==3){
       j_ell <- j_ell + 1
       Kj <- kernel_bin(X_affected, X_affected) * kernel_ns(xj,xj,ell=ell[j_ell], a = 1, b = 0, c = 1)
+      #Kj <- kernel_bin(X_affected, X_affected) * ... 
     }else if(types[j]==4){
       j_ell <- j_ell + 1
       Kj <- kernel_se(xj,xj,ell=ell[j_ell])
@@ -136,11 +142,11 @@ nameComponents <- function(types,names){
 #' Scale the effect sizes
 #'
 #' @param FFF matrix where one column corresponds to one additive data component
-#' @param f_var variance to which \code{FFF} will be scaled
 #' @param relevances the desired variance of each component (column)
 #' @param force_zero_mean should each component be forced to have zero mean?
+#' @param i_dis index of a component for which the zero-mean forcing is skipped
 #' @return a new matrix \code{FFF}
-scaleRelevances <- function(FFF, relevances, f_var, force_zero_mean = TRUE){
+scaleRelevances <- function(FFF, relevances, force_zero_mean = TRUE, i_dis){
   
   # Some input checking
   d <- dim(FFF)[2]
@@ -149,21 +155,12 @@ scaleRelevances <- function(FFF, relevances, f_var, force_zero_mean = TRUE){
     stop("negative relevances not allowed!")
   }
   
-  multip <- 1
-  if(R==0){
-    if(f_var !=0){
-      stop("cannot set f_var different from zero if all relevances are zero")
-    }else{
-      multip <- 0
-    }
-  }
-  
   # Scale the columns to correct relevances
   for(j in 1:d){
     std <- stats::sd(FFF[,j])
     if(std > 0){
-      FFF[,j] <- multip*sqrt(relevances[j])/std*FFF[,j]
-      if(force_zero_mean){
+      FFF[,j] <- sqrt(relevances[j])/std*FFF[,j]
+      if(force_zero_mean && j != i_dis){
         FFF[,j] <- FFF[,j] - mean(FFF[,j])
       }
     }

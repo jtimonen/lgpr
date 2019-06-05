@@ -4,7 +4,7 @@
 \alias{kernel_ns}
 \title{Compute a nonstationary kernel matrix using input warping}
 \usage{
-kernel_ns(x1, x2 = NULL, alpha = 1, ell, a, b, c)
+kernel_ns(x1, x2 = NULL, alpha = 1, ell, a, b, c, nan_replace = 0)
 }
 \arguments{
 \item{x1}{vector of length n}
@@ -20,6 +20,8 @@ kernel_ns(x1, x2 = NULL, alpha = 1, ell, a, b, c)
 \item{b}{location of the effective time window}
 
 \item{c}{maximum range}
+
+\item{nan_replace}{the value to use for replacing NaN values}
 }
 \value{
 A kernel matrix of size n x m

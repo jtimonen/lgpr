@@ -40,7 +40,7 @@ matrix K_beta(vector beta, int[] row_to_caseID){
       if(i_caseID*j_caseID > 0){
         tmp = sqrt(beta[i_caseID]*beta[j_caseID]);
       }else{
-        tmp = 1;
+        tmp = 0;
       }
       BETA[i,j] = tmp;
       BETA[j,i] = tmp;
@@ -49,7 +49,7 @@ matrix K_beta(vector beta, int[] row_to_caseID){
     if(i_caseID > 0){
       BETA[i,i] = beta[i_caseID];
     }else{
-      BETA[i,i] = 1;
+      BETA[i,i] = 0;
     }
 
   }
@@ -57,7 +57,7 @@ matrix K_beta(vector beta, int[] row_to_caseID){
   if(i_caseID > 0){
     BETA[n,n] = beta[i_caseID];
   }else{
-    BETA[n,n] = 1;
+    BETA[n,n] = 0;
   }
   return(BETA);
 }
