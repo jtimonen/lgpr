@@ -30,13 +30,15 @@ if(D[3]==1){
   }else{
     x_tilde = get_x_tilde(X[3], T_onset[1], T_observed, caseID_to_rows, caseID_nrows); 
   }
-  w = to_array_1d(sigmoid(x_tilde, stp, 0.0, 1.0));
+  w = to_array_1d(warp_input(x_tilde, stp, 0.0, 1.0));
     
-  // Homogeneous or heterogeneous disease effect
-  if(HMGNS==1){
-    Kxr = cov_exp_quad(w, alp, ell).* KF[2];
-  }else{
-    Kxr = K_beta(beta[1], row_to_caseID).* cov_exp_quad(w, alp, ell).* KF[2];
+  // Create disease effect kernel
+  Kxr = KF[2] .* cov_exp_quad(w, alp, ell);
+  if(HMGNS==0){
+    Kxr = K_beta(beta[1], row_to_caseID) .* Kxr;
+  }
+  if(USE_VAR_MASK==1){
+    Kxr = K_var_mask(x_tilde, stp) .* Kxr;
   }
   Lxr = cholesky_decompose(Kxr + EYE);
   F[1,r,] = Lxr*ETA[1,r,];

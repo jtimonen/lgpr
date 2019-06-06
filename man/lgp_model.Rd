@@ -10,7 +10,7 @@ lgp_model(formula, data, likelihood = "Gaussian",
   sample_F = (likelihood != "Gaussian"), t_test = NULL,
   id_variable = "id", time_variable = "age", disAge_variable = NULL,
   continuous_vars = NULL, categorical_vars = NULL,
-  offset_vars = NULL)
+  offset_vars = NULL, variance_mask = FALSE)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -58,6 +58,9 @@ as categorical.}
 \item{offset_vars}{Names of the categorical covariates that are treated as 
 time-independent group offsets. If \code{NULL}, no variables are interpreted as such
 covariates.}
+
+\item{variance_mask}{Should a variance mask be used to force disease component
+variance to zero before disease onset?}
 }
 \value{
 An object of class \code{lgpmodel}.

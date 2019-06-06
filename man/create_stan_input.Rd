@@ -6,7 +6,7 @@
 \usage{
 create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
   uncertain_diagnosis, equal_effect, C_hat, DELTA, sample_F, t_test,
-  verbose)
+  verbose, variance_mask)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -42,6 +42,9 @@ likelihood is not Gaussian).}
 Otherwise use \code{\link{lgp_predict}} after fitting the model.}
 
 \item{verbose}{Can this print some info?}
+
+\item{variance_mask}{Should a variance mask be used to force disease component
+variance to zero before disease onset?}
 }
 \value{
 A list containing the data to be given to \code{rstan::sampling}, some info about

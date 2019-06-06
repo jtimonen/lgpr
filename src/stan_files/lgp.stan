@@ -84,9 +84,9 @@ data {
   int HS[6];        // (currently not used)
   int F_is_sampled; // should the function values be sampled? 
                     // (must be 1 for non-Gaussian lh)
-  
-  // Should the log-parametrized likelihood function be used ?
-  int<lower=0,upper=1> use_log_param_lh; 
+                    
+  // Variance mask
+  int<lower=0,upper=1> USE_VAR_MASK;
   
 }
 
@@ -124,7 +124,6 @@ transformed data{
   print("* Additional model info:")
   if(LH!=1){
     print("  - C_hat = ", C_hat);
-    print("  - use_log_param_lh = ", use_log_param_lh)
   }
   print("  - D = ", D);
   print("  - F_is_sampled = ", F_is_sampled)
@@ -133,6 +132,7 @@ transformed data{
     print("  - Number of cases = ", N_cases);
     print("  - UNCRT = ", UNCRT);
     print("  - HMGNS = ", HMGNS);
+    print("  - USE_VAR_MASK = ", USE_VAR_MASK);
   }
   print(" ")
   
@@ -209,18 +209,10 @@ model {
         real log_g[n] = to_array_1d(F_sum[1:n] + C_hat);
         if(LH==2){
           // 2. Poisson likelihood
-          if(use_log_param_lh){
-            y_int ~ poisson_log(log_g);
-          }else{
-            y_int ~ poisson(exp(log_g));
-          }
+          y_int ~ poisson_log(log_g);
         }else if(LH==3){
           // 3. Negative binomial likelihood
-          if(use_log_param_lh){
-            y_int ~ neg_binomial_2_log(log_g, rep_vector(phi[1], n) );
-          }else{
-            y_int ~ neg_binomial_2(exp(log_g), rep_vector(phi[1], n) );
-          }
+          y_int ~ neg_binomial_2_log(log_g, rep_vector(phi[1], n) );
         }else{
           reject("Unknown likelihood!")
         }

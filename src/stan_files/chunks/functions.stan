@@ -1,9 +1,16 @@
 
-// The input warping function w(x)
-vector sigmoid(vector x, real a, real b, real c){
+// The input warping function 
+vector warp_input(vector x, real a, real b, real c){
   int n_tot = num_elements(x);
   vector[n_tot] w = 2*c*(-0.5 + rep_vector(1, n_tot)./(1+exp(-a*(x-b))));
   return(w);
+}
+
+// The variance mask function
+vector var_mask(vector x, real a){
+  int n_tot = num_elements(x);
+  vector[n_tot] s = rep_vector(1, n_tot)./(1+exp(-a*x));
+  return(s);
 }
 
 // Compute X_tilde
@@ -17,4 +24,3 @@ vector get_x_tilde(vector x_disAge, vector T_onset, vector T_observed, int[,] ma
   }
   return(x_tilde);
 }
-

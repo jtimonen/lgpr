@@ -26,6 +26,7 @@ lgp <- function(formula,
                 skip_postproc    = FALSE,
                 t_test           = NULL,
                 threshold        = 0.95,
+                variance_mask    = FALSE,
                 ...)
 {
   # Create the model
@@ -44,7 +45,8 @@ lgp <- function(formula,
                      disAge_variable  = disAge_variable,
                      continuous_vars  = continuous_vars,
                      categorical_vars = categorical_vars,
-                     offset_vars      = offset_vars)
+                     offset_vars      = offset_vars,
+                     variance_mask    = variance_mask)
   
   show(model)
   
@@ -94,6 +96,8 @@ lgp <- function(formula,
 #' @param offset_vars Names of the categorical covariates that are treated as 
 #' time-independent group offsets. If \code{NULL}, no variables are interpreted as such
 #' covariates.
+#' @param variance_mask Should a variance mask be used to force disease component
+#' variance to zero before disease onset?
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
@@ -111,7 +115,8 @@ lgp_model <- function(formula,
                       disAge_variable  = NULL,
                       continuous_vars  = NULL,
                       categorical_vars = NULL,
-                      offset_vars      = NULL)
+                      offset_vars      = NULL,
+                      variance_mask    = FALSE)
 {
   # Model as a string
   fc <- as.character(formula)
@@ -139,9 +144,8 @@ lgp_model <- function(formula,
                                DELTA          = DELTA,
                                sample_F       = sample_F,
                                t_test         = t_test,
-                               verbose        = TRUE)
-  
-  
+                               verbose        = TRUE,
+                               variance_mask  = variance_mask)
   
   # Data to Stan
   stan_dat <- PREPROC$stan_dat
@@ -156,7 +160,8 @@ lgp_model <- function(formula,
                DELTA           = stan_dat$DELTA,
                component_names = lgp_component_names(stan_dat),
                covariate_names = lgp_covariate_names(stan_dat),
-               response_name   = fc[2])
+               response_name   = fc[2],
+               variance_mask   = variance_mask)
   
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",

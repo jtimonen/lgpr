@@ -22,7 +22,8 @@ create_stan_input <- function(formula,
                               DELTA,
                               sample_F,
                               t_test,
-                              verbose)
+                              verbose,
+                              variance_mask)
 {
   
   # Check sample_F input
@@ -100,7 +101,7 @@ create_stan_input <- function(formula,
                      DELTA     = DELTA,
                      C_hat     = C_hat,
                      F_is_sampled = as.numeric(sample_F),
-                     use_log_param_lh = 1
+                     USE_VAR_MASK = as.numeric(variance_mask)
   )
   
   # Get some variables related to diseased individuals

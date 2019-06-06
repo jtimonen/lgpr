@@ -10,7 +10,8 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   continuous_vars = NULL, categorical_vars = NULL,
   offset_vars = NULL, C_hat = NULL, DELTA = 1e-12,
   sample_F = (likelihood != "Gaussian"), parallel = FALSE,
-  skip_postproc = FALSE, t_test = NULL, threshold = 0.95, ...)
+  skip_postproc = FALSE, t_test = NULL, threshold = 0.95,
+  variance_mask = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -66,6 +67,9 @@ If \code{TRUE}, then Stan is run by first defining
 Otherwise use \code{\link{lgp_predict}} after fitting the model.}
 
 \item{threshold}{Covariate selection threshold.}
+
+\item{variance_mask}{Should a variance mask be used to force disease component
+variance to zero before disease onset?}
 
 \item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
 \code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.}
