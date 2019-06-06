@@ -114,7 +114,8 @@ predict_preproc <- function(fit, X_test, samples){
   LH       <- stan_dat$LH
   
   # Other model info
-  fields   <- c("HMGNS", "UNCRT", "caseID_to_rows", "row_to_caseID", "DELTA")
+  fields   <- c("HMGNS", "UNCRT", "caseID_to_rows", "row_to_caseID", 
+                "DELTA", "USE_VAR_MASK", "vm_params")
   info     <- stan_dat[fields]
   
   if(info$UNCRT==1){
@@ -380,6 +381,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
   stp   <- kernel_info$stp
   beta  <- kernel_info$beta
   info  <- kernel_info$info
+  VM    <- info$USE_VAR_MASK
+  vm_params <- info$vm_params
   
   # Get dimensions and age and id covariates
   n1   <- dim(X1)[1]
@@ -419,6 +422,15 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     disAge2  <- X2[,3]
     xnn1     <- as.numeric(!is.nan(disAge1))
     xnn2     <- as.numeric(!is.nan(disAge2))
+    
+    # alpha mask
+    if(VM==1){
+      K_var_mask <- compute_K_var_mask(disAge1, disAge2, vm_params, stp)
+    }else{
+      K_var_mask <- matrix(1, n1, n2)
+    }
+    
+    # beta mask
     if(info$HMGNS==0){
       caseID_1 <- X1[,d1] # case ids must be the last column
       caseID_2 <- X2[,d2]
@@ -426,7 +438,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     }else{
       K_beta <- matrix(1, n1, n2)
     }
-    KK[,,r] <- K_beta * kernel_bin(xnn1, xnn2) * 
+    
+    KK[,,r] <- K_var_mask * K_beta * kernel_bin(xnn1, xnn2) * 
       kernel_ns(disAge1, disAge2, mag, len, a = stp, b = 0, c = 1)
   }
   if(D[4]>0){

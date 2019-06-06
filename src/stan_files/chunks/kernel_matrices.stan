@@ -38,7 +38,7 @@
       KX[r] = K_beta(beta[1], row_to_caseID) .* KX[r];
     }
     if(USE_VAR_MASK==1){
-      KX[r] = K_var_mask(x_tilde, stp) .* KX[r];
+      KX[r] = K_var_mask(x_tilde, stp, vm_params) .* KX[r];
     }
   }
   for(j in 1:D[4]){

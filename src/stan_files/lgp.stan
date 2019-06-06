@@ -1,5 +1,5 @@
 // *lgp.stan*
-// The Stan model of the 'lgpr' package
+// This is the main Stan model of the 'lgpr' package
 // Author: Juho Timonen
 
 #include /chunks/license.stan
@@ -87,6 +87,7 @@ data {
                     
   // Variance mask
   int<lower=0,upper=1> USE_VAR_MASK;
+  real vm_params[2];
   
 }
 

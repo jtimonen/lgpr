@@ -111,7 +111,8 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
                       p_ONS = ONSET$p_ONS, 
                       L_ons = ONSET$L_ons,
                       U_ons = ONSET$U_ons,
-                      backwards = ONSET$backwards
+                      backwards = ONSET$backwards,
+                      vm_params = prior$vm_params
   )
   
   return(stan_priors)

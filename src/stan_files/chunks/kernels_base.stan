@@ -26,9 +26,12 @@ matrix K_bin(int[] x1, int[] x2, int c){
 }
 
 // Multiplier matrix to enable heterogeneous diseaseAge effect
-matrix K_var_mask(vector x_tilde, real stp){
+matrix K_var_mask(vector x_tilde, real stp, real[] vm_params){
   int n = num_elements(x_tilde);
-  vector[n] s = var_mask(x_tilde-3, 4*stp);
+  real a = stp * vm_params[2];
+  real h = vm_params[1];
+  real r = 1/a*log(h/(1-h));
+  vector[n] s = var_mask(x_tilde - r, a);
   matrix[n,n] MASK = tcrossprod(to_matrix(s));
   return(MASK);
 }

@@ -119,7 +119,7 @@ plot_simdata_by_individual <- function(simData,
                                  na.rm = TRUE)
   }else{
     h <- h + ggplot2::geom_point(ggplot2::aes_string(shape = 'leg', 
-                                                     color = color_str),
+                                                     color = 'is_test'),
                                  na.rm = TRUE)
   }
 

@@ -38,7 +38,7 @@ if(D[3]==1){
     Kxr = K_beta(beta[1], row_to_caseID) .* Kxr;
   }
   if(USE_VAR_MASK==1){
-    Kxr = K_var_mask(x_tilde, stp) .* Kxr;
+    Kxr = K_var_mask(x_tilde, stp, vm_params) .* Kxr;
   }
   Lxr = cholesky_decompose(Kxr + EYE);
   F[1,r,] = Lxr*ETA[1,r,];

@@ -128,3 +128,24 @@ compute_K_beta <- function(beta, row_to_caseID_1, row_to_caseID_2){
   return(BETA)
 }
 
+
+#' Compute the variance mask kernel matrix
+#'
+#' @param disAge1 disease-related age covariate vector of length \code{n1}
+#' @param disAge2 disease-related age covariate vector of length \code{n2}
+#' @param vm_params vector of two mask function parameters
+#' @param stp input warping steepness
+#' @param nan_replace value to replace nans in disAge vectors
+#' @return a matrix of size \code{n1} x \code{n2}
+compute_K_var_mask <- function(disAge1, disAge2, vm_params, stp, nan_replace = 0){
+  disAge1[is.nan(disAge1)] <- nan_replace
+  disAge2[is.nan(disAge2)] <- nan_replace
+  mask_fun <- function(x,a){1/(1+exp(-a*x))}
+  a  <- stp * vm_params[2];
+  h  <- vm_params[1];
+  r  <- 1/a*log(h/(1-h));
+  s1 <- mask_fun(disAge1 - r, a)
+  s2 <- mask_fun(disAge2 - r, a)
+  M  <- tcrossprod(s1, s2)
+  return(M)
+}
