@@ -18,7 +18,6 @@
 #' @return An updated object of class \code{lgpfit}.
 postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL){
   
-  cat("* Begin postprocessing. \n")
   model  <- fit@model
   info   <- model@info
   sdat   <- model@stan_dat

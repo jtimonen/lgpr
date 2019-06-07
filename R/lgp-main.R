@@ -215,8 +215,9 @@ lgp_fit <- function(model, threshold, parallel = FALSE, skip_postproc = FALSE, .
   # Finalize the 'lgpfit' object
   tryCatch({
     if(!skip_postproc){
+      cat("* Begin postprocessing. \n")
       fit@Rhat <- assess_convergence(fit)
-      fit      <- postproc(fit, threshold, average_before_variance = F)
+      fit      <- postproc(fit, threshold, average_before_variance = FALSE)
       show(fit)
     }else{
       cat("* Skipped postprocessing.\n")
@@ -281,7 +282,7 @@ lgp_predict <- function(fit,
   }else{
     
     # Predictions using multiple samples
-    cat("using ", length(samples), " parameter samples. \n\n", sep = "")
+    cat("using ", length(samples), " parameter sample(s). \n\n", sep = "")
     PAR    <- hyperparam_samples(fit, samples)
     pnames <- colnames(PAR)
     ns     <- dim(PAR)[1]
@@ -305,7 +306,7 @@ lgp_predict <- function(fit,
       LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
       
       # Print progress
-      if(print_progress){
+      if(print_progress %% ns > 1){
         if(i_smp %in% iprint){cat('=')}
         if(i_smp == ns){ cat('\n\n')}
       }

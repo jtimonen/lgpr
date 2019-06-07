@@ -243,14 +243,15 @@ add_test_caseIDs <- function(X_test, X_data){
 #' @param X_data Covariate matrix (data points).
 #' @param y_data Response variable (data points).
 #' @param X_test Covariate matrix (test points).
-#' @param params Kernel function and other hyperparameters.
-#' @param D A vector of length 6.
-#' @param info Other model info.
+#' @param params Kernel function and other hyperparameters
+#' @param info other model info
+#' @param D a vector of length 6
 #' @param cnames Names of the model components.
 #' @param handle_extra What to do if test data contains individuals that are
 #' not in the training data? Must be 'silent', 'warning' or 'error'.
 #' @return A list.
-compute_predictions <- function(X_data, y_data, X_test, params, D, info, cnames, 
+compute_predictions <- function(X_data, y_data, X_test, 
+                                params, D, info, cnames, 
                                 handle_extra = "warning"){
   
   # Check that the IDs are same
@@ -287,24 +288,24 @@ compute_predictions <- function(X_data, y_data, X_test, params, D, info, cnames,
     beta <- NULL
   }
   
-  # Compute kernel matrices
-  KERNEL_INFO <- list(D     = D, 
-                      alpha = alpha, 
-                      ell   = ell, 
-                      stp   = stp, 
-                      beta  = beta, 
-                      info  = info)
+  sigma_n <- params[which(grepl("sigma_n", nam))]
+  KERNEL_INFO <- list(D       = D, 
+                      alpha   = alpha, 
+                      ell     = ell, 
+                      stp     = stp, 
+                      beta    = beta,
+                      info    = info)
   
+  # Compute kernel matrices
   KK   <- compute_kernel_matrices(X_data, X_data, KERNEL_INFO)
   KKs  <- compute_kernel_matrices(X_test, X_data, KERNEL_INFO)
   KKss <- compute_kernel_matrices(X_test, X_test, KERNEL_INFO)
   
   # Compute predictions
-  sigma_n <- params[which(grepl("sigma_n", nam))]
-  PRED    <- compute_predicted_components(KK, KKs, KKss, 
-                                          y_data, sigma_n, info$DELTA)
-  F_mu    <- PRED$F_mu
-  F_var   <- PRED$F_var
+  PRED <- compute_predicted_components(KK, KKs, KKss, y_data, 
+                                          sigma_n, info$DELTA)
+  F_mu  <- PRED$F_mu
+  F_var <- PRED$F_var
   colnames(F_mu)  <- c(cnames, "f")
   colnames(F_var) <- c(cnames, "f")
   d  <- dim(F_mu)[2]
@@ -376,10 +377,10 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
   
   # Get hyperparams and other kernel info
   D     <- kernel_info$D
-  alpha <- kernel_info$alpha
-  ell   <- kernel_info$ell
-  stp   <- kernel_info$stp
-  beta  <- kernel_info$beta
+  alpha <- as.numeric(kernel_info$alpha)
+  ell   <- as.numeric(kernel_info$ell)
+  stp   <- as.numeric(kernel_info$stp)
+  beta  <- as.numeric(kernel_info$beta)
   info  <- kernel_info$info
   VM    <- info$USE_VAR_MASK
   vm_params <- info$vm_params

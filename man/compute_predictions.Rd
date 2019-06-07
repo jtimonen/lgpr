@@ -14,11 +14,11 @@ compute_predictions(X_data, y_data, X_test, params, D, info, cnames,
 
 \item{X_test}{Covariate matrix (test points).}
 
-\item{params}{Kernel function and other hyperparameters.}
+\item{params}{Kernel function and other hyperparameters}
 
-\item{D}{A vector of length 6.}
+\item{D}{a vector of length 6}
 
-\item{info}{Other model info.}
+\item{info}{other model info}
 
 \item{cnames}{Names of the model components.}
 

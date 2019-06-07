@@ -22,7 +22,7 @@ plot_simdata <- function(simData,
     if(!is.null(i_test)){
       stop("cannot specify test points when plotting componentwise")
     }
-    linecolor    <- "gray10"
+    linecolor    <- "gray50"
     h <- plot_simdata_by_component(simData, linecolor, nrow, ncol)
   }else{
     linecolor    <- "gray70"
@@ -110,7 +110,8 @@ plot_simdata_by_individual <- function(simData,
   # Plot signal line and data points
   h <- h + ggplot2::geom_line(ggplot2::aes_string(linetype = 'leg'), 
                               color = linecolor,
-                              lwd   = 1) +
+                              lwd   = 1,
+                              alpha = 1) +
     ggplot2::scale_shape_manual(values=c(NA, 16)) +
     ggplot2::scale_linetype_manual(values=c(1, 0))
   
@@ -145,16 +146,19 @@ plot_simdata_by_individual <- function(simData,
 #' @param nrow an argument for \code{ggplot2::facet_wrap}
 #' @param ncol an argument for \code{ggplot2::facet_wrap}
 #' @param plot_point should points be plotted also
+#' @param linealpha line alpha
 #' @return a ggplot object
 plot_simdata_by_component <- function(simData, 
                                       linecolor = "black", 
                                       nrow = NULL, 
                                       ncol = NULL,
-                                      plot_point = TRUE){
-  pointcolor <- linecolor
+                                      plot_point = TRUE,
+                                      linealpha = 1){
+  pointcolor <- "black"
+  linetype   <- 3
   DF <- create_simdata_plot_df(simData)
   h <- ggplot2::ggplot(DF, ggplot2::aes_string(x='age', y='value', group='id'))
-  h <- h + ggplot2::geom_line(color = linecolor)
+  h <- h + ggplot2::geom_line(color = linecolor, alpha = linealpha, lty = linetype)
   if(plot_point){
     h <- h + ggplot2::geom_point(color = pointcolor)
   }
@@ -163,10 +167,9 @@ plot_simdata_by_component <- function(simData,
   dat  <- simData$data
   N    <- length(unique(dat$id))
   n    <- length(dat$id)
-  subt <- paste(n, " data points, ", N, " individuals", sep="")
+  subt <- paste(N, " individuals (dotted lines connect an individual)", sep="")
   h <- h + ggplot2::ggtitle("Simulated data", subtitle = subt)
   h <- h + ggplot2::labs(x = "Age", y = "value")
-  h <- h + ggplot2::theme_bw()
   h <- h + ggplot2::theme(legend.title=ggplot2::element_blank())
   
   return(h)

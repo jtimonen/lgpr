@@ -5,7 +5,6 @@
 #include /chunks/license.stan
 
 functions{
-#include /chunks/functions.stan
 #include /chunks/kernels_base.stan
 #include /chunks/define_prior.stan
 }

@@ -121,8 +121,13 @@ plot_data <- function(data,
 #' @param title optional prefix to plot title
 #' @param sample_idx If given, only one sample will be plotted, else the average
 #' components over all samples.
+#' @param linealpha line alpha
 #' @return a ggplot object
-plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NULL){
+plot_components <- function(fit, 
+                            corrected = TRUE, 
+                            title = NULL, 
+                            sample_idx = NULL,
+                            linealpha = 0.6){
   
   
   # Check input correctness
@@ -206,14 +211,15 @@ plot_components <- function(fit, corrected = TRUE, title = NULL, sample_idx = NU
   df  <- data.frame(id, age, f, component)
   colnames(df)[1] <- idvar
   colnames(df)[2] <- timevar
+  subt <- "dotted lines connect an individual"
   h   <- ggplot2::ggplot(df, ggplot2::aes_string(x = timevar, 
                                                  y = 'f', 
                                                  group = idvar)) + 
-    ggplot2::geom_line() + 
+    ggplot2::geom_line(linetype = 3, alpha = linealpha) + 
     ggplot2::geom_point() + 
     ggplot2::facet_wrap(. ~ component) +
     ggplot2::labs(y = yname) +
-    ggplot2::ggtitle(label = ptitle)
+    ggplot2::ggtitle(label = ptitle, subtitle = subt)
   return(h)
 }
 

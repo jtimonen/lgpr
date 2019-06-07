@@ -254,18 +254,27 @@ hyperparam_estimate <- function(object, type = "mean"){
 #' @param samples Sample indices. If NULL, all samples are taken.
 #' @return a data frame
 hyperparam_samples <- function(object, samples = NULL){
-  DF    <- as.data.frame(object@stan_fit)
-  nam   <- names(DF)
+  nam   <- names(object@stan_fit)
   i_eta <- which(grepl("ETA",nam))
   i_f   <- which(grepl("F",nam))
   i_lp  <- which(grepl("lp__",nam))
-  DF    <- DF[, -c(i_f,i_eta,i_lp)]
-  if(!is.null(samples)){
-    DF <- DF[samples, ]
+  nam   <- nam[-c(i_f,i_eta,i_lp)]
+  ext   <- rstan::extract(object@stan_fit, pars = nam)
+  n     <- length(ext[[1]])
+  cn    <- names(ext)
+  d     <- length(cn)
+  OUT   <- matrix(0, n, d)
+  for(j in 1:d){
+    OUT[,j] <- ext[[j]]
   }
-  return(DF)
+  OUT <- data.frame(OUT)
+  colnames(OUT) <- cn
+  if(is.null(samples)){
+    samples <- 1:n
+  }
+  OUT <- OUT[samples,]
+  return(OUT)
 }
-
 
 
 #' Get average runtime of a chain

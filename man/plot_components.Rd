@@ -5,7 +5,7 @@
 \title{Visualize the (average) inferred components evaluated at data points}
 \usage{
 plot_components(fit, corrected = TRUE, title = NULL,
-  sample_idx = NULL)
+  sample_idx = NULL, linealpha = 0.6)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -16,6 +16,8 @@ plot_components(fit, corrected = TRUE, title = NULL,
 
 \item{sample_idx}{If given, only one sample will be plotted, else the average
 components over all samples.}
+
+\item{linealpha}{line alpha}
 }
 \value{
 a ggplot object
