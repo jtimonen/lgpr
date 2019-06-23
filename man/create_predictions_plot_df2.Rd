@@ -5,7 +5,7 @@
 \title{Create a plotting data frame for ggplot}
 \usage{
 create_predictions_plot_df2(model, PRED, scale_f = TRUE,
-  componentwise = FALSE, mode)
+  componentwise = FALSE, mode, n_sds)
 }
 \arguments{
 \item{model}{An object of class \code{lgpmodel}.}
@@ -17,6 +17,8 @@ create_predictions_plot_df2(model, PRED, scale_f = TRUE,
 \item{componentwise}{Should the predictions be plotted componentwise?}
 
 \item{mode}{mode}
+
+\item{n_sds}{number of standard deviations for the uncertainty band width}
 }
 \value{
 a data frame

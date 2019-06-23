@@ -5,7 +5,7 @@
 \title{Plot posterior of f}
 \usage{
 plot_posterior_f(fit, PRED = NULL, componentwise = FALSE,
-  plot_uncertainty = TRUE)
+  plot_uncertainty = TRUE, n_sds = n_sds)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -15,6 +15,8 @@ plot_posterior_f(fit, PRED = NULL, componentwise = FALSE,
 \item{componentwise}{A boolean value.}
 
 \item{plot_uncertainty}{Should an uncertainty ribbon be plotted?}
+
+\item{n_sds}{number of standard deviations for the uncertainty band width}
 }
 \value{
 a ggplot object

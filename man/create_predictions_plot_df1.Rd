@@ -4,12 +4,14 @@
 \alias{create_predictions_plot_df1}
 \title{Create a plotting data frame for ggplot}
 \usage{
-create_predictions_plot_df1(fit, scale_f = TRUE)
+create_predictions_plot_df1(fit, scale_f = TRUE, n_sds)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
 \item{scale_f}{Should the predictions be scaled back to the original data scale?}
+
+\item{n_sds}{number of standard deviations for the uncertainty band width}
 }
 \value{
 a data frame

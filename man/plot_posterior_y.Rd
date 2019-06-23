@@ -4,7 +4,8 @@
 \alias{plot_posterior_y}
 \title{Plot posterior predictive distribution}
 \usage{
-plot_posterior_y(fit, PRED, uncertainty = "ribbon", test_data = NULL)
+plot_posterior_y(fit, PRED, uncertainty = "ribbon", test_data = NULL,
+  n_sds = 2)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -14,6 +15,8 @@ plot_posterior_y(fit, PRED, uncertainty = "ribbon", test_data = NULL)
 \item{uncertainty}{Either "none", "ribbon" or "errorbar".}
 
 \item{test_data}{Test data set.}
+
+\item{n_sds}{number of standard deviations for the uncertainty band width}
 }
 \value{
 a ggplot object

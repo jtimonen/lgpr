@@ -7,15 +7,24 @@
 #' @param componentwise A boolean value.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a ggplot object
-plot_posterior_f <- function(fit, PRED = NULL, componentwise = FALSE, plot_uncertainty = TRUE){
+plot_posterior_f <- function(fit, 
+                             PRED = NULL, 
+                             componentwise = FALSE, 
+                             plot_uncertainty = TRUE,
+                             n_sds = n_sds){
   if(componentwise){
-    h <- plot_posterior_components(fit, PRED = PRED, plot_uncertainty = plot_uncertainty)
+    h <- plot_posterior_components(fit, 
+                                   PRED = PRED, 
+                                   plot_uncertainty = plot_uncertainty,
+                                   n_sds = n_sds)
   }else{
     h <- plot_posterior_predictions(fit, 
                                     mode = "posterior", 
                                     PRED = PRED, 
-                                    plot_uncertainty = plot_uncertainty)
+                                    plot_uncertainty = plot_uncertainty,
+                                    n_sds = n_sds)
   }
   return(h)
 }
@@ -28,20 +37,26 @@ plot_posterior_f <- function(fit, PRED = NULL, componentwise = FALSE, plot_uncer
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param uncertainty Either "none", "ribbon" or "errorbar".
 #' @param test_data Test data set.
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a ggplot object
-plot_posterior_y <- function(fit, PRED, uncertainty = "ribbon", test_data = NULL){
+plot_posterior_y <- function(fit, PRED, 
+                             uncertainty = "ribbon", 
+                             test_data = NULL,
+                             n_sds = 2){
   if(is.null(PRED)){
     stop("You must specify the PRED argument!")
   }
   if(uncertainty=="ribbon"){
     h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
-                                    test_data = test_data)
+                                    test_data = test_data, n_sds = n_sds)
   }else if(uncertainty=="errorbar"){
     h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
-                                    error_bar = TRUE, test_data = test_data)
+                                    error_bar = TRUE, test_data = test_data,
+                                    n_sds = n_sds)
   }else{
     h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
-                                    plot_uncertainty = FALSE, test_data = test_data) 
+                                    plot_uncertainty = FALSE, test_data = test_data,
+                                    n_sds = n_sds) 
   }
   return(h)
 }
@@ -70,6 +85,7 @@ plot_posterior_y <- function(fit, PRED, uncertainty = "ribbon", test_data = NULL
 #' @param pch_test test point marker
 #' @param size_test test point size
 #' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a ggplot object
 plot_posterior_predictions <- function(fit, 
                                        mode,
@@ -90,14 +106,15 @@ plot_posterior_predictions <- function(fit,
                                        color_test         = "deepskyblue2",
                                        pch_test           = 21,
                                        size_test          = 2,
-                                       error_bar          = FALSE)
+                                       error_bar          = FALSE,
+                                       n_sds              = n_sds)
 {
   
   # Input checks and options
   cwise <- FALSE
   OPT <- plot_predictions_options(fit, color_scheme, cwise,
                                   original_y_scale, PRED, test_data, 
-                                  color_scheme_onset, mode)
+                                  color_scheme_onset, mode, n_sds)
   DF      <- OPT$DF
   idvar   <- OPT$idvar
   timevar <- OPT$timevar
@@ -225,6 +242,7 @@ plot_posterior_predictions <- function(fit,
 #' @param original_y_scale should the predictions be scaled back to the original data y scale
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a ggplot object
 plot_posterior_components <- function(fit, 
                                       PRED               = NULL, 
@@ -234,7 +252,8 @@ plot_posterior_components <- function(fit,
                                       plot_uncertainty   = TRUE,
                                       title              = NULL,
                                       original_y_scale   = TRUE,
-                                      ylim               = NULL)
+                                      ylim               = NULL,
+                                      n_sds              = 2)
 {
   
   # Input checks and options
@@ -244,7 +263,8 @@ plot_posterior_components <- function(fit,
   mode      <- "posterior"
   OPT       <- plot_predictions_options(fit, color_scheme,
                                         cwise, original_y_scale, 
-                                        PRED, test_data, cs_onset, mode)
+                                        PRED, test_data, cs_onset, mode,
+                                        n_sds)
   
   # Make some variables easily accessible
   DF      <- OPT$DF
@@ -303,6 +323,7 @@ plot_posterior_components <- function(fit,
 #' @param original_y_scale Boolean value.
 #' @param test_data test data
 #' @param mode mode
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a list
 plot_predictions_options <- function(fit, 
                                      color_scheme, 
@@ -311,7 +332,8 @@ plot_predictions_options <- function(fit,
                                      PRED,
                                      test_data,
                                      color_scheme_onset,
-                                     mode){
+                                     mode,
+                                     n_sds){
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   model <- fit@model
@@ -348,7 +370,8 @@ plot_predictions_options <- function(fit,
       stop("Plotting predictions componentwise not implemented in this case!")
     }
     DF <- create_predictions_plot_df1(fit, 
-                                      scale_f = original_y_scale)
+                                      scale_f = original_y_scale,
+                                      n_sds = n_sds)
   }else{
     if(info$sample_F){
       stop("Do not give predictions as input for a model where F was sampled!")
@@ -357,7 +380,8 @@ plot_predictions_options <- function(fit,
                                       PRED, 
                                       scale_f = original_y_scale, 
                                       componentwise = componentwise,
-                                      mode = mode)
+                                      mode = mode,
+                                      n_sds = n_sds)
   }
   
   # Return
@@ -452,9 +476,10 @@ plot_predictions_add_onsets <- function(fit, h,
 #' 
 #' @description A helper function for \code{plot_predictions}.
 #' @param fit An object of class \code{lgpfit}.
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @param scale_f Should the predictions be scaled back to the original data scale?
 #' @return a data frame
-create_predictions_plot_df1 <- function(fit, scale_f = TRUE){
+create_predictions_plot_df1 <- function(fit, scale_f = TRUE, n_sds){
   
   model <- fit@model
   info  <- model@info
@@ -478,8 +503,8 @@ create_predictions_plot_df1 <- function(fit, scale_f = TRUE){
     std  <- as.numeric(PRED$std)
     
     # Scale some things
-    upper <- mu + 2*std
-    lower <- mu - 2*std
+    upper <- mu + n_sds*std
+    lower <- mu - n_sds*std
     if(scale_f){
       mu    <- YSCL$fun_inv(mu)
       upper <- YSCL$fun_inv(upper)
@@ -532,8 +557,14 @@ create_predictions_plot_df1 <- function(fit, scale_f = TRUE){
 #' @param scale_f Should the predictions be scaled back to the original data scale?
 #' @param componentwise Should the predictions be plotted componentwise?
 #' @param mode mode
+#' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a data frame
-create_predictions_plot_df2 <- function(model, PRED, scale_f = TRUE, componentwise = FALSE, mode){
+create_predictions_plot_df2 <- function(model, 
+                                        PRED, 
+                                        scale_f = TRUE, 
+                                        componentwise = FALSE, 
+                                        mode,
+                                        n_sds){
   
   LIST    <- PRED$LIST
   X_test  <- PRED$X_test_scaled
@@ -583,8 +614,8 @@ create_predictions_plot_df2 <- function(model, PRED, scale_f = TRUE, componentwi
   std <- sqrt(as.numeric(S2))
   
   # Scale some things
-  upper <- mu + 2*std
-  lower <- mu - 2*std
+  upper <- mu + n_sds*std
+  lower <- mu - n_sds*std
   if(scale_f){
     mu    <- YSCL$fun_inv(mu)
     upper <- YSCL$fun_inv(upper)

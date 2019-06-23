@@ -59,7 +59,10 @@ create_X <- function(N,
       ran <- range(t_data)
       mrn <- mean(ran)
       onset_range <- c(mrn, mrn)
-      cat("Onset range set to [", onset_range[1], ", ", onset_range[2], "]. \n", sep="")
+      if(D[1]==1){
+        cat("Onset range set to [", onset_range[1], ", ",
+            onset_range[2], "]. \n", sep="")
+      }
     }else{
       stop("invalid onset range!")
     }

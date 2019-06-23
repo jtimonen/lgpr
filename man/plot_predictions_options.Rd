@@ -5,7 +5,7 @@
 \title{Do input checks and set options for plotting predictions}
 \usage{
 plot_predictions_options(fit, color_scheme, componentwise,
-  original_y_scale, PRED, test_data, color_scheme_onset, mode)
+  original_y_scale, PRED, test_data, color_scheme_onset, mode, n_sds)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -23,6 +23,8 @@ plot_predictions_options(fit, color_scheme, componentwise,
 \item{color_scheme_onset}{Another color scheme.}
 
 \item{mode}{mode}
+
+\item{n_sds}{number of standard deviations for the uncertainty band width}
 }
 \value{
 a list

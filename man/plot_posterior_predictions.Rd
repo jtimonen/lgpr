@@ -10,7 +10,7 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
   title = NULL, original_y_scale = TRUE, ylim = NULL,
   plot_obs_onset = FALSE, plot_onset_samples = FALSE,
   ypos_dens = NULL, test_data = NULL, color_test = "deepskyblue2",
-  pch_test = 21, size_test = 2, error_bar = FALSE)
+  pch_test = 21, size_test = 2, error_bar = FALSE, n_sds = n_sds)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -52,6 +52,8 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 \item{size_test}{test point size}
 
 \item{error_bar}{should uncertainty be plotted using error bars instead of a ribbon}
+
+\item{n_sds}{number of standard deviations for the uncertainty band width}
 }
 \value{
 a ggplot object
