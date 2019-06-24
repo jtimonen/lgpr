@@ -9,6 +9,8 @@
 #'   \item 1 = other continuous covariate
 #'   \item 2 = a categorical covariate that interacts with age
 #'   \item 3 = a categorical covariate that acts as a group offset
+#'   \item 4 = a categorical covariate that that acts as a group offset AND
+#'   is restricted to have value 0 for controls and 1 for cases
 #' }
 #' @param relevances Relative relevance of each component. Must have be a vector
 #' so that \cr
@@ -18,10 +20,16 @@
 #' @param lengthscales A vector so that \cr \code{length(lengthscales) = }
 #' \code{2 + sum(covariates \%in\% c(0,1,2))}.
 #' @param X_affected which individuals are affected by the disease
-#' @param dis_fun A function that defines the disease effect. If NULL, the effect
-#' is is drawn from a nonstationary GP prior.
+#' @param dis_fun A function or a string that defines the disease effect. If this
+#' is a function, that function is used to generate the effect. If \code{dis_fun}
+#' is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
+#' prior (vm is the variance masked version of it).
 #' @param useBinKernel Should the binary kernel be used for categorical covariates? 
 #' If this is \code{TRUE}, the effect will exist only for group 1.
+#' @param steepness Steepness of the input warping function. This is only used
+#' if the disease component is in the model.
+#' @param vm_params Parameters of the variance mask function. This is only 
+#' needed if \code{useMaskedVarianceKernel = TRUE}.
 #' @return a data frame FFF where one column corresponds to one additive data component
 create_F <- function(X,
                      covariates,
@@ -29,10 +37,28 @@ create_F <- function(X,
                      lengthscales,
                      X_affected,
                      dis_fun,
-                     useBinKernel = TRUE)
+                     useBinKernel,
+                     steepness,
+                     vm_params)
 {
-  D     <- c(1, 2, covariates + 3)
-  KK    <- simulate_kernels(X, D, lengthscales, X_affected, useBinKernel)
+  i4 <- which(covariates==4)
+  covariates[i4] <- 3
+  D <- c(1, 2, covariates + 3)
+  useMaskedVarianceKernel <- TRUE
+  if(is.character(dis_fun)){
+    if(dis_fun=="gp_vm"){
+      useMaskedVarianceKernel <- TRUE
+    }else if(dis_fun=="gp_ns"){
+      useMaskedVarianceKernel <- FALSE
+    }else{
+      stop("Invalid keyword for input dis_fun (", dis_fun,")")
+    }
+  }
+  
+  KK    <- simulate_kernels(X, D, lengthscales,
+                            X_affected, useBinKernel, 
+                            useMaskedVarianceKernel, 
+                            steepness, vm_params)
   labs  <- nameComponents(D, colnames(X))
   FFF   <- drawLatentComponents(KK)
   if(sum(D==3)==1){
@@ -40,8 +66,10 @@ create_F <- function(X,
   }else{
     i_dis <- -1
   }
-  if(i_dis > 0 && !is.null(dis_fun)){
+  if(i_dis > 0 && is.function(dis_fun)){
     FFF[,i_dis] <- disease_effect(X[,1],X[,3],dis_fun)
+  }else{
+    #do nothing, keep the component drawn from a GP
   }
   
   FFF   <- scaleRelevances(FFF, relevances, force_zero_mean = TRUE, i_dis)
@@ -66,8 +94,21 @@ create_F <- function(X,
 #' @param X_affected which individuals are affected by the disease
 #' @param useBinKernel whether or not binary (mask) kernel should be used for
 #' categorical covariates
+#' @param useMaskedVarianceKernel should the masked variance kernel be used 
+#' for drawing the disease component
+#' @param steepness steepness of the input warping function
+#' @param vm_params parameters of the variance mask function
 #' @return a 3D array
-simulate_kernels <- function(X, types, lengthscales, X_affected, useBinKernel=TRUE){
+simulate_kernels <- function(X,
+                             types, 
+                             lengthscales, 
+                             X_affected, 
+                             useBinKernel = TRUE,
+                             useMaskedVarianceKernel = TRUE,
+                             steepness,
+                             vm_params
+)
+{
   n     <- dim(X)[1]
   d     <- length(types)
   KK    <- array(0,c(n,n,d))
@@ -90,8 +131,11 @@ simulate_kernels <- function(X, types, lengthscales, X_affected, useBinKernel=TR
       Kj <- kernel_se(t,t,ell=ell[j_ell])
     }else if(types[j]==3){
       j_ell <- j_ell + 1
-      Kj <- kernel_bin(X_affected, X_affected) * kernel_ns(xj,xj,ell=ell[j_ell], a = 1, b = 0, c = 1)
-      #Kj <- kernel_bin(X_affected, X_affected) * ... 
+      Kj <- kernel_bin(X_affected, X_affected) *
+        kernel_ns(xj,xj,ell=ell[j_ell], a = steepness, b = 0, c = 1)
+      if(useMaskedVarianceKernel){
+        Kj <- Kj * compute_K_var_mask(xj,xj, vm_params, stp = steepness)
+      }
     }else if(types[j]==4){
       j_ell <- j_ell + 1
       Kj <- kernel_se(xj,xj,ell=ell[j_ell])

@@ -10,7 +10,8 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   2 + sum(covariates \%in\% c(0, 1, 2))), f_var = 1,
   noise_type = "Gaussian", snr = 3, phi = 1,
   N_affected = round(N/2), onset_range = "auto",
-  t_observed = "after_0", C_hat = 0, dis_fun = NULL,
+  t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
+  useBinKernel = TRUE, steepness = 1, vm_params = c(1, 0.05),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
   1)))
 }
@@ -27,6 +28,8 @@ covariates are created. Different integers correspond to the following covariate
   \item 1 = other continuous covariate
   \item 2 = a categorical covariate that interacts with age
   \item 3 = a categorical covariate that acts as a group offset
+  \item 4 = a categorical covariate that that acts as a group offset AND
+  is restricted to have value 0 for controls and 1 for cases
 }}
 
 \item{names}{Covariate names.}
@@ -71,8 +74,19 @@ or \code{"random_p"} or \code{"exact"}.}
 
 \item{C_hat}{A constant added to f}
 
-\item{dis_fun}{A function that defines the disease effect. If NULL, the effect
-is is drawn from a nonstationary GP prior.}
+\item{dis_fun}{A function or a string that defines the disease effect. If this
+is a function, that function is used to generate the effect. If \code{dis_fun}
+is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
+prior (vm is the variance masked version of it).}
+
+\item{useBinKernel}{Should the binary kernel be used for categorical covariates? 
+If this is \code{TRUE}, the effect will exist only for group 1.}
+
+\item{steepness}{Steepness of the input warping function. This is only used
+if the disease component is in the model.}
+
+\item{vm_params}{Parameters of the variance mask function. This is only 
+needed if \code{useMaskedVarianceKernel = TRUE}.}
 
 \item{continuous_info}{Info for generating continuous covariates. Must be a list
 containing fields \code{lambda} and \code{mu}, which have length 3. The continuous

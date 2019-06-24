@@ -9,6 +9,8 @@
 #'   \item 1 = other continuous covariate
 #'   \item 2 = a categorical covariate that interacts with age
 #'   \item 3 = a categorical covariate that acts as a group offset
+#'   \item 4 = a categorical covariate that that acts as a group offset AND
+#'   is restricted to have value 0 for controls and 1 for cases
 #' }
 #' @param names Covariate names.
 #' @param n_categs An integer vector defining the number of categories
@@ -38,15 +40,19 @@ create_X <- function(N,
                      onset_range,
                      continuous_info)
 {
-  D    <- rep(0,4)
+  D    <- rep(0,5)
   D[1] <- sum(covariates==0)
   D[2] <- sum(covariates==1)
   D[3] <- sum(covariates==2)
   D[4] <- sum(covariates==3)
+  D[5] <- sum(covariates==4)
   if(length(n_categs)!=sum(D[3:4])){
-    stop(paste("Length of n_categs must be same as the number of categorical covariates!",
-               " Found = ", length(n_categs), " should be = ", sum(D[3:4]), ".", sep ="") )
+    stop(paste("Length of n_categs must be same as the number of 2's",
+               " and 3's in the covariates vector!",
+               " Found = ", length(n_categs), " should be = ", 
+               sum(D[3:4]), ".", sep ="") )
   }
+  
   n_invalid <- sum(n_categs <= 1)
   if(n_invalid > 0) stop("n_categs must only contain integers larger than 1!")
   k   <- length(t_data)
@@ -102,6 +108,15 @@ create_X <- function(N,
     categ <- c()
   }
   X <- cbind(id, age, disAge, cont, categ)
+  if(D[5]>0){
+    if(D[1]==0){stop("cannot include a 4 in covariates if 0 is not included!")}
+    if(D[5]==1){
+      group <- as.numeric(!is.nan(disAge))
+      X <- cbind(X, group)
+    }else{
+      stop("only one 4 can be included in the covariates vector")
+    }
+  }
   colnames(X) <- names
   out <-list(X        = data.frame(X), 
              onsets   = onsets, 

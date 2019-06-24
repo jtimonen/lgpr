@@ -11,7 +11,7 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   offset_vars = NULL, C_hat = NULL, DELTA = 1e-12,
   sample_F = (likelihood != "Gaussian"), parallel = FALSE,
   skip_postproc = FALSE, t_test = NULL, threshold = 0.95,
-  variance_mask = FALSE, ...)
+  variance_mask = TRUE, ...)
 }
 \arguments{
 \item{formula}{A formula of the form

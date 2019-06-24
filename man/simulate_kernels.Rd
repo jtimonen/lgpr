@@ -4,7 +4,8 @@
 \alias{simulate_kernels}
 \title{Compute all kernel matrices when simulating data}
 \usage{
-simulate_kernels(X, types, lengthscales, X_affected, useBinKernel = TRUE)
+simulate_kernels(X, types, lengthscales, X_affected, useBinKernel = TRUE,
+  useMaskedVarianceKernel = TRUE, steepness, vm_params)
 }
 \arguments{
 \item{X}{covariates}
@@ -25,6 +26,13 @@ simulate_kernels(X, types, lengthscales, X_affected, useBinKernel = TRUE)
 
 \item{useBinKernel}{whether or not binary (mask) kernel should be used for
 categorical covariates}
+
+\item{useMaskedVarianceKernel}{should the masked variance kernel be used 
+for drawing the disease component}
+
+\item{steepness}{steepness of the input warping function}
+
+\item{vm_params}{parameters of the variance mask function}
 }
 \value{
 a 3D array

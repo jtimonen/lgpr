@@ -80,3 +80,22 @@ test_that("lgp can sample F", {
   )
   
 })
+
+test_that("lgp can used without the vm kernel", {
+  
+  expect_identical(suppressWarnings({
+    as.vector(lgp(formula = y ~ id + age + diseaseAge + group,
+                  data    = simulate_data(N          = 4,
+                                          t_data     = 10*c(1,2,3,4,5),
+                                          covariates = c(0,1,2,4),
+                                          dis_fun    = "gp_ns")$data,
+                  iter    = 100,
+                  chains  = 1,
+                  refresh = 1000,
+                  offset_vars = c("group"),
+                  sample_F = F)@model@stan_dat$D)
+  }),
+  c(1,1,1,0,0,1)
+  )
+  
+})

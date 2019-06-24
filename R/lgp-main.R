@@ -26,7 +26,7 @@ lgp <- function(formula,
                 skip_postproc    = FALSE,
                 t_test           = NULL,
                 threshold        = 0.95,
-                variance_mask    = FALSE,
+                variance_mask    = TRUE,
                 ...)
 {
   # Create the model

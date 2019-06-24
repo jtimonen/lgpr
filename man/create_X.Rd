@@ -18,6 +18,8 @@ covariates are created. Different integers correspond to the following covariate
   \item 1 = other continuous covariate
   \item 2 = a categorical covariate that interacts with age
   \item 3 = a categorical covariate that acts as a group offset
+  \item 4 = a categorical covariate that that acts as a group offset AND
+  is restricted to have value 0 for controls and 1 for cases
 }}
 
 \item{names}{Covariate names.}

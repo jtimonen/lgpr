@@ -44,8 +44,12 @@ simulate_data <- function(N,
                           onset_range     = "auto",
                           t_observed      = "after_0",
                           C_hat           = 0,
-                          dis_fun         = NULL,
-                          continuous_info = list(mu = c(pi/8,pi,-0.5), lambda = c(pi/8,pi,1))
+                          dis_fun         = "gp_vm",
+                          useBinKernel    = TRUE,
+                          steepness       = 1,
+                          vm_params       = c(1,0.05),
+                          continuous_info = list(mu = c(pi/8,pi,-0.5), 
+                                                 lambda = c(pi/8,pi,1))
 )
 {
   if(N < 2) stop("There must be at least 2 individuals!")
@@ -79,7 +83,10 @@ simulate_data <- function(N,
                   relevances,
                   lengthscales,
                   X_affected,
-                  dis_fun
+                  dis_fun,
+                  useBinKernel,
+                  steepness,
+                  vm_params
   )
   
   # Total signal f is a (scaled) sum of the components plus a constant
@@ -207,11 +214,12 @@ sim_generate_names <- function(covariates){
   
   # Get default names
   names <- c("id", "age")
-  def   <- c("x", "z", "offset")
+  def   <- c("x", "z", "offset", "group")
   d0 <- sum(covariates==0)
   d1 <- sum(covariates==1)
   d2 <- sum(covariates==2)
   d3 <- sum(covariates==3)
+  d4 <- sum(covariates==4)
   if(d0==1){
     names <- c(names, "diseaseAge" )
   }
@@ -235,6 +243,9 @@ sim_generate_names <- function(covariates){
     }else{
       names <- c(names, def[3])
     }
+  }
+  if(d4 > 0){
+    names <- c(names, "group")
   }
   
   return(names)
