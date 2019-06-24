@@ -1,4 +1,4 @@
-#' Plot simulated data for each individual separately
+#' Visualize simulated data
 #'
 #' @export
 #' @description This is a wrapper for \code{plot_simdata_by_individual} and

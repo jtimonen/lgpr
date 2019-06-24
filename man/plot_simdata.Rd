@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-simdata.R
 \name{plot_simdata}
 \alias{plot_simdata}
-\title{Plot simulated data for each individual separately}
+\title{Visualize simulated data}
 \usage{
 plot_simdata(simData, componentwise = FALSE, nrow = NULL,
   ncol = NULL, i_test = NULL, color_test = "steelblue2")

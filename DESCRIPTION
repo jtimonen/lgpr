@@ -1,6 +1,6 @@
 Package: lgpr
 Title: Interpretable longitudinal Gaussian process regression modeling
-Version: 0.22.4
+Version: 0.22.5
 Authors@R: 
     person(given = "Juho",
            family = "Timonen",

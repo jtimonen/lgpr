@@ -93,7 +93,7 @@ test_that("lgp can used without the vm kernel", {
                   chains  = 1,
                   refresh = 1000,
                   offset_vars = c("group"),
-                  sample_F = F)@model@stan_dat$D)
+                  variance_mask = FALSE)@model@stan_dat$D)
   }),
   c(1,1,1,0,0,1)
   )

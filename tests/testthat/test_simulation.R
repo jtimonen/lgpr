@@ -10,7 +10,7 @@ test_that("gaussian data can be simulated", {
                   relevances   = c(1,1,1,0),
                   names        = c("sex", "location"),
                   t_jitter     = 0.5))),
-   7
+   8
   )
 })
 
@@ -20,7 +20,7 @@ test_that("poisson data can be simulated", {
                                t_data       = seq(6, 36, by = 6),
                                covariates   = c(    2,2),
                                noise_type   = "Poisson"))),
-    7
+    8
   )
 })
 
@@ -30,6 +30,6 @@ test_that("neg binomial data can be simulated", {
                                t_data       = c(1,2,3),
                                covariates   = c(    2,2),
                                noise_type   = "NB"))),
-    7
+    8
   )
 })

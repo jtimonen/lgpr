@@ -47,7 +47,7 @@ prior_default <- function(sigma_alpha = 1)
                 phi            = prior_phi,
                 beta           = prior_bet,
                 onset          = prior_ons,
-                vm_params      = c(0.01, 1))
+                vm_params      = c(0.025, 1))
   
   return(prior)
 }

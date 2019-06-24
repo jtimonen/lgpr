@@ -47,7 +47,7 @@ simulate_data <- function(N,
                           dis_fun         = "gp_vm",
                           useBinKernel    = TRUE,
                           steepness       = 1,
-                          vm_params       = c(1,0.05),
+                          vm_params       = c(0.025, 1),
                           continuous_info = list(mu = c(pi/8,pi,-0.5), 
                                                  lambda = c(pi/8,pi,1))
 )
@@ -78,7 +78,7 @@ simulate_data <- function(N,
   X_affected <- c(rep(1, N_affected*k), rep(0, (N - N_affected)*k))
   
   # Simulate the components F
-  FFF <- create_F(X,
+  COMP <- create_F(X,
                   covariates,
                   relevances,
                   lengthscales,
@@ -88,6 +88,7 @@ simulate_data <- function(N,
                   steepness,
                   vm_params
   )
+  FFF <- COMP$FFF
   
   # Total signal f is a (scaled) sum of the components plus a constant
   f <- rowSums(FFF)
@@ -115,6 +116,7 @@ simulate_data <- function(N,
   # Return 
   out <- list(data            = OBSERVED$dat,
               components      = comp,
+              kernel_matrices = COMP$KKK,
               onsets          = IN$onsets,
               onsets_observed = OBSERVED$onsets_observed,
               par_ABO         = IN$par_cont,

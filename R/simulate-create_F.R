@@ -74,7 +74,8 @@ create_F <- function(X,
   
   FFF   <- scaleRelevances(FFF, relevances, force_zero_mean = TRUE, i_dis)
   colnames(FFF) <- labs
-  return(data.frame(FFF))
+  ret <- list(FFF = data.frame(FFF), KKK = KK)
+  return(ret)
 }
 
 
@@ -103,8 +104,8 @@ simulate_kernels <- function(X,
                              types, 
                              lengthscales, 
                              X_affected, 
-                             useBinKernel = TRUE,
-                             useMaskedVarianceKernel = TRUE,
+                             useBinKernel,
+                             useMaskedVarianceKernel,
                              steepness,
                              vm_params
 )
@@ -134,7 +135,8 @@ simulate_kernels <- function(X,
       Kj <- kernel_bin(X_affected, X_affected) *
         kernel_ns(xj,xj,ell=ell[j_ell], a = steepness, b = 0, c = 1)
       if(useMaskedVarianceKernel){
-        Kj <- Kj * compute_K_var_mask(xj,xj, vm_params, stp = steepness)
+        M  <- compute_K_var_mask(xj,xj, vm_params, stp = steepness)
+        Kj <- Kj * M
       }
     }else if(types[j]==4){
       j_ell <- j_ell + 1

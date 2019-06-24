@@ -143,6 +143,13 @@ compute_K_var_mask <- function(disAge1, disAge2, vm_params, stp, nan_replace = 0
   mask_fun <- function(x,a){1/(1+exp(-a*x))}
   a  <- stp * vm_params[2];
   h  <- vm_params[1];
+  if(h >= 1 || h <=0){
+    stop("vm_params[1] must be between 0 and 1!")
+  }
+  if(vm_params[2] <= 0){
+    stop("vm_params[2] must be greater than 0!")
+  }
+  
   r  <- 1/a*log(h/(1-h));
   s1 <- mask_fun(disAge1 - r, a)
   s2 <- mask_fun(disAge2 - r, a)
