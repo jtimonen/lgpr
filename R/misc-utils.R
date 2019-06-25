@@ -142,6 +142,17 @@ model_info <- function(object, print = TRUE){
 }
 
 
+#' Extract inferred components for one sample
+#'
+#' @param fit an object of class \code{lgpfit}
+#' @param sample_idx sample index
+#' @return a list
+extract_components_onesample <- function(fit, sample_idx){
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  return(postproc(fit, threshold = 0.95, FALSE, sample_idx))  
+}
+
+
 #' Extract inferred disease onset times
 #'
 #' @param id the id covariate, vector of length \code{n}
@@ -149,9 +160,12 @@ model_info <- function(object, print = TRUE){
 #' @param disAge the observed disease-related age covariate, vector of length \code{n}
 #' @return vector of observed onset times
 get_onset_times <- function(id, age, disAge){
-  uid   <- unique(id)
-  t_ons <- rep(0, length(uid))
-  names(t_ons) <- uid
+  uid          <- unique(id)
+  t_ons        <- rep(0, length(uid))
+  formatter    <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
+  uid_str      <- formatter(uid) # zero padded format for the IDs
+  names(t_ons) <- uid_str
+  
   j <- 0
   for(i in uid){
     j    <- j + 1
@@ -165,17 +179,6 @@ get_onset_times <- function(id, age, disAge){
     
   }
   return(t_ons)
-}
-
-
-#' Extract inferred components for one sample
-#'
-#' @param fit an object of class \code{lgpfit}
-#' @param sample_idx sample index
-#' @return a list
-extract_components_onesample <- function(fit, sample_idx){
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  return(postproc(fit, threshold = 0.95, FALSE, sample_idx))  
 }
 
 

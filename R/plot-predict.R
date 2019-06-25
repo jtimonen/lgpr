@@ -8,23 +8,33 @@
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @param n_sds number of standard deviations for the uncertainty band width
+#' 
 #' @return a ggplot object
 plot_posterior_f <- function(fit, 
                              PRED = NULL, 
                              componentwise = FALSE, 
                              plot_uncertainty = TRUE,
-                             n_sds = n_sds){
+                             n_sds = 2){
   if(componentwise){
     h <- plot_posterior_components(fit, 
                                    PRED = PRED, 
                                    plot_uncertainty = plot_uncertainty,
                                    n_sds = n_sds)
   }else{
+    plot_obs_onset     <- FALSE
+    plot_onset_samples <- FALSE
+    if(fit@model@stan_dat$UNCRT == 1){
+      plot_obs_onset     <- TRUE
+      plot_onset_samples <- TRUE
+    }
+    
     h <- plot_posterior_predictions(fit, 
                                     mode = "posterior", 
                                     PRED = PRED, 
                                     plot_uncertainty = plot_uncertainty,
-                                    n_sds = n_sds)
+                                    n_sds = n_sds,
+                                    plot_obs_onset     = plot_obs_onset,
+                                    plot_onset_samples = plot_onset_samples)
   }
   return(h)
 }
@@ -107,7 +117,7 @@ plot_posterior_predictions <- function(fit,
                                        pch_test           = 21,
                                        size_test          = 2,
                                        error_bar          = FALSE,
-                                       n_sds              = n_sds)
+                                       n_sds              = 2)
 {
   
   # Input checks and options
@@ -452,11 +462,14 @@ plot_predictions_add_onsets <- function(fit, h,
     }
     
     # This part assumes that case individuals come first
-    uid   <- unique(df[[idvar]])
+    uid        <- unique(df[[idvar]])
+    formatter <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
+    uid_str   <- formatter(uid) # zero padded format for the IDs
     N     <- length(uid)
     Nc    <- model@stan_dat$N_cases
     t_smp <- c(t_smp, rep(NaN, (N-Nc)*n_smp))
-    fv    <- as.factor(rep(uid, each = n_smp))
+    fv    <- as.factor(rep(uid_str, each = n_smp))
+    
     dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
     h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 
                                    na.rm    = TRUE,

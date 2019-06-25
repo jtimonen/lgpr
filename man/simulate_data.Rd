@@ -11,7 +11,7 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   noise_type = "Gaussian", snr = 3, phi = 1,
   N_affected = round(N/2), onset_range = "auto",
   t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
-  useBinKernel = TRUE, steepness = 1, vm_params = c(0.025, 1),
+  useBinKernel = TRUE, steepness = 0.5, vm_params = c(0.025, 1),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
   1)))
 }

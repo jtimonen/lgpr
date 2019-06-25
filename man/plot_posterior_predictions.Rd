@@ -10,7 +10,7 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
   title = NULL, original_y_scale = TRUE, ylim = NULL,
   plot_obs_onset = FALSE, plot_onset_samples = FALSE,
   ypos_dens = NULL, test_data = NULL, color_test = "deepskyblue2",
-  pch_test = 21, size_test = 2, error_bar = FALSE, n_sds = n_sds)
+  pch_test = 21, size_test = 2, error_bar = FALSE, n_sds = 2)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

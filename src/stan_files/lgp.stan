@@ -133,6 +133,9 @@ transformed data{
     print("  - UNCRT = ", UNCRT);
     print("  - HMGNS = ", HMGNS);
     print("  - USE_VAR_MASK = ", USE_VAR_MASK);
+    if(USE_VAR_MASK==1){
+      print("      o vm_params = [", vm_params,"]");
+    }
   }
   print(" ")
   

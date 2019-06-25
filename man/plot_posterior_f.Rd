@@ -5,7 +5,7 @@
 \title{Plot posterior of f}
 \usage{
 plot_posterior_f(fit, PRED = NULL, componentwise = FALSE,
-  plot_uncertainty = TRUE, n_sds = n_sds)
+  plot_uncertainty = TRUE, n_sds = 2)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

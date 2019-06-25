@@ -46,7 +46,7 @@ simulate_data <- function(N,
                           C_hat           = 0,
                           dis_fun         = "gp_vm",
                           useBinKernel    = TRUE,
-                          steepness       = 1,
+                          steepness       = 0.5,
                           vm_params       = c(0.025, 1),
                           continuous_info = list(mu = c(pi/8,pi,-0.5), 
                                                  lambda = c(pi/8,pi,1))
@@ -293,8 +293,10 @@ sim_data_to_observed <- function(dat, t_observed){
           inds0 <- which(rem > t_possible)
           if(length(inds0)<1){
             stop("There are no data points after t = ", t_possible,"!")
+          }else{
+            idx0 <- inds0[1] # next measurement point after detection is possible
+            t0   <- rem[idx0]
           }
-          idx0  <- inds0[1]
         }else{
           parsed <- sim_parse_t_obs(t_observed)
           if(parsed$type=="random"){
