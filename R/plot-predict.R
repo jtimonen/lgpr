@@ -11,15 +11,15 @@
 #' 
 #' @return a ggplot object
 plot_posterior_f <- function(fit, 
-                             PRED = NULL, 
-                             componentwise = FALSE, 
+                             PRED             = NULL, 
+                             componentwise    = FALSE, 
                              plot_uncertainty = TRUE,
-                             n_sds = 2){
+                             n_sds            = 2){
   if(componentwise){
     h <- plot_posterior_components(fit, 
-                                   PRED = PRED, 
+                                   PRED             = PRED, 
                                    plot_uncertainty = plot_uncertainty,
-                                   n_sds = n_sds)
+                                   n_sds            = n_sds)
   }else{
     plot_obs_onset     <- FALSE
     plot_onset_samples <- FALSE
@@ -27,17 +27,23 @@ plot_posterior_f <- function(fit,
       plot_obs_onset     <- TRUE
       plot_onset_samples <- TRUE
     }
-    
+    if(fit@model@info$sample_F){
+      alpha_line <- 0.1
+    }else{
+      alpha_line <- 1
+    }
     h <- plot_posterior_predictions(fit, 
-                                    mode = "posterior", 
-                                    PRED = PRED, 
-                                    plot_uncertainty = plot_uncertainty,
-                                    n_sds = n_sds,
+                                    mode               = "posterior", 
+                                    PRED               = PRED, 
+                                    plot_uncertainty   = plot_uncertainty,
+                                    n_sds              = n_sds,
                                     plot_obs_onset     = plot_obs_onset,
-                                    plot_onset_samples = plot_onset_samples)
+                                    plot_onset_samples = plot_onset_samples,
+                                    alpha_line         = alpha_line)
   }
   return(h)
 }
+
 
 #' Plot posterior predictive distribution
 #' 
@@ -138,7 +144,11 @@ plot_posterior_predictions <- function(fit,
   DF$facet_var <- formatter(id_pred)
   # Set title
   if(mode == "posterior"){
-    ptitle <- "Posterior distribution of f"
+    if(info$sample_F){
+      ptitle <- "Posterior distribution of f" 
+    }else{
+      ptitle <- "Posterior samples of g"
+    }
   }else{
     ptitle <- "Posterior predictive distribution"
   }
@@ -152,12 +162,13 @@ plot_posterior_predictions <- function(fit,
     group_var <- idvar
     y_var     <- "mu"
   }
+
   if(error_bar){
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var))
   }else{
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
   }
-  
+
   # Edit plot title
   if(!is.null(title)){
     ptitle <- paste(title, ": ", ptitle, sep="")
@@ -201,13 +212,13 @@ plot_posterior_predictions <- function(fit,
   colnames(df)[3] <- respvar
   h <- h + ggplot2::geom_point(data = df, mapping = ggplot2::aes_string(
     x = timevar,
-    y = respvar)
+    y = respvar),
+    inherit.aes = FALSE
   )
   
   # Add onsets
   h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
                                    idvar, timevar, ypos_dens, OPT$cs_onset)
-  
   # Plot test data
   if(!is.null(test_data)){
     id_test    <- formatter(test_data[[idvar]])
@@ -223,7 +234,7 @@ plot_posterior_predictions <- function(fit,
     }
     h <- h + ggplot2::geom_point(mapping  = ggplot2::aes_string(x = "xxx", y = "yyy"), 
                                  na.rm    = TRUE,
-                                 inherit.aes = F,
+                                 inherit.aes = FALSE,
                                  data     = point.data, 
                                  color    = edgecol,
                                  pch      = pch_test,

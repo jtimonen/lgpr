@@ -59,6 +59,7 @@ create_F <- function(X,
                             X_affected, useBinKernel, 
                             useMaskedVarianceKernel, 
                             steepness, vm_params)
+
   labs  <- nameComponents(D, colnames(X))
   FFF   <- drawLatentComponents(KK)
   if(sum(D==3)==1){
@@ -71,7 +72,7 @@ create_F <- function(X,
   }else{
     #do nothing, keep the component drawn from a GP
   }
-  
+
   FFF   <- scaleRelevances(FFF, relevances, force_zero_mean = TRUE, i_dis)
   colnames(FFF) <- labs
   ret <- list(FFF = data.frame(FFF), KKK = KK)
