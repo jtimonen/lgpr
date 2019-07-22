@@ -4,16 +4,29 @@
 \alias{postproc}
 \title{Finalize the lgpfit object after sampling}
 \usage{
-postproc(fit, threshold, average_before_variance, sample_idx = NULL)
+postproc(fit, threshold = 0.95, ell_smooth = "ell_shared",
+  ell_smooth_multip = 1, sample_idx = NULL,
+  average_before_variance = FALSE)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
 
 \item{threshold}{Covariate selection threshold.}
 
-\item{average_before_variance}{Should the variances be computed using average components?}
+\item{ell_smooth}{Defines how to determine smoothing lengthscale for corrected shared age 
+effect inference. Possible options are
+\enumerate{
+   \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
+   component is used as \code{ell_smooth}
+   \item \code{"none"} - no correction will be performed
+   \item A numeric argument that directly defines \code{ell_smooth}
+}}
+
+\item{ell_smooth_multip}{a multiplier for ell_smooth}
 
 \item{sample_idx}{If supplied, this just returns the inferred components for one sample.}
+
+\item{average_before_variance}{Should the variances be computed using average components?}
 }
 \value{
 An updated object of class \code{lgpfit}.

@@ -15,8 +15,22 @@
 #' @param threshold Covariate selection threshold.
 #' @param average_before_variance Should the variances be computed using average components?
 #' @param sample_idx If supplied, this just returns the inferred components for one sample.
+#' @param ell_smooth Defines how to determine smoothing lengthscale for corrected shared age 
+#' effect inference. Possible options are
+#' \enumerate{
+#'    \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
+#'    component is used as \code{ell_smooth}
+#'    \item \code{"none"} - no correction will be performed
+#'    \item A numeric argument that directly defines \code{ell_smooth}
+#' }
+#' @param ell_smooth_multip a multiplier for ell_smooth
 #' @return An updated object of class \code{lgpfit}.
-postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL){
+postproc <- function(fit, 
+                     threshold               = 0.95, 
+                     ell_smooth              = "ell_shared",
+                     ell_smooth_multip       = 1,
+                     sample_idx              = NULL,
+                     average_before_variance = FALSE){
   
   model  <- fit@model
   info   <- model@info
@@ -56,8 +70,19 @@ postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL)
     # Covariate and component relevance computations
     if(average_before_variance){
       
+      cat("* Averaging before computing variations.\n")
       # Compute relevances using average F's
-      if(D[2]>0){ell <- mean(ELL)} else {ell <- NULL}
+      if(is.numeric(ell_smooth)){
+        ell <- ell_smooth * ell_smooth_multip
+      }else if(is.character(ell_smooth)){
+        if(ell_smooth == "ell_shared"){
+          ell <- ELL[i] * ell_smooth_multip
+        }else if(ell_smooth == "none"){
+          ell <- NULL
+        }else{
+          stop("Invalid keyword '", ell_smooth, "' for ell_smooth!")
+        }
+      }
       REL          <- compute_relevances(FFF_avg, y_data, info, D, ell, x_age)
       FFF_cor_avg  <- REL$FFF_cor
       p_comp       <- REL$p_comp
@@ -69,6 +94,7 @@ postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL)
     }else{
       
       # Compute relevances for each sample
+      cat("* Computing relevances over", n_smp, " posterior samples.\n")
       p_comp   <- matrix(0, n_smp, n_cmp + 1)
       p_cov    <- matrix(0, n_smp, n_cmp + 1)
       p_signal <- rep(0, n_smp)
@@ -76,7 +102,17 @@ postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL)
       evar     <- rep(0, n_smp)
       FFF_cor_avg <- matrix(0, n, n_cmp + 2)
       for(i in 1:n_smp){
-        if(D[2]>0){ell <- ELL[i]} else {ell <- NULL}
+        if(is.numeric(ell_smooth)){
+          ell <- ell_smooth * ell_smooth_multip
+        }else if(is.character(ell_smooth)){
+          if(ell_smooth == "ell_shared"){
+            ell <- ELL[i] * ell_smooth_multip
+          }else if(ell_smooth == "none"){
+            ell <- NULL
+          }else{
+            stop("Invalid keyword '", ell_smooth, "' for ell_smooth!")
+          }
+        }
         FFF_i           <- data.frame(FFF[i,,])
         colnames(FFF_i) <- colnames(FFF_avg)
         REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
@@ -102,6 +138,10 @@ postproc <- function(fit, threshold, average_before_variance, sample_idx = NULL)
     fit@signal_variance      <- svar
     fit@residual_variance    <- evar
     fit@covariate_selection  <- varsel(fit, threshold)
+    fit@postproc_info        <- list(threshold               = threshold,
+                                     ell_smooth              = ell_smooth,
+                                     ell_smooth_multip       = ell_smooth_multip,
+                                     average_before_variance = average_before_variance)
     return(fit)
   }else{
     # Just get one sample

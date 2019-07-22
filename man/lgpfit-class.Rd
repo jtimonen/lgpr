@@ -29,6 +29,8 @@ All slots that are lists contain fields 'samples' and 'average'.
 
 \item{\code{residual_variance}}{Residual variance.}
 
+\item{\code{postproc_info}}{Postprocessing information.}
+
 \item{\code{Rhat}}{Split Rhat statistics.}
 }}
 

@@ -88,12 +88,12 @@ get_function_component_samples <- function(fit, only_at_datapoints)
 #' @param FFF a data frame of size \code{n_data} x \code{n_components+2}
 #' @param y_data (scaled) measurements of the response variable
 #' @param info model info
-#' @param ell lengthscale of shared age
+#' @param ell_smooth lengthscale for kernel smoothing
 #' @param D a vector of length 6
 #' @param x_age (scaled) age covariate
 #' @return a list
-compute_relevances <- function(FFF, y_data, info, D, ell, x_age){
-
+compute_relevances <- function(FFF, y_data, info, D, ell_smooth, x_age){
+  
   # Signal variance
   y_pred   <- FFF$g
   svar     <- stats::var(y_pred)
@@ -117,13 +117,13 @@ compute_relevances <- function(FFF, y_data, info, D, ell, x_age){
   names(p_comp) <- nam
   p_comp        <- t(as.matrix(p_comp))
   
-  # Separate effects
+  # Estimate the shared age effect in interaction terms
   if(D[2]>0 && (D[1]+D[5]) > 0){
     i_edit <- (sum(D[1:4])+1):sum(D[1:5])
     if(D[1]){
       i_edit <- c(D[1], i_edit)
     }
-    FFF_cor <- separate_effects(FFF, x_age, D, ell, i_edit)
+    FFF_cor <- separate_effects(FFF, x_age, D, ell_smooth, i_edit)
   }else{
     FFF_cor <- FFF
   }
@@ -194,33 +194,37 @@ get_predicted <- function(fit)
 #' @param i_edit Indices of columns whose effect should be moved to shared age.
 #' @return a corrected \code{f_post}
 separate_effects <- function(f_post, t, D, ell, i_edit){
-  i_shared <- D[1] + 1
-  if(any(i_edit<=0)){stop("invalid input 'i_edit'!")}
-  for(j in i_edit){
-    fj                <- f_post[,j]
-    ks                <- kernel_smoothing(fj, t, t, ell)
-    f_post[,i_shared] <- f_post[,i_shared] + ks
-    f_post[,j]        <- f_post[,j] - ks
+  if(is.null(ell)){
+    return(f_post)
+  }else{
+    i_shared <- D[1] + 1
+    if(any(i_edit<=0)){stop("invalid input 'i_edit'!")}
+    for(j in i_edit){
+      fj                <- f_post[,j]
+      ks                <- kernel_smoothing(fj, t, t, ell)
+      f_post[,i_shared] <- f_post[,i_shared] + ks
+      f_post[,j]        <- f_post[,j] - ks
+    }
+    return(f_post)
   }
-  return(f_post)
 }
 
 
 #' Estimate conditional mean time profile using gaussian kernel smoothing
 #'
-#' @param y a vector of length \code{n} to be smoothed
+#' @param v a vector of length \code{n} to be smoothed
 #' @param t vector of \code{n} time points corresponding to \code{y}
 #' @param t_out the set of \code{p} time points where the smoothing should be evaluated
-#' @param ell Gaussian kernel lengthscale
+#' @param ell kernel lengthscale
 #' @return a vector of length \code{p}
-kernel_smoothing <- function(y, t, t_out, ell){
+kernel_smoothing <- function(v, t, t_out, ell){
   p <- length(t_out)
   n <- length(t)
   K <- kernel_se(t_out, t, alpha = 1, ell = ell)
   for(idx in 1:p){
     K[idx,] <- K[idx,]/sum(K[idx,]) # normalize kernel rows to sum to 1
   }
-  y_out <- K%*%y
+  y_out <- K%*%v
   return(y_out)
 }
 

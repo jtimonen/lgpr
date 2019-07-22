@@ -39,7 +39,20 @@ matrix K_cat(vector x1, vector x2){
 
 // Binary (mask) kernel (not evaluated during sampling)
 // - this is currently needed only for X_notnan
-matrix K_bin(int[] x1, int[] x2, int c){
+matrix K_bin_int(int[] x1, int[] x2, int c){
+  int n1 = num_elements(x1);
+  int n2 = num_elements(x2);
+  matrix[n1,n2] K;
+  for(i in 1:n1){
+    for(j in 1:n2){
+      K[i,j] = (x1[i]==c)*(x2[j]==c);
+    }
+  }
+  return(K);
+}
+
+// Binary (mask) kernel but with real inputs
+matrix K_bin_real(vector x1, vector x2, int c){
   int n1 = num_elements(x1);
   int n2 = num_elements(x2);
   matrix[n1,n2] K;

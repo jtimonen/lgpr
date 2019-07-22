@@ -10,7 +10,8 @@ lgp_model(formula, data, likelihood = "Gaussian",
   sample_F = (likelihood != "Gaussian"), t_test = NULL,
   id_variable = "id", time_variable = "age", disAge_variable = NULL,
   continuous_vars = NULL, categorical_vars = NULL,
-  offset_vars = NULL, variance_mask = FALSE)
+  offset_vars = NULL, variance_mask = FALSE,
+  cat_kernel_type = "categorical")
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -61,6 +62,10 @@ covariates.}
 
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
+
+\item{cat_kernel_type}{Kernel type for categorical variables (other than id). Possible
+options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
+only category \code{"1"} will have an effect).}
 }
 \value{
 An object of class \code{lgpmodel}.

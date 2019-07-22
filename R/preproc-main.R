@@ -23,7 +23,8 @@ create_stan_input <- function(formula,
                               sample_F,
                               t_test,
                               verbose,
-                              variance_mask)
+                              variance_mask,
+                              cat_kernel_type)
 {
   
   # Check sample_F input
@@ -91,6 +92,15 @@ create_stan_input <- function(formula,
     }
   }
   
+  # Categorical or binary kernel?
+  if(cat_kernel_type == "categorical"){
+    cat_kernel <- 1
+  }else if(cat_kernel_type == "binary"){
+    cat_kernel <- 0
+  }else{
+    stop("Invalid option '", cat_kernel_type, ' for cat_kernel_type!')
+  }
+  
   # Create the list that is the Stan input
   stan_dat   <- list(X         = t(X_final),
                      X_id      = X_final[,1],
@@ -101,7 +111,8 @@ create_stan_input <- function(formula,
                      DELTA     = DELTA,
                      C_hat     = C_hat,
                      F_is_sampled = as.numeric(sample_F),
-                     USE_VAR_MASK = as.numeric(variance_mask)
+                     USE_VAR_MASK = as.numeric(variance_mask),
+                     cat_kernel = cat_kernel
   )
   
   # Get some variables related to diseased individuals

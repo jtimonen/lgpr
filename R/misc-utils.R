@@ -189,7 +189,7 @@ get_onset_times <- function(id, age, disAge){
 extract_t_onset_samples <- function(fit){
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   if(fit@model@stan_dat$UNCRT==0){
-    stop("uncertainty wa not modeled!")
+    stop("uncertainty was not modeled!")
   }else{
     SMP <- rstan::extract(fit@stan_fit, pars = "T_onset")$T_onset[,1,]
     return(SMP)  
@@ -210,3 +210,20 @@ get_case_ids <- function(fit){
   return(cid)
 }
 
+#' Print info about component and covariate relevances
+#'
+#' @param fit an object of class \code{lgpfit}
+#' @return nothing
+show_relevances <- function(fit){
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  r1 <- fit@covariate_relevances$average
+  r2 <- fit@component_relevances$average
+  cat("Covariate relevances: \n\n")
+  print(round(r1, 5))
+  cat("\nComponent relevances: \n\n")
+  print(round(r2, 5))
+  ell_smooth <- fit@postproc_info$ell_smooth
+  ell_smooth_multip <- fit@postproc_info$ell_smooth_multip
+  cat("\nell_smooth =", ell_smooth, "\n")
+  cat("ell_smooth_multip =", ell_smooth_multip, "\n")
+}

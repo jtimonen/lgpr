@@ -11,7 +11,8 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   offset_vars = NULL, C_hat = NULL, DELTA = 1e-12,
   sample_F = (likelihood != "Gaussian"), parallel = FALSE,
   skip_postproc = FALSE, t_test = NULL, threshold = 0.95,
-  variance_mask = TRUE, ...)
+  variance_mask = TRUE, ell_smooth = "ell_shared",
+  ell_smooth_multip = 1, cat_kernel_type = "categorical", ...)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -70,6 +71,21 @@ Otherwise use \code{\link{lgp_predict}} after fitting the model.}
 
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
+
+\item{ell_smooth}{Defines how to determine smoothing lengthscale for corrected shared age 
+effect inference. Possible options are
+\enumerate{
+   \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
+   component is used as \code{ell_smooth}
+   \item \code{"none"} - no correction will be performed
+   \item A numeric argument that directly defines \code{ell_smooth}
+}}
+
+\item{ell_smooth_multip}{a multiplier for ell_smooth}
+
+\item{cat_kernel_type}{Kernel type for categorical variables (other than id). Possible
+options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
+only category \code{"1"} will have an effect).}
 
 \item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
 \code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.}

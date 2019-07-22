@@ -4,16 +4,16 @@
 \alias{kernel_smoothing}
 \title{Estimate conditional mean time profile using gaussian kernel smoothing}
 \usage{
-kernel_smoothing(y, t, t_out, ell)
+kernel_smoothing(v, t, t_out, ell)
 }
 \arguments{
-\item{y}{a vector of length \code{n} to be smoothed}
+\item{v}{a vector of length \code{n} to be smoothed}
 
 \item{t}{vector of \code{n} time points corresponding to \code{y}}
 
 \item{t_out}{the set of \code{p} time points where the smoothing should be evaluated}
 
-\item{ell}{Gaussian kernel lengthscale}
+\item{ell}{kernel lengthscale}
 }
 \value{
 a vector of length \code{p}

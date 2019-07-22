@@ -84,9 +84,10 @@ data {
   int F_is_sampled; // should the function values be sampled? 
                     // (must be 1 for non-Gaussian lh)
                     
-  // Variance mask
+  // Kernel types that have options
   int<lower=0,upper=1> USE_VAR_MASK;
   real vm_params[2];
+  int<lower=0,upper=1> cat_kernel; // {1 = categorical, 0 = binary} kernel
   
 }
 
@@ -103,11 +104,15 @@ transformed data{
   // Precompute fixed kernel matrices
   KF[1]  = K_cat(X[1], X[1]);
   for(j in 1:D[3]){
-    KF[1+j] = K_bin(X_notnan, X_notnan, 1);
+    KF[1+j] = K_bin_int(X_notnan, X_notnan, 1);
   }
   for(j in 1:D[5]){
     int ix = 2 + D[3] + D[4] + j;
-    KF[1+D[3]+j] = K_cat(X[ix], X[ix]);
+    if(cat_kernel == 1){
+      KF[1+D[3]+j] = K_cat(X[ix], X[ix]);
+    }else{
+      KF[1+D[3]+j] = K_bin_real(X[ix], X[ix], 1);
+    }
   }
   for(j in 1:D[6]){
     int ix = 2+D[3]+D[4]+D[5]+j;
@@ -127,6 +132,7 @@ transformed data{
   }
   print("  - D = ", D);
   print("  - F_is_sampled = ", F_is_sampled)
+  print("  - cat_kernel = ", cat_kernel)
   if(D[3]==1){
     print("* Disease modeling info: ");
     print("  - Number of cases = ", N_cases);
@@ -134,7 +140,7 @@ transformed data{
     print("  - HMGNS = ", HMGNS);
     print("  - USE_VAR_MASK = ", USE_VAR_MASK);
     if(USE_VAR_MASK==1){
-      print("      o vm_params = [", vm_params,"]");
+      print("      o vm_params = ", vm_params);
     }
   }
   print(" ")

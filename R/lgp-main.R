@@ -27,6 +27,9 @@ lgp <- function(formula,
                 t_test           = NULL,
                 threshold        = 0.95,
                 variance_mask    = TRUE,
+                ell_smooth       = "ell_shared",
+                ell_smooth_multip = 1,
+                cat_kernel_type  = "categorical",
                 ...)
 {
   # Create the model
@@ -46,7 +49,8 @@ lgp <- function(formula,
                      continuous_vars  = continuous_vars,
                      categorical_vars = categorical_vars,
                      offset_vars      = offset_vars,
-                     variance_mask    = variance_mask)
+                     variance_mask    = variance_mask,
+                     cat_kernel_type  = cat_kernel_type)
   
   show(model)
   
@@ -54,7 +58,9 @@ lgp <- function(formula,
   fit <- lgp_fit(model         = model, 
                  threshold     = threshold,
                  parallel      = parallel, 
-                 skip_postproc = skip_postproc, 
+                 skip_postproc = skip_postproc,
+                 ell_smooth    = ell_smooth,
+                 ell_smooth_multip = ell_smooth_multip,
                  ...)
   
   # Return the lgpfit object
@@ -98,6 +104,9 @@ lgp <- function(formula,
 #' covariates.
 #' @param variance_mask Should a variance mask be used to force disease component
 #' variance to zero before disease onset?
+#' @param cat_kernel_type Kernel type for categorical variables (other than id). Possible
+#' options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
+#' only category \code{"1"} will have an effect). 
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
@@ -116,7 +125,8 @@ lgp_model <- function(formula,
                       continuous_vars  = NULL,
                       categorical_vars = NULL,
                       offset_vars      = NULL,
-                      variance_mask    = FALSE)
+                      variance_mask    = FALSE,
+                      cat_kernel_type  = "categorical")
 {
   # Model as a string
   fc <- as.character(formula)
@@ -145,7 +155,8 @@ lgp_model <- function(formula,
                                sample_F       = sample_F,
                                t_test         = t_test,
                                verbose        = TRUE,
-                               variance_mask  = variance_mask)
+                               variance_mask  = variance_mask,
+                               cat_kernel_type = cat_kernel_type)
   
   # Data to Stan
   stan_dat <- PREPROC$stan_dat
@@ -161,7 +172,8 @@ lgp_model <- function(formula,
                component_names = lgp_component_names(stan_dat),
                covariate_names = lgp_covariate_names(stan_dat),
                response_name   = fc[2],
-               variance_mask   = variance_mask)
+               variance_mask   = variance_mask,
+               cat_kernel_type = cat_kernel_type)
   
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",
@@ -187,11 +199,26 @@ lgp_model <- function(formula,
 #' \code{options(mc.cores = } \code{parallel::detectCores())}.
 #' @param skip_postproc In this mode the postprocessing after running Stan is skipped.
 #' @param threshold Covariate selection threshold.
+#' @param ell_smooth Defines how to determine smoothing lengthscale for corrected shared age 
+#' effect inference. Possible options are
+#' \enumerate{
+#'    \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
+#'    component is used as \code{ell_smooth}
+#'    \item \code{"none"} - no correction will be performed
+#'    \item A numeric argument that directly defines \code{ell_smooth}
+#' }
+#' @param ell_smooth_multip a multiplier for ell_smooth
 #' @return An object of class \code{lgpfit}.
 #' @seealso For the possible additional arguments, see \code{\link[rstan]{sampling}}.
 #' For creating the \code{lgpmodel} input, see \code{\link{lgp_model}}.
 #'
-lgp_fit <- function(model, threshold, parallel = FALSE, skip_postproc = FALSE, ...)
+lgp_fit <- function(model, 
+                    threshold, 
+                    parallel          = FALSE, 
+                    skip_postproc     = FALSE, 
+                    ell_smooth        = "ell_shared",
+                    ell_smooth_multip = 1,
+                    ...)
 {
   
   # Set Stan auto_write to true
@@ -217,7 +244,11 @@ lgp_fit <- function(model, threshold, parallel = FALSE, skip_postproc = FALSE, .
     if(!skip_postproc){
       cat("* Begin postprocessing. \n")
       fit@Rhat <- assess_convergence(fit)
-      fit      <- postproc(fit, threshold, average_before_variance = FALSE)
+      fit      <- postproc(fit, 
+                           threshold               = threshold, 
+                           ell_smooth              = ell_smooth,
+                           ell_smooth_multip       = ell_smooth_multip,
+                           average_before_variance = FALSE)
       show(fit)
     }else{
       cat("* Skipped postprocessing.\n")

@@ -75,6 +75,7 @@ setMethod(f = "show",
 #' @slot covariate_selection Covariate selection info.
 #' @slot signal_variance Signal variance.
 #' @slot residual_variance Residual variance.
+#' @slot postproc_info Postprocessing information.
 #' @slot Rhat Split Rhat statistics.
 #'
 lgpfit <- setClass(
@@ -92,7 +93,8 @@ lgpfit <- setClass(
     signal_variance      = "numeric",
     residual_variance    = "numeric",
     Rhat                 = "numeric",
-    covariate_selection  = "list"
+    covariate_selection  = "list",
+    postproc_info        = "list"
   )
 )
 
