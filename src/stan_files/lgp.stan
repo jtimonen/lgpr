@@ -87,7 +87,7 @@ data {
   // Kernel types that have options
   int<lower=0,upper=1> USE_VAR_MASK;
   real vm_params[2];
-  int<lower=0,upper=1> cat_kernel; // {1 = categorical, 0 = binary} kernel
+  int<lower=0,upper=1> cat_interact_kernel; // {1 = categorical, 0 = binary} kernel
   
 }
 
@@ -108,7 +108,7 @@ transformed data{
   }
   for(j in 1:D[5]){
     int ix = 2 + D[3] + D[4] + j;
-    if(cat_kernel == 1){
+    if(cat_interact_kernel == 1){
       KF[1+D[3]+j] = K_cat(X[ix], X[ix]);
     }else{
       KF[1+D[3]+j] = K_bin_real(X[ix], X[ix], 1);
@@ -132,7 +132,7 @@ transformed data{
   }
   print("  - D = ", D);
   print("  - F_is_sampled = ", F_is_sampled)
-  print("  - cat_kernel = ", cat_kernel)
+  print("  - cat_interact_kernel = ", cat_interact_kernel)
   if(D[3]==1){
     print("* Disease modeling info: ");
     print("  - Number of cases = ", N_cases);

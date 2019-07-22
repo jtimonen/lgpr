@@ -29,7 +29,7 @@ lgp <- function(formula,
                 variance_mask    = TRUE,
                 ell_smooth       = "ell_shared",
                 ell_smooth_multip = 1,
-                cat_kernel_type  = "categorical",
+                cat_interact_kernel_type = "categorical",
                 ...)
 {
   # Create the model
@@ -50,7 +50,7 @@ lgp <- function(formula,
                      categorical_vars = categorical_vars,
                      offset_vars      = offset_vars,
                      variance_mask    = variance_mask,
-                     cat_kernel_type  = cat_kernel_type)
+                     cat_interact_kernel_type  = cat_interact_kernel_type)
   
   show(model)
   
@@ -104,8 +104,8 @@ lgp <- function(formula,
 #' covariates.
 #' @param variance_mask Should a variance mask be used to force disease component
 #' variance to zero before disease onset?
-#' @param cat_kernel_type Kernel type for categorical variables (other than id). Possible
-#' options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
+#' @param cat_interact_kernel_type Kernel type for categorical variables (other than id). 
+#' Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
 #' only category \code{"1"} will have an effect). 
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
@@ -126,7 +126,7 @@ lgp_model <- function(formula,
                       categorical_vars = NULL,
                       offset_vars      = NULL,
                       variance_mask    = FALSE,
-                      cat_kernel_type  = "categorical")
+                      cat_interact_kernel_type = "categorical")
 {
   # Model as a string
   fc <- as.character(formula)
@@ -156,7 +156,7 @@ lgp_model <- function(formula,
                                t_test         = t_test,
                                verbose        = TRUE,
                                variance_mask  = variance_mask,
-                               cat_kernel_type = cat_kernel_type)
+                               cat_interact_kernel_type = cat_interact_kernel_type)
   
   # Data to Stan
   stan_dat <- PREPROC$stan_dat
@@ -173,7 +173,7 @@ lgp_model <- function(formula,
                covariate_names = lgp_covariate_names(stan_dat),
                response_name   = fc[2],
                variance_mask   = variance_mask,
-               cat_kernel_type = cat_kernel_type)
+               cat_interact_kernel_type = cat_interact_kernel_type)
   
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",

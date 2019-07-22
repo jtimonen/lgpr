@@ -848,7 +848,7 @@ private:
     int F_is_sampled;
     int USE_VAR_MASK;
     vector<double> vm_params;
-    int cat_kernel;
+    int cat_interact_kernel;
     int n_tot;
     int nf;
     int sum_D;
@@ -1429,11 +1429,11 @@ public:
                 vm_params[i_0__] = vals_r__[pos__++];
             }
             current_statement_begin__ = 268;
-            context__.validate_dims("data initialization", "cat_kernel", "int", context__.to_vec());
-            cat_kernel = int(0);
-            vals_i__ = context__.vals_i("cat_kernel");
+            context__.validate_dims("data initialization", "cat_interact_kernel", "int", context__.to_vec());
+            cat_interact_kernel = int(0);
+            vals_i__ = context__.vals_i("cat_interact_kernel");
             pos__ = 0;
-            cat_kernel = vals_i__[pos__++];
+            cat_interact_kernel = vals_i__[pos__++];
 
             // validate, data variables
             current_statement_begin__ = 193;
@@ -1517,8 +1517,8 @@ public:
             check_less_or_equal(function__,"USE_VAR_MASK",USE_VAR_MASK,1);
             current_statement_begin__ = 267;
             current_statement_begin__ = 268;
-            check_greater_or_equal(function__,"cat_kernel",cat_kernel,0);
-            check_less_or_equal(function__,"cat_kernel",cat_kernel,1);
+            check_greater_or_equal(function__,"cat_interact_kernel",cat_interact_kernel,0);
+            check_less_or_equal(function__,"cat_interact_kernel",cat_interact_kernel,1);
             // initialize data variables
             current_statement_begin__ = 273;
             n_tot = int(0);
@@ -1575,7 +1575,7 @@ public:
 
 
                 current_statement_begin__ = 289;
-                if (as_bool(logical_eq(cat_kernel,1))) {
+                if (as_bool(logical_eq(cat_interact_kernel,1))) {
 
                     current_statement_begin__ = 290;
                     stan::model::assign(KF, 
@@ -1674,8 +1674,8 @@ public:
             }
             current_statement_begin__ = 313;
             if (pstream__) {
-                stan_print(pstream__,"  - cat_kernel = ");
-                stan_print(pstream__,cat_kernel);
+                stan_print(pstream__,"  - cat_interact_kernel = ");
+                stan_print(pstream__,cat_interact_kernel);
                 *pstream__ << std::endl;
             }
             current_statement_begin__ = 314;

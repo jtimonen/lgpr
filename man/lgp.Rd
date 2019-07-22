@@ -12,7 +12,7 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   sample_F = (likelihood != "Gaussian"), parallel = FALSE,
   skip_postproc = FALSE, t_test = NULL, threshold = 0.95,
   variance_mask = TRUE, ell_smooth = "ell_shared",
-  ell_smooth_multip = 1, cat_kernel_type = "categorical", ...)
+  ell_smooth_multip = 1, cat_interact_kernel_type = "categorical", ...)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -83,8 +83,8 @@ effect inference. Possible options are
 
 \item{ell_smooth_multip}{a multiplier for ell_smooth}
 
-\item{cat_kernel_type}{Kernel type for categorical variables (other than id). Possible
-options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
+\item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
+Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
 only category \code{"1"} will have an effect).}
 
 \item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},

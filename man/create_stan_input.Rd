@@ -6,7 +6,7 @@
 \usage{
 create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
   uncertain_diagnosis, equal_effect, C_hat, DELTA, sample_F, t_test,
-  verbose, variance_mask, cat_kernel_type)
+  verbose, variance_mask, cat_interact_kernel_type)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -46,8 +46,8 @@ Otherwise use \code{\link{lgp_predict}} after fitting the model.}
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
 
-\item{cat_kernel_type}{Kernel type for categorical variables (other than id). Possible
-options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
+\item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
+Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
 only category \code{"1"} will have an effect).}
 }
 \value{
