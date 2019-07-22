@@ -72,17 +72,7 @@ postproc <- function(fit,
       
       cat("* Averaging before computing variations.\n")
       # Compute relevances using average F's
-      if(is.numeric(ell_smooth)){
-        ell <- ell_smooth * ell_smooth_multip
-      }else if(is.character(ell_smooth)){
-        if(ell_smooth == "ell_shared"){
-          ell <- ELL[i] * ell_smooth_multip
-        }else if(ell_smooth == "none"){
-          ell <- NULL
-        }else{
-          stop("Invalid keyword '", ell_smooth, "' for ell_smooth!")
-        }
-      }
+      ell          <- get_ell_smooth(ell_smooth, ell_smooth_multip, mean(ELL))
       REL          <- compute_relevances(FFF_avg, y_data, info, D, ell, x_age)
       FFF_cor_avg  <- REL$FFF_cor
       p_comp       <- REL$p_comp
@@ -102,17 +92,7 @@ postproc <- function(fit,
       evar     <- rep(0, n_smp)
       FFF_cor_avg <- matrix(0, n, n_cmp + 2)
       for(i in 1:n_smp){
-        if(is.numeric(ell_smooth)){
-          ell <- ell_smooth * ell_smooth_multip
-        }else if(is.character(ell_smooth)){
-          if(ell_smooth == "ell_shared"){
-            ell <- ELL[i] * ell_smooth_multip
-          }else if(ell_smooth == "none"){
-            ell <- NULL
-          }else{
-            stop("Invalid keyword '", ell_smooth, "' for ell_smooth!")
-          }
-        }
+        ell             <- get_ell_smooth(ell_smooth, ell_smooth_multip, ELL[i])
         FFF_i           <- data.frame(FFF[i,,])
         colnames(FFF_i) <- colnames(FFF_avg)
         REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
@@ -148,7 +128,9 @@ postproc <- function(fit,
     if(average_before_variance){stop("Should not average if taking one sample!")}
     FFF_i           <- data.frame(FFF[sample_idx,,])
     colnames(FFF_i) <- colnames(FFF_avg)
-    REL             <- compute_relevances(FFF_i, y_data, info, D, ELL[sample_idx], x_age)
+    ell             <- get_ell_smooth(ell_smooth, ell_smooth_multip, ELL[sample_idx])
+    cat("ell_smooth =", ell, "\n")
+    REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
     FFF_i_cor       <- REL$FFF_cor
     out             <- list(components = FFF_i, corrected = FFF_i_cor)
     return(out)

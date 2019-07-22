@@ -149,7 +149,15 @@ model_info <- function(object, print = TRUE){
 #' @return a list
 extract_components_onesample <- function(fit, sample_idx){
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  return(postproc(fit, threshold = 0.95, FALSE, sample_idx))  
+  pinfo <- fit@postproc_info
+  ret <- postproc(fit, 
+                  threshold               = pinfo$threshold,
+                  ell_smooth              = pinfo$ell_smooth,
+                  ell_smooth_multip       = pinfo$ell_smooth_multip,
+                  average_before_variance = pinfo$average_before_variance,
+                  sample_idx              = sample_idx)
+  
+  return(ret)  
 }
 
 
@@ -226,4 +234,25 @@ show_relevances <- function(fit){
   ell_smooth_multip <- fit@postproc_info$ell_smooth_multip
   cat("\nell_smooth =", ell_smooth, "\n")
   cat("ell_smooth_multip =", ell_smooth_multip, "\n")
+}
+
+
+#' A convenience function used in postproc-main.R
+#'
+#' @param ell_smooth a character or numeric argument
+#' @param ell_smooth_multip numeric
+#' @param ell_smp numeric
+#' @return a number
+get_ell_smooth <- function(ell_smooth, ell_smooth_multip, ell_smp){
+  if(is.numeric(ell_smooth)){
+    ell <- ell_smooth * ell_smooth_multip
+  }else if(is.character(ell_smooth)){
+    if(ell_smooth == "ell_shared"){
+      ell <- ell_smp * ell_smooth_multip
+    }else if(ell_smooth == "none"){
+      ell <- NULL
+    }else{
+      stop("Invalid keyword '", ell_smooth, "' for ell_smooth!")
+    }
+  }
 }
