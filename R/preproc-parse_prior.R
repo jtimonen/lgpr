@@ -112,6 +112,7 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
                       L_ons = ONSET$L_ons,
                       U_ons = ONSET$U_ons,
                       backwards = ONSET$backwards,
+                      relative  = ONSET$relative,
                       vm_params = prior$vm_params
   )
   
@@ -140,6 +141,7 @@ parse_prior_onset <- function(dist, N_cases, T_observed, T_last, UNCRT){
   if(is.character(type)){
     parts <- strsplit(type,"_")[[1]]
     backwards <- FALSE
+    relative <- FALSE
     if(length(parts)>2){
       if(parts[3]=="backwards"){
         backwards <- TRUE
@@ -154,6 +156,16 @@ parse_prior_onset <- function(dist, N_cases, T_observed, T_last, UNCRT){
       }else if(parts[2]=="before"){
         L_ons  <- rep(0, N_cases)
         U_ons  <- T_observed 
+      }else if(parts[2]=="relative"){
+        relative <- TRUE
+        L_ons  <- rep(0, N_cases)
+        U_ons  <- T_last
+        if(length(parts)>2){
+          stop("Do not set third keyword if using relative mode!")
+        }
+        if(!(parts[1] %in% c("normal", "student-t"))){
+          stop("Only normal and student-t priors available in relative mode!")
+        }
       }else{
         stop("Unknown second keyword '", parts[2],"'! ")
       }
@@ -178,7 +190,8 @@ parse_prior_onset <- function(dist, N_cases, T_observed, T_last, UNCRT){
               p_ONS     = p_ONS,
               L_ons     = L_ons,
               U_ons     = U_ons,
-              backwards = as.numeric(backwards))
+              backwards = as.numeric(backwards),
+              relative  = as.numeric(relative))
   return(ret)
 }
 

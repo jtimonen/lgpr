@@ -76,111 +76,6 @@ prior_LonGP <- function()
 }
 
 
-#' Validate prior by sampling the signal and noise from it
-#'
-#' @export
-#' @param model An object of class \code{\link{lgpmodel}}.
-#' @param chains how many chains are used to sample from the prior
-#' @param iter for how many iterations are the chains run
-#' @param parallel should the chains be run in parallel?
-#' @return An object of class \code{lgpfit} and random samples of both `f` and `y`.
-#'
-validate_prior <- function(model,
-                           chains   = 4,
-                           iter     = 1000,
-                           parallel = FALSE)
-{
-  
-  stop("sorry, this function does not currenly work!")
-  # Remove likelihood
-  model@stan_dat$LH <- 0
-  
-  # Sample from the prior
-  fit <- lgp_fit(model, 
-                 iter     = iter, 
-                 parallel = parallel, 
-                 chains   = chains,
-                 refresh  = 2*iter)
-  
-  sf    <- fit@stan_fit
-  F_rng <- rstan::extract(sf, pars = "F_rng")$F_rng[,1,]
-  sig   <- rstan::extract(sf, pars = "sigma_n")$sigma_n
-  phi   <- rstan::extract(sf, pars = "phi")$phi
-  C_hat <- model@stan_dat$C_hat
-  if(model@likelihood=="Gaussian"){
-    fff <- (F_rng + C_hat)
-    F_mean <- colMeans(fff)
-    F_std  <- apply(fff,2,stats::sd)
-    mean_f <- mean(F_mean)
-    std_f  <- mean(F_std)
-    mean_y <- mean_f
-    std_y  <- mean(F_std + sig)
-  }else if(model@likelihood == "Poisson"){
-    fff    <- C_hat*exp(F_rng)
-    F_mean <- colMeans(fff)
-    F_std  <- apply(fff,2,stats::sd)
-    mean_f <- mean(F_mean)
-    std_f  <- mean(F_std)
-    mean_y <- mean_f
-    std_y  <- mean(sqrt(F_std^2 + F_mean))
-  }else if(model@likelihood == "Negative Binomial"){
-    fff    <- C_hat*exp(F_rng)
-    F_mean <- colMeans(fff)
-    n      <- length(F_mean)
-    F_std  <- apply(fff,2,stats::sd)
-    mean_f <- mean(F_mean)
-    std_f  <- mean(F_std)
-    S      <- length(phi)
-    yyy    <- matrix(0, S, n)
-    for(s in 1:S){
-      yyy[s,] <- MASS::rnegbin(n = n, mu = fff[s,], theta = phi[s])
-    }
-    Y_mean <- colMeans(yyy)
-    Y_std  <- apply(yyy,2,stats::sd)
-    mean_y <- mean(Y_mean)
-    std_y  <- mean(Y_std)
-  }
-  #if(noiseType == "Gaussian"){
-  #  y_n <- matrix(0, s, n)
-  #  for(is in 1:s){
-  #    y_n[is,] <- stats::rnorm(n = n, mean = 0, sd = sig[is])
-  #  }
-  #  mu_rng <- f_rng
-  # y_rng <- mu_rng + y_n
-  #}else if(noiseType == "Poisson"){
-  #  mu_rng <- mean(data$y)*exp(f_rng)
-  #  y_rng  <- matrix(0, s, n)
-  ##  for(is in 1:s){
-  #    y_rng[is,] <- stats::rpois(n = n, lambda = mu_rng[is,])
-  #  }
-  #}else if(noiseType == "NB"){
-  #  mu_rng <- mean(data$y)*exp(f_rng)
-  #  y_rng  <- matrix(0, s, n)
-  #  for(is in 1:s){
-  #    y_rng[is,] <- MASS::rnegbin(n = n, mu = mu_rng[is,], theta = phi[is])
-  #  }
-  #}
-  
-  yname <- strsplit(model@formula, "~")[[1]][1]
-  yname <- substr(yname,1,nchar(yname)-1)
-  y_data <- model@data[[yname]]
-  cat("\n")
-  cat("* Mean of ", yname, ": ", mean(y_data),  " (data)\n", sep="")
-  cat("* Std of ", yname, ": ", stats::sd(y_data), " (data)\n", sep="")
-  cat("* Mean of signal: ", mean_f,  " (sampled)\n", sep="")
-  cat("* Std of signal: ", std_f, " (sampled)\n", sep="")
-  cat("* Mean of y: ", mean_y,  " (sampled)\n", sep="")
-  cat("* Std of y: ", std_y, " (sampled)\n", sep="")
-  
-  ret <- list(mean_f = mean_f,
-              std_f  = std_f,
-              mean_y = mean_y,
-              std_y  = std_y,
-              C_hat  = C_hat)
-  cat("\n")
-  return(ret)
-}
-
 
 #' Human-readable description of a specified prior
 #' 
@@ -360,9 +255,13 @@ prior_stan_to_readable <- function(stan_dat){
           pn_base <- pname
           pname <- paste("T_obs[",k,"] - ", pname, sep="")
         }
+        if(stan_dat$relative==1){
+          pn_base <- pname
+          pname <- paste("- T_obs[",k,"] + ", pname, sep="")
+        }
         ps  <- prior_statement(pname, TYP[1:2], P[1:3], dist, FALSE)
         str <- paste("[lower=", LB[k], ", upper=", UB[k], "]", sep="")
-        if(stan_dat$backwards==1){
+        if(stan_dat$backwards==1 || stan_dat$relative==1){
           str <- paste(str, " (bound is for ", pn_base, ")", sep="")
         }
         ps <- paste(ps, str, sep = "")
@@ -420,4 +319,111 @@ prior_statement <- function(parname, TYP, P, dist, row_change = TRUE){
   # Return
   return(str)
 }
+
+
+#' Validate prior by sampling the signal and noise from it
+#'
+#' @export
+#' @param model An object of class \code{\link{lgpmodel}}.
+#' @param chains how many chains are used to sample from the prior
+#' @param iter for how many iterations are the chains run
+#' @param parallel should the chains be run in parallel?
+#' @return An object of class \code{lgpfit} and random samples of both `f` and `y`.
+#'
+validate_prior <- function(model,
+                           chains   = 4,
+                           iter     = 1000,
+                           parallel = FALSE)
+{
+  
+  stop("sorry, this function does not currenly work!")
+  # Remove likelihood
+  model@stan_dat$LH <- 0
+  
+  # Sample from the prior
+  fit <- lgp_fit(model, 
+                 iter     = iter, 
+                 parallel = parallel, 
+                 chains   = chains,
+                 refresh  = 2*iter)
+  
+  sf    <- fit@stan_fit
+  F_rng <- rstan::extract(sf, pars = "F_rng")$F_rng[,1,]
+  sig   <- rstan::extract(sf, pars = "sigma_n")$sigma_n
+  phi   <- rstan::extract(sf, pars = "phi")$phi
+  C_hat <- model@stan_dat$C_hat
+  if(model@likelihood=="Gaussian"){
+    fff <- (F_rng + C_hat)
+    F_mean <- colMeans(fff)
+    F_std  <- apply(fff,2,stats::sd)
+    mean_f <- mean(F_mean)
+    std_f  <- mean(F_std)
+    mean_y <- mean_f
+    std_y  <- mean(F_std + sig)
+  }else if(model@likelihood == "Poisson"){
+    fff    <- C_hat*exp(F_rng)
+    F_mean <- colMeans(fff)
+    F_std  <- apply(fff,2,stats::sd)
+    mean_f <- mean(F_mean)
+    std_f  <- mean(F_std)
+    mean_y <- mean_f
+    std_y  <- mean(sqrt(F_std^2 + F_mean))
+  }else if(model@likelihood == "Negative Binomial"){
+    fff    <- C_hat*exp(F_rng)
+    F_mean <- colMeans(fff)
+    n      <- length(F_mean)
+    F_std  <- apply(fff,2,stats::sd)
+    mean_f <- mean(F_mean)
+    std_f  <- mean(F_std)
+    S      <- length(phi)
+    yyy    <- matrix(0, S, n)
+    for(s in 1:S){
+      yyy[s,] <- MASS::rnegbin(n = n, mu = fff[s,], theta = phi[s])
+    }
+    Y_mean <- colMeans(yyy)
+    Y_std  <- apply(yyy,2,stats::sd)
+    mean_y <- mean(Y_mean)
+    std_y  <- mean(Y_std)
+  }
+  #if(noiseType == "Gaussian"){
+  #  y_n <- matrix(0, s, n)
+  #  for(is in 1:s){
+  #    y_n[is,] <- stats::rnorm(n = n, mean = 0, sd = sig[is])
+  #  }
+  #  mu_rng <- f_rng
+  # y_rng <- mu_rng + y_n
+  #}else if(noiseType == "Poisson"){
+  #  mu_rng <- mean(data$y)*exp(f_rng)
+  #  y_rng  <- matrix(0, s, n)
+  ##  for(is in 1:s){
+  #    y_rng[is,] <- stats::rpois(n = n, lambda = mu_rng[is,])
+  #  }
+  #}else if(noiseType == "NB"){
+  #  mu_rng <- mean(data$y)*exp(f_rng)
+  #  y_rng  <- matrix(0, s, n)
+  #  for(is in 1:s){
+  #    y_rng[is,] <- MASS::rnegbin(n = n, mu = mu_rng[is,], theta = phi[is])
+  #  }
+  #}
+  
+  yname <- strsplit(model@formula, "~")[[1]][1]
+  yname <- substr(yname,1,nchar(yname)-1)
+  y_data <- model@data[[yname]]
+  cat("\n")
+  cat("* Mean of ", yname, ": ", mean(y_data),  " (data)\n", sep="")
+  cat("* Std of ", yname, ": ", stats::sd(y_data), " (data)\n", sep="")
+  cat("* Mean of signal: ", mean_f,  " (sampled)\n", sep="")
+  cat("* Std of signal: ", std_f, " (sampled)\n", sep="")
+  cat("* Mean of y: ", mean_y,  " (sampled)\n", sep="")
+  cat("* Std of y: ", std_y, " (sampled)\n", sep="")
+  
+  ret <- list(mean_f = mean_f,
+              std_f  = std_f,
+              mean_y = mean_y,
+              std_y  = std_y,
+              C_hat  = C_hat)
+  cat("\n")
+  return(ret)
+}
+
 

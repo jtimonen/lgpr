@@ -49,7 +49,9 @@
   if(UNCRT){
     real tx;
     for(k in 1:N_cases){
-      if(backwards==1){
+      if(relative==1){
+        tx = - T_observed[k] + T_onset[1,k];
+      }else if(backwards==1){
         tx = T_observed[k] - T_onset[1,k];
       }else{
         tx = T_onset[1,k];

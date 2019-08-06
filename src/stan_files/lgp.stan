@@ -76,6 +76,7 @@ data {
   vector[N_cases] L_ons[UNCRT];    // lower bounds for sampled disease onset
   vector[N_cases] U_ons[UNCRT];    // upper bounds for sampled disease onset
   int<lower=0,upper=1> backwards;  // is the prior for onset "backwards"
+  int<lower=0,upper=1> relative;   // is the prior for onset relative to observed onset
   
   // Other
   real DELTA;       // jitter to ensure pos. def. kernel matrices
