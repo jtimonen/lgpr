@@ -237,8 +237,9 @@ plot_beta <- function(fit,
   ibeta <- grep("beta", names(df))
   df    <- df[, ibeta]
   colnames(df) <- paste("id = ", names(aff), sep="")
-  p <- bayesplot::mcmc_dens(df)
-  beta <- "beta" # avoid note from R CMD check
+  bayesplot::color_scheme_set(scheme = color_scheme)
+  p     <- bayesplot::mcmc_dens(df)
+  beta  <- "beta" # avoid note from R CMD check
   p <- p + ggplot2::xlab(expression(beta))
   
   str <- paste("Affected individuals: ", paste(names(which(aff)), collapse = ", "), sep="")
