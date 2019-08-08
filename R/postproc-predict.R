@@ -285,7 +285,8 @@ compute_predictions <- function(X_data, y_data, X_test,
     }
     if(info$UNCRT==1){
       t_ons <- params[which(grepl("T_onset", nam))]
-      names(t_ons) <- info$case_ids
+      t_ons <- rbind(info$case_ids, t_ons)
+      rownames(t_ons) <- c("case id", "onset time")
     }else{
       t_ons <- NULL
     }
@@ -435,6 +436,25 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     xnn1     <- as.numeric(!is.nan(disAge1))
     xnn2     <- as.numeric(!is.nan(disAge2))
     
+    # modify diseaseAges if they are uncertain
+    if(info$UNCRT==1){
+      formatter    <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
+      id1_str  <- formatter(id1)
+      id2_str  <- formatter(id2)
+      t_onset1 <- rep(NaN, n1)
+      t_onset2 <- rep(NaN, n2)
+      case_ids <- t_ons[1,]
+      for(i_iter in 1:dim(t_ons)[2]){
+        caseid <- t_ons[1, i_iter]
+        i1 <- which(id1==caseid)
+        i2 <- which(id2==caseid)
+        t_onset1[i1] <- t_ons[2,i_iter]
+        t_onset2[i2] <- t_ons[2,i_iter]
+      }
+      disAge1  <- TSCL$fun_inv(age1) - t_onset1
+      disAge2  <- TSCL$fun_inv(age2) - t_onset2
+    }
+    
     # alpha mask
     if(VM==1){
       K_var_mask <- compute_K_var_mask(disAge1, disAge2, vm_params, stp)
@@ -449,21 +469,6 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
       K_beta   <- compute_K_beta(beta, caseID_1, caseID_2)
     }else{
       K_beta <- matrix(1, n1, n2)
-    }
-    
-    # modify diseaseAges
-    if(info$UNCRT==1){
-      formatter    <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
-      id1_str  <- formatter(id1)
-      id2_str  <- formatter(id2)
-      t_onset1 <- t_ons[id1_str]
-      t_onset2 <- t_ons[id2_str]
-      disAge1  <- TSCL$fun_inv(age1) - t_onset1
-      disAge2  <- TSCL$fun_inv(age2) - t_onset2
-      na1 <- which(is.na(disAge1))
-      na2 <- which(is.na(disAge2))
-      disAge1[na1] <- NaN
-      disAge2[na2] <- NaN
     }
     
     # Evaluate the nonstationary kernel

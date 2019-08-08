@@ -7,10 +7,11 @@
 plot_posterior_predictions(fit, mode, PRED = NULL,
   color_scheme = "red", color_scheme_onset = "gray", alpha = 0.5,
   alpha_line = 1, alpha2 = 0.5, plot_uncertainty = TRUE,
-  title = NULL, original_y_scale = TRUE, ylim = NULL,
-  plot_obs_onset = FALSE, plot_onset_samples = FALSE,
-  ypos_dens = NULL, test_data = NULL, color_test = "deepskyblue2",
-  pch_test = 21, size_test = 2, error_bar = FALSE, n_sds = 2)
+  title = NULL, ylim = NULL, plot_obs_onset = FALSE,
+  plot_onset_samples = FALSE, ypos_dens = NULL, test_data = NULL,
+  color_test = "deepskyblue2", pch_test = 21, size_test = 2,
+  error_bar = FALSE, n_sds = 2, reference_onsets = NULL,
+  post_onset_statistic = "none")
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -33,8 +34,6 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{title}{optional prefix to plot title}
 
-\item{original_y_scale}{should the predictions be scaled back to the original data y scale}
-
 \item{ylim}{y axis limits}
 
 \item{plot_obs_onset}{should the observed disease onset be plotted by a vertical line}
@@ -54,10 +53,14 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 \item{error_bar}{should uncertainty be plotted using error bars instead of a ribbon}
 
 \item{n_sds}{number of standard deviations for the uncertainty band width}
+
+\item{reference_onsets}{reference onset times}
+
+\item{post_onset_statistic}{statistic computed from onset samples (mean or median)}
 }
 \value{
 a ggplot object
 }
 \description{
-NOTE: currently plotting the onsets assumes that the case individuals come first!
+Plot posterior of f or predictive distribution for y
 }

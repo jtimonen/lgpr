@@ -5,7 +5,8 @@
 \title{Add disease onsets to predictions plot}
 \usage{
 plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
-  idvar, timevar, ypos_dens, color_scheme_onset, alpha2 = 1)
+  idvar, timevar, ypos_dens, color_scheme_onset, reference_onsets,
+  post_onset_statistic, alpha2 = 1)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -23,6 +24,10 @@ plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
 \item{ypos_dens}{y position of the estimated onset density}
 
 \item{color_scheme_onset}{color scheme}
+
+\item{reference_onsets}{reference onset times}
+
+\item{post_onset_statistic}{statistic computed from onset samples}
 
 \item{alpha2}{alpha parameter}
 }

@@ -80,7 +80,7 @@ plot_posterior_y <- function(fit, PRED,
 
 #' Plot posterior of f or predictive distribution for y
 #' 
-#' @description NOTE: currently plotting the onsets assumes that the case individuals come first!
+#' @export
 #' @param fit An object of class \code{lgpfit}.
 #' @param mode Must be either "posterior" or "predictive".
 #' @param PRED Predictions computed using \code{lgp_predict}.
@@ -89,7 +89,6 @@ plot_posterior_y <- function(fit, PRED,
 #' @param alpha_line Line opacity.
 #' @param alpha2 alpha of t_onset density
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
-#' @param original_y_scale should the predictions be scaled back to the original data y scale
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
 #' @param plot_obs_onset should the observed disease onset be plotted by a vertical line
@@ -102,6 +101,8 @@ plot_posterior_y <- function(fit, PRED,
 #' @param size_test test point size
 #' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
 #' @param n_sds number of standard deviations for the uncertainty band width
+#' @param reference_onsets reference onset times 
+#' @param post_onset_statistic statistic computed from onset samples (mean or median)
 #' @return a ggplot object
 plot_posterior_predictions <- function(fit, 
                                        mode,
@@ -113,7 +114,6 @@ plot_posterior_predictions <- function(fit,
                                        alpha2             = 0.5,
                                        plot_uncertainty   = TRUE,
                                        title              = NULL,
-                                       original_y_scale   = TRUE,
                                        ylim               = NULL,
                                        plot_obs_onset     = FALSE,
                                        plot_onset_samples = FALSE,
@@ -123,10 +123,13 @@ plot_posterior_predictions <- function(fit,
                                        pch_test           = 21,
                                        size_test          = 2,
                                        error_bar          = FALSE,
-                                       n_sds              = 2)
+                                       n_sds              = 2,
+                                       reference_onsets   = NULL,
+                                       post_onset_statistic = "none")
 {
   
   # Input checks and options
+  original_y_scale <- TRUE
   cwise <- FALSE
   OPT <- plot_predictions_options(fit, color_scheme, cwise,
                                   original_y_scale, PRED, test_data, 
@@ -162,13 +165,13 @@ plot_posterior_predictions <- function(fit,
     group_var <- idvar
     y_var     <- "mu"
   }
-
+  
   if(error_bar){
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var))
   }else{
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
   }
-
+  
   # Edit plot title
   if(!is.null(title)){
     ptitle <- paste(title, ": ", ptitle, sep="")
@@ -218,7 +221,8 @@ plot_posterior_predictions <- function(fit,
   
   # Add onsets
   h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
-                                   idvar, timevar, ypos_dens, OPT$cs_onset)
+                                   idvar, timevar, ypos_dens, OPT$cs_onset,
+                                   reference_onsets, post_onset_statistic)
   # Plot test data
   if(!is.null(test_data)){
     id_test    <- formatter(test_data[[idvar]])
@@ -429,6 +433,8 @@ plot_predictions_options <- function(fit,
 #' @param timevar time variable name
 #' @param ypos_dens y position of the estimated onset density
 #' @param color_scheme_onset color scheme
+#' @param reference_onsets reference onset times 
+#' @param post_onset_statistic statistic computed from onset samples
 #' @param alpha2 alpha parameter
 #' @return a modified ggplot object
 plot_predictions_add_onsets <- function(fit, h, 
@@ -438,6 +444,8 @@ plot_predictions_add_onsets <- function(fit, h,
                                         timevar,
                                         ypos_dens,
                                         color_scheme_onset,
+                                        reference_onsets,
+                                        post_onset_statistic,
                                         alpha2 = 1)
 {
   # Plot observed onsets
@@ -455,6 +463,19 @@ plot_predictions_add_onsets <- function(fit, h,
                                  color    = "black",
                                  linetype = 1)
     
+    if(!is.null(reference_onsets)){
+      l1 <- length(reference_onsets)
+      l2 <- length(t_ons)
+      if(l1!=l2){
+        stop("invalid length of reference_onsets (", l1, "), must be ", l2)
+      }
+      refline.data <- data.frame(zzz = reference_onsets, facet_var = names(t_ons))
+      h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
+                                   na.rm    = TRUE,
+                                   data     = refline.data, 
+                                   color    = "firebrick3",
+                                   linetype = 1)
+    }
   }
   
   # Plot onset samples
@@ -472,10 +493,29 @@ plot_predictions_add_onsets <- function(fit, h,
       ypos_dens <- min(df[[yvar]]) - 1.5*dens_scale
     }
     
-    # This part assumes that case individuals come first
+    # Plot onset time mean or median
     cid_str   <- colnames(T_smp)
-    fv        <- as.factor(rep(cid_str, each = n_smp))
+    if(post_onset_statistic=="mean"){
+      statistic <- colMeans(T_smp)
+    }else if(post_onset_statistic=="median"){
+      statistic <- apply(T_smp, 2, stats::median)
+    }else{
+      statistic <- NULL
+    }
+    if(!is.null(statistic)){
+      nams <- names(t_ons)
+      i_good <- which(nams %in% cid_str)
+      nams <- nams[i_good]
+      statline.data <- data.frame(zzz = statistic, facet_var = nams)
+      h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
+                                   na.rm    = TRUE,
+                                   data     = statline.data, 
+                                   color    = "gray50",
+                                   linetype = 1)
+    }
     
+    # Plot kernel density estimate of posterior of onset time
+    fv        <- as.factor(rep(cid_str, each = n_smp))
     dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
     h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 
                                    na.rm    = TRUE,
