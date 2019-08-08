@@ -118,10 +118,6 @@ predict_preproc <- function(fit, X_test, samples){
                 "DELTA", "USE_VAR_MASK", "vm_params", "cat_interact_kernel")
   info     <- stan_dat[fields]
   
-  if(info$UNCRT==1){
-    stop("lgp_predict not implemented to work with UNCRT=1 yet!")
-  }
-  
   # Input checking
   if(LH!=1){
     stop("Computing predictions outside the data is possible only for models",
@@ -174,6 +170,8 @@ predict_preproc <- function(fit, X_test, samples){
       samples <- 1:dim(PAR)[1]
     }
   }
+  
+  info$case_ids <- get_case_ids(fit)
   
   # Return
   ret <- list(X_data   = X_data, 
@@ -247,11 +245,13 @@ add_test_caseIDs <- function(X_test, X_data){
 #' @param info other model info
 #' @param D a vector of length 6
 #' @param cnames Names of the model components.
+#' @param TSCL time scaling function and its inverse
 #' @param handle_extra What to do if test data contains individuals that are
 #' not in the training data? Must be 'silent', 'warning' or 'error'.
 #' @return A list.
 compute_predictions <- function(X_data, y_data, X_test, 
-                                params, D, info, cnames, 
+                                params, D, info, cnames,
+                                TSCL,
                                 handle_extra = "warning"){
   
   # Check that the IDs are same
@@ -283,9 +283,16 @@ compute_predictions <- function(X_data, y_data, X_test,
     }else{
       beta <- NULL
     }
+    if(info$UNCRT==1){
+      t_ons <- params[which(grepl("T_onset", nam))]
+      names(t_ons) <- info$case_ids
+    }else{
+      t_ons <- NULL
+    }
   }else{
     stp  <- NULL
     beta <- NULL
+    t_ons <- NULL
   }
   
   sigma_n <- params[which(grepl("sigma_n", nam))]
@@ -294,7 +301,9 @@ compute_predictions <- function(X_data, y_data, X_test,
                       ell     = ell, 
                       stp     = stp, 
                       beta    = beta,
-                      info    = info)
+                      t_ons   = t_ons,
+                      info    = info,
+                      TSCL    = TSCL)
   
   # Compute kernel matrices
   KK   <- compute_kernel_matrices(X_data, X_data, KERNEL_INFO)
@@ -381,9 +390,11 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
   ell   <- as.numeric(kernel_info$ell)
   stp   <- as.numeric(kernel_info$stp)
   beta  <- as.numeric(kernel_info$beta)
+  t_ons <- kernel_info$t_ons
   info  <- kernel_info$info
   VM    <- info$USE_VAR_MASK
   vm_params <- info$vm_params
+  TSCL  <- kernel_info$TSCL
   cat_interact_kernel <- info$cat_interact_kernel
   
   # Get dimensions and age and id covariates
@@ -416,7 +427,6 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     KK[,,r] <- kernel_se(age1, age2, mag, len)
   }
   if(D[3]==1){
-    # TODO :include the special feature UNCRT too
     r        <- r + 1
     mag      <- alpha[r]
     len      <- ell[r]
@@ -441,6 +451,22 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
       K_beta <- matrix(1, n1, n2)
     }
     
+    # modify diseaseAges
+    if(info$UNCRT==1){
+      formatter    <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
+      id1_str  <- formatter(id1)
+      id2_str  <- formatter(id2)
+      t_onset1 <- t_ons[id1_str]
+      t_onset2 <- t_ons[id2_str]
+      disAge1  <- TSCL$fun_inv(age1) - t_onset1
+      disAge2  <- TSCL$fun_inv(age2) - t_onset2
+      na1 <- which(is.na(disAge1))
+      na2 <- which(is.na(disAge2))
+      disAge1[na1] <- NaN
+      disAge2[na2] <- NaN
+    }
+    
+    # Evaluate the nonstationary kernel
     KK[,,r] <- K_var_mask * K_beta * kernel_bin(xnn1, xnn2) * 
       kernel_ns(disAge1, disAge2, mag, len, a = stp, b = 0, c = 1)
   }

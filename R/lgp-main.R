@@ -276,6 +276,8 @@ lgp_fit <- function(model,
 #' all parameter samples (\code{samples="all"}). This can also be a set of indices, 
 #' for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.
 #' @param print_progress Should progress be printed (if there is more than one sample)?
+#' @param print_params Should the parameter values be printed? (only works if \code{samples}
+#' is mean or median.)
 #' @return A list.
 #' @seealso 
 #' \itemize{
@@ -285,7 +287,8 @@ lgp_fit <- function(model,
 lgp_predict <- function(fit, 
                         X_test, 
                         samples        = "mean",
-                        print_progress = TRUE)
+                        print_progress = TRUE,
+                        print_params   = FALSE)
 {
   
   # Run some input checks and scale data correctly
@@ -298,6 +301,8 @@ lgp_predict <- function(fit,
   D       <- PP$D
   cnames  <- PP$cnames
   LIST    <- list()
+  TSCL    <- fit@model@scalings$TSCL
+  
   cat("* Computing predictions ")
   
   if(is.character(samples)){
@@ -306,7 +311,10 @@ lgp_predict <- function(fit,
     if(samples %in% c("mean", "median")){
       cat("using posterior ", samples, " parameters. \n", sep = "")
       params    <- hyperparam_estimate(fit, samples)
-      LIST[[1]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
+      if(print_params){
+        print(params)
+      }
+      LIST[[1]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames, TSCL)
     }else{
       stop("\ninvalid 'samples' input for lgp_predict! (", samples, ")")
     }
@@ -334,7 +342,7 @@ lgp_predict <- function(fit,
       # Predict with current parameter sample
       params        <- as.numeric(PAR[i_smp,])
       names(params) <- pnames
-      LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames)
+      LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames, TSCL)
       
       # Print progress
       if(print_progress %% ns > 1){

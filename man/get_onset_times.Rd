@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc-utils.R
 \name{get_onset_times}
 \alias{get_onset_times}
-\title{Extract inferred disease onset times}
+\title{Extract observed disease onset times from diseaseAge covariate vector}
 \usage{
 get_onset_times(id, age, disAge)
 }
@@ -17,5 +17,5 @@ get_onset_times(id, age, disAge)
 vector of observed onset times
 }
 \description{
-Extract inferred disease onset times
+Extract observed disease onset times from diseaseAge covariate vector
 }

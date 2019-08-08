@@ -4,7 +4,8 @@
 \alias{lgp_predict}
 \title{Compute predictions for a fitted model}
 \usage{
-lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE)
+lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE,
+  print_params = FALSE)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -17,6 +18,9 @@ all parameter samples (\code{samples="all"}). This can also be a set of indices,
 for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.}
 
 \item{print_progress}{Should progress be printed (if there is more than one sample)?}
+
+\item{print_params}{Should the parameter values be printed? (only works if \code{samples}
+is mean or median.)}
 }
 \value{
 A list.

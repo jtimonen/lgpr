@@ -453,7 +453,7 @@ plot_predictions_add_onsets <- function(fit, h,
                                  na.rm    = TRUE,
                                  data     = vline.data, 
                                  color    = "black",
-                                 linetype = 3)
+                                 linetype = 1)
     
   }
   
@@ -473,13 +473,8 @@ plot_predictions_add_onsets <- function(fit, h,
     }
     
     # This part assumes that case individuals come first
-    uid        <- unique(df[[idvar]])
-    formatter <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
-    uid_str   <- formatter(uid) # zero padded format for the IDs
-    N     <- length(uid)
-    Nc    <- model@stan_dat$N_cases
-    t_smp <- c(t_smp, rep(NaN, (N-Nc)*n_smp))
-    fv    <- as.factor(rep(uid_str, each = n_smp))
+    cid_str   <- colnames(T_smp)
+    fv        <- as.factor(rep(cid_str, each = n_smp))
     
     dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
     h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 

@@ -161,7 +161,7 @@ extract_components_onesample <- function(fit, sample_idx){
 }
 
 
-#' Extract inferred disease onset times
+#' Extract observed disease onset times from diseaseAge covariate vector
 #'
 #' @param id the id covariate, vector of length \code{n}
 #' @param age the age covariate, vector of length \code{n}
@@ -200,6 +200,10 @@ extract_t_onset_samples <- function(fit){
     stop("uncertainty was not modeled!")
   }else{
     SMP <- rstan::extract(fit@stan_fit, pars = "T_onset")$T_onset[,1,]
+    cid <- get_case_ids(fit)
+    formatter <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
+    cid_str <- formatter(cid) # zero padded format for the IDs
+    colnames(SMP) <- cid_str
     return(SMP)  
   }
 }

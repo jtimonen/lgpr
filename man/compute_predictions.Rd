@@ -4,7 +4,7 @@
 \alias{compute_predictions}
 \title{Compute component-wise predictions at test points}
 \usage{
-compute_predictions(X_data, y_data, X_test, params, D, info, cnames,
+compute_predictions(X_data, y_data, X_test, params, D, info, cnames, TSCL,
   handle_extra = "warning")
 }
 \arguments{
@@ -21,6 +21,8 @@ compute_predictions(X_data, y_data, X_test, params, D, info, cnames,
 \item{info}{other model info}
 
 \item{cnames}{Names of the model components.}
+
+\item{TSCL}{time scaling function and its inverse}
 
 \item{handle_extra}{What to do if test data contains individuals that are
 not in the training data? Must be 'silent', 'warning' or 'error'.}
