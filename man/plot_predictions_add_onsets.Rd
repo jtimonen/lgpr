@@ -6,7 +6,8 @@
 \usage{
 plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
   idvar, timevar, ypos_dens, color_scheme_onset, reference_onsets,
-  post_onset_statistic, alpha2 = 1)
+  post_onset_statistic, linetypes = c(1, 2, 3), linecolors = c("black",
+  "red", "gray50"), alpha2 = 1)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -28,6 +29,10 @@ plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
 \item{reference_onsets}{reference onset times}
 
 \item{post_onset_statistic}{statistic computed from onset samples}
+
+\item{linetypes}{onset line types}
+
+\item{linecolors}{onset line colors}
 
 \item{alpha2}{alpha parameter}
 }

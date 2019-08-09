@@ -11,7 +11,9 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
   plot_onset_samples = FALSE, ypos_dens = NULL, test_data = NULL,
   color_test = "deepskyblue2", pch_test = 21, size_test = 2,
   error_bar = FALSE, n_sds = 2, reference_onsets = NULL,
-  post_onset_statistic = "none", original_y_scale = TRUE)
+  post_onset_statistic = "none", original_y_scale = TRUE,
+  data_color = "black", data_marker = 21, ons_linetypes = c(1, 2, 3),
+  ons_linecolors = c("black", "red", "gray50"))
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -59,6 +61,10 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 \item{post_onset_statistic}{statistic computed from onset samples (mean or median)}
 
 \item{original_y_scale}{should the predictions be scaled back to original data scale}
+
+\item{ons_linetypes}{onset line types}
+
+\item{ons_linecolors}{onset line colors}
 }
 \value{
 a ggplot object

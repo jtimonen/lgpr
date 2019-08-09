@@ -103,6 +103,8 @@ plot_posterior_y <- function(fit, PRED,
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @param reference_onsets reference onset times 
 #' @param post_onset_statistic statistic computed from onset samples (mean or median)
+#' @param ons_linetypes onset line types
+#' @param ons_linecolors onset line colors
 #' @param original_y_scale should the predictions be scaled back to original data scale
 #' @return a ggplot object
 plot_posterior_predictions <- function(fit, 
@@ -127,7 +129,11 @@ plot_posterior_predictions <- function(fit,
                                        n_sds              = 2,
                                        reference_onsets   = NULL,
                                        post_onset_statistic = "none",
-                                       original_y_scale   = TRUE)
+                                       original_y_scale   = TRUE,
+                                       data_color         = "black",
+                                       data_marker        = 21,
+                                       ons_linetypes      = c(1,2,3),
+                                       ons_linecolors     = c("black", "red", "gray50"))
 {
   
   # Input checks and options
@@ -204,6 +210,12 @@ plot_posterior_predictions <- function(fit,
     h <- h + ggplot2::geom_line(color = OPT$linecolor, alpha = alpha_line)
   }
   
+  # Add onsets
+  h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
+                                   idvar, timevar, ypos_dens, OPT$cs_onset,
+                                   reference_onsets, post_onset_statistic,
+                                   ons_linetypes, ons_linecolors)
+  
   # Plot also the data
   dat  <- model@data
   X_id <- as.numeric(dat[[idvar]])
@@ -217,13 +229,12 @@ plot_posterior_predictions <- function(fit,
   h <- h + ggplot2::geom_point(data = df, mapping = ggplot2::aes_string(
     x = timevar,
     y = respvar),
+    color = data_color,
+    pch = data_marker,
     inherit.aes = FALSE
   )
   
-  # Add onsets
-  h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
-                                   idvar, timevar, ypos_dens, OPT$cs_onset,
-                                   reference_onsets, post_onset_statistic)
+  
   # Plot test data
   if(!is.null(test_data)){
     id_test    <- formatter(test_data[[idvar]])
@@ -435,6 +446,8 @@ plot_predictions_options <- function(fit,
 #' @param ypos_dens y position of the estimated onset density
 #' @param color_scheme_onset color scheme
 #' @param reference_onsets reference onset times 
+#' @param linetypes onset line types
+#' @param linecolors onset line colors
 #' @param post_onset_statistic statistic computed from onset samples
 #' @param alpha2 alpha parameter
 #' @return a modified ggplot object
@@ -447,9 +460,10 @@ plot_predictions_add_onsets <- function(fit, h,
                                         color_scheme_onset,
                                         reference_onsets,
                                         post_onset_statistic,
+                                        linetypes = c(1,2,3),
+                                        linecolors = c("black", "red", "gray50"),
                                         alpha2 = 1)
 {
-  # Plot observed onsets
   model <- fit@model
   D     <- model@stan_dat$D
   if(D[3]==1 && plot_obs_onset){
@@ -458,12 +472,8 @@ plot_predictions_add_onsets <- function(fit, h,
     t_ons <- get_onset_times(id = df[[idvar]], age = df[[timevar]], disAge = df[[davar]])
     vline.data <- data.frame(zzz = t_ons, facet_var = names(t_ons))
     
-    h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
-                                 na.rm    = TRUE,
-                                 data     = vline.data, 
-                                 color    = "black",
-                                 linetype = 1)
-    
+
+    # First possible reference onsets
     if(!is.null(reference_onsets)){
       l1 <- length(reference_onsets)
       l2 <- length(t_ons)
@@ -474,9 +484,16 @@ plot_predictions_add_onsets <- function(fit, h,
       h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
                                    na.rm    = TRUE,
                                    data     = refline.data, 
-                                   color    = "firebrick3",
-                                   linetype = 1)
+                                   color    = linecolors[1],
+                                   linetype = linetypes[1])
     }
+    
+    # Then observed onsets
+    h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
+                                 na.rm    = TRUE,
+                                 data     = vline.data, 
+                                 color    = linecolors[2],
+                                 linetype = linetypes[2])
   }
   
   # Plot onset samples
@@ -511,8 +528,8 @@ plot_predictions_add_onsets <- function(fit, h,
       h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
                                    na.rm    = TRUE,
                                    data     = statline.data, 
-                                   color    = "gray50",
-                                   linetype = 1)
+                                   color    = linecolors[3],
+                                   linetype = linetypes[3])
     }
     
     # Plot kernel density estimate of posterior of onset time
