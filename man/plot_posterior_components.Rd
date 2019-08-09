@@ -6,7 +6,7 @@
 \usage{
 plot_posterior_components(fit, PRED = NULL, color_scheme = "red",
   alpha = 0.1, alpha_line = 1, plot_uncertainty = TRUE,
-  title = NULL, original_y_scale = TRUE, ylim = NULL, n_sds = 2)
+  title = NULL, ylim = NULL, n_sds = 2, original_y_scale = FALSE)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -23,11 +23,11 @@ plot_posterior_components(fit, PRED = NULL, color_scheme = "red",
 
 \item{title}{optional prefix to plot title}
 
-\item{original_y_scale}{should the predictions be scaled back to the original data y scale}
-
 \item{ylim}{y axis limits}
 
 \item{n_sds}{number of standard deviations for the uncertainty band width}
+
+\item{original_y_scale}{should the predictions be scaled back to original data scale}
 }
 \value{
 a ggplot object

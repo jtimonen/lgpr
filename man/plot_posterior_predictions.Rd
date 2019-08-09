@@ -11,7 +11,7 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
   plot_onset_samples = FALSE, ypos_dens = NULL, test_data = NULL,
   color_test = "deepskyblue2", pch_test = 21, size_test = 2,
   error_bar = FALSE, n_sds = 2, reference_onsets = NULL,
-  post_onset_statistic = "none")
+  post_onset_statistic = "none", original_y_scale = TRUE)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -57,6 +57,8 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 \item{reference_onsets}{reference onset times}
 
 \item{post_onset_statistic}{statistic computed from onset samples (mean or median)}
+
+\item{original_y_scale}{should the predictions be scaled back to original data scale}
 }
 \value{
 a ggplot object

@@ -103,6 +103,7 @@ plot_posterior_y <- function(fit, PRED,
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @param reference_onsets reference onset times 
 #' @param post_onset_statistic statistic computed from onset samples (mean or median)
+#' @param original_y_scale should the predictions be scaled back to original data scale
 #' @return a ggplot object
 plot_posterior_predictions <- function(fit, 
                                        mode,
@@ -125,11 +126,11 @@ plot_posterior_predictions <- function(fit,
                                        error_bar          = FALSE,
                                        n_sds              = 2,
                                        reference_onsets   = NULL,
-                                       post_onset_statistic = "none")
+                                       post_onset_statistic = "none",
+                                       original_y_scale   = TRUE)
 {
   
   # Input checks and options
-  original_y_scale <- TRUE
   cwise <- FALSE
   OPT <- plot_predictions_options(fit, color_scheme, cwise,
                                   original_y_scale, PRED, test_data, 
@@ -264,9 +265,9 @@ plot_posterior_predictions <- function(fit,
 #' @param alpha Ribbon fill opacity.
 #' @param alpha_line Line opacity
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
-#' @param original_y_scale should the predictions be scaled back to the original data y scale
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
+#' @param original_y_scale should the predictions be scaled back to original data scale
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a ggplot object
 plot_posterior_components <- function(fit, 
@@ -276,9 +277,9 @@ plot_posterior_components <- function(fit,
                                       alpha_line         = 1,
                                       plot_uncertainty   = TRUE,
                                       title              = NULL,
-                                      original_y_scale   = TRUE,
                                       ylim               = NULL,
-                                      n_sds              = 2)
+                                      n_sds              = 2,
+                                      original_y_scale   = FALSE)
 {
   
   # Input checks and options
