@@ -9,7 +9,7 @@ hyperparam_estimate(object, type = "mean")
 \arguments{
 \item{object}{An (incomplete) object of class \code{lgpfit}.}
 
-\item{type}{Must be "mean" or "median".}
+\item{type}{Must be "mean", "median", or "map".}
 }
 \value{
 a data frame

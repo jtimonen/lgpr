@@ -272,8 +272,8 @@ lgp_fit <- function(model,
 #' @param fit An object of class \code{lgpfit}.
 #' @param X_test The test points where the predictions should be computed.
 #' @param samples The predictions can be computed either by using only the posterior mean
-#' \cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or for
-#' all parameter samples (\code{samples="all"}). This can also be a set of indices, 
+#' \cr (\code{samples="mean"}), median (\code{samples="median"}), or MAP (\code{samples="map"}) 
+#' parameters, or for all parameter samples (\code{samples="all"}). This can also be a set of indices, 
 #' for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.
 #' @param print_progress Should progress be printed (if there is more than one sample)?
 #' @param print_params Should the parameter values be printed? (only works if \code{samples}
@@ -308,8 +308,13 @@ lgp_predict <- function(fit,
   if(is.character(samples)){
     
     # Predictions using a single parameter estimate
-    if(samples %in% c("mean", "median")){
-      cat("using posterior ", samples, " parameters. \n", sep = "")
+    if(samples %in% c("mean", "median", "map")){
+      if(samples %in% c("mean", "median")){
+        samples_str <- paste("posterior", samples)
+      }else{
+        samples_str <- "MAP"
+      }
+      cat("using ", samples_str, " parameters. \n", sep = "")
       params    <- hyperparam_estimate(fit, samples)
       if(print_params){
         print(params)
@@ -367,7 +372,7 @@ lgp_predict <- function(fit,
 #' @param fit an object of class \code{lgpfit}
 #' @param test_data a test data matrix
 #' @param verbose Should this print progress?
-#' @param samples Sample indices or a keyword "mean", "median" or "all".
+#' @param samples Sample indices or a keyword "mean", "median", "map", or "all".
 #' @param plot should this return also a plot of the data and predictions?
 #' @return a ggplot object or lppd
 lgp_test <- function(fit, test_data, plot = FALSE, verbose = TRUE, samples = "mean"){

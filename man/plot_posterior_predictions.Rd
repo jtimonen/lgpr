@@ -62,6 +62,10 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{original_y_scale}{should the predictions be scaled back to original data scale}
 
+\item{data_color}{data marker color}
+
+\item{data_marker}{data marker type}
+
 \item{ons_linetypes}{onset line types}
 
 \item{ons_linecolors}{onset line colors}

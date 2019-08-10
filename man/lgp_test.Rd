@@ -16,7 +16,7 @@ lgp_test(fit, test_data, plot = FALSE, verbose = TRUE,
 
 \item{verbose}{Should this print progress?}
 
-\item{samples}{Sample indices or a keyword "mean", "median" or "all".}
+\item{samples}{Sample indices or a keyword "mean", "median", "map", or "all".}
 }
 \value{
 a ggplot object or lppd

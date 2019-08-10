@@ -13,8 +13,8 @@ lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE,
 \item{X_test}{The test points where the predictions should be computed.}
 
 \item{samples}{The predictions can be computed either by using only the posterior mean
-\cr (\code{samples="mean"}) or median (\code{samples="median"}) parameters, or for
-all parameter samples (\code{samples="all"}). This can also be a set of indices, 
+\cr (\code{samples="mean"}), median (\code{samples="median"}), or MAP (\code{samples="map"}) 
+parameters, or for all parameter samples (\code{samples="all"}). This can also be a set of indices, 
 for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.}
 
 \item{print_progress}{Should progress be printed (if there is more than one sample)?}

@@ -105,6 +105,8 @@ plot_posterior_y <- function(fit, PRED,
 #' @param post_onset_statistic statistic computed from onset samples (mean or median)
 #' @param ons_linetypes onset line types
 #' @param ons_linecolors onset line colors
+#' @param data_marker data marker type
+#' @param data_color data marker color
 #' @param original_y_scale should the predictions be scaled back to original data scale
 #' @return a ggplot object
 plot_posterior_predictions <- function(fit, 

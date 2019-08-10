@@ -232,7 +232,7 @@ kernel_smoothing <- function(v, t, t_out, ell){
 #' Get a posterior estimate of model (hyper)parameters
 #'
 #' @param object An (incomplete) object of class \code{lgpfit}.
-#' @param type Must be "mean" or "median".
+#' @param type Must be "mean", "median", or "map".
 #' @return a data frame
 hyperparam_estimate <- function(object, type = "mean"){
   DF    <- as.data.frame(object@stan_fit)
@@ -244,6 +244,9 @@ hyperparam_estimate <- function(object, type = "mean"){
     DF <- colMeans(DF)
   }else if(type=="median"){
     DF <- apply(DF, 2, stats::median)
+  }else if(type=="map"){
+    i_max <- which(DF$lp__==max(DF$lp__))
+    DF <- colMeans(DF[i_max,]) # colmeans just to get correct data type
   }else{
     stop("Invalid type!")
   }
