@@ -6,14 +6,15 @@
 \alias{lgpr}
 \title{The 'lgpr' package.}
 \description{
-Bayesian nonparametric modeling and covariate selection for longitudinal data. 
-The package enables 
+Longitudinal Gaussian Process regression. 
+The package features
 \itemize{
   \item Additive Gaussian process modeling of longitudinal data
-  \item Full posterior inference for the above models using No-U-Turn Hamiltonian Monte Carlo sampling
-  \item Selecting the relevant covariates that explain the target variable
+  \item Posterior inference of the model (hyper)parameters using Stan
+  \item Computation of covariate relevances, i.e. how much each covariate explains the target variable
   \item Specialized modeling of a non-stationary disease effect
   \item Functions for visualizing longitudinal data, posterior samples and model predictions
+  \item Gaussian, Poisson or Negative Binomial observation models
 }
 }
 \section{Basic usage}{
@@ -47,12 +48,12 @@ The package enables
 \author{
 Juho Timonen (first.last at aalto.fi)
 }
-\keyword{Covariate}
 \keyword{Gaussian}
-\keyword{Longitudinal}
-\keyword{Nonparametric}
-\keyword{Stan}
+\keyword{Stan,}
+\keyword{covariate}
 \keyword{data,}
-\keyword{modeling,}
+\keyword{interpretable}
+\keyword{longitudinal}
+\keyword{models}
 \keyword{processes,}
 \keyword{selection,}

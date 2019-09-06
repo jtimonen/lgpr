@@ -4,31 +4,26 @@
 \alias{plot_data}
 \title{A spaghetti plot of longitudinal data.}
 \usage{
-plot_data(data, highlight_col = NULL, highlight_lty = NULL,
-  highlight_cont = NULL, response = "y", palette = "Set1",
-  colgrad = "gray", psize = 2, title = NULL, lwd = 0.5)
+plot_data(data, highlight = NULL, response = "y", id_variable = "id",
+  time_variable = "age", psize = 2, lwd = 0.5, title = NULL)
 }
 \arguments{
-\item{data}{A data frame. Must contain columns \code{id} and \code{age}.}
+\item{data}{A data frame.}
 
-\item{highlight_col}{Name of a categorical covariate to be highlighted with color.}
+\item{highlight}{Name of a covariate to be highlighted with color, or id of a subject
+to be highlighted.}
 
-\item{highlight_lty}{Name of a categorical covariate to be highlighted with line style.}
+\item{response}{Name of the response variable.}
 
-\item{highlight_cont}{Name of a continuous covariate to be highlighted.}
+\item{id_variable}{Name of id variable.}
 
-\item{response}{Name of the response variable (\code{default ="y"}).}
+\item{time_variable}{Name of time variable.}
 
-\item{palette}{Name of a ColorBrewer palette.}
-
-\item{colgrad}{A colour gradient type, must be either \code{"gray"}
-(default), or \code{"diverging"}.}
-
-\item{psize}{Point}
-
-\item{title}{optional prefix to plot title}
+\item{psize}{point size}
 
 \item{lwd}{line width}
+
+\item{title}{additional string added to title}
 }
 \value{
 a ggplot object

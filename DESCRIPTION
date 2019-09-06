@@ -1,15 +1,16 @@
 Package: lgpr
-Title: Interpretable longitudinal Gaussian process regression modeling
-Version: 0.23.9
+Title: Longitudinal Gaussian Process Regression
+Version: 0.24.0
 Authors@R: 
     person(given = "Juho",
            family = "Timonen",
            role = c("aut", "cre"),
            email = "juho.timonen@aalto.fi")
-Description: Implements interpretable nonparametric modeling and
+Description: Implements interpretable nonparametric analysis and
              covariate selection for longitudinal data using additive
-             Gaussian processes. Full Bayesian inference for 
-             Gaussian process models is performed using Stan.
+             Gaussian process regression. Includes specialized non-stationary disease
+             effect modeling features for biomedical studies. Bayesian inference for
+             model parameters is performed using Stan.
 License: GPL (>=3)
 Depends: 
     methods,
