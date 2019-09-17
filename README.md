@@ -16,7 +16,7 @@ https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 
 ### 2. Install lgpr
 
-### 2.1 On command line:
+1) On command line:
 * download or clone this repository
 * put it in directory **lgpr** under parent directory **parent-dir**
 * go to **parent-dir** and run `R CMD build lgpr`
@@ -25,6 +25,6 @@ https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 
 OR
 
-### 2.2 Using `devtools`:
+2) Using `devtools`:
 * Install the `devtools` package
 * Run `devtools::install_github('jtimonen/lgpr')`
