@@ -28,4 +28,4 @@ OR
 
 2) Using `devtools`:
 * Install the `devtools` package
-* Run `devtools::install_github('jtimonen/lgpr')`
+* Run `devtools::install_github('jtimonen/lgpr', build_vignettes = TRUE)`
