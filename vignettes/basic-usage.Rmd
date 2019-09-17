@@ -23,47 +23,43 @@ knitr::opts_chunk$set(
 This vignette demonstrates how to model a longitudinal data set and perform covariate selection using the `lgp` function of the `lgpr` package. In the example cases, the number of data points is small enough so that the experiments can be run in just a few seconds.
 
 ```{r load}
-library("lgpr")
+require("lgpr")
 set.seed(123)
 ```
 
 ## Example
+Here we simulate data with 8 individuals. We simulate individual-specific and shared age effects, as well as a sex-specific age effect. Also a categorial 'location' covariate is simulated, but it has no effect.
 
 ```{r example, fig.width=6.6, fig.height=4}
-
-# generate artificial data --------------------------------------------------
-
+# generate artificial data -----------------------------------------------
 simData <- simulate_data(N           = 8,
                         t_data       = seq(6, 30, by = 6),
-                        covariates   = c(    2,2),
-                        lengthscales = c(6,6,6,6),
-                        relevances   = c(1,1,1,0),
+                        covariates   = c(    2,2), # covariate types (2 = categorical)
+                        lengthscales = c(6,6,6,6), # true effect lengthscales
+                        relevances   = c(1,1,1,0), # true covariate relevances
                         names        = c("sex", "location"),
-                        t_jitter     = 0.5,
-                        snr          = 5)
+                        t_jitter     = 0.5,  # jitter in time points
+                        snr          = 5)    # signal-to-noise ratio
 
-data <- simData$data
+data <- simData$data # data frame
 plot_simdata(simData, componentwise = F)
 plot_simdata(simData, componentwise = T)
 
 # create and fit a model --------------------------------------------------
-
-fit <- lgp(formula  = y ~ id + age + sex + location,
+fit <- lgp(formula  = y ~ id + age + sex + location, # model formula
            data     = data,
            iter     = 1000, 
-           chains   = 1)
+           chains   = 1,
+           refresh  = 500)
 
 # visualization -----------------------------------------------------------
-
 plot(fit)
 plot_components(fit)
 
 # prediction --------------------------------------------------------------
-
 t_test <- seq(0, 40, length.out = 60)
 X_test <- create_test_points(fit, t_test)
 PRED   <- lgp_predict(fit, X_test, samples = "mean")
-plot_posterior_y(fit, PRED, uncertainty = "errorbar")
-
+plot_posterior_y(fit, PRED, uncertainty = "ribbon")
 ```
 

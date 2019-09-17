@@ -16,16 +16,33 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#"
 )
 ```
   
+```{r require}
+require(lgpr)
+```
+
 ## Default priors
   
-All parameters that are sampled have default priors which can be replaced by user-supplied priors. In the simplest case, the `prior` argument for the `lgp` function can be ignored, in which case default priors are used. [insert here what they are]
+All parameters that are sampled have default priors which can be replaced by user-supplied priors. In the simplest case, the `prior` argument for the `lgp` function can be ignored, in which case default priors are used (`prior = prior_default()`). The prior argument has to be a list with the following fields
+
+```{r fields}
+my_prior <- prior_default()
+print(names(my_prior))
+```
+
+These fields themselves contain lists specifying prior distributions for different types of model parameters. If a custom prior is to be supplied, it is recommended that it is done by first creating the list using `prior_default`, and then editing its fields. For example, the prior for the magnitude parameter of the disease-related age component can be accessed and edited in the following way:
+```{r access}
+print(my_prior$alpha$diseaseAge)
+my_prior$alpha$diseaseAge <- list(type = "normal", mu = 0, sigma = 1)
+print(my_prior$alpha$diseaseAge)
+```
+
 
 ## Prior distributions
-The possible types of prior distributions are
+The possible types of prior distributions that can be defined are
   
 1. Uniform (`uniform`)
 2. Normal (`normal`)
@@ -41,7 +58,7 @@ In addition, all kernel parameters like $\alpha, \ell, \sigma_n$ are constrained
 There are no hyperparameters.
   
 ### 2. Normal distribution $N(\mu,\sigma)$
-The normal prior has two hyperparameters, $\mu$ and $\sigma$. The first one defines the location and second one defines the width of the distribution.
+The normal prior has two hyperparameters, $\mu$ and $\sigma$. The first one defines the mean and second one defines the standard deviation of the distribution.
   
 ```{r, fig.show='hold', echo = FALSE, fig.width = 3.45, fig.height = 2.6}
 t   <- seq(0,5,by=0.05)
@@ -161,17 +178,3 @@ for(idx in c(1:2)){
                  cex = 0.7)
 }
 ```
-
-## Transforms
-In the usual case, the prior for a parameter $X$ is defined to be the distribution $p_{X}(x)$, which is one of the distiributions listed above. However, in some cases we may want to define the prior so that $f(X) \sim p_{X}$, where $f$ is an invertible mapping. In this case, the log Jacobian of the transform is automatically added to the logarithm of the target density inside the Stan model. The user does not need to worry about this, and the can specify the prior transformation as explained below. The supported transformations and the corresponding log Jacobians are listed in the below table.
-
-```{r, echo = FALSE, results = 'asis'}
-transforms <- c("square")
-f <- c("$x^2$")
-J <- c("$\\log|2y|$")
-T <- cbind(transforms, f, J)
-colnames(T) <- c(" ", "$f(x)$", "$\\log \\left| \\frac{\\partial}{\\partial y} f(y) \\right|$") 
-knitr::kable(T)
-```
-
-[insert how to define the transforms in the lgp function]
