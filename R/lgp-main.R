@@ -80,7 +80,7 @@ lgp <- function(formula,
 #' @param likelihood Either \code{"Gaussian"} (default), \code{"Poisson"} or \code{"NB"}.
 #' @param prior Prior distribution. Can be created for example using the function 
 #' \code{\link{prior_default}}.
-#' @param uncertain_diagnosis Do we wish to model uncertainty in the disease onset?
+#' @param uncertain_diagnosis Do we wish to model uncertainty in the disease effect time?
 #' @param equal_effect Is the disease effect assumed to be equally strong for all diseased individuals?
 #' @param DELTA the amount of added jitter to ensure positive definiteness of the kernel
 #' @param C_hat This can only be given if likelihood is not Gaussian. The signal \code{f} 

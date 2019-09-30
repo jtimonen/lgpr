@@ -32,9 +32,9 @@ the number of 2's and 3's in the \code{covariates} vector.}
 
 \item{t_jitter}{Standard deviation of the jitter added to the given measurement times.}
 
-\item{onset_range}{Time interval from which the disease onsets are sampled uniformly.
+\item{onset_range}{Time interval from which the disease effect times are sampled uniformly.
 Alternatively, This can any function that returns the (possibly randomly generated)
-real disease onset time for one individual.}
+real disease effect time for one individual.}
 
 \item{continuous_info}{Info for generating continuous covariates. Must be a list
 containing fields \code{lambda} and \code{mu}, which have length 3. The continuous

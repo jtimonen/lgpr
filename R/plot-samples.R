@@ -177,10 +177,10 @@ plot_inputwarp <- function(fit,
 }
 
 
-#' Visualize posterior uncertainty in the disease onset
+#' Visualize posterior uncertainty in the disease effect times
 #' 
 #' @export
-#' @description Can only be used if the uncertainty of onset was modeled.
+#' @description Can only be used if the uncertainty of effect time was modeled.
 #' @param fit An object of class \code{lgpfit}.
 #' @param color_scheme Name of bayesplot color scheme.
 #' @param prob Inner interval
@@ -194,10 +194,10 @@ plot_onset <- function(fit,
                        point_est    = "none")
 {
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  ptitle <- "Posterior distribution of the inferred disease onset"
+  ptitle <- "Posterior distribution of the inferred disease effect time"
   sd <- fit@model@stan_dat
   if(sd$UNCRT==0){
-    stop("The disease onset was not modeled as uncertain!")
+    stop("The disease effect time was not modeled as uncertain!")
   }
   p <- plot_samples(fit, 
                     regex_pars   = "T_onset", 

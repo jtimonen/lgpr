@@ -24,7 +24,7 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{color_scheme}{Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.}
 
-\item{color_scheme_onset}{color scheme name for onset density plotting}
+\item{color_scheme_onset}{color scheme name for effect time density plotting}
 
 \item{alpha}{Ribbon fill opacity.}
 
@@ -38,9 +38,9 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{ylim}{y axis limits}
 
-\item{plot_obs_onset}{should the observed disease onset be plotted by a vertical line}
+\item{plot_obs_onset}{should the observed disease onset/initiation time be plotted by a vertical line}
 
-\item{plot_onset_samples}{should a distribution of sampled onsets be plotted}
+\item{plot_onset_samples}{should a distribution of sampled effect times be plotted}
 
 \item{ypos_dens}{y-position of the density plot}
 
@@ -58,7 +58,7 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{reference_onsets}{reference onset times}
 
-\item{post_onset_statistic}{statistic computed from onset samples (mean or median)}
+\item{post_onset_statistic}{statistic computed from effect time samples (mean or median)}
 
 \item{original_y_scale}{should the predictions be scaled back to original data scale}
 

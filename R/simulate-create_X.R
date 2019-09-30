@@ -18,9 +18,9 @@
 #' the number of 2's and 3's in the \code{covariates} vector.
 #' @param t_data Measurement times.
 #' @param t_jitter Standard deviation of the jitter added to the given measurement times.
-#' @param onset_range Time interval from which the disease onsets are sampled uniformly.
+#' @param onset_range Time interval from which the disease effect times are sampled uniformly.
 #' Alternatively, This can any function that returns the (possibly randomly generated)
-#' real disease onset time for one individual.
+#' real disease effect time for one individual.
 #' @param continuous_info Info for generating continuous covariates. Must be a list
 #' containing fields \code{lambda} and \code{mu}, which have length 3. The continuous
 #' covariates are generated so that \code{x <- sin(a*t + b) + c}, where
@@ -149,7 +149,7 @@ drawMeasurementTimes <- function(N, t_data, t_jitter){
 
 #' Compute the disease-related ages
 #' @param age the age covariate, a vector of length \code{N*k}
-#' @param onsets true disease onsets, a vector of length \code{N}
+#' @param onsets true disease effect times, a vector of length \code{N}
 #' @param k number of measurements per individual
 #' @return the diseaseAge covariate, a vector of length \code{N*k}
 onsetsToDiseaseAge <- function(onsets, age, k){

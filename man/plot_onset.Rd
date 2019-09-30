@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-samples.R
 \name{plot_onset}
 \alias{plot_onset}
-\title{Visualize posterior uncertainty in the disease onset}
+\title{Visualize posterior uncertainty in the disease effect times}
 \usage{
 plot_onset(fit, color_scheme = "red", prob = 1, prob_outer = 1,
   point_est = "none")
@@ -22,5 +22,5 @@ plot_onset(fit, color_scheme = "red", prob = 1, prob_outer = 1,
 a ggplot object
 }
 \description{
-Can only be used if the uncertainty of onset was modeled.
+Can only be used if the uncertainty of effect time was modeled.
 }

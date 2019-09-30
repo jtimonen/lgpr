@@ -26,7 +26,7 @@ appear in the formula must exist as columns of \code{data}.}
 \item{prior}{Prior distribution. Can be created for example using the function 
 \code{\link{prior_default}}.}
 
-\item{uncertain_diagnosis}{Do we wish to model uncertainty in the disease onset?}
+\item{uncertain_diagnosis}{Do we wish to model uncertainty in the disease effect time?}
 
 \item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased individuals?}
 

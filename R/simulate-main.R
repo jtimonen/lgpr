@@ -9,8 +9,8 @@
 #' to the number of diseased individuals. This argument can only be given if \code{covariates}
 #' contains a zero.
 #' @param t_observed Determines how the disease onset is observed. This can be any function 
-#' that takes the real disease onset as an argument and returns the (possibly randomly generated)
-#' observed onset time. Alternatively, this can be a string of the form \code{"after_n"}
+#' that takes the real disease effect time as an argument and returns the (possibly randomly generated)
+#' observed onset/initiation time. Alternatively, this can be a string of the form \code{"after_n"}
 #' or \code{"random_p"} or \code{"exact"}.
 #' @param f_var variance of f
 #' @param C_hat A constant added to f
@@ -19,7 +19,7 @@
 #'   \item \code{out$data} is a data frame containing the actual data and 
 #'   \item \code{out$components} contains more points for smoother visualizations of the 
 #'   generating process. 
-#'   \item \code{out$onsets} contains the real disease onset times
+#'   \item \code{out$onsets} contains the real disease effect times
 #'   \item \code{out$p_signal} proportion of variance explained by signal
 #' }
 #' @examples 

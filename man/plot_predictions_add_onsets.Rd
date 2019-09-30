@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-predict.R
 \name{plot_predictions_add_onsets}
 \alias{plot_predictions_add_onsets}
-\title{Add disease onsets to predictions plot}
+\title{Add disease onset / effect times to predictions plot}
 \usage{
 plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
   idvar, timevar, ypos_dens, color_scheme_onset, reference_onsets,
@@ -28,7 +28,7 @@ plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
 
 \item{reference_onsets}{reference onset times}
 
-\item{post_onset_statistic}{statistic computed from onset samples}
+\item{post_onset_statistic}{statistic computed from effect time samples}
 
 \item{linetypes}{onset line types}
 

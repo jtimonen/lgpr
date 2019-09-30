@@ -85,11 +85,12 @@ plot_simdata_by_individual <- function(simData,
   no1  <- sum(!is.nan(ons1))
   if(no1 > 0){
     
-    subt <- paste(subt,". Vertical lines are the real (solid) and observed (dashed) disease onset.", sep ="")
+    subt <- paste(subt,". Vertical lines are the real effect time (solid) ",
+                  "and observed disease onset / initiation time (dashed).", sep ="")
     vline1.data <- data.frame(z = ons1, id = c(1:N))
     vline2.data <- data.frame(z = ons2, id = c(1:N))
     
-    # Plot real onsets
+    # Plot real effect times
     h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "z"), 
                                  na.rm    = TRUE,
                                  data     = vline1.data, 

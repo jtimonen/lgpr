@@ -25,7 +25,7 @@ appear in the formula must exist as columns of \code{data}.}
 
 \item{standardize}{Should the response variable be standardized?}
 
-\item{uncertain_diagnosis}{Do we wish to model uncertainty in the disease onset?}
+\item{uncertain_diagnosis}{Do we wish to model uncertainty in the disease effect time?}
 
 \item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased individuals?}
 

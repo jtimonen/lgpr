@@ -7,7 +7,7 @@
 onsetsToDiseaseAge(onsets, age, k)
 }
 \arguments{
-\item{onsets}{true disease onsets, a vector of length \code{N}}
+\item{onsets}{true disease effect times, a vector of length \code{N}}
 
 \item{age}{the age covariate, a vector of length \code{N*k}}
 

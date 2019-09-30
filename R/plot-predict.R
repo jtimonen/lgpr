@@ -91,9 +91,9 @@ plot_posterior_y <- function(fit, PRED,
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
-#' @param plot_obs_onset should the observed disease onset be plotted by a vertical line
-#' @param plot_onset_samples should a distribution of sampled onsets be plotted
-#' @param color_scheme_onset color scheme name for onset density plotting
+#' @param plot_obs_onset should the observed disease onset/initiation time be plotted by a vertical line
+#' @param plot_onset_samples should a distribution of sampled effect times be plotted
+#' @param color_scheme_onset color scheme name for effect time density plotting
 #' @param ypos_dens y-position of the density plot
 #' @param test_data Test data frame
 #' @param color_test test point color
@@ -102,7 +102,7 @@ plot_posterior_y <- function(fit, PRED,
 #' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @param reference_onsets reference onset times 
-#' @param post_onset_statistic statistic computed from onset samples (mean or median)
+#' @param post_onset_statistic statistic computed from effect time samples (mean or median)
 #' @param ons_linetypes onset line types
 #' @param ons_linecolors onset line colors
 #' @param data_marker data marker type
@@ -437,7 +437,7 @@ plot_predictions_options <- function(fit,
 }
 
 
-#' Add disease onsets to predictions plot
+#' Add disease onset / effect times to predictions plot
 #' @description NOTE: currently assumes that diseased individuals come first.
 #' @param fit An object of class \code{lgpfit}.
 #' @param h a ggplot object
@@ -450,7 +450,7 @@ plot_predictions_options <- function(fit,
 #' @param reference_onsets reference onset times 
 #' @param linetypes onset line types
 #' @param linecolors onset line colors
-#' @param post_onset_statistic statistic computed from onset samples
+#' @param post_onset_statistic statistic computed from effect time samples
 #' @param alpha2 alpha parameter
 #' @return a modified ggplot object
 plot_predictions_add_onsets <- function(fit, h, 
@@ -498,7 +498,7 @@ plot_predictions_add_onsets <- function(fit, h,
                                  linetype = linetypes[2])
   }
   
-  # Plot onset samples
+  # Plot effect time samples
   UNCRT <- model@stan_dat$UNCRT
   if(UNCRT==1 && D[3]==1 & plot_onset_samples){
     
@@ -513,7 +513,7 @@ plot_predictions_add_onsets <- function(fit, h,
       ypos_dens <- min(df[[yvar]]) - 1.5*dens_scale
     }
     
-    # Plot onset time mean or median
+    # Plot effect time mean or median
     cid_str   <- colnames(T_smp)
     if(post_onset_statistic=="mean"){
       statistic <- colMeans(T_smp)
@@ -534,7 +534,7 @@ plot_predictions_add_onsets <- function(fit, h,
                                    linetype = linetypes[3])
     }
     
-    # Plot kernel density estimate of posterior of onset time
+    # Plot kernel density estimate of posterior of effect time
     fv        <- as.factor(rep(cid_str, each = n_smp))
     dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
     h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 
