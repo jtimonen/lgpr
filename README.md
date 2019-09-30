@@ -4,7 +4,7 @@ An R-package for **L**ongitudinal **G**aussian **P**rocess **R**egression and co
 * Nonparametric modeling of longitudinal data
 * Selection of categorical and continuous covariates
 * Disease effect modeling either homogeneously or heterogeneously across diagnosed patients
-* Modeling uncertainty in the disease onset
+* Modeling uncertainty in the disease effect time
 * Efficient posterior inference using [Stan](https://mc-stan.org/)
 * Visualization of inferred covariate effects
 
