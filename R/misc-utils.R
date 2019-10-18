@@ -25,6 +25,8 @@ likelihood_as_str <- function(LH){
     str <- "Poisson"
   }else if(LH==3){
     str <- "Negative Binomial"
+  }else if(LH==4){
+    str <- "binomial"
   }else{
     str <- "Unknown likelihood"
   }

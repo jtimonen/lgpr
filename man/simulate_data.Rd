@@ -9,7 +9,7 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   sum(covariates \%in\% c(2, 3))), t_jitter = 0, lengthscales = rep(12,
   2 + sum(covariates \%in\% c(0, 1, 2))), f_var = 1,
   noise_type = "Gaussian", snr = 3, phi = 1,
-  N_affected = round(N/2), onset_range = "auto",
+  N_affected = round(N/2), t_effect_range = "auto",
   t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
   useBinKernel = TRUE, steepness = 0.5, vm_params = c(0.025, 1),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
@@ -63,11 +63,11 @@ only with \cr
 to the number of diseased individuals. This argument can only be given if \code{covariates}
 contains a zero.}
 
-\item{onset_range}{Time interval from which the disease effect times are sampled uniformly.
+\item{t_effect_range}{Time interval from which the disease effect times are sampled uniformly.
 Alternatively, This can any function that returns the (possibly randomly generated)
 real disease effect time for one individual.}
 
-\item{t_observed}{Determines how the disease onset is observed. This can be any function 
+\item{t_observed}{Determines how the disease effect time is observed. This can be any function 
 that takes the real disease effect time as an argument and returns the (possibly randomly generated)
 observed onset/initiation time. Alternatively, this can be a string of the form \code{"after_n"}
 or \code{"random_p"} or \code{"exact"}.}

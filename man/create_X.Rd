@@ -4,7 +4,7 @@
 \alias{create_X}
 \title{Simulate an input data frame X}
 \usage{
-create_X(N, covariates, names, n_categs, t_data, t_jitter, onset_range,
+create_X(N, covariates, names, n_categs, t_data, t_jitter, t_effect_range,
   continuous_info)
 }
 \arguments{
@@ -32,7 +32,7 @@ the number of 2's and 3's in the \code{covariates} vector.}
 
 \item{t_jitter}{Standard deviation of the jitter added to the given measurement times.}
 
-\item{onset_range}{Time interval from which the disease effect times are sampled uniformly.
+\item{t_effect_range}{Time interval from which the disease effect times are sampled uniformly.
 Alternatively, This can any function that returns the (possibly randomly generated)
 real disease effect time for one individual.}
 

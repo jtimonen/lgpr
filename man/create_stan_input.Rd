@@ -5,8 +5,8 @@
 \title{Create input for Stan}
 \usage{
 create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
-  uncertain_diagnosis, equal_effect, C_hat, DELTA, sample_F, t_test,
-  verbose, variance_mask, cat_interact_kernel_type)
+  uncertain_effect_time, equal_effect, C_hat, DELTA, sample_F, t_test,
+  verbose, variance_mask, cat_interact_kernel_type, N_trials)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -19,17 +19,18 @@ appear in the formula must exist as columns of \code{data}.}
 \item{prior}{Prior distribution. Can be created for example using the function 
 \code{\link{prior_default}}.}
 
-\item{likelihood}{Either \code{"Gaussian"} (default), \code{"Poisson"} or \code{"NB"}.}
+\item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
+(default), \code{"Poisson"}, \code{"NB" (negative binomial) or "binomial"}.}
 
 \item{varInfo}{Variable type info.}
 
 \item{standardize}{Should the response variable be standardized?}
 
-\item{uncertain_diagnosis}{Do we wish to model uncertainty in the disease effect time?}
+\item{uncertain_effect_time}{Do we wish to model uncertainty in the disease effect time?}
 
 \item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased individuals?}
 
-\item{C_hat}{This can only be given if likelihood is not Gaussian. The signal \code{f} 
+\item{C_hat}{This can only be given if likelihood is Poisson or NB. The signal \code{f} 
 will the be transformed so that \code{g = } \code{exp(C_hat + f)}. If \code{NULL}, it will be
 set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response variable.}
 
@@ -49,6 +50,10 @@ variance to zero before disease onset?}
 \item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
 Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
 only category \code{"1"} will have an effect).}
+
+\item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
+Must have length equal to number of data points. Setting this to vector of ones corresponds to 
+Bernoulli observation model.}
 }
 \value{
 A list containing the data to be given to \code{rstan::sampling}, some info about

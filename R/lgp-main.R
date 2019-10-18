@@ -11,7 +11,7 @@ lgp <- function(formula,
                 data,
                 likelihood       = "Gaussian",
                 prior            = prior_default(),
-                uncertain_diagnosis = FALSE,
+                uncertain_effect_time = FALSE,
                 equal_effect     = TRUE,
                 id_variable      = "id",
                 time_variable    = "age",
@@ -30,6 +30,7 @@ lgp <- function(formula,
                 ell_smooth       = "ell_shared",
                 ell_smooth_multip = 1,
                 cat_interact_kernel_type = "categorical",
+                N_trials         = NULL,
                 ...)
 {
   # Create the model
@@ -37,7 +38,7 @@ lgp <- function(formula,
                      data             = data,
                      likelihood       = likelihood,
                      prior            = prior,
-                     uncertain_diagnosis = uncertain_diagnosis,
+                     uncertain_effect_time = uncertain_effect_time,
                      equal_effect     = equal_effect,
                      C_hat            = C_hat,
                      DELTA            = DELTA,
@@ -50,7 +51,8 @@ lgp <- function(formula,
                      categorical_vars = categorical_vars,
                      offset_vars      = offset_vars,
                      variance_mask    = variance_mask,
-                     cat_interact_kernel_type  = cat_interact_kernel_type)
+                     cat_interact_kernel_type  = cat_interact_kernel_type,
+                     N_trials         = N_trials)
   
   show(model)
   
@@ -77,13 +79,14 @@ lgp <- function(formula,
 #' defining the response variable \code{y} and covariates \code{xi}. All variables that
 #' appear in the formula must exist as columns of \code{data}.
 #' @param data A data frame containing (at least) the variables given in \code{formula}.
-#' @param likelihood Either \code{"Gaussian"} (default), \code{"Poisson"} or \code{"NB"}.
+#' @param likelihood Determines the observation model. Must be either \code{"Gaussian"} 
+#' (default), \code{"Poisson"}, \code{"NB" (negative binomial) or "binomial"}.
 #' @param prior Prior distribution. Can be created for example using the function 
 #' \code{\link{prior_default}}.
-#' @param uncertain_diagnosis Do we wish to model uncertainty in the disease effect time?
+#' @param uncertain_effect_time Do we wish to model uncertainty in the disease effect time?
 #' @param equal_effect Is the disease effect assumed to be equally strong for all diseased individuals?
 #' @param DELTA the amount of added jitter to ensure positive definiteness of the kernel
-#' @param C_hat This can only be given if likelihood is not Gaussian. The signal \code{f} 
+#' @param C_hat This can only be given if likelihood is Poisson or NB. The signal \code{f} 
 #' will the be transformed so that \code{g = } \code{exp(C_hat + f)}. If \code{NULL}, it will be
 #' set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response variable.
 #' @param sample_F Determines if the function values are be sampled (must be \code{TRUE} if
@@ -106,14 +109,17 @@ lgp <- function(formula,
 #' variance to zero before disease onset?
 #' @param cat_interact_kernel_type Kernel type for categorical variables (other than id). 
 #' Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
-#' only category \code{"1"} will have an effect). 
+#' only category \code{"1"} will have an effect).
+#' @param N_trials This argument (number of trials) is only needed when likelihood is binomial.
+#' Must have length equal to number of data points. Setting this to vector of ones corresponds to 
+#' Bernoulli observation model.
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
                       data,
                       likelihood       = "Gaussian",
                       prior            = prior_default(likelihood),
-                      uncertain_diagnosis = FALSE,
+                      uncertain_effect_time = FALSE,
                       equal_effect     = TRUE,
                       C_hat            = NULL,
                       DELTA            = 1e-12,
@@ -125,8 +131,10 @@ lgp_model <- function(formula,
                       continuous_vars  = NULL,
                       categorical_vars = NULL,
                       offset_vars      = NULL,
-                      variance_mask    = FALSE,
-                      cat_interact_kernel_type = "categorical")
+                      variance_mask    = TRUE,
+                      cat_interact_kernel_type = "categorical",
+                      N_trials = NULL
+)
 {
   # Model as a string
   fc <- as.character(formula)
@@ -148,7 +156,7 @@ lgp_model <- function(formula,
                                likelihood     = likelihood,
                                varInfo        = varInfo,
                                standardize    = (likelihood %in% c("Gaussian", "none")),
-                               uncertain_diagnosis = uncertain_diagnosis,
+                               uncertain_effect_time = uncertain_effect_time,
                                equal_effect   = equal_effect,
                                C_hat          = C_hat,
                                DELTA          = DELTA,
@@ -156,7 +164,8 @@ lgp_model <- function(formula,
                                t_test         = t_test,
                                verbose        = TRUE,
                                variance_mask  = variance_mask,
-                               cat_interact_kernel_type = cat_interact_kernel_type)
+                               cat_interact_kernel_type = cat_interact_kernel_type,
+                               N_trials       = N_trials)
   
   # Data to Stan
   stan_dat <- PREPROC$stan_dat
@@ -173,7 +182,8 @@ lgp_model <- function(formula,
                covariate_names = lgp_covariate_names(stan_dat),
                response_name   = fc[2],
                variance_mask   = variance_mask,
-               cat_interact_kernel_type = cat_interact_kernel_type)
+               cat_interact_kernel_type = cat_interact_kernel_type,
+               N_trials        = N_trials)
   
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",

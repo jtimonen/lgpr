@@ -4,11 +4,11 @@
 #' @param D an integer vector of length 6
 #' @param X the design matrix
 #' @param X_notnan a binary vector of length n
-#' @param uncertain_diagnosis Boolean value
+#' @param uncertain_effect_time Boolean value
 #' @param equal_effect Boolean value
 #' @param TSCL time scaling function and its inverse
 #' @return a list
-get_diseased_info <- function(D, X, X_notnan, uncertain_diagnosis, equal_effect, TSCL){
+get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time, equal_effect, TSCL){
   X_id   <- X[, 1]
   M_max  <- max(table(X_id))
   MAPS   <- get_case_row_mappings(X_notnan, X_id)
@@ -17,7 +17,7 @@ get_diseased_info <- function(D, X, X_notnan, uncertain_diagnosis, equal_effect,
   # Return 
   ret <- list(
     HMGNS          = as.numeric(equal_effect),
-    UNCRT          = as.numeric(uncertain_diagnosis),
+    UNCRT          = as.numeric(uncertain_effect_time),
     N_cases        = length(MAPS$caseID_nrows),
     caseID_to_rows = MAPS$caseID_to_rows,
     caseID_nrows   = MAPS$caseID_nrows,

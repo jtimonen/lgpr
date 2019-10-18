@@ -40,6 +40,7 @@ prior_default <- function(sigma_alpha = 1)
   # Uncertain disease onset
   prior_ons <- list(type = "uniform_whole")
   
+  # Number of trials (Bernoulli or binomial observation model)
   prior <- list(alpha          = prior_mag,
                 lengthscale    = prior_ls,
                 warp_steepness = prior_st,
@@ -62,8 +63,6 @@ prior_LonGP <- function()
   
   # Start by creating the default prior
   prior <- prior_default()
-  
-
   t4    <- list(type = "student-t", mu = 0, sigma  = 1, nu = 4)
   p_sig <- list(type = "inv-gamma", shape  = 1/2, scale = 0.01/2, transform = "square")
   

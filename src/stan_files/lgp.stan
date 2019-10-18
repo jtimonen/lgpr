@@ -1,5 +1,5 @@
 // *lgp.stan*
-// This is the main Stan model of the 'lgpr' package
+// This is the main Stan model file of the 'lgpr' package
 // Author: Juho Timonen
 
 #include /chunks/license.stan
@@ -11,13 +11,12 @@ functions{
 
 data {
 
-  // Dimensions
-  int<lower=1> N_tot;      // total number of individuals
-  int<lower=0> N_cases;    // number of "diseased" individuals
-  int<lower=2> d;          // number of covariates in the data (id and age required)
-  int<lower=1> n;          // number of observations
-  int<lower=0> n_test;     // number of test points
-  
+  int<lower=1> N_tot;        // total number of individuals
+  int<lower=0> N_cases;      // number of "diseased" individuals
+  int<lower=2> d;            // number of covariates in the data (id and age required)
+  int<lower=1> n;            // number of observations
+  int<lower=0> n_test;       // number of test points
+  int<lower=1> N_trials[n];  // numbers of trials (set to all ones for bernoulli model)
 
   // Modeled data
   vector[n + n_test] X[d];          // covariates, X[j] is the jth covariate
@@ -26,8 +25,8 @@ data {
   vector[n] y;                      // the response variable (as a vector of reals)
   int       y_int[n];               // the response variable (as an array of integers)
 
-  // Likelihood type
-  int<lower=0,upper=3> LH;          
+  // Observation model
+  int<lower=0,upper=4> LH;          
   
   // D is an array of six integers, so that
   //   D[1] = binary value indicating if id*age is a predictor
@@ -80,7 +79,7 @@ data {
   
   // Other
   real DELTA;       // jitter to ensure pos. def. kernel matrices
-  real C_hat;       // GP mean (constant value)
+  real C_hat;       // C_hat parameter for poisson and NB models
   int HS[6];        // (currently not used)
   int F_is_sampled; // should the function values be sampled? 
                     // (must be 1 for non-Gaussian lh)
@@ -170,10 +169,10 @@ parameters {
   real<lower=0> lengthscale_categAge[D[5]];
 
   // Miscellaneous
-  real<lower=0> warp_steepness[D[3]];               // steepness of input warping
-  real<lower=0> sigma_n[LH==1 || LH==0];            // noise std for Gaussian likelihood
-  vector[n_tot] ETA[F_is_sampled, sum_D];           // isotropic versions of F
-  real<lower=0> phi[LH==3 || LH==0];                // overdispersion parameter for NB likelihood
+  real<lower=0> warp_steepness[D[3]];       // steepness of input warping
+  real<lower=0> sigma_n[LH==1 || LH==0];    // noise std for Gaussian likelihood
+  vector[n_tot] ETA[F_is_sampled, sum_D];   // isotropic versions of F
+  real<lower=0> phi[LH==3 || LH==0];        // overdispersion parameter for NB likelihood
 
   // Parameters related to diseased individuals
   vector<lower=0,upper=1>[N_cases] beta[HMGNS==0];  // individual-specific magnitude
@@ -213,19 +212,26 @@ model {
     
       // Compute likelihood
       if(LH==1){
-        // 1. Gaussian likelihood
-        y ~ normal(F_sum[1:n], rep_vector(sigma_n[1], n));
-      }else{
-        real log_g[n] = to_array_1d(F_sum[1:n] + C_hat);
-        if(LH==2){
-          // 2. Poisson likelihood
-          y_int ~ poisson_log(log_g);
-        }else if(LH==3){
-          // 3. Negative binomial likelihood
-          y_int ~ neg_binomial_2_log(log_g, rep_vector(phi[1], n) );
-        }else{
-          reject("Unknown likelihood!")
-        }
+        // 1. Gaussian observation model
+        real SIGMA[n] = to_array_1d(rep_vector(sigma_n[1], n)); // means
+        real MU[n] = to_array_1d(F_sum[1:n]);                   // stds 
+        target += normal_lpdf(y | MU, SIGMA);
+      }else if(LH==2){
+        // 2. Poisson observation model
+        real LOG_MU[n] = to_array_1d(F_sum[1:n] + C_hat); // means (rate parameters) on log-scale
+        target += poisson_log_lpmf(y_int | LOG_MU);
+      }else if(LH==3){
+        // 3. Negative binomial observation model
+        real LOG_MU[n] = to_array_1d(F_sum[1:n] + C_hat); // means on log-scale
+        real PHI[n] = to_array_1d(rep_vector(phi[1], n)); // inverse dispersion parameters
+        target += neg_binomial_2_log_lpmf(y_int | LOG_MU, PHI);
+      }else if(LH==4){
+        // 4. Bernoulli or binomial observation model
+        real LOGIT_P[n] = to_array_1d(F_sum[1:n]); // probabilities of success on log-scale
+        target += binomial_logit_lpmf(y_int | N_trials, LOGIT_P);
+      }
+      else{
+        reject("Unknown observation model!")
       }
     
     }else{

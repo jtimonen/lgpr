@@ -8,7 +8,7 @@
 #' @param N_affected Number of diseased individuals that are affected by the disease. This defaults
 #' to the number of diseased individuals. This argument can only be given if \code{covariates}
 #' contains a zero.
-#' @param t_observed Determines how the disease onset is observed. This can be any function 
+#' @param t_observed Determines how the disease effect time is observed. This can be any function 
 #' that takes the real disease effect time as an argument and returns the (possibly randomly generated)
 #' observed onset/initiation time. Alternatively, this can be a string of the form \code{"after_n"}
 #' or \code{"random_p"} or \code{"exact"}.
@@ -41,7 +41,7 @@ simulate_data <- function(N,
                           snr             = 3,
                           phi             = 1,
                           N_affected      = round(N/2),
-                          onset_range     = "auto",
+                          t_effect_range  = "auto",
                           t_observed      = "after_0",
                           C_hat           = 0,
                           dis_fun         = "gp_vm",
@@ -69,7 +69,7 @@ simulate_data <- function(N,
                  n_categs        = n_categs,
                  t_data          = t_data ,
                  t_jitter        = t_jitter,
-                 onset_range     = onset_range,
+                 t_effect_range  = t_effect_range,
                  continuous_info = continuous_info)
   X <- IN$X
   

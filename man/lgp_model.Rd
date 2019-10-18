@@ -5,13 +5,13 @@
 \title{Create an lgp model}
 \usage{
 lgp_model(formula, data, likelihood = "Gaussian",
-  prior = prior_default(likelihood), uncertain_diagnosis = FALSE,
+  prior = prior_default(likelihood), uncertain_effect_time = FALSE,
   equal_effect = TRUE, C_hat = NULL, DELTA = 1e-12,
   sample_F = (likelihood != "Gaussian"), t_test = NULL,
   id_variable = "id", time_variable = "age", disAge_variable = NULL,
   continuous_vars = NULL, categorical_vars = NULL,
-  offset_vars = NULL, variance_mask = FALSE,
-  cat_interact_kernel_type = "categorical")
+  offset_vars = NULL, variance_mask = TRUE,
+  cat_interact_kernel_type = "categorical", N_trials = NULL)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -21,16 +21,17 @@ appear in the formula must exist as columns of \code{data}.}
 
 \item{data}{A data frame containing (at least) the variables given in \code{formula}.}
 
-\item{likelihood}{Either \code{"Gaussian"} (default), \code{"Poisson"} or \code{"NB"}.}
+\item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
+(default), \code{"Poisson"}, \code{"NB" (negative binomial) or "binomial"}.}
 
 \item{prior}{Prior distribution. Can be created for example using the function 
 \code{\link{prior_default}}.}
 
-\item{uncertain_diagnosis}{Do we wish to model uncertainty in the disease effect time?}
+\item{uncertain_effect_time}{Do we wish to model uncertainty in the disease effect time?}
 
 \item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased individuals?}
 
-\item{C_hat}{This can only be given if likelihood is not Gaussian. The signal \code{f} 
+\item{C_hat}{This can only be given if likelihood is Poisson or NB. The signal \code{f} 
 will the be transformed so that \code{g = } \code{exp(C_hat + f)}. If \code{NULL}, it will be
 set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response variable.}
 
@@ -66,6 +67,10 @@ variance to zero before disease onset?}
 \item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
 Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
 only category \code{"1"} will have an effect).}
+
+\item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
+Must have length equal to number of data points. Setting this to vector of ones corresponds to 
+Bernoulli observation model.}
 }
 \value{
 An object of class \code{lgpmodel}.

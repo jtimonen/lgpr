@@ -16,7 +16,7 @@ create_stan_input <- function(formula,
                               likelihood,
                               varInfo,
                               standardize,
-                              uncertain_diagnosis,
+                              uncertain_effect_time,
                               equal_effect,
                               C_hat,
                               DELTA,
@@ -24,7 +24,8 @@ create_stan_input <- function(formula,
                               t_test,
                               verbose,
                               variance_mask,
-                              cat_interact_kernel_type)
+                              cat_interact_kernel_type,
+                              N_trials)
 {
   
   # Check sample_F input
@@ -61,15 +62,16 @@ create_stan_input <- function(formula,
   stan_dims <- get_model_dims(X, D, likelihood)
   
   # Set C_hat (constant)
+  nb_or_pois <- likelihood %in% c("NB","Poisson")
   if(is.null(C_hat)){
-    if(likelihood == "Gaussian"){
-      C_hat <- 0
-    }else{
+    if(nb_or_pois){
       C_hat <- log(mean(response))
+    }else{
+      C_hat <- 0
     }
   }else{
-    if(likelihood == "Gaussian"){
-      stop("Do not give the C_hat argument if likelihood is Gaussian!")
+    if(!nb_or_pois){
+      stop("Only give the C_hat argument if observation model is Poisson or NB!")
     }
   }
   
@@ -101,6 +103,19 @@ create_stan_input <- function(formula,
     stop("Invalid option '", cat_interact_kernel_type, ' for cat_interact_kernel_type!')
   }
   
+  # Check N_trials
+  if(is.null(N_trials)){
+      N_trials <- rep(1, length(response))
+  }else{
+    if(likelihood != "binomial"){
+      stop("Only give the N_trials argument if likelihood is binomial!")
+    }
+    if(length(N_trials)!= length(response)){
+      stop("Invalid length of N_trials!")
+    }
+  }
+
+  
   # Create the list that is the Stan input
   stan_dat   <- list(X         = t(X_final),
                      X_id      = X_final[,1],
@@ -112,14 +127,15 @@ create_stan_input <- function(formula,
                      C_hat     = C_hat,
                      F_is_sampled = as.numeric(sample_F),
                      USE_VAR_MASK = as.numeric(variance_mask),
-                     cat_interact_kernel = cat_interact_kernel
+                     cat_interact_kernel = cat_interact_kernel,
+                     N_trials  = N_trials
   )
   
   # Get some variables related to diseased individuals
   stan_dis  <- get_diseased_info(D, 
                                  X_final, 
                                  X_notnan_final,
-                                 uncertain_diagnosis, 
+                                 uncertain_effect_time, 
                                  equal_effect,
                                  SCL$TSCL)
   

@@ -313,8 +313,10 @@ get_model_dims <- function(X, D, likelihood){
     LH <- 2
   }else if(likelihood=="NB"){
     LH <- 3
+  }else if(likelihood=="binomial"){
+    LH <- 4
   }else{
-    stop("The likelihood must be either 'none', 'Gaussian', 'Poisson', or 'NB'!")
+    stop("The likelihood must be either 'none', 'Gaussian', 'Poisson', 'binomial', or 'NB'!")
   }
   
   # Return

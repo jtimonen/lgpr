@@ -18,7 +18,7 @@
 #' the number of 2's and 3's in the \code{covariates} vector.
 #' @param t_data Measurement times.
 #' @param t_jitter Standard deviation of the jitter added to the given measurement times.
-#' @param onset_range Time interval from which the disease effect times are sampled uniformly.
+#' @param t_effect_range Time interval from which the disease effect times are sampled uniformly.
 #' Alternatively, This can any function that returns the (possibly randomly generated)
 #' real disease effect time for one individual.
 #' @param continuous_info Info for generating continuous covariates. Must be a list
@@ -37,9 +37,10 @@ create_X <- function(N,
                      n_categs,
                      t_data,
                      t_jitter,
-                     onset_range,
+                     t_effect_range,
                      continuous_info)
 {
+  onset_range <- t_effect_range
   D    <- rep(0,5)
   D[1] <- sum(covariates==0)
   D[2] <- sum(covariates==1)
@@ -66,11 +67,11 @@ create_X <- function(N,
       mrn <- mean(ran)
       onset_range <- c(mrn, mrn)
       if(D[1]==1){
-        cat("Onset range set to [", onset_range[1], ", ",
+        cat("Disease effect time range set to [", onset_range[1], ", ",
             onset_range[2], "]. \n", sep="")
       }
     }else{
-      stop("invalid onset range!")
+      stop("invalid t_effect_range!")
     }
   }
   
