@@ -1,12 +1,12 @@
 # lgpr
-An R-package for **L**ongitudinal **G**aussian **P**rocess **R**egression and covariate selection.
+An R-package for **L**ongitudinal **G**aussian **P**rocess **R**egression.
 
-* Nonparametric modeling of longitudinal data
-* Selection of categorical and continuous covariates
+* Bayesian nonparametric modeling of longitudinal data using additive Gaussian process regression
+* Selection of categorical and continuous covariates, and interpretable visualization of covariate effects
 * Disease effect modeling either homogeneously or heterogeneously across diagnosed patients
 * Modeling uncertainty in the disease effect time
+* Gaussian, Poisson and Negative Binomial observation models
 * Efficient posterior inference using [Stan](https://mc-stan.org/)
-* Visualization of inferred covariate effects
 
 ## Installation
 
