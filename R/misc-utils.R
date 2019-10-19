@@ -262,3 +262,15 @@ get_ell_smooth <- function(ell_smooth, ell_smooth_multip, ell_smp){
     }
   }
 }
+
+
+#' Get lgpr version description
+#'
+#' @export
+#' @return package description
+get_pkg_description <- function(){
+  lgprLib <- dirname(system.file(package = "lgpr"))
+  descr   <- suppressWarnings(utils::packageDescription("lgpr",
+                                                        lib.loc = lgprLib))
+  return(descr)
+}

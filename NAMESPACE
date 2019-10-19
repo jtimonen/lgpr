@@ -3,6 +3,7 @@
 export(affected)
 export(compute_lppd)
 export(create_test_points)
+export(get_pkg_description)
 export(get_runtime)
 export(lgp)
 export(lgp_fit)

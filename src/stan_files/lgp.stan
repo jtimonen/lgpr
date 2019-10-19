@@ -3,11 +3,7 @@
 // Author: Juho Timonen
 
 #include /chunks/license.stan
-
-functions{
-#include /chunks/kernels_base.stan
-#include /chunks/define_prior.stan
-}
+#include /chunks/functions.stan
 
 data {
 
@@ -15,15 +11,14 @@ data {
   int<lower=0> N_cases;      // number of "diseased" individuals
   int<lower=2> d;            // number of covariates in the data (id and age required)
   int<lower=1> n;            // number of observations
-  int<lower=0> n_test;       // number of test points
   int<lower=1> N_trials[n];  // numbers of trials (set to all ones for bernoulli model)
 
   // Modeled data
-  vector[n + n_test] X[d];          // covariates, X[j] is the jth covariate
-  int       X_id[n + n_test];       // the id covariate as an array of integers
-  int       X_notnan[n + n_test];   // X_notnan[i] tells if X_diseaseAge[i] is originally NaN
-  vector[n] y;                      // the response variable (as a vector of reals)
-  int       y_int[n];               // the response variable (as an array of integers)
+  vector[n] X[d];           // covariates, X[j] is the jth covariate
+  int       X_id[n];        // the id covariate as an array of integers
+  int       X_notnan[n];    // X_notnan[i] tells if X_diseaseAge[i] is originally NaN
+  vector[n] y;              // the response variable (as a vector of reals)
+  int       y_int[n];       // the response variable (as an array of integers)
 
   // Observation model
   int<lower=0,upper=4> LH;          
@@ -65,17 +60,17 @@ data {
   real p_ONS[N_cases, 3];    // for onset, if uncertain
   
   // Inputs related to mapping from row index to case index and back
-  int<lower=0,upper=n+n_test> M_max;
+  int<lower=0,upper=n>        M_max;
   int<lower=0>                caseID_to_rows[N_cases, M_max];
-  int<lower=0,upper=N_cases>  row_to_caseID[n + n_test]; 
+  int<lower=0,upper=N_cases>  row_to_caseID[n]; 
   int<lower=0,upper=M_max>    caseID_nrows[N_cases];
   
   // Inputs related to uncertain disease onset
-  vector[N_cases] T_observed;      // observed disease onset times
-  vector[N_cases] L_ons[UNCRT];    // lower bounds for sampled disease onset
-  vector[N_cases] U_ons[UNCRT];    // upper bounds for sampled disease onset
+  vector[N_cases] T_observed;      // observed disease effect times
+  vector[N_cases] L_ons[UNCRT];    // lower bounds for sampled disease effect times
+  vector[N_cases] U_ons[UNCRT];    // upper bounds for sampled disease effect times
   int<lower=0,upper=1> backwards;  // is the prior for onset "backwards"
-  int<lower=0,upper=1> relative;   // is the prior for onset relative to observed onset
+  int<lower=0,upper=1> relative;   // is the prior for effect time relative to observed one
   
   // Other
   real DELTA;       // jitter to ensure pos. def. kernel matrices
@@ -92,42 +87,20 @@ data {
 }
 
 transformed data{
-  int n_tot = n + n_test;                  // total number of points
-  int nf = 1 + D[3] + D[5] + D[6];         // number of fixed kernel matrices
-  int sum_D = sum(D);                      // total number of covariates
-  matrix[n_tot,n_tot] KF[nf];              // declare the array of fixed kernel matrices
-  real x_age[n_tot] = to_array_1d(X[2]);   // age covariate as an array
-
-  // GP mean
-  vector[n_tot] mu = rep_vector(C_hat, n_tot);
+  int nf = 1 + D[3] + D[5] + D[6];     // number of fixed kernel matrices
+  int sum_D = sum(D);                  // total number of covariates
+  matrix[n,n] KF[nf] = compute_fixed_kernel_matrices(X, X, X_notnan, X_notnan, D, cat_interact_kernel);
+  vector[n] mu = rep_vector(C_hat, n); // GP mean
     
-  // Precompute fixed kernel matrices
-  KF[1]  = K_cat(X[1], X[1]);
-  for(j in 1:D[3]){
-    KF[1+j] = K_bin_int(X_notnan, X_notnan, 1);
-  }
-  for(j in 1:D[5]){
-    int ix = 2 + D[3] + D[4] + j;
-    if(cat_interact_kernel == 1){
-      KF[1+D[3]+j] = K_cat(X[ix], X[ix]);
-    }else{
-      KF[1+D[3]+j] = K_bin_real(X[ix], X[ix], 1);
-    }
-  }
-  for(j in 1:D[6]){
-    int ix = 2+D[3]+D[4]+D[5]+j;
-    KF[1+D[3]+D[5]+j] = K_cat(X[ix], X[ix]);
-  }
   
   // Print some info (mostly for debugging)
   print(" ")
-  print("* Likelihood = ", LH);
+  print("* Observation model = ", LH);
   print("* Number of data points = ", n);
-  print("* Number of test points = ", n_test);
   print("* Number of model components = ", sum_D);
   print("* Number of individuals = ", N_tot);
   print("* Additional model info:")
-  if(LH!=1){
+  if(LH==2 || LH==3){
     print("  - C_hat = ", C_hat);
   }
   print("  - D = ", D);
@@ -145,10 +118,6 @@ transformed data{
   }
   print(" ")
   
-  // Input check
-  if((n_test) != 0 && (1-F_is_sampled)){
-    reject("Number of test points must be zero if F is not sampled!");
-  }
 }
 
 parameters {
@@ -171,7 +140,7 @@ parameters {
   // Miscellaneous
   real<lower=0> warp_steepness[D[3]];       // steepness of input warping
   real<lower=0> sigma_n[LH==1 || LH==0];    // noise std for Gaussian likelihood
-  vector[n_tot] ETA[F_is_sampled, sum_D];   // isotropic versions of F
+  vector[n] ETA[F_is_sampled, sum_D];       // isotropic versions of F
   real<lower=0> phi[LH==3 || LH==0];        // overdispersion parameter for NB likelihood
 
   // Parameters related to diseased individuals
@@ -182,12 +151,17 @@ parameters {
 
 transformed parameters {
   vector[N_cases] T_onset[UNCRT];
-  vector[n_tot] F[F_is_sampled, sum_D];
+  vector[n] F[F_is_sampled, sum_D];
   if(UNCRT){
     T_onset[1] = L_ons[1] + (U_ons[1] - L_ons[1]) .* T_raw[1];
   }
   if(F_is_sampled){
-#include /chunks/additive_components.stan
+    matrix[n,n] KX[sum_D] = compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+    for(r in 1:sum_D){
+      matrix[n,n] EYE = diag_matrix(rep_vector(DELTA, n));
+      matrix[n,n] Lxr = cholesky_decompose(KX[r] + EYE);
+      F[1,r,] = Lxr*ETA[1,r,];
+    }
   }
 }
 
@@ -205,8 +179,8 @@ model {
       
       //  F IS SAMPLED
       // Compute f 
-      vector[n_tot] F_sum = rep_vector(0, n_tot);
-      for (i in 1:n_tot){
+      vector[n] F_sum = rep_vector(0, n);
+      for (i in 1:n){
         F_sum[i] += sum(F[1,,i]); 
       }
     
@@ -235,13 +209,20 @@ model {
       }
     
     }else{
-    
       // F NOT SAMPLED
-#include /chunks/kernel_matrices.stan
+      matrix[n,n] Ky;
+      matrix[n,n] Ly;
+      matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
+      matrix[n,n] KX[sum_D] = compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
       if(LH!=1){
         reject("Likelihood must be Gaussian if F is not sampled!")
       }
-      y  ~ multi_normal_cholesky(mu, Ly);
+      for(j in 1:sum_D){
+        Kx += KX[j]; 
+      }
+      Ky = Kx + diag_matrix(rep_vector(square(sigma_n[1]), n));
+      Ly = cholesky_decompose(Ky);
+      y ~ multi_normal_cholesky(mu, Ly);
     }
   }
 }
@@ -255,7 +236,15 @@ generated quantities {
    if(F_is_sampled==0){
      matrix[n,n] A;
      vector[n] v;
-#include /chunks/kernel_matrices.stan
+     matrix[n,n] Ky;
+     matrix[n,n] Ly;
+     matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
+     matrix[n,n] KX[sum_D] = compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+     for(j in 1:sum_D){
+       Kx += KX[j]; 
+     }
+     Ky = Kx + diag_matrix(rep_vector(square(sigma_n[1]), n));
+     Ly = cholesky_decompose(Ky);
      v = mdivide_left_tri_low(Ly, y);
      for(j in 1:sum_D){
        A  = mdivide_left_tri_low(Ly, transpose(KX[j]));

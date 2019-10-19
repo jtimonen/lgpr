@@ -31,6 +31,8 @@ All slots that are lists contain fields 'samples' and 'average'.
 
 \item{\code{postproc_info}}{Postprocessing information.}
 
+\item{\code{pkg_description}}{Package description.}
+
 \item{\code{Rhat}}{Split Rhat statistics.}
 }}
 
