@@ -274,3 +274,12 @@ get_pkg_description <- function(){
                                                         lib.loc = lgprLib))
   return(descr)
 }
+
+
+#' Get main stan model of the package
+#'
+#' @export
+#' @return an object of class stanmodel
+get_stan_model <- function(){
+  return(stanmodels[["lgp"]])
+}

@@ -246,7 +246,14 @@ lgp_fit <- function(model,
   stan_fit  <- rstan::sampling(object = stanmodels[["lgp"]], data = stan_dat, ...)
   
   # Initialize the 'lgpfit' object
-  fit <- new("lgpfit", stan_fit = stan_fit, model = model)
+  ver <- "NOT FOUND"
+  tryCatch({
+    ver <- get_pkg_description()$Version
+  }, error = function(e){
+    cat("unable to get version number\n")
+  })
+  fit <- new("lgpfit", stan_fit = stan_fit, model = model, 
+             pkg_version = ver)
   
 
   # Finalize the 'lgpfit' object

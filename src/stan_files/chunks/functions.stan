@@ -1,7 +1,7 @@
 functions{
 
   // LOG PRIOR TO BE ADDED TO TARGET
-  real log_prior(real x, int[ ] types, real[ ] hp){
+  real STANFUNC_log_prior(real x, int[ ] types, real[ ] hp){
     real lp;
     real a = hp[1]; // prior hyperparameter 1
     real b = hp[2]; // prior hyperparameter 2
@@ -40,21 +40,21 @@ functions{
   }
   
   // INPUT WARP
-  vector warp_input(vector x, real a, real b, real c){
+  vector STANFUNC_warp_input(vector x, real a, real b, real c){
     int n_tot = num_elements(x);
     vector[n_tot] w = 2*c*(-0.5 + rep_vector(1, n_tot)./(1+exp(-a*(x-b))));
     return(w);
   }
 
   // VARIANCE MASK
-  vector var_mask(vector x, real a){
+  vector STANFUNC_var_mask(vector x, real a){
     int n_tot = num_elements(x);
     vector[n_tot] s = rep_vector(1, n_tot)./(1+exp(-a*x));
     return(s);
   }
 
   // COMPUTE X_TILDE
-  vector get_x_tilde(vector x_disAge, vector T_onset, vector T_observed, int[,] mapping, int[] lengths){
+  vector STANFUNC_get_x_tilde(vector x_disAge, vector T_onset, vector T_observed, int[,] mapping, int[] lengths){
     int n_tot = num_elements(x_disAge);
     int N_cases = num_elements(lengths);
     vector[n_tot] x_tilde = rep_vector(0.0, n_tot);
@@ -66,7 +66,7 @@ functions{
   }
 
   // CATEGORICAL KERNEL 
-  matrix K_cat(vector x1, vector x2){
+  matrix STANFUNC_K_cat(vector x1, vector x2){
     int n1 = num_elements(x1);
     int n2 = num_elements(x2);
     matrix[n1,n2] K;
@@ -79,7 +79,7 @@ functions{
   }
 
   // BINARY (MASK) KERNEL 
-  matrix K_bin_int(int[] x1, int[] x2, int c){
+  matrix STANFUNC_K_bin_int(int[] x1, int[] x2, int c){
     int n1 = num_elements(x1);
     int n2 = num_elements(x2);
     matrix[n1,n2] K;
@@ -92,7 +92,7 @@ functions{
   }
 
   // Binary (mask) kernel but with real inputs
-  matrix K_bin_real(vector x1, vector x2, int c){
+  matrix STANFUNC_K_bin_real(vector x1, vector x2, int c){
     int n1 = num_elements(x1);
     int n2 = num_elements(x2);
     matrix[n1,n2] K;
@@ -105,14 +105,14 @@ functions{
   }
 
   // Multiplier matrix to enable heterogeneous diseaseAge effect 
-  matrix K_var_mask(vector x1_tilde, vector x2_tilde, real stp, real[] vm_params){
+  matrix STANFUNC_K_var_mask(vector x1_tilde, vector x2_tilde, real stp, real[] vm_params){
     int n1 = num_elements(x1_tilde);
     int n2 = num_elements(x2_tilde);
     real a = stp * vm_params[2];
     real h = vm_params[1];
     real r = 1/a*log(h/(1-h));
-    vector[n1] s1 = var_mask(x1_tilde - r, a);
-    vector[n2] s2 = var_mask(x2_tilde - r, a);
+    vector[n1] s1 = STANFUNC_var_mask(x1_tilde - r, a);
+    vector[n2] s2 = STANFUNC_var_mask(x2_tilde - r, a);
     matrix[n1,n2] S1 = rep_matrix(s1, n2);
     matrix[n1,n2] S2 = transpose(rep_matrix(s2, n1));
     matrix[n1,n2] MASK = S1 .* S2;
@@ -120,7 +120,7 @@ functions{
   }
 
   // Multiplier matrix to enable heterogeneous diseaseAge effect
-  matrix K_beta_symmetric(vector beta, int[] row_to_caseID){
+  matrix STANFUNC_K_beta_symmetric(vector beta, int[] row_to_caseID){
     int n = num_elements(row_to_caseID);
     int i_caseID = 0;
     int j_caseID = 0;
@@ -155,7 +155,7 @@ functions{
   }
   
     // Multiplier matrix to enable heterogeneous diseaseAge effect
-  matrix K_beta(vector beta, int[] row_to_caseID_1, int[] row_to_caseID_2){
+  matrix STANFUNC_K_beta(vector beta, int[] row_to_caseID_1, int[] row_to_caseID_2){
     int n1 = num_elements(row_to_caseID_1);
     int n2 = num_elements(row_to_caseID_2);
     int i_caseID = 0;
@@ -178,33 +178,33 @@ functions{
   
     
   // COMPUTE FIXED KERNEL MATRICES (do not depend on parameters)
-  matrix[] compute_fixed_kernel_matrices(vector[] X1, vector[] X2, int[] X1_nn, int[] X2_nn, int[] D, int cat_interact_kernel){
+  matrix[] STANFUNC_compute_fixed_kernel_matrices(vector[] X1, vector[] X2, int[] X1_nn, int[] X2_nn, int[] D, int cat_interact_kernel){
     int n1 = num_elements(X1[1]);
     int n2 = num_elements(X2[1]);
     int nf = 1 + D[3] + D[5] + D[6]; 
     matrix[n1,n2] KF[nf];
-    KF[1] = K_cat(X1[1], X2[1]);
+    KF[1] = STANFUNC_K_cat(X1[1], X2[1]);
     for(j in 1:D[3]){
-      KF[1+j] = K_bin_int(X1_nn, X2_nn, 1);
+      KF[1+j] = STANFUNC_K_bin_int(X1_nn, X2_nn, 1);
     }
     for(j in 1:D[5]){
       int ix = 2 + D[3] + D[4] + j;
       if(cat_interact_kernel == 1){
-        KF[1+D[3]+j] = K_cat(X1[ix], X2[ix]);
+        KF[1+D[3]+j] = STANFUNC_K_cat(X1[ix], X2[ix]);
       }else{
-        KF[1+D[3]+j] = K_bin_real(X1[ix], X2[ix], 1);
+        KF[1+D[3]+j] = STANFUNC_K_bin_real(X1[ix], X2[ix], 1);
       }
     }
     for(j in 1:D[6]){
       int ix = 2+D[3]+D[4]+D[5]+j;
-      KF[1+D[3]+D[5]+j] = K_cat(X1[ix], X2[ix]);
+      KF[1+D[3]+D[5]+j] = STANFUNC_K_cat(X1[ix], X2[ix]);
     }
     return(KF);
   }
   
   
   // COMPUTE ALL KERNEL MATRICES
-  matrix[] compute_kernel_matrices(vector[] X1, vector[] X2, int[,] caseID_to_rows_1, int[,] caseID_to_rows_2, int[] row_to_caseID_1, int[] row_to_caseID_2, int[] caseID_nrows_1, int[] caseID_nrows_2, matrix[] KF, vector[] T_onset, vector T_observed, int[] D, int UNCRT, int HMGNS, int USE_VAR_MASK, real[] vm_params, real[] alpha_idAge, real[] alpha_sharedAge, real[] alpha_diseaseAge, real[] alpha_continuous, real[] alpha_categAge, real[] alpha_categOffset, real[] lengthscale_idAge, real[] lengthscale_sharedAge, real[] lengthscale_diseaseAge, real[] lengthscale_continuous, real[] lengthscale_categAge, real[] warp_steepness, vector[] beta){
+  matrix[] STANFUNC_compute_kernel_matrices(vector[] X1, vector[] X2, int[,] caseID_to_rows_1, int[,] caseID_to_rows_2, int[] row_to_caseID_1, int[] row_to_caseID_2, int[] caseID_nrows_1, int[] caseID_nrows_2, matrix[] KF, vector[] T_onset, vector T_observed, int[] D, int UNCRT, int HMGNS, int USE_VAR_MASK, real[] vm_params, real[] alpha_idAge, real[] alpha_sharedAge, real[] alpha_diseaseAge, real[] alpha_continuous, real[] alpha_categAge, real[] alpha_categOffset, real[] lengthscale_idAge, real[] lengthscale_sharedAge, real[] lengthscale_diseaseAge, real[] lengthscale_continuous, real[] lengthscale_categAge, real[] warp_steepness, vector[] beta){
     int n1 = num_elements(X1[1]);
     int n2 = num_elements(X2[1]);
     real x1_age[n1] = to_array_1d(X1[2]);   // age covariate as an array
@@ -239,19 +239,19 @@ functions{
         x1_tilde = X1[3];
         x2_tilde = X2[3];
       }else{
-        x1_tilde = get_x_tilde(X1[3], T_onset[1], T_observed, caseID_to_rows_1, caseID_nrows_1);
-        x2_tilde = get_x_tilde(X2[3], T_onset[1], T_observed, caseID_to_rows_2, caseID_nrows_2); 
+        x1_tilde = STANFUNC_get_x_tilde(X1[3], T_onset[1], T_observed, caseID_to_rows_1, caseID_nrows_1);
+        x2_tilde = STANFUNC_get_x_tilde(X2[3], T_onset[1], T_observed, caseID_to_rows_2, caseID_nrows_2); 
       }
-      w1 = to_array_1d(warp_input(x1_tilde, stp, 0.0, 1.0));
-      w2 = to_array_1d(warp_input(x2_tilde, stp, 0.0, 1.0));
+      w1 = to_array_1d(STANFUNC_warp_input(x1_tilde, stp, 0.0, 1.0));
+      w2 = to_array_1d(STANFUNC_warp_input(x2_tilde, stp, 0.0, 1.0));
     
       // Create disease effect kernel
       KX[r] = KF[2] .* cov_exp_quad(w1, w2, alp, ell);
       if(HMGNS==0){
-        KX[r] = K_beta(beta[1], row_to_caseID_1, row_to_caseID_2) .* KX[r];
+        KX[r] = STANFUNC_K_beta(beta[1], row_to_caseID_1, row_to_caseID_2) .* KX[r];
       }
       if(USE_VAR_MASK==1){
-        KX[r] = K_var_mask(x1_tilde, x2_tilde, stp, vm_params) .* KX[r];
+        KX[r] = STANFUNC_K_var_mask(x1_tilde, x2_tilde, stp, vm_params) .* KX[r];
       }
     }
     for(j in 1:D[4]){

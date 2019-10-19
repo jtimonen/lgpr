@@ -89,7 +89,7 @@ data {
 transformed data{
   int nf = 1 + D[3] + D[5] + D[6];     // number of fixed kernel matrices
   int sum_D = sum(D);                  // total number of covariates
-  matrix[n,n] KF[nf] = compute_fixed_kernel_matrices(X, X, X_notnan, X_notnan, D, cat_interact_kernel);
+  matrix[n,n] KF[nf] = STANFUNC_compute_fixed_kernel_matrices(X, X, X_notnan, X_notnan, D, cat_interact_kernel);
   vector[n] mu = rep_vector(C_hat, n); // GP mean
     
   
@@ -156,7 +156,7 @@ transformed parameters {
     T_onset[1] = L_ons[1] + (U_ons[1] - L_ons[1]) .* T_raw[1];
   }
   if(F_is_sampled){
-    matrix[n,n] KX[sum_D] = compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+    matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
     for(r in 1:sum_D){
       matrix[n,n] EYE = diag_matrix(rep_vector(DELTA, n));
       matrix[n,n] Lxr = cholesky_decompose(KX[r] + EYE);
@@ -213,7 +213,7 @@ model {
       matrix[n,n] Ky;
       matrix[n,n] Ly;
       matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
-      matrix[n,n] KX[sum_D] = compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+      matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
       if(LH!=1){
         reject("Likelihood must be Gaussian if F is not sampled!")
       }
@@ -239,7 +239,7 @@ generated quantities {
      matrix[n,n] Ky;
      matrix[n,n] Ly;
      matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
-     matrix[n,n] KX[sum_D] = compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+     matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
      for(j in 1:sum_D){
        Kx += KX[j]; 
      }
