@@ -11,7 +11,7 @@ test_that("lgp runs", {
                   data    = simulate_data(N = 4, 10*c(1,2,3,4,5))$data, 
                   iter    = 100,
                   chains  = 1, 
-                  refresh = 1000)@model@stan_dat$D)
+                  refresh = 0)@model@stan_dat$D)
   }),
   c(1,1,0,0,0,0)
   )
@@ -23,7 +23,7 @@ test_that("lgp runs", {
                                           covariates = c(2))$data,
                   iter    = 100,
                   chains  = 1, 
-                  refresh = 1000)@model@stan_dat$D)
+                  refresh = 0)@model@stan_dat$D)
     }),
     c(1,1,0,0,1,0)
   )
@@ -40,7 +40,7 @@ test_that("lgp runs without id*age component", {
                   chains  = 1,
                   time_variable = "age",
                   id_variable = "id",
-                  refresh = 1000)@model@stan_dat$D)
+                  refresh = 0)@model@stan_dat$D)
     }),
     c(0,1,0,0,1,0)
   )
@@ -55,7 +55,7 @@ test_that("lgp runs without age*id component but with shared age", {
                                           covariates = c(2))$data,
                   iter    = 100,
                   chains  = 1,
-                  refresh = 1000)@model@stan_dat$D)
+                  refresh = 0)@model@stan_dat$D)
     }),
     c(0,1,0,0,1,0)
   )
@@ -72,7 +72,7 @@ test_that("lgp can sample F", {
                                           covariates = c(0,1,2,3))$data,
                   iter    = 100,
                   chains  = 1,
-                  refresh = 1000,
+                  refresh = 0,
                   offset_vars = c("offset"),
                   sample_F = T)@model@stan_dat$D)
     }),
@@ -91,7 +91,7 @@ test_that("lgp can used without the vm kernel", {
                                           dis_fun    = "gp_ns")$data,
                   iter    = 100,
                   chains  = 1,
-                  refresh = 1000,
+                  refresh = 0,
                   offset_vars = c("group"),
                   variance_mask = FALSE)@model@stan_dat$D)
   }),

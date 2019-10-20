@@ -24,7 +24,7 @@ likelihood_as_str <- function(LH){
   }else if(LH==2){
     str <- "Poisson"
   }else if(LH==3){
-    str <- "Negative Binomial"
+    str <- "negative binomial"
   }else if(LH==4){
     str <- "binomial"
   }else{
@@ -98,19 +98,12 @@ model_info <- function(object, print = TRUE){
   info  <- object@info
   
   # Model formula and likelihood
-  str   <- paste('  Model:\n    f = ', paste(info$component_names, collapse=" + "), sep = "")
-  LH    <- object@stan_dat$LH
-  yvar  <- info$varInfo$response_variable
-  if(LH==1){
-    str <- paste(str, "\n    ", yvar, " ~ N(f, sigma^2*I)\n", sep="")
-  }else{
-    str <- paste(str, "\n    g = exp(C + f), C = ", round(object@stan_dat$C_hat, 4), sep = "")
-    if(LH==2){
-      str <- paste(str, "\n    ", yvar, " ~ Poisson(g) \n", sep="")
-    }else if(LH==3){
-      str <- paste(str, "\n    ", yvar, " ~ NB(g, phi) \n", sep="")
-    }
-  }
+  str    <- paste('  Model:\n    f = ', paste(info$component_names, collapse=" + "), sep = "")
+  LH     <- object@stan_dat$LH
+  LH_str <- likelihood_as_str(LH)
+  yvar   <- info$varInfo$response_variable
+  str    <- paste(str, "\n    Response variable: ", yvar, sep="")
+  str    <- paste(str, "\n    Observation model: ", LH_str, sep="")
   
   # Covariate types
   t1 <- info$varInfo$id_variable
@@ -283,3 +276,4 @@ get_pkg_description <- function(){
 get_stan_model <- function(){
   return(stanmodels[["lgp"]])
 }
+

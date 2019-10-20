@@ -38,18 +38,14 @@ before_install:
 script: 
   - |
     travis_wait 42 R CMD build .
-    travis_wait 59 R CMD check lgpr*tar.gz
+    travis_wait 59 R CMD check sisters*tar.gz
 
-r_github_packages:
-  - r-lib/covr
-  
 after_script:
-  - tar -ztvf lgpr_*.tar.gz
+  - tar -ztvf sisters_*.tar.gz
   - echo ${NOT_CRAN}
 
 after_success:
   - travis_wait 40 tar -C .. -xf $PKG_TARBALL
-  - Rscript -e 'covr::codecov()'
-  
+
 after_failure:
-  - cat lgpr.Rcheck/00*
+- cat sisters.Rcheck/00*
