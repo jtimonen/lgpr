@@ -7,8 +7,8 @@ src/*.o
 src/*.so
 src/*.dll
 src/*.exe
+src/stan_functions
 inst/doc
-.Rproj.user
 *.exe
 *.so
 *.o

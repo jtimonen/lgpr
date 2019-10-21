@@ -1,0 +1,19 @@
+citHeader("Preprint to come soon.")
+
+citEntry(entry = "Article",
+  title        = "lgpr: Longitudinal Gaussian Process Regression",
+  author       = personList(as.person("Juho Timonen"),
+                   as.person("Aki Vehtari"),
+                   as.person("Harri Lähdesmäki")),
+  journal      = "-",
+  year         = "2019",
+  volume       = "-",
+  number       = "-",
+  pages        = "0--0",
+  url          = "https://github.com/jtimonen/lgpr",
+
+  textVersion  =
+  paste("Juho Timonen, Aki Vehtari and Harri Lähdesmäki (2019).",
+        "lgpr: Longitudinal Gaussian Process Regression.",
+        "URL https://github.com/jtimonen/lgpr")
+)
