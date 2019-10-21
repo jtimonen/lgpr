@@ -126,7 +126,7 @@ functions{
     return(K);
   }
 
-  // Multiplier matrix to enable heterogeneous diseaseAge effect
+  // Multiplier matrix to enable variance masking
   matrix STANFUNC_K_var_mask(vector x1_tilde, vector x2_tilde, real stp, real[] vm_params){
     int n1 = num_elements(x1_tilde);
     int n2 = num_elements(x2_tilde);

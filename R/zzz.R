@@ -1,10 +1,3 @@
-.onLoad <- function(libname, pkgname) { # nocov start
-  sf <- rstan::expose_stan_functions(
-    stanmodels$lgp, 
-    cacheDir = file.path('src', 'stan_functions'),
-                        cleanupCacheDir = TRUE)
-} # nocov end
-
 .onAttach <- function(...) {
   Lib <- dirname(system.file(package = "lgpr"))
   pkgdesc <- suppressWarnings(utils::packageDescription("lgpr",
