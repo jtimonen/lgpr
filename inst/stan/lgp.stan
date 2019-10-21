@@ -298,6 +298,74 @@ functions{
     }
     return(KX);
   }
+  
+  
+  // COMPUTE ALL KERNEL MATRICES (SYMMETRIC)
+  matrix[] STANFUNC_compute_kernel_matrices_symmetric(vector[] X, int[,] caseID_to_rows, int[] row_to_caseID, int[] caseID_nrows, matrix[] KF, vector[] T_onset, vector T_observed, int[] D, int UNCRT, int HMGNS, int USE_VAR_MASK, real[] vm_params, real[] alpha_idAge, real[] alpha_sharedAge, real[] alpha_diseaseAge, real[] alpha_continuous, real[] alpha_categAge, real[] alpha_categOffset, real[] lengthscale_idAge, real[] lengthscale_sharedAge, real[] lengthscale_diseaseAge, real[] lengthscale_continuous, real[] lengthscale_categAge, real[] warp_steepness, vector[] beta){
+    int n = num_elements(X[1]);
+    real x_age[n] = to_array_1d(X[2]);   // age covariate as an array
+    int sum_D = sum(D);
+    matrix[n,n] KX[sum_D];
+    int r = 0;
+    if(D[1]==1){
+      real alp = alpha_idAge[1];
+      real ell = lengthscale_idAge[1];
+      r += 1;
+      KX[r] = cov_exp_quad(x_age, alp, ell) .* KF[1];
+    }
+    if(D[2]==1){
+      real alp = alpha_sharedAge[1];
+      real ell = lengthscale_sharedAge[1];
+      r += 1;
+      KX[r] = cov_exp_quad(x_age, alp, ell);
+    }
+    if(D[3]==1){
+      real alp = alpha_diseaseAge[1];
+      real ell = lengthscale_diseaseAge[1];
+      real stp = warp_steepness[1];
+      vector[n] x_tilde;
+      real w[n];
+      r += 1;
+
+      // Handle diseaseAge uncertainty
+      if(UNCRT==0){
+        x_tilde = X[3];
+      }else{
+        x_tilde = STANFUNC_get_x_tilde(X[3], T_onset[1], T_observed, caseID_to_rows, caseID_nrows);
+      }
+      w = to_array_1d(STANFUNC_warp_input(x_tilde, stp, 0.0, 1.0));
+
+      // Create disease effect kernel
+      KX[r] = KF[2] .* cov_exp_quad(w, alp, ell);
+      if(HMGNS==0){
+        KX[r] = STANFUNC_K_beta_symmetric(beta[1], row_to_caseID) .* KX[r];
+      }
+      if(USE_VAR_MASK==1){
+        KX[r] = STANFUNC_K_var_mask(x_tilde, x_tilde, stp, vm_params) .* KX[r];
+      }
+    }
+    for(j in 1:D[4]){
+      real alp = alpha_continuous[j];
+      real ell = lengthscale_continuous[j];
+      int ix  = 2 + D[3] + j;
+      r += 1;
+      KX[r] = cov_exp_quad(to_array_1d(X[ix]), alp, ell);
+    }
+    for(j in 1:D[5]){
+      real alp = alpha_categAge[j];
+      real ell = lengthscale_categAge[j];
+      int ikf = 1 + D[3] + j;
+      r += 1;
+      KX[r] = cov_exp_quad(x_age, alp, ell) .* KF[ikf];
+    }
+    for(j in 1:D[6]){
+      int ikf = 1 + D[3] + D[5] + j;
+      real alp = alpha_categOffset[j];
+      r += 1;
+      KX[r] = square(alp) * KF[ikf];
+    }
+    return(KX);
+  }
 
 }
 
@@ -468,7 +536,7 @@ transformed parameters {
     T_onset[1] = L_ons[1] + (U_ons[1] - L_ons[1]) .* T_raw[1];
   }
   if(F_is_sampled){
-    matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+    matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices_symmetric(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
     for(r in 1:sum_D){
       matrix[n,n] EYE = diag_matrix(rep_vector(DELTA, n));
       matrix[n,n] Lxr = cholesky_decompose(KX[r] + EYE);
@@ -601,7 +669,7 @@ model {
       matrix[n,n] Ky;
       matrix[n,n] Ly;
       matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
-      matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+      matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices_symmetric(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
       if(LH!=1){
         reject("Likelihood must be Gaussian if F is not sampled!")
       }
@@ -631,7 +699,7 @@ generated quantities {
      matrix[n,n] Ky;
      matrix[n,n] Ly;
      matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
-     matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices(X, X, caseID_to_rows, caseID_to_rows, row_to_caseID, row_to_caseID, caseID_nrows, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,  alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
+     matrix[n,n] KX[sum_D] = STANFUNC_compute_kernel_matrices_symmetric(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, lengthscale_idAge, lengthscale_sharedAge, lengthscale_diseaseAge, lengthscale_continuous, lengthscale_categAge, warp_steepness, beta);
      for(j in 1:sum_D){
        Kx += KX[j];
      }

@@ -272,13 +272,13 @@ get_response <- function(data, varInfo, standardize, likelihood){
   # Check the response for negative values or non-integer values
   if(!(likelihood %in% c("none", "Gaussian"))){
     if(sum(response<0) > 0){
-      msg <- paste("The response variable contains negative values.",
+      msg <- paste("The response variable contains negative values. ",
                    "Only the likelihoods 'Gaussian' and 'none' are allowed in such case!\n", sep="")
       stop(msg)
     }
     notint <- sum(response - round(response))
     if(notint > 0){
-      msg <- paste("The response variable contains non-integer values.",
+      msg <- paste("The response variable contains non-integer values. ",
                    " Only the likelihoods 'Gaussian' and 'none' are allowed in such case!\n", sep="")
       stop(msg)
     }
