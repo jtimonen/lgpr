@@ -104,6 +104,7 @@ model_info <- function(object, print = TRUE){
   yvar   <- info$varInfo$response_variable
   str    <- paste(str, "\n    Response variable: ", yvar, sep="")
   str    <- paste(str, "\n    Observation model: ", LH_str, sep="")
+  str    <- paste(str, "\n")
   
   # Covariate types
   t1 <- info$varInfo$id_variable

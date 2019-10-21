@@ -35,7 +35,7 @@ setMethod(f = "show",
             if(object@stan_dat$UNCRT==1){
               str2 <- "uncertain"
             }else{
-              str2 <- "exact"
+              str2 <- "fixed"
             }
             if(object@stan_dat$HMGNS==0){
               str3 <- "heterogeneous"
@@ -45,12 +45,12 @@ setMethod(f = "show",
             D <- object@stan_dat$D
             cat("\n ---------- LGPMODEL SUMMARY ----------\n\n")
             str_dis <- paste("  Disease component \n",
-                             "    - Onset type: ", str2, "\n",
+                             "    - Effect time: ", str2, "\n",
                              "    - Effect type: ", str3, "\n", sep="")
             
             minfo <- model_info(object, print = FALSE)
             cat(minfo)
-            cat(paste("  Likelihood: ", str1, "\n", sep=""))
+            cat(paste("  Observation model: ", str1, "\n", sep=""))
             if(D[3]==1){
               cat(str_dis)
             }
@@ -118,7 +118,7 @@ setMethod(f = "show",
             n_iters  <- length(LP[[1]])
             
             cat("* Chains: ", n_chains, sep="")
-            cat(", iterations: ", n_iters, "\n", sep="")
+            cat(", post-warmup iterations: ", n_iters, "\n", sep="")
             cat("* Average runtime per chain: ",
                 runtime$warmup, " s (warmup) and ",
                 runtime$sampling, " s (sampling)\n", sep="")
@@ -128,7 +128,7 @@ setMethod(f = "show",
             rv <- object@residual_variance
             pevf <- mean(sv/(sv+rv))
             
-            cat("* Proportion of variance explained by signal = ", round(pevf, 3), "\n", sep="")
+            cat("* Proportion of signal = ", round(pevf, 3), "\n", sep="")
             cat("* Covariate relevances:\n")
             cat("\n")
             
