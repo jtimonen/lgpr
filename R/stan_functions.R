@@ -6,5 +6,5 @@
 #' @param c an input
 #' @export
 stanfunc_warp_input <- function(t, a, b, c) {
-  return STANFUNC_warp_input(t, a, b, c)
+  return(STANFUNC_warp_input(t, a, b, c))
 }
