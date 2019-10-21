@@ -50,6 +50,8 @@ get_function_component_samples <- function(fit, only_at_datapoints)
     G_tot <- F_tot
   }else if(LH==2 || LH==3){
     G_tot <- exp(F_tot + C_hat)
+  }else if(LH==4){
+    G_tot <- sd$N_trials * 1/(1 + exp(-F_tot))
   }else{
     stop("Unknown likelihood!")
   }
@@ -160,7 +162,8 @@ get_predicted <- function(fit)
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   info <- fit@model@info
   sf   <- fit@stan_fit
-  n    <- fit@model@stan_dat$n
+  sdat <- fit@model@stan_dat
+  n    <- sdat$n
   if(!info$sample_F){
     F_mean <- rstan::extract(sf, pars = "F_mean_tot")$F_mean_tot[,1,]
     F_var  <- rstan::extract(sf, pars = "F_var_tot")$F_var_tot[,1,]
@@ -175,8 +178,13 @@ get_predicted <- function(fit)
     C_hat <- fit@model@stan_dat$C_hat
     if(LH == 1){
       G_smp <- F_smp
-    }else{
+    }else if(LH == 2 || LH == 3){
       G_smp <- exp(F_smp + C_hat)
+    }else if(LH == 4){
+      N_trials <- sdat$N_trials
+      G_smp <- N_trials * 1/(1 + exp(-F_smp))
+    }else{
+      stop("Unknown likelihood!")
     }
     ret <- list(F_smp = F_smp, G_smp = G_smp)
   }

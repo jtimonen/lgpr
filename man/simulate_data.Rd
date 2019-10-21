@@ -13,7 +13,7 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
   useBinKernel = TRUE, steepness = 0.5, vm_params = c(0.025, 1),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
-  1)))
+  1)), N_trials = 1)
 }
 \arguments{
 \item{N}{Number of individuals.}
@@ -51,13 +51,13 @@ the number of 2's and 3's in the \code{covariates} vector.}
 
 \item{f_var}{variance of f}
 
-\item{noise_type}{Either "Gaussian", "Poisson" or "NB" (negative binomial).}
+\item{noise_type}{Either "Gaussian", "Poisson", NB" (negative binomial) or "binomial".}
 
 \item{snr}{The desired signal-to-noise ratio. This argument is valid
 only with \cr
 \code{noise_type = "Gaussian"}.}
 
-\item{phi}{The dispersion parameter for negative binomial noise.}
+\item{phi}{The dispersion parameter for negative binomial data. The variance is g + g^2/phi.}
 
 \item{N_affected}{Number of diseased individuals that are affected by the disease. This defaults
 to the number of diseased individuals. This argument can only be given if \code{covariates}
@@ -97,6 +97,8 @@ covariates are generated so that \code{x <- sin(a*t + b) + c}, where
   \item \code{b <- mu[2] + lambda[2]*stats::runif(1)}
   \item \code{c <- mu[3] + lambda[3]*stats::runif(1)}
 }}
+
+\item{N_trials}{The number of trials parameter for binomial data.}
 }
 \value{
 A list \code{out}, where 

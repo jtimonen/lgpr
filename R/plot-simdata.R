@@ -9,13 +9,15 @@
 #' @param ncol an argument for \code{ggplot2::facet_wrap}
 #' @param i_test test point indices
 #' @param color_test test point color
+#' @param y_transform function to transform y
 #' @return a ggplot object
 plot_simdata <- function(simData, 
                          componentwise = FALSE,
                          nrow          = NULL, 
                          ncol          = NULL,
                          i_test        = NULL,
-                         color_test    = "steelblue2")
+                         color_test    = "steelblue2",
+                         y_transform   = function(x){x})
 {
   
   if(componentwise){
@@ -26,7 +28,7 @@ plot_simdata <- function(simData,
     h <- plot_simdata_by_component(simData, linecolor, nrow, ncol)
   }else{
     linecolor    <- "gray70"
-    h <- plot_simdata_by_individual(simData, linecolor, nrow, ncol, i_test, color_test)
+    h <- plot_simdata_by_individual(simData, linecolor, nrow, ncol, i_test, color_test, y_transform)
   }
   return(h)
 }
@@ -40,13 +42,15 @@ plot_simdata <- function(simData,
 #' @param ncol an argument for \code{ggplot2::facet_wrap}
 #' @param i_test test point indices
 #' @param color_test test point color
+#' @param y_transform function to transform y
 #' @return a ggplot object
 plot_simdata_by_individual <- function(simData, 
                                        linecolor   = "gray70", 
                                        nrow        = NULL, 
                                        ncol        = NULL,
                                        i_test      = NULL,
-                                       color_test  = "steelblue2"){
+                                       color_test  = "steelblue2",
+                                       y_transform = function(x){x}){
   vlinecolors <- c("firebrick3", "firebrick4")
   vlinetypes <- c(1,5)
   dat  <- simData$data
@@ -54,7 +58,7 @@ plot_simdata_by_individual <- function(simData,
   ons  <- simData$onsets
   D3   <- ("diseaseAge" %in% colnames(comp))
   g    <- comp$g
-  y    <- dat$y
+  y    <- y_transform(dat$y)
   yval <- c(g,y)
   leg  <- rep(c("g", "y"), each = length(g))
   id   <- rep(dat$id, 2)

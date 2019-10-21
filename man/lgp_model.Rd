@@ -69,7 +69,7 @@ Possible options are \code{"categorical"} (default) and \code{"binary"} (mask ke
 only category \code{"1"} will have an effect).}
 
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
-Must have length equal to number of data points. Setting this to vector of ones corresponds to 
+Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
 }
 \value{

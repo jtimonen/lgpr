@@ -208,17 +208,7 @@ assess_convergence <- function(fit, verbose = TRUE, recompute = F){
   imax <- which(Rhat == rmax)
   imax <- imax[1]
   rmax <- round(rmax, 3)
-  if(rmax > 1.1){
-    if(rmax < 1.2){
-      if(verbose) cat(paste("* The largest R_hat value is ", rmax, " (", names(Rhat)[imax], ")\n", sep=""))
-      warning("* max(R_hat) > 1.1, chains may not have converged.\n")
-    } else {
-      if(verbose) cat(paste("* The largest R_hat value is ", rmax, " (", names(Rhat)[imax], ")\n", sep=""))
-      warning("* max(R_hat) > 1.2, bad convergence!\n")
-    }
-  }else{
-    if(verbose) cat("* The largest R_hat value is ", rmax, " (", names(Rhat)[imax], ").\n", sep="")
-  }
+  if(verbose) cat("* The largest R_hat value (ignoring generated quantities) is ", rmax, " (", names(Rhat)[imax], ").\n", sep="")
   return(Rhat)
 }
 

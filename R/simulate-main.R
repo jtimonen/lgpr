@@ -49,8 +49,8 @@ simulate_data <- function(N,
                           steepness       = 0.5,
                           vm_params       = c(0.025, 1),
                           continuous_info = list(mu = c(pi/8,pi,-0.5), 
-                                                 lambda = c(pi/8,pi,1))
-)
+                                                 lambda = c(pi/8,pi,1)),
+                          N_trials        = 1)
 {
   if(N < 2) stop("There must be at least 2 individuals!")
   if(length(t_data) < 3) stop("There must be at least 3 time points per individual!")
@@ -96,7 +96,7 @@ simulate_data <- function(N,
   f <- f + C_hat
   
   # Generate noise
-  NOISY <- create_y(noise_type, f, snr = snr, phi = phi)
+  NOISY <- create_y(noise_type, f, snr = snr, phi = phi, N_trials = N_trials)
   g     <- NOISY$g
   y     <- NOISY$y
   noise <- y - g
@@ -129,18 +129,19 @@ simulate_data <- function(N,
 
 #' Generate noisy observations
 
-#' @param noise_type Either "Gaussian", "Poisson" or "NB" (negative binomial).
+#' @param noise_type Either "Gaussian", "Poisson", NB" (negative binomial) or "binomial".
 #' @param snr The desired signal-to-noise ratio. This argument is valid
 #' only with \cr
 #' \code{noise_type = "Gaussian"}.
-#' @param phi The dispersion parameter for negative binomial noise.
+#' @param phi The dispersion parameter for negative binomial data. The variance is g + g^2/phi.
+#' @param N_trials The number of trials parameter for binomial data.
 #' @param f The underlying signal.
 #' @return A list \code{out}, where
 #' \itemize{
 #'   \item \code{out$g} is \code{f} mapped through an inverse link function and
 #'   \item \code{out$y} is the noisy response variable.
 #' }
-create_y <- function(noise_type, f, snr, phi){
+create_y <- function(noise_type, f, snr, phi, N_trials){
   L  <- length(f)
   y  <- rep(0, L)
   if(noise_type=="Gaussian"){
@@ -160,10 +161,10 @@ create_y <- function(noise_type, f, snr, phi){
     for(i in 1:L){
       y[i] <- stats::rnbinom(n = 1, mu = g[i], size = phi)
     }
-  }else if(noise_type=="Bernoulli"){
+  }else if(noise_type=="binomial"){
     g <- 1/(1 + exp(-f))
     for(i in 1:L){
-      y[i] <- stats::rbinom(n = 1, size = 1, prob = g[i])
+      y[i] <- stats::rbinom(n = 1, size = N_trials, prob = g[i])
     }
   }else{
     stop(paste("Invalid input noise_type = '", noise_type, "'", sep =""))

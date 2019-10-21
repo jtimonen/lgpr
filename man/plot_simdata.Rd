@@ -5,7 +5,8 @@
 \title{Visualize simulated data}
 \usage{
 plot_simdata(simData, componentwise = FALSE, nrow = NULL,
-  ncol = NULL, i_test = NULL, color_test = "steelblue2")
+  ncol = NULL, i_test = NULL, color_test = "steelblue2",
+  y_transform = function(x) {     x })
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
@@ -19,6 +20,8 @@ plot_simdata(simData, componentwise = FALSE, nrow = NULL,
 \item{i_test}{test point indices}
 
 \item{color_test}{test point color}
+
+\item{y_transform}{function to transform y}
 }
 \value{
 a ggplot object

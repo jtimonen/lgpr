@@ -110,6 +110,9 @@ create_stan_input <- function(formula,
     if(likelihood != "binomial"){
       stop("Only give the N_trials argument if likelihood is binomial!")
     }
+    if(length(N_trials)==1){
+      N_trials <- rep(N_trials, length(response))
+    }
     if(length(N_trials)!= length(response)){
       stop("Invalid length of N_trials!")
     }

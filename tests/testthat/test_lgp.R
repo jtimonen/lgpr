@@ -81,7 +81,7 @@ test_that("lgp can sample F", {
   
 })
 
-test_that("lgp can used without the vm kernel", {
+test_that("lgp can be used without the vm kernel", {
   
   expect_identical(suppressWarnings({
     as.vector(lgp(formula = y ~ id + age + diseaseAge + group,
@@ -97,5 +97,50 @@ test_that("lgp can used without the vm kernel", {
   }),
   c(1,1,1,0,0,1)
   )
+  
+})
+
+
+test_that("lgp can be run using Poisson observation model", {
+  
+  expect_identical(suppressWarnings({
+    length(lgp(formula = y ~ id + age,
+                  data    = simulate_data(N = 4, t_data = 10*c(1,2,3,4,5), noise_type = 'Poisson')$data,
+                  likelihood = 'Poisson',
+                  iter    = 60,
+                  chains  = 1,
+                  refresh = 0)@signal_variance)
+  }), length(integer(30)))
+  
+})
+
+
+test_that("lgp can be run using NB observation model", {
+  
+  expect_identical(suppressWarnings({
+    length(lgp(formula = y ~ id + age,
+               data    = simulate_data(N = 4, t_data = 10*c(1,2,3,4,5), 
+                                       noise_type = 'NB',
+                                       phi = 2)$data,
+               likelihood = 'NB',
+               iter    = 60,
+               chains  = 1,
+               refresh = 0)@signal_variance)
+  }), length(integer(30)))
+  
+})
+
+test_that("lgp can be run using binomial observation model", {
+  
+  expect_identical(suppressWarnings({
+    length(lgp(formula = y ~ id + age,
+               data    = simulate_data(N = 4, t_data = 10*c(1,2,3,4,5), 
+                                       noise_type = 'binomial', N_trials = 20)$data,
+               likelihood = 'binomial',
+               N_trials = 20,
+               iter    = 60,
+               chains  = 1,
+               refresh = 0)@signal_variance)
+  }), length(integer(30)))
   
 })
