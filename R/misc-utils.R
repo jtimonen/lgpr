@@ -236,6 +236,16 @@ show_relevances <- function(fit){
   cat("ell_smooth_multip =", ell_smooth_multip, "\n")
 }
 
+#' Extract samples of the shared age lengthscale
+#'
+#' @param fit an object of class 'lgpfit'
+#' @return a vector
+get_ell_shared_samples <- function(fit){
+  D <- fit@model@stan_dat$D
+  if(D[2]==0){stop("Model does not contain a shared age component!")}
+  ELL <- rstan::extract(fit@stan_fit, pars = "lengthscale_sharedAge")[[1]]
+  return(ELL)
+}
 
 #' A convenience function used in postproc-main.R
 #'

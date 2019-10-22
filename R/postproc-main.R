@@ -60,7 +60,7 @@ postproc <- function(fit,
   
   # Get shared age covariate and its lengthscale samples
   if(D[2]>0){
-    ELL   <- rstan::extract(fit@stan_fit, pars = "lengthscale_sharedAge")[[1]]
+    ELL   <- get_ell_shared_samples(fit)
     x_age <- as.numeric(sdat$X[2,])
   }else{
     ELL   <- NULL

@@ -1,6 +1,6 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 0.26.6
+Version: 0.26.7
 Authors@R: 
     person(given = "Juho",
            family = "Timonen",
@@ -26,7 +26,8 @@ Imports:
     bayesplot (>= 1.7.0),
     MASS (>= 7.3-50),
     stats (>= 3.4),
-    ggplot2 (>= 3.1.0)
+    ggplot2 (>= 3.1.0),
+    ggpubr (>= 0.2.3)
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),

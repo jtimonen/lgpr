@@ -115,10 +115,8 @@ setMethod(f = "show",
             n_chains <- length(object@stan_fit@inits)
             LP       <- rstan::get_logposterior(object@stan_fit)
             runtime  <- get_runtime(object)
-            n_iters  <- length(LP[[1]])
             
-            cat("* Chains: ", n_chains, sep="")
-            cat(", post-warmup iterations: ", n_iters, "\n", sep="")
+            cat("* Chains: ", n_chains, "\n", sep="")
             cat("* Average runtime per chain: ",
                 runtime$warmup, " s (warmup) and ",
                 runtime$sampling, " s (sampling)\n", sep="")
