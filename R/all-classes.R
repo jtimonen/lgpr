@@ -123,7 +123,7 @@ setMethod(f = "show",
                 runtime$warmup, " s (warmup) and ",
                 runtime$sampling, " s (sampling)\n", sep="")
             
-            assess_convergence(object)
+            assess_convergence(object, verbose = TRUE)
             sv <- object@signal_variance
             rv <- object@residual_variance
             pevf <- mean(sv/(sv+rv))

@@ -31,6 +31,7 @@ lgp <- function(formula,
                 ell_smooth_multip = 1,
                 cat_interact_kernel_type = "categorical",
                 N_trials         = NULL,
+                verbose_mode     = FALSE,
                 ...)
 {
   # Create the model
@@ -52,9 +53,10 @@ lgp <- function(formula,
                      offset_vars      = offset_vars,
                      variance_mask    = variance_mask,
                      cat_interact_kernel_type  = cat_interact_kernel_type,
-                     N_trials         = N_trials)
+                     N_trials         = N_trials,
+                     verbose_mode     = verbose_mode)
   
-  show(model)
+  if(verbose_mode){ show(model) }
   
   # Fit the model
   fit <- lgp_fit(model         = model, 
@@ -63,6 +65,7 @@ lgp <- function(formula,
                  skip_postproc = skip_postproc,
                  ell_smooth    = ell_smooth,
                  ell_smooth_multip = ell_smooth_multip,
+                 verbose       =  verbose_mode,
                  ...)
   
   # Return the lgpfit object
@@ -113,6 +116,7 @@ lgp <- function(formula,
 #' @param N_trials This argument (number of trials) is only needed when likelihood is binomial.
 #' Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 #' Bernoulli observation model.
+#' @param verbose_mode Should more verbose output be printed?
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
@@ -133,7 +137,8 @@ lgp_model <- function(formula,
                       offset_vars      = NULL,
                       variance_mask    = TRUE,
                       cat_interact_kernel_type = "categorical",
-                      N_trials = NULL
+                      N_trials         = NULL,
+                      verbose_mode     = FALSE
 )
 {
   # Model as a string
@@ -162,7 +167,7 @@ lgp_model <- function(formula,
                                DELTA          = DELTA,
                                sample_F       = sample_F,
                                t_test         = t_test,
-                               verbose        = TRUE,
+                               verbose        = verbose_mode,
                                variance_mask  = variance_mask,
                                cat_interact_kernel_type = cat_interact_kernel_type,
                                N_trials       = N_trials)
@@ -218,6 +223,7 @@ lgp_model <- function(formula,
 #'    \item A numeric argument that directly defines \code{ell_smooth}
 #' }
 #' @param ell_smooth_multip a multiplier for ell_smooth
+#' @param verbose should some output be printed?
 #' @return An object of class \code{lgpfit}.
 #' @seealso For the possible additional arguments, see \code{\link[rstan]{sampling}}.
 #' For creating the \code{lgpmodel} input, see \code{\link{lgp_model}}.
@@ -228,6 +234,7 @@ lgp_fit <- function(model,
                     skip_postproc     = FALSE, 
                     ell_smooth        = "ell_shared",
                     ell_smooth_multip = 1,
+                    verbose           = FALSE,
                     ...)
 {
   
@@ -246,11 +253,11 @@ lgp_fit <- function(model,
   stan_fit  <- rstan::sampling(object = stanmodels[["lgp"]], data = stan_dat, ...)
   
   # Initialize the 'lgpfit' object
-  ver <- "NOT FOUND"
+  ver <- "NOT SET"
   tryCatch({
     ver <- get_pkg_description()$Version
   }, error = function(e){
-    cat("unable to get version number\n")
+    ver <- "NOT FOUND"
   })
   fit <- new("lgpfit", stan_fit = stan_fit, model = model, 
              pkg_version = ver)
@@ -259,16 +266,17 @@ lgp_fit <- function(model,
   # Finalize the 'lgpfit' object
   tryCatch({
     if(!skip_postproc){
-      cat("* Begin postprocessing. \n")
+      if(verbose){ cat("* Begin postprocessing. \n") }
       fit@Rhat <- assess_convergence(fit)
       fit      <- postproc(fit, 
                            threshold               = threshold, 
                            ell_smooth              = ell_smooth,
                            ell_smooth_multip       = ell_smooth_multip,
-                           average_before_variance = FALSE)
-      show(fit)
+                           average_before_variance = FALSE,
+                           verbose                 = verbose)
+      if(verbose){ show(fit) }
     }else{
-      cat("* Skipped postprocessing.\n")
+      if(verbose){ cat("* Skipped postprocessing.\n") }
     }
   }, error = function(e) {
     warning(e)

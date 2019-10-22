@@ -6,7 +6,7 @@
 \usage{
 postproc(fit, threshold = 0.95, ell_smooth = "ell_shared",
   ell_smooth_multip = 1, sample_idx = NULL,
-  average_before_variance = FALSE)
+  average_before_variance = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
@@ -27,6 +27,8 @@ effect inference. Possible options are
 \item{sample_idx}{If supplied, this just returns the inferred components for one sample.}
 
 \item{average_before_variance}{Should the variances be computed using average components?}
+
+\item{verbose}{Should some output be printed?}
 }
 \value{
 An updated object of class \code{lgpfit}.

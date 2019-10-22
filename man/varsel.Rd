@@ -4,7 +4,7 @@
 \alias{varsel}
 \title{Covariate selection}
 \usage{
-varsel(object, threshold = 0.95, verbose = TRUE)
+varsel(object, threshold = 0.95, verbose = FALSE)
 }
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}

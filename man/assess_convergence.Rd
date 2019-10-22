@@ -4,7 +4,7 @@
 \alias{assess_convergence}
 \title{Assess convergence of the chains}
 \usage{
-assess_convergence(fit, verbose = TRUE, recompute = F)
+assess_convergence(fit, verbose = FALSE, recompute = F)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}

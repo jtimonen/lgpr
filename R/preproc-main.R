@@ -5,7 +5,7 @@
 #' @inheritParams lgp_model
 #' @param standardize Should the response variable be standardized?
 #' @param varInfo Variable type info.
-#' @param verbose Can this print some info?
+#' @param verbose Should more verbose output be printed?
 #' @return A list containing the data to be given to \code{rstan::sampling}, some info about
 #' preprocessing and all the information about scaling the inputs and response, and updated
 #' variable type info.
@@ -131,7 +131,8 @@ create_stan_input <- function(formula,
                      F_is_sampled = as.numeric(sample_F),
                      USE_VAR_MASK = as.numeric(variance_mask),
                      cat_interact_kernel = cat_interact_kernel,
-                     N_trials  = N_trials
+                     N_trials  = N_trials,
+                     verbose_mode = as.numeric(verbose)
   )
   
   # Get some variables related to diseased individuals

@@ -24,13 +24,15 @@
 #'    \item A numeric argument that directly defines \code{ell_smooth}
 #' }
 #' @param ell_smooth_multip a multiplier for ell_smooth
+#' @param verbose Should some output be printed?
 #' @return An updated object of class \code{lgpfit}.
 postproc <- function(fit, 
                      threshold               = 0.95, 
                      ell_smooth              = "ell_shared",
                      ell_smooth_multip       = 1,
                      sample_idx              = NULL,
-                     average_before_variance = FALSE){
+                     average_before_variance = FALSE,
+                     verbose                 = FALSE){
   
   model  <- fit@model
   info   <- model@info
@@ -69,8 +71,8 @@ postproc <- function(fit,
     
     # Covariate and component relevance computations
     if(average_before_variance){
-      
-      cat("* Averaging before computing variations.\n")
+      if(verbose){ cat("* Averaging before computing variations.\n") }
+    
       # Compute relevances using average F's
       ell          <- get_ell_smooth(ell_smooth, ell_smooth_multip, mean(ELL))
       REL          <- compute_relevances(FFF_avg, y_data, info, D, ell, x_age)
@@ -84,7 +86,7 @@ postproc <- function(fit,
     }else{
       
       # Compute relevances for each sample
-      cat("* Computing relevances over", n_smp, " posterior samples.\n")
+      if(verbose){ cat("* Computing relevances over", n_smp, "posterior samples.\n") }
       p_comp   <- matrix(0, n_smp, n_cmp + 1)
       p_cov    <- matrix(0, n_smp, n_cmp + 1)
       p_signal <- rep(0, n_smp)
@@ -108,8 +110,8 @@ postproc <- function(fit,
       colnames(p_comp)      <- NAMES1
       colnames(p_cov)       <- NAMES2
     }
+    if(verbose){ cat("\n") }
     
-    cat("\n")
     # Set slot values
     fit@components           <- FFF_avg
     fit@components_corrected <- FFF_cor_avg
@@ -117,7 +119,7 @@ postproc <- function(fit,
     fit@covariate_relevances <- list(samples = p_cov, average = colMeans(p_cov))
     fit@signal_variance      <- svar
     fit@residual_variance    <- evar
-    fit@covariate_selection  <- varsel(fit, threshold)
+    fit@covariate_selection  <- varsel(fit, threshold, verbose)
     fit@postproc_info        <- list(threshold               = threshold,
                                      ell_smooth              = ell_smooth,
                                      ell_smooth_multip       = ell_smooth_multip,
@@ -129,7 +131,7 @@ postproc <- function(fit,
     FFF_i           <- data.frame(FFF[sample_idx,,])
     colnames(FFF_i) <- colnames(FFF_avg)
     ell             <- get_ell_smooth(ell_smooth, ell_smooth_multip, ELL[sample_idx])
-    cat("ell_smooth =", ell, "\n")
+    if(verbose){ cat("ell_smooth =", ell, "\n") }
     REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
     FFF_i_cor       <- REL$FFF_cor
     out             <- list(components = FFF_i, corrected = FFF_i_cor)
@@ -146,7 +148,7 @@ postproc <- function(fit,
 #' @param threshold A threshold for proportion of explained variance
 #' @param verbose should this print some output
 #' @return the selected covariates
-varsel <- function(object, threshold = 0.95, verbose = TRUE)
+varsel <- function(object, threshold = 0.95, verbose = FALSE)
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
   if(threshold > 1 || threshold < 0) stop("'threshold' must be between 0 and 1!")
@@ -180,7 +182,7 @@ varsel <- function(object, threshold = 0.95, verbose = TRUE)
 #' @param verbose should convergence info be printed?
 #' @param recompute Should the Rhat statistics be recomputed?
 #' @return Potential scale reduction factors (R_hat).
-assess_convergence <- function(fit, verbose = TRUE, recompute = F){
+assess_convergence <- function(fit, verbose = FALSE, recompute = F){
   
   if(length(fit@Rhat)==0 || recompute){
     info     <- fit@model@info

@@ -42,7 +42,7 @@ likelihood is not Gaussian).}
 \item{t_test}{Optional test time points. Should only be used if \code{sample_F = TRUE}.
 Otherwise use \code{\link{lgp_predict}} after fitting the model.}
 
-\item{verbose}{Can this print some info?}
+\item{verbose}{Should more verbose output be printed?}
 
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}

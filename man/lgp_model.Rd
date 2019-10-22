@@ -11,7 +11,8 @@ lgp_model(formula, data, likelihood = "Gaussian",
   id_variable = "id", time_variable = "age", disAge_variable = NULL,
   continuous_vars = NULL, categorical_vars = NULL,
   offset_vars = NULL, variance_mask = TRUE,
-  cat_interact_kernel_type = "categorical", N_trials = NULL)
+  cat_interact_kernel_type = "categorical", N_trials = NULL,
+  verbose_mode = FALSE)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -71,6 +72,8 @@ only category \code{"1"} will have an effect).}
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
+
+\item{verbose_mode}{Should more verbose output be printed?}
 }
 \value{
 An object of class \code{lgpmodel}.

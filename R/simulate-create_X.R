@@ -30,6 +30,7 @@
 #'   \item \code{b <- mu[2] + lambda[2]*stats::runif(1)}
 #'   \item \code{c <- mu[3] + lambda[3]*stats::runif(1)}
 #' }
+#' @param verbose verbosity mode
 #' @return \code{list(X, onsets, par_cont)}
 create_X <- function(N, 
                      covariates, 
@@ -38,7 +39,8 @@ create_X <- function(N,
                      t_data,
                      t_jitter,
                      t_effect_range,
-                     continuous_info)
+                     continuous_info,
+                     verbose)
 {
   onset_range <- t_effect_range
   D    <- rep(0,5)
@@ -67,8 +69,8 @@ create_X <- function(N,
       mrn <- mean(ran)
       onset_range <- c(mrn, mrn)
       if(D[1]==1){
-        cat("Disease effect time range set to [", onset_range[1], ", ",
-            onset_range[2], "]. \n", sep="")
+        if(verbose) {cat("Disease effect time range set to [", onset_range[1], ", ",
+            onset_range[2], "]. \n", sep="") }
       }
     }else{
       stop("invalid t_effect_range!")

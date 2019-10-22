@@ -13,7 +13,7 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   skip_postproc = FALSE, t_test = NULL, threshold = 0.95,
   variance_mask = TRUE, ell_smooth = "ell_shared",
   ell_smooth_multip = 1, cat_interact_kernel_type = "categorical",
-  N_trials = NULL, ...)
+  N_trials = NULL, verbose_mode = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -92,6 +92,8 @@ only category \code{"1"} will have an effect).}
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
+
+\item{verbose_mode}{Should more verbose output be printed?}
 
 \item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
 \code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.}

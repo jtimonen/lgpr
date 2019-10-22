@@ -50,7 +50,8 @@ simulate_data <- function(N,
                           vm_params       = c(0.025, 1),
                           continuous_info = list(mu = c(pi/8,pi,-0.5), 
                                                  lambda = c(pi/8,pi,1)),
-                          N_trials        = 1)
+                          N_trials        = 1,
+                          verbose = FALSE)
 {
   if(N < 2) stop("There must be at least 2 individuals!")
   if(length(t_data) < 3) stop("There must be at least 3 time points per individual!")
@@ -70,7 +71,8 @@ simulate_data <- function(N,
                  t_data          = t_data ,
                  t_jitter        = t_jitter,
                  t_effect_range  = t_effect_range,
-                 continuous_info = continuous_info)
+                 continuous_info = continuous_info,
+                 verbose         = verbose)
   X <- IN$X
   
   # Compute X_affected

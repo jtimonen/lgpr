@@ -5,7 +5,8 @@
 \title{Fit an lgp model}
 \usage{
 lgp_fit(model, threshold, parallel = FALSE, skip_postproc = FALSE,
-  ell_smooth = "ell_shared", ell_smooth_multip = 1, ...)
+  ell_smooth = "ell_shared", ell_smooth_multip = 1, verbose = FALSE,
+  ...)
 }
 \arguments{
 \item{model}{An object of class \code{lgpmodel}.}
@@ -28,6 +29,8 @@ effect inference. Possible options are
 }}
 
 \item{ell_smooth_multip}{a multiplier for ell_smooth}
+
+\item{verbose}{should some output be printed?}
 
 \item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
 \code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.}

@@ -5,7 +5,7 @@
 \title{Simulate an input data frame X}
 \usage{
 create_X(N, covariates, names, n_categs, t_data, t_jitter, t_effect_range,
-  continuous_info)
+  continuous_info, verbose)
 }
 \arguments{
 \item{N}{Number of individuals.}
@@ -45,6 +45,8 @@ covariates are generated so that \code{x <- sin(a*t + b) + c}, where
   \item \code{b <- mu[2] + lambda[2]*stats::runif(1)}
   \item \code{c <- mu[3] + lambda[3]*stats::runif(1)}
 }}
+
+\item{verbose}{verbosity mode}
 }
 \value{
 \code{list(X, onsets, par_cont)}
