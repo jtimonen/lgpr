@@ -4,7 +4,7 @@
 \alias{compute_relevances}
 \title{Covariate and component relevance calculations}
 \usage{
-compute_relevances(FFF, y_data, info, D, ell_smooth, x_age)
+compute_relevances(FFF, y_data, info, D)
 }
 \arguments{
 \item{FFF}{a data frame of size \code{n_data} x \code{n_components+2}}
@@ -14,10 +14,6 @@ compute_relevances(FFF, y_data, info, D, ell_smooth, x_age)
 \item{info}{model info}
 
 \item{D}{a vector of length 6}
-
-\item{ell_smooth}{lengthscale for kernel smoothing}
-
-\item{x_age}{(scaled) age covariate}
 }
 \value{
 a list

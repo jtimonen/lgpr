@@ -10,10 +10,8 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   continuous_vars = NULL, categorical_vars = NULL,
   offset_vars = NULL, C_hat = NULL, DELTA = 1e-12,
   sample_F = (likelihood != "Gaussian"), parallel = FALSE,
-  skip_postproc = FALSE, t_test = NULL, threshold = 0.95,
-  variance_mask = TRUE, ell_smooth = "ell_shared",
-  ell_smooth_multip = 1, cat_interact_kernel_type = "categorical",
-  N_trials = NULL, verbose_mode = FALSE, ...)
+  skip_postproc = FALSE, threshold = 0.95, variance_mask = TRUE,
+  N_trials = NULL, verbose = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -66,34 +64,16 @@ If \code{TRUE}, then Stan is run by first defining
 
 \item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
 
-\item{t_test}{Optional test time points. Should only be used if \code{sample_F = TRUE}.
-Otherwise use \code{\link{lgp_predict}} after fitting the model.}
-
 \item{threshold}{Covariate selection threshold.}
 
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
 
-\item{ell_smooth}{Defines how to determine smoothing lengthscale for corrected shared age 
-effect inference. Possible options are
-\enumerate{
-   \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
-   component is used as \code{ell_smooth}
-   \item \code{"none"} - no correction will be performed
-   \item A numeric argument that directly defines \code{ell_smooth}
-}}
-
-\item{ell_smooth_multip}{a multiplier for ell_smooth}
-
-\item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
-Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
-only category \code{"1"} will have an effect).}
-
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
 
-\item{verbose_mode}{Should more verbose output be printed?}
+\item{verbose}{Should more verbose output be printed?}
 
 \item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
 \code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.}

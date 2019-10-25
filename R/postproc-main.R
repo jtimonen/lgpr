@@ -1,38 +1,10 @@
 #' Finalize the lgpfit object after sampling
 #'
-#' @description Creates the \code{lgpfit} slots
-#' \enumerate{
-#'   \item \code{components} - Inferred components.
-#'   \item \code{components_corrected} - Covariate-effect corrected components.
-#'   \item \code{component_relevances} - Inferred component relevances.
-#'   \item \code{covariate_relevances} - Inferred covariate relevances.
-#'   \item \code{signal_variance} - Signal variance.
-#'   \item \code{residual_variance} - Residual variance.
-#'   \item \code{covariate_selection} -  Covariate selection info
-#' }
-#' all of which are lists that contain the fields \code{samples} and \code{average}.
 #' @param fit An (incomplete) object of class \code{lgpfit}.
 #' @param threshold Covariate selection threshold.
-#' @param average_before_variance Should the variances be computed using average components?
-#' @param sample_idx If supplied, this just returns the inferred components for one sample.
-#' @param ell_smooth Defines how to determine smoothing lengthscale for corrected shared age 
-#' effect inference. Possible options are
-#' \enumerate{
-#'    \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
-#'    component is used as \code{ell_smooth}
-#'    \item \code{"none"} - no correction will be performed
-#'    \item A numeric argument that directly defines \code{ell_smooth}
-#' }
-#' @param ell_smooth_multip a multiplier for ell_smooth
 #' @param verbose Should some output be printed?
 #' @return An updated object of class \code{lgpfit}.
-postproc <- function(fit, 
-                     threshold               = 0.95, 
-                     ell_smooth              = "ell_shared",
-                     ell_smooth_multip       = 1,
-                     sample_idx              = NULL,
-                     average_before_variance = FALSE,
-                     verbose                 = FALSE){
+postproc <- function(fit, threshold = 0.95, verbose = FALSE){
   
   model  <- fit@model
   info   <- model@info
@@ -45,7 +17,7 @@ postproc <- function(fit,
   NAMES2 <- c(info$covariate_names, "noise")
   
   # Get function component samples
-  FFF      <- get_function_component_samples(fit, only_at_datapoints = TRUE)
+  FFF      <- get_function_component_samples(fit)
   n_smp    <- dim(FFF)[1]
   n_dat    <- dim(FFF)[2]
   n_cmp    <- dim(FFF)[3] - 2
@@ -53,107 +25,53 @@ postproc <- function(fit,
   # Get average inferred components
   FFF_avg  <- apply(FFF, c(2,3), mean)
   FFF_avg  <- matrix_to_df(FFF_avg)
+  if(n != n_dat){ stop("Data size sanity check failed!") }
   
-  if(n != n_dat){
-    stop("Data size sanity check failed!")
-  }
   
-  # Get shared age covariate and its lengthscale samples
-  if(D[2]>0){
-    ELL   <- get_ell_shared_samples(fit)
-    x_age <- as.numeric(sdat$X[2,])
-  }else{
-    ELL   <- NULL
-    x_age <- NULL
-  }
-  
-  if(is.null(sample_idx)){
-    
-    # Covariate and component relevance computations
-    if(average_before_variance){
-      if(verbose){ cat("* Averaging before computing variations.\n") }
-    
-      # Compute relevances using average F's
-      ell          <- get_ell_smooth(ell_smooth, ell_smooth_multip, mean(ELL))
-      REL          <- compute_relevances(FFF_avg, y_data, info, D, ell, x_age)
-      FFF_cor_avg  <- REL$FFF_cor
-      p_comp       <- REL$p_comp
-      p_cov        <- REL$p_cov
-      p_signal     <- REL$p_signal
-      svar         <- REL$svar
-      evar         <- REL$evar
-      
-    }else{
-      
-      # Compute relevances for each sample
-      if(verbose){ cat("* Computing relevances over", n_smp, "posterior samples.\n") }
-      p_comp   <- matrix(0, n_smp, n_cmp + 1)
-      p_cov    <- matrix(0, n_smp, n_cmp + 1)
-      p_signal <- rep(0, n_smp)
-      svar     <- rep(0, n_smp)
-      evar     <- rep(0, n_smp)
-      FFF_cor_avg <- matrix(0, n, n_cmp + 2)
-      for(i in 1:n_smp){
-        ell             <- get_ell_smooth(ell_smooth, ell_smooth_multip, ELL[i])
-        FFF_i           <- data.frame(FFF[i,,])
-        colnames(FFF_i) <- colnames(FFF_avg)
-        REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
-        p_comp[i,]      <- REL$p_comp
-        p_cov[i,]       <- REL$p_cov
-        p_signal[i]     <- REL$p_signal
-        svar[i]         <- REL$svar
-        evar[i]         <- REL$evar
-        FFF_i_cor       <- REL$FFF_cor
-        FFF_cor_avg     <- FFF_cor_avg + 1/n_smp*FFF_i_cor
-      }
-      colnames(FFF_cor_avg) <- colnames(FFF_i_cor)
-      colnames(p_comp)      <- NAMES1
-      colnames(p_cov)       <- NAMES2
-    }
-    if(verbose){ cat("\n") }
-    
-    # Set slot values
-    fit@components           <- FFF_avg
-    fit@components_corrected <- FFF_cor_avg
-    fit@component_relevances <- list(samples = p_comp, average = colMeans(p_comp))
-    fit@covariate_relevances <- list(samples = p_cov, average = colMeans(p_cov))
-    fit@signal_variance      <- svar
-    fit@residual_variance    <- evar
-    fit@covariate_selection  <- varsel(fit, threshold, verbose)
-    fit@postproc_info        <- list(threshold               = threshold,
-                                     ell_smooth              = ell_smooth,
-                                     ell_smooth_multip       = ell_smooth_multip,
-                                     average_before_variance = average_before_variance)
-    return(fit)
-  }else{
-    # Just get one sample
-    if(average_before_variance){stop("Should not average if taking one sample!")}
-    FFF_i           <- data.frame(FFF[sample_idx,,])
+  # Compute relevances for each sample
+  if(verbose){ cat("* Computing relevances over", n_smp, "posterior samples.\n") }
+  p_comp   <- matrix(0, n_smp, n_cmp + 1)
+  p_signal <- rep(0, n_smp)
+  svar     <- rep(0, n_smp)
+  evar     <- rep(0, n_smp)
+  for(i in 1:n_smp){
+    FFF_i           <- data.frame(FFF[i,,])
     colnames(FFF_i) <- colnames(FFF_avg)
-    ell             <- get_ell_smooth(ell_smooth, ell_smooth_multip, ELL[sample_idx])
-    if(verbose){ cat("ell_smooth =", ell, "\n") }
-    REL             <- compute_relevances(FFF_i, y_data, info, D, ell, x_age)
-    FFF_i_cor       <- REL$FFF_cor
-    out             <- list(components = FFF_i, corrected = FFF_i_cor)
-    return(out)
+    REL             <- compute_relevances(FFF_i, y_data, info, D)
+    p_comp[i,]      <- REL$p_comp
+    p_signal[i]     <- REL$p_signal
+    svar[i]         <- REL$svar
+    evar[i]         <- REL$evar
   }
+  colnames(p_comp)  <- NAMES1
+  
+  if(verbose){ cat("\n") }
+  
+  # Set slot values
+  fit@components         <- FFF_avg
+  fit@relevances         <- list(samples = p_comp, 
+                                 average = colMeans(p_comp))
+  fit@signal_variance    <- svar
+  fit@residual_variance  <- evar
+  fit@selection          <- selection(fit, threshold, verbose)
+  return(fit)
   
 }
 
 
-#' Covariate selection
+#' Select relevant components
 #'
 #' @export
 #' @param object An object of class \code{lgpfit}.
 #' @param threshold A threshold for proportion of explained variance
 #' @param verbose should this print some output
 #' @return the selected covariates
-varsel <- function(object, threshold = 0.95, verbose = FALSE)
+selection <- function(object, threshold = 0.95, verbose = FALSE)
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
   if(threshold > 1 || threshold < 0) stop("'threshold' must be between 0 and 1!")
   info       <- object@model@info
-  rel        <- object@covariate_relevances$average
+  rel        <- object@relevances$average
   rel        <- sort(rel, decreasing = TRUE)
   i_noise    <- which(names(rel)=="noise")
   rel_rem    <- rel[-i_noise]
@@ -164,15 +82,19 @@ varsel <- function(object, threshold = 0.95, verbose = FALSE)
     if(h > threshold){
       selected <- names(rel[1:j])
       if(verbose){
-        cat("* The following covariates explain ", round(h*100,2), "% of variance: {", sep="")
+        cat("* The following components explain ", round(h*100,2), "% of variance: {", sep="")
         str <- paste(selected, collapse=", ")
         cat(str)
         cat("}.\n")
       }
-      return(list(selected = selected, ev_sum = h, prop_ev = rel))
+      res <- list(selected = selected, ev_sum = h, 
+                  prop_ev = rel, threshold = threshold)
+      return(res)
     }
   }
-  return(list(selected = names(rel), ev_sum = 1, prop_ev = rel))
+  res <- list(selected = names(rel), ev_sum = 1,
+              prop_ev = rel, threshold = threshold)
+  return(res)
 }
 
 

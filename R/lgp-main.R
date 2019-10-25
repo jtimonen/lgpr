@@ -24,14 +24,10 @@ lgp <- function(formula,
                 sample_F         = (likelihood!= "Gaussian"),
                 parallel         = FALSE,
                 skip_postproc    = FALSE,
-                t_test           = NULL,
                 threshold        = 0.95,
                 variance_mask    = TRUE,
-                ell_smooth       = "ell_shared",
-                ell_smooth_multip = 1,
-                cat_interact_kernel_type = "categorical",
                 N_trials         = NULL,
-                verbose_mode     = FALSE,
+                verbose          = FALSE,
                 ...)
 {
   # Create the model
@@ -44,7 +40,6 @@ lgp <- function(formula,
                      C_hat            = C_hat,
                      DELTA            = DELTA,
                      sample_F         = sample_F,
-                     t_test           = t_test,
                      id_variable      = id_variable,
                      time_variable    = time_variable,
                      disAge_variable  = disAge_variable,
@@ -52,20 +47,17 @@ lgp <- function(formula,
                      categorical_vars = categorical_vars,
                      offset_vars      = offset_vars,
                      variance_mask    = variance_mask,
-                     cat_interact_kernel_type  = cat_interact_kernel_type,
                      N_trials         = N_trials,
-                     verbose_mode     = verbose_mode)
+                     verbose          = verbose)
   
-  if(verbose_mode){ show(model) }
+  if(verbose){ show(model) }
   
   # Fit the model
   fit <- lgp_fit(model         = model, 
                  threshold     = threshold,
                  parallel      = parallel, 
                  skip_postproc = skip_postproc,
-                 ell_smooth    = ell_smooth,
-                 ell_smooth_multip = ell_smooth_multip,
-                 verbose       =  verbose_mode,
+                 verbose       = verbose,
                  ...)
   
   # Return the lgpfit object
@@ -94,8 +86,6 @@ lgp <- function(formula,
 #' set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response variable.
 #' @param sample_F Determines if the function values are be sampled (must be \code{TRUE} if
 #' likelihood is not Gaussian).
-#' @param t_test Optional test time points. Should only be used if \code{sample_F = TRUE}.
-#' Otherwise use \code{\link{lgp_predict}} after fitting the model.
 #' @param id_variable Name of the unique subject identifier variable.
 #' @param time_variable Name of the time variable.
 #' @param disAge_variable Name of the disease-related age variable. If {NULL}, this
@@ -110,13 +100,10 @@ lgp <- function(formula,
 #' covariates.
 #' @param variance_mask Should a variance mask be used to force disease component
 #' variance to zero before disease onset?
-#' @param cat_interact_kernel_type Kernel type for categorical variables (other than id). 
-#' Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
-#' only category \code{"1"} will have an effect).
 #' @param N_trials This argument (number of trials) is only needed when likelihood is binomial.
 #' Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 #' Bernoulli observation model.
-#' @param verbose_mode Should more verbose output be printed?
+#' @param verbose Should more verbose output be printed?
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
@@ -126,9 +113,8 @@ lgp_model <- function(formula,
                       uncertain_effect_time = FALSE,
                       equal_effect     = TRUE,
                       C_hat            = NULL,
-                      DELTA            = 1e-12,
+                      DELTA            = 1e-8,
                       sample_F         = (likelihood!= "Gaussian"),
-                      t_test           = NULL,
                       id_variable      = "id",
                       time_variable    = "age",
                       disAge_variable  = NULL,
@@ -136,9 +122,8 @@ lgp_model <- function(formula,
                       categorical_vars = NULL,
                       offset_vars      = NULL,
                       variance_mask    = TRUE,
-                      cat_interact_kernel_type = "categorical",
                       N_trials         = NULL,
-                      verbose_mode     = FALSE
+                      verbose          = FALSE
 )
 {
   # Model as a string
@@ -166,10 +151,8 @@ lgp_model <- function(formula,
                                C_hat          = C_hat,
                                DELTA          = DELTA,
                                sample_F       = sample_F,
-                               t_test         = t_test,
-                               verbose        = verbose_mode,
+                               verbose        = verbose,
                                variance_mask  = variance_mask,
-                               cat_interact_kernel_type = cat_interact_kernel_type,
                                N_trials       = N_trials)
   
   # Data to Stan
@@ -180,14 +163,13 @@ lgp_model <- function(formula,
   info <- list(likelihood      = lh_str,
                formula         = f,
                varInfo         = PREPROC$varInfo,
-               sample_F        = as.logical(stan_dat$F_is_sampled),
+               sample_F        = as.logical(stan_dat$F_IS_SAMPLED),
                C_hat           = stan_dat$C_hat,
                DELTA           = stan_dat$DELTA,
                component_names = lgp_component_names(stan_dat),
                covariate_names = lgp_covariate_names(stan_dat),
                response_name   = fc[2],
                variance_mask   = variance_mask,
-               cat_interact_kernel_type = cat_interact_kernel_type,
                N_trials        = N_trials)
   
   # Create the 'lgpmodel' object
@@ -214,15 +196,6 @@ lgp_model <- function(formula,
 #' \code{options(mc.cores = } \code{parallel::detectCores())}.
 #' @param skip_postproc In this mode the postprocessing after running Stan is skipped.
 #' @param threshold Covariate selection threshold.
-#' @param ell_smooth Defines how to determine smoothing lengthscale for corrected shared age 
-#' effect inference. Possible options are
-#' \enumerate{
-#'    \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
-#'    component is used as \code{ell_smooth}
-#'    \item \code{"none"} - no correction will be performed
-#'    \item A numeric argument that directly defines \code{ell_smooth}
-#' }
-#' @param ell_smooth_multip a multiplier for ell_smooth
 #' @param verbose should some output be printed?
 #' @return An object of class \code{lgpfit}.
 #' @seealso For the possible additional arguments, see \code{\link[rstan]{sampling}}.
@@ -232,8 +205,6 @@ lgp_fit <- function(model,
                     threshold, 
                     parallel          = FALSE, 
                     skip_postproc     = FALSE, 
-                    ell_smooth        = "ell_shared",
-                    ell_smooth_multip = 1,
                     verbose           = FALSE,
                     ...)
 {
@@ -269,11 +240,8 @@ lgp_fit <- function(model,
       if(verbose){ cat("* Begin postprocessing. \n") }
       fit@Rhat <- assess_convergence(fit)
       fit      <- postproc(fit, 
-                           threshold               = threshold, 
-                           ell_smooth              = ell_smooth,
-                           ell_smooth_multip       = ell_smooth_multip,
-                           average_before_variance = FALSE,
-                           verbose                 = verbose)
+                           threshold = threshold, 
+                           verbose   = verbose)
       if(verbose){ show(fit) }
     }else{
       if(verbose){ cat("* Skipped postprocessing.\n") }

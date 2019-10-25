@@ -4,15 +4,13 @@
 \alias{plot_component}
 \title{Visualize one (average) inferred component evaluated at data points}
 \usage{
-plot_component(fit, idx, corrected = TRUE, sample_idx = NULL,
-  linealpha = 1, linetype = 3)
+plot_component(fit, idx, sample_idx = NULL, linealpha = 1,
+  linetype = 3)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
 \item{idx}{Index of component to be plotted.}
-
-\item{corrected}{Should this plot a covariate-effect corrected component?}
 
 \item{sample_idx}{If given, only one sample will be plotted, else the average
 components over all samples.}

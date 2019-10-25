@@ -1,12 +1,8 @@
 
 #' Get values of sampled function components at data points
 #' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @param only_at_datapoints Should the values be obtained only at data points
-#' or also test points?
-#' @return An array of size \code{n_samples} x \code{n_data} x \code{n_components+2} if
-#' \code{only_at_datapoints} is \code{TRUE}, else the size is
-#' \code{n_samples} x \code{n_total} x \code{n_components+2} 
-get_function_component_samples <- function(fit, only_at_datapoints)
+#' @return An array of size \code{n_samples} x \code{n_data} x \code{n_components+2}
+get_function_component_samples <- function(fit)
 {
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   info  <- fit@model@info
@@ -17,9 +13,6 @@ get_function_component_samples <- function(fit, only_at_datapoints)
   
   # Get function components
   if(!info$sample_F){
-    if(!only_at_datapoints){
-      stop("There cannot not be test points because F was not sampled!")
-    }
     F_cmp <- rstan::extract(sf, pars = "F_mean_cmp")$F_mean_cmp[,1,,]
     n_dim <- length(dim(F_cmp))
     if(n_dim==3){
@@ -69,16 +62,6 @@ get_function_component_samples <- function(fit, only_at_datapoints)
   FFF[,,n_cmp+1]  <- F_tot
   FFF[,,n_cmp+2]  <- G_tot
   
-  # Remove possible samples at test points
-  n <- fit@model@stan_dat$n
-  if(only_at_datapoints){
-    FFF <- FFF[,1:n,]
-  }else{
-    n_test <- fit@model@stan_dat$n_test
-    if(n_test==0){
-      stop("There are no test points!")
-    }
-  }
   nam <- info$component_names
   nam <- c(nam, "f", "g")
   dimnames(FFF)[[3]] <- nam
@@ -90,11 +73,9 @@ get_function_component_samples <- function(fit, only_at_datapoints)
 #' @param FFF a data frame of size \code{n_data} x \code{n_components+2}
 #' @param y_data (scaled) measurements of the response variable
 #' @param info model info
-#' @param ell_smooth lengthscale for kernel smoothing
 #' @param D a vector of length 6
-#' @param x_age (scaled) age covariate
 #' @return a list
-compute_relevances <- function(FFF, y_data, info, D, ell_smooth, x_age){
+compute_relevances <- function(FFF, y_data, info, D){
   
   # Signal variance
   y_pred   <- FFF$g
@@ -119,37 +100,11 @@ compute_relevances <- function(FFF, y_data, info, D, ell_smooth, x_age){
   names(p_comp) <- nam
   p_comp        <- t(as.matrix(p_comp))
   
-  # Estimate the shared age effect in interaction terms
-  if(D[2]>0 && (D[1]+D[5]) > 0){
-    i_edit <- (sum(D[1:4])+1):sum(D[1:5])
-    if(D[1]){
-      i_edit <- c(D[1], i_edit)
-    }
-    FFF_cor <- separate_effects(FFF, x_age, D, ell_smooth, i_edit)
-  }else{
-    FFF_cor <- FFF
-  }
-  
-  # Covariate relevances
-  if(n_cmp > 1){
-    p_cov   <- apply(FFF_cor[,1:n_cmp], 2, stats::var)
-    p_cov   <- p_cov/sum(p_cov)*p_signal  
-  }else{
-    p_cov <- p_signal
-  }          
-  nam          <- c(info$covariate_names, "noise")
-  p_cov        <- c(p_cov, 1-p_signal)
-  names(p_cov) <- nam
-  p_cov        <- t(as.matrix(p_cov))
-  
-  
   # Create the returned list
   ret <- list(p_comp   = p_comp,
-              p_cov    = p_cov,
               p_signal = p_signal,
               svar     = svar,
-              evar     = evar,
-              FFF_cor  = FFF_cor)
+              evar     = evar)
   return(ret)
 }
 

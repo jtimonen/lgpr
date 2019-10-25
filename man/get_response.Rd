@@ -4,7 +4,7 @@
 \alias{get_response}
 \title{Get the (scaled) response variable}
 \usage{
-get_response(data, varInfo, standardize, likelihood)
+get_response(data, varInfo, standardize, LH)
 }
 \arguments{
 \item{data}{the data frame given as input to \code{lgp}}
@@ -13,7 +13,7 @@ get_response(data, varInfo, standardize, likelihood)
 
 \item{standardize}{should the response be standardized to unit variance and zero mean}
 
-\item{likelihood}{the likelihood}
+\item{LH}{likelihood as integer}
 }
 \value{
 a list with the (scaled) response variable

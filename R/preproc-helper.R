@@ -236,10 +236,10 @@ standardize_inputs <- function(X, D){
 #' @param data the data frame given as input to \code{lgp}
 #' @param varInfo variable type info
 #' @param standardize should the response be standardized to unit variance and zero mean
-#' @param likelihood the likelihood
+#' @param LH likelihood as integer
 #' @return a list with the (scaled) response variable
 #'
-get_response <- function(data, varInfo, standardize, likelihood){
+get_response <- function(data, varInfo, standardize, LH){
   
   yName      <- varInfo$response_variable
   response   <- data[yName]
@@ -251,8 +251,9 @@ get_response <- function(data, varInfo, standardize, likelihood){
   }
   
   # Do some checks and update info
+  lh_not_01 <- !(LH %in% c(0,1))
   if(standardize){
-    if(!(likelihood %in% c("none", "Gaussian"))){
+    if(lh_not_01){
       stop("Standardization of response is only possible if likelihood is 'Gaussian' or 'none'!")
     }
   }
@@ -270,7 +271,7 @@ get_response <- function(data, varInfo, standardize, likelihood){
   response <- sclfun(response)
   
   # Check the response for negative values or non-integer values
-  if(!(likelihood %in% c("none", "Gaussian"))){
+  if(lh_not_01){
     if(sum(response<0) > 0){
       msg <- paste("The response variable contains negative values. ",
                    "Only the likelihoods 'Gaussian' and 'none' are allowed in such case!\n", sep="")
@@ -291,45 +292,89 @@ get_response <- function(data, varInfo, standardize, likelihood){
 }
 
 
-#' Set a lot of generic variables that the Stan model needs as input
+#' Get some dimension variables that the Stan model needs as input
 #'
 #' @param X the design matrix
 #' @param D a vector of length 6
-#' @param likelihood the `likelihood` input to \code{lgp}
 #' @return a list
-get_model_dims <- function(X, D, likelihood){
+get_model_dims <- function(X, D){
   
-  # Dimensions
   N_tot <- length(unique(X[,1]))
   n     <- dim(X)[1]
   d     <- dim(X)[2]
-  
-  # Get likelihood
-  if(likelihood=="none"){
-    LH <- 0
-  }else if(likelihood=="Gaussian"){
-    LH <- 1
-  }else if(likelihood=="Poisson"){
-    LH <- 2
-  }else if(likelihood=="NB"){
-    LH <- 3
-  }else if(likelihood=="binomial"){
-    LH <- 4
-  }else{
-    stop("The likelihood must be either 'none', 'Gaussian', 'Poisson', 'binomial', or 'NB'!")
-  }
-  
-  # Return
-  ret <- list(
-    n     = n,
-    d     = d,
-    D     = D,
-    N_tot = N_tot,
-    LH    = LH
-  )
-  
+  ret    <- list(n = n, d = d, D = D, N_tot = N_tot)
   return(ret)
 }
 
+#' Count numbers of different categories for each categorical variable
+#'
+#' @param X the design matrix
+#' @param D a vector of length 6
+#' @return a numeric vector
+set_N_cat <- function(X, D){
+  
+  N_cat    <- rep(0, 1+D[5]+D[6])
+  j0       <- 2 + D[3] + D[4]
+  x1       <- X[, 1]
+  N_cat[1] <- length(unique(x1)) # should equal to number of individuals
+  if(D[5]>0){
+    for(j in 1:D[5]){
+      xj <- X[, j0 + j]
+      N_cat[1 + j] <- length(unique(xj))
+    }
+  }
+  if(D[6]>0){
+    for(j in 1:D[6]){
+      xj <- X[, j0 + D[5] + j]
+      N_cat[1 + D[5] + j] <- length(unique(xj))
+    }
+  }
+  return(as.array(N_cat))
+}
 
+#' Set C_hat (Poisson and NB observation models)
+#'
+#' @param C_hat the C_hat argument given as input to \code{lgp}
+#' @param response response variable
+#' @param LH likelihood as int
+#' @return a real number
+set_C_hat <- function(C_hat, response, LH){
+  nb_or_pois <- LH %in% c(2,3)
+  if(is.null(C_hat)){
+    if(nb_or_pois){
+      C_hat <- log(mean(response))
+    }else{
+      C_hat <- 0
+    }
+  }else{
+    if(!nb_or_pois){
+      stop("Only give the C_hat argument if observation model is Poisson or NB!")
+    }
+  }
+  return(C_hat)
+}
+
+
+#' Set N_trials (binomial and Bernoulli observation models)
+#'
+#' @param N_trials the N_trials argument given as input to \code{lgp}
+#' @param response response variable
+#' @param LH likelihood as int
+#' @return a numeric vector
+set_N_trials <- function(N_trials, response, LH){
+  if(is.null(N_trials)){
+    N_trials <- rep(1, length(response))
+  }else{
+    if(LH != 4){
+      stop("Only give the N_trials argument if likelihood is binomial!")
+    }
+    if(length(N_trials)==1){
+      N_trials <- rep(N_trials, length(response))
+    }
+    if(length(N_trials)!= length(response)){
+      stop("Invalid length of N_trials!")
+    }
+  }
+  return(N_trials)
+}
 

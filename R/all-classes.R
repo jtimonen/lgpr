@@ -65,17 +65,13 @@ setMethod(f = "show",
 
 #' An S4 class to represent the output of the \code{lgp_fit} function
 #' 
-#' @description All slots that are lists contain fields 'samples' and 'average'.
 #' @slot stan_fit The \code{stanfit} object returned by \code{rstan::sampling}.
 #' @slot model The \code{lgpmodel} object returned by \code{lgp_model}.
 #' @slot components Inferred components.
-#' @slot components_corrected Covariate-effect corrected components.
-#' @slot component_relevances Inferred component relevances.
-#' @slot covariate_relevances Inferred covariate relevances.
-#' @slot covariate_selection Covariate selection info.
+#' @slot relevances Inferred component relevances.
+#' @slot selection Covariate selection info.
 #' @slot signal_variance Signal variance.
 #' @slot residual_variance Residual variance.
-#' @slot postproc_info Postprocessing information.
 #' @slot pkg_version Package version number.
 #' @slot Rhat Split Rhat statistics.
 #'
@@ -88,15 +84,12 @@ lgpfit <- setClass(
     stan_fit             = "stanfit",
     model                = "lgpmodel",
     components           = "data.frame",
-    components_corrected = "data.frame",
-    component_relevances = "list",
-    covariate_relevances = "list",
+    relevances           = "list",
+    selection            = "list",
     signal_variance      = "numeric",
     residual_variance    = "numeric",
-    Rhat                 = "numeric",
-    covariate_selection  = "list",
-    postproc_info        = "list",
-    pkg_version          = "character"
+    pkg_version          = "character",
+    Rhat                 = "numeric"
   )
 )
 
@@ -113,10 +106,8 @@ setMethod(f = "show",
           {
             cat("\n ---------- LGPFIT SUMMARY ----------\n\n")
             n_chains <- length(object@stan_fit@inits)
-            LP       <- rstan::get_logposterior(object@stan_fit)
             runtime  <- get_runtime(object)
             
-            cat("* Chains: ", n_chains, "\n", sep="")
             cat("* Average runtime per chain: ",
                 runtime$warmup, " s (warmup) and ",
                 runtime$sampling, " s (sampling)\n", sep="")
@@ -125,14 +116,20 @@ setMethod(f = "show",
             sv <- object@signal_variance
             rv <- object@residual_variance
             pevf <- mean(sv/(sv+rv))
+            sel  <- object@selection
+            tr   <- sel$threshold
             
             cat("* Proportion of signal = ", round(pevf, 3), "\n", sep="")
-            cat("* Covariate relevances:\n")
+            cat("* Selection threshold = ", tr, "\n", sep ="")
+
+            rel  <- object@relevances$average
+            cn   <- names(rel)
+            r1   <- round(rel,3)
+            r2   <- cn %in% sel$selected
+            DF   <- data.frame(r1,r2)
             cat("\n")
             
-            rel          <- object@covariate_relevances$average
-            DF           <- round(rbind(rel),3)
-            rownames(DF) <- c("relevance")
+            colnames(DF) <- c("Relevance", "Selected" )
             print(DF)
             cat("\n")
           }

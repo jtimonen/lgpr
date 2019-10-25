@@ -6,13 +6,12 @@
 \usage{
 lgp_model(formula, data, likelihood = "Gaussian",
   prior = prior_default(likelihood), uncertain_effect_time = FALSE,
-  equal_effect = TRUE, C_hat = NULL, DELTA = 1e-12,
-  sample_F = (likelihood != "Gaussian"), t_test = NULL,
-  id_variable = "id", time_variable = "age", disAge_variable = NULL,
+  equal_effect = TRUE, C_hat = NULL, DELTA = 1e-08,
+  sample_F = (likelihood != "Gaussian"), id_variable = "id",
+  time_variable = "age", disAge_variable = NULL,
   continuous_vars = NULL, categorical_vars = NULL,
-  offset_vars = NULL, variance_mask = TRUE,
-  cat_interact_kernel_type = "categorical", N_trials = NULL,
-  verbose_mode = FALSE)
+  offset_vars = NULL, variance_mask = TRUE, N_trials = NULL,
+  verbose = FALSE)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -41,9 +40,6 @@ set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response varia
 \item{sample_F}{Determines if the function values are be sampled (must be \code{TRUE} if
 likelihood is not Gaussian).}
 
-\item{t_test}{Optional test time points. Should only be used if \code{sample_F = TRUE}.
-Otherwise use \code{\link{lgp_predict}} after fitting the model.}
-
 \item{id_variable}{Name of the unique subject identifier variable.}
 
 \item{time_variable}{Name of the time variable.}
@@ -65,15 +61,11 @@ covariates.}
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
 
-\item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
-Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
-only category \code{"1"} will have an effect).}
-
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
 
-\item{verbose_mode}{Should more verbose output be printed?}
+\item{verbose}{Should more verbose output be printed?}
 }
 \value{
 An object of class \code{lgpmodel}.

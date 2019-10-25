@@ -5,8 +5,8 @@
 \title{Create input for Stan}
 \usage{
 create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
-  uncertain_effect_time, equal_effect, C_hat, DELTA, sample_F, t_test,
-  verbose, variance_mask, cat_interact_kernel_type, N_trials)
+  uncertain_effect_time, equal_effect, C_hat, DELTA, sample_F, verbose,
+  variance_mask, N_trials)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -39,17 +39,10 @@ set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response varia
 \item{sample_F}{Determines if the function values are be sampled (must be \code{TRUE} if
 likelihood is not Gaussian).}
 
-\item{t_test}{Optional test time points. Should only be used if \code{sample_F = TRUE}.
-Otherwise use \code{\link{lgp_predict}} after fitting the model.}
-
 \item{verbose}{Should more verbose output be printed?}
 
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
-
-\item{cat_interact_kernel_type}{Kernel type for categorical variables (other than id). 
-Possible options are \code{"categorical"} (default) and \code{"binary"} (mask kernel where
-only category \code{"1"} will have an effect).}
 
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 

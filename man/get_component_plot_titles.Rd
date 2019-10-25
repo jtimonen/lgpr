@@ -4,11 +4,9 @@
 \alias{get_component_plot_titles}
 \title{Get inferred components}
 \usage{
-get_component_plot_titles(corrected = TRUE, sample_idx = NULL)
+get_component_plot_titles(sample_idx = NULL)
 }
 \arguments{
-\item{corrected}{Should this obtain the covariate-effect corrected components?}
-
 \item{sample_idx}{Integer or NULL}
 }
 \value{

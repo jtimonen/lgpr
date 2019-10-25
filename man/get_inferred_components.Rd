@@ -4,12 +4,10 @@
 \alias{get_inferred_components}
 \title{Get inferred components}
 \usage{
-get_inferred_components(fit, corrected = TRUE, sample_idx = NULL)
+get_inferred_components(fit, sample_idx = NULL)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
-
-\item{corrected}{Should this obtain the covariate-effect corrected components?}
 
 \item{sample_idx}{If given, only one sample will be obtained else the average
 components over all samples.}

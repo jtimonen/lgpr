@@ -24,13 +24,36 @@ likelihood_as_str <- function(LH){
   }else if(LH==2){
     str <- "Poisson"
   }else if(LH==3){
-    str <- "negative binomial"
+    str <- "NB"
   }else if(LH==4){
     str <- "binomial"
   }else{
     str <- "Unknown likelihood"
   }
   return(str)
+}
+
+
+#' Convert likelihood string to Stan encoding
+#'
+#' @param likelihood a string
+#' @return an integer
+likelihood_as_int <- function(likelihood){
+  likelihood <- tolower(likelihood)
+  if(likelihood=="none"){
+    LH <- 0
+  }else if(likelihood=="gaussian"){
+    LH <- 1
+  }else if(likelihood=="poisson"){
+    LH <- 2
+  }else if(likelihood=="nb"){
+    LH <- 3
+  }else if(likelihood=="binomial"){
+    LH <- 4
+  }else{
+    stop("likelihood must be either 'none', 'Gaussian', 'Poisson', 'binomial', or 'NB'!")
+  }
+  return(LH)
 }
 
 
@@ -138,25 +161,6 @@ model_info <- function(object, print = TRUE){
 }
 
 
-#' Extract inferred components for one sample
-#'
-#' @param fit an object of class \code{lgpfit}
-#' @param sample_idx sample index
-#' @return a list
-extract_components_onesample <- function(fit, sample_idx){
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  pinfo <- fit@postproc_info
-  ret <- postproc(fit, 
-                  threshold               = pinfo$threshold,
-                  ell_smooth              = pinfo$ell_smooth,
-                  ell_smooth_multip       = pinfo$ell_smooth_multip,
-                  average_before_variance = pinfo$average_before_variance,
-                  sample_idx              = sample_idx)
-  
-  return(ret)  
-}
-
-
 #' Extract observed disease onset times from diseaseAge covariate vector
 #'
 #' @param id the id covariate, vector of length \code{n}
@@ -216,55 +220,6 @@ get_case_ids <- function(fit){
   i1  <- sd$caseID_to_rows[,1]
   cid <- id[i1]
   return(cid)
-}
-
-#' Print info about component and covariate relevances
-#'
-#' @param fit an object of class \code{lgpfit}
-#' @return nothing
-show_relevances <- function(fit){
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  r1 <- fit@covariate_relevances$average
-  r2 <- fit@component_relevances$average
-  cat("Covariate relevances: \n\n")
-  print(round(r1, 5))
-  cat("\nComponent relevances: \n\n")
-  print(round(r2, 5))
-  ell_smooth <- fit@postproc_info$ell_smooth
-  ell_smooth_multip <- fit@postproc_info$ell_smooth_multip
-  cat("\nell_smooth =", ell_smooth, "\n")
-  cat("ell_smooth_multip =", ell_smooth_multip, "\n")
-}
-
-#' Extract samples of the shared age lengthscale
-#'
-#' @param fit an object of class 'lgpfit'
-#' @return a vector
-get_ell_shared_samples <- function(fit){
-  D <- fit@model@stan_dat$D
-  if(D[2]==0){stop("Model does not contain a shared age component!")}
-  ELL <- rstan::extract(fit@stan_fit, pars = "lengthscale_sharedAge")[[1]]
-  return(ELL)
-}
-
-#' A convenience function used in postproc-main.R
-#'
-#' @param ell_smooth a character or numeric argument
-#' @param ell_smooth_multip numeric
-#' @param ell_smp numeric
-#' @return a number
-get_ell_smooth <- function(ell_smooth, ell_smooth_multip, ell_smp){
-  if(is.numeric(ell_smooth)){
-    ell <- ell_smooth * ell_smooth_multip
-  }else if(is.character(ell_smooth)){
-    if(ell_smooth == "ell_shared"){
-      ell <- ell_smp * ell_smooth_multip
-    }else if(ell_smooth == "none"){
-      ell <- NULL
-    }else{
-      stop("Invalid keyword '", ell_smooth, "' for ell_smooth!")
-    }
-  }
 }
 
 

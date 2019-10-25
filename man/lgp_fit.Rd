@@ -5,8 +5,7 @@
 \title{Fit an lgp model}
 \usage{
 lgp_fit(model, threshold, parallel = FALSE, skip_postproc = FALSE,
-  ell_smooth = "ell_shared", ell_smooth_multip = 1, verbose = FALSE,
-  ...)
+  verbose = FALSE, ...)
 }
 \arguments{
 \item{model}{An object of class \code{lgpmodel}.}
@@ -18,17 +17,6 @@ If \code{TRUE}, then Stan is run by first defining
 \code{options(mc.cores = } \code{parallel::detectCores())}.}
 
 \item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
-
-\item{ell_smooth}{Defines how to determine smoothing lengthscale for corrected shared age 
-effect inference. Possible options are
-\enumerate{
-   \item \code{"ell_shared"} (default) - the sampled lengthscale of the shared age 
-   component is used as \code{ell_smooth}
-   \item \code{"none"} - no correction will be performed
-   \item A numeric argument that directly defines \code{ell_smooth}
-}}
-
-\item{ell_smooth_multip}{a multiplier for ell_smooth}
 
 \item{verbose}{should some output be printed?}
 

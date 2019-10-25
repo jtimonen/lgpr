@@ -92,7 +92,7 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
   p_PHI <- PAR[[8]]
   p_BET <- c(prior$beta$shape1, prior$beta$shape2)
   
-  # Parse prior of uncertain disease onset
+  # Parse prior of uncertain disease effect time
   ONSET <- parse_prior_onset(prior$onset, N_cases, T_observed, T_last, UNCRT)
   
   # Things returned and given to Stan
@@ -111,8 +111,9 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
                       p_ONS = ONSET$p_ONS, 
                       L_ons = ONSET$L_ons,
                       U_ons = ONSET$U_ons,
-                      backwards = ONSET$backwards,
-                      relative  = ONSET$relative,
+                      
+                      BACKWARDS = ONSET$backwards,
+                      RELATIVE  = ONSET$relative,
                       vm_params = prior$vm_params
   )
   

@@ -4,15 +4,13 @@
 \alias{plot_components}
 \title{Visualize the (average) inferred components evaluated at data points}
 \usage{
-plot_components(fit, corrected = TRUE, title = NULL,
-  sample_idx = NULL, linealpha = 1, linetype = 3,
-  return_list = FALSE, ncol = NULL, nrow = NULL, legend = NULL,
-  labels = "auto", ylim = NULL)
+plot_components(fit, title = NULL, sample_idx = NULL, linealpha = 1,
+  linetype = 3, return_list = FALSE, ncol = NULL, nrow = NULL,
+  legend = NULL, labels = "auto", ylim = NULL, font_size = 9,
+  theme = ggplot2::theme_minimal())
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
-
-\item{corrected}{Should this plot the covariate-effect corrected components?}
 
 \item{title}{optional prefix to plot title}
 
@@ -34,6 +32,10 @@ components over all samples.}
 \item{labels}{labels argument for ggarrange}
 
 \item{ylim}{y axis limits}
+
+\item{font_size}{font size for plots}
+
+\item{theme}{ggplot theme}
 }
 \value{
 alist of ggplot objects or one combined plot

@@ -6,7 +6,7 @@
 \alias{lgpfit}
 \title{An S4 class to represent the output of the \code{lgp_fit} function}
 \description{
-All slots that are lists contain fields 'samples' and 'average'.
+An S4 class to represent the output of the \code{lgp_fit} function
 }
 \section{Slots}{
 
@@ -17,19 +17,13 @@ All slots that are lists contain fields 'samples' and 'average'.
 
 \item{\code{components}}{Inferred components.}
 
-\item{\code{components_corrected}}{Covariate-effect corrected components.}
+\item{\code{relevances}}{Inferred component relevances.}
 
-\item{\code{component_relevances}}{Inferred component relevances.}
-
-\item{\code{covariate_relevances}}{Inferred covariate relevances.}
-
-\item{\code{covariate_selection}}{Covariate selection info.}
+\item{\code{selection}}{Covariate selection info.}
 
 \item{\code{signal_variance}}{Signal variance.}
 
 \item{\code{residual_variance}}{Residual variance.}
-
-\item{\code{postproc_info}}{Postprocessing information.}
 
 \item{\code{pkg_version}}{Package version number.}
 

@@ -2,20 +2,18 @@
 % Please edit documentation in R/preproc-helper.R
 \name{get_model_dims}
 \alias{get_model_dims}
-\title{Set a lot of generic variables that the Stan model needs as input}
+\title{Get some dimension variables that the Stan model needs as input}
 \usage{
-get_model_dims(X, D, likelihood)
+get_model_dims(X, D)
 }
 \arguments{
 \item{X}{the design matrix}
 
 \item{D}{a vector of length 6}
-
-\item{likelihood}{the `likelihood` input to \code{lgp}}
 }
 \value{
 a list
 }
 \description{
-Set a lot of generic variables that the Stan model needs as input
+Get some dimension variables that the Stan model needs as input
 }

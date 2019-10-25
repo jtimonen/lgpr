@@ -4,18 +4,13 @@
 \alias{get_function_component_samples}
 \title{Get values of sampled function components at data points}
 \usage{
-get_function_component_samples(fit, only_at_datapoints)
+get_function_component_samples(fit)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
-
-\item{only_at_datapoints}{Should the values be obtained only at data points
-or also test points?}
 }
 \value{
-An array of size \code{n_samples} x \code{n_data} x \code{n_components+2} if
-\code{only_at_datapoints} is \code{TRUE}, else the size is
-\code{n_samples} x \code{n_total} x \code{n_components+2}
+An array of size \code{n_samples} x \code{n_data} x \code{n_components+2}
 }
 \description{
 Get values of sampled function components at data points

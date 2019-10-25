@@ -21,26 +21,24 @@ create_stan_input <- function(formula,
                               C_hat,
                               DELTA,
                               sample_F,
-                              t_test,
                               verbose,
                               variance_mask,
-                              cat_interact_kernel_type,
                               N_trials)
 {
   
+  # Parse likelihood
+  LH  <- likelihood_as_int(likelihood)
+  
   # Check sample_F input
-  if(!sample_F && likelihood!="Gaussian"){
+  if(!sample_F && LH!=1){
     stop("sample_F must be true if likelihood is not Gaussian")
-  }
-  if(!sample_F && !is.null(t_test)){
-    stop("t_test must be NULL if F is not sampled!")
   }
   
   # Check the model formula
   check_formula(formula, data)
   
   # Get the (scaled) response variable
-  RESP       <- get_response(data, varInfo, standardize, likelihood)
+  RESP       <- get_response(data, varInfo, standardize, LH)
   response   <- RESP$response
   
   # Resolve covariate types
@@ -54,98 +52,39 @@ create_stan_input <- function(formula,
   X          <- covariates$X
   X_notnan   <- covariates$X_notnan
   
-  # Standardize continuous input covariates
-  SCL <- standardize_inputs(X, D)
-  X   <- SCL$X
+  # Compute dimensions and standardize covariates
+  stan_dims <- get_model_dims(X, D)
+  N_cat     <- set_N_cat(X, D)
+  SCL       <- standardize_inputs(X, D)
+  X         <- SCL$X
   
-  # Get some variables defining the model dimensions
-  stan_dims <- get_model_dims(X, D, likelihood)
-  
-  # Set C_hat (constant)
-  nb_or_pois <- likelihood %in% c("NB","Poisson")
-  if(is.null(C_hat)){
-    if(nb_or_pois){
-      C_hat <- log(mean(response))
-    }else{
-      C_hat <- 0
-    }
-  }else{
-    if(!nb_or_pois){
-      stop("Only give the C_hat argument if observation model is Poisson or NB!")
-    }
-  }
-  
-  # Concatenate possible test points
-  X_notnan <- as.vector(X_notnan)
-  if(is.null(t_test)){
-    X_final        <- X
-    X_notnan_final <- X_notnan
-    n_test         <- 0
-  }else{
-    X_star     <- create_X_star(X, D, t_test, SCL$TSCL, X_notnan)
-    X_star[,2] <- SCL$TSCL$fun(X_star[,2])
-    X_final    <- rbind(X, X_star)
-    n_test     <- dim(X_star)[1]
-    if(stan_dims$D[3]>0){
-      Xnn_star       <- as.numeric(!is.nan(X[,3]))
-      X_notnan_final <- c(X_notnan, Xnn_star)
-    }else{
-      X_notnan_final <- c(X_notnan, rep(0, n_test))
-    }
-  }
-  
-  # Categorical or binary kernel?
-  if(cat_interact_kernel_type == "categorical"){
-    cat_interact_kernel <- 1
-  }else if(cat_interact_kernel_type == "binary"){
-    cat_interact_kernel <- 0
-  }else{
-    stop("Invalid option '", cat_interact_kernel_type, ' for cat_interact_kernel_type!')
-  }
-  
-  # Check N_trials
-  if(is.null(N_trials)){
-      N_trials <- rep(1, length(response))
-  }else{
-    if(likelihood != "binomial"){
-      stop("Only give the N_trials argument if likelihood is binomial!")
-    }
-    if(length(N_trials)==1){
-      N_trials <- rep(N_trials, length(response))
-    }
-    if(length(N_trials)!= length(response)){
-      stop("Invalid length of N_trials!")
-    }
-  }
-
+  # Check and possibly edit N_trials and C_hat
+  N_trials <- set_N_trials(N_trials, response, LH)
+  C_hat <- set_C_hat(C_hat, response, LH)
   
   # Create the list that is the Stan input
-  stan_dat   <- list(X         = t(X_final),
-                     X_id      = X_final[,1],
-                     X_notnan  = X_notnan_final,
+  stan_dat   <- list(X         = t(X),
+                     X_notnan  = X_notnan,
                      y         = response,
                      y_int     = round(response),
-                     n_test    = n_test,
-                     DELTA     = DELTA,
-                     C_hat     = C_hat,
-                     F_is_sampled = as.numeric(sample_F),
-                     USE_VAR_MASK = as.numeric(variance_mask),
-                     cat_interact_kernel = cat_interact_kernel,
+                     LH        = LH,
                      N_trials  = N_trials,
-                     verbose_mode = as.numeric(verbose)
+                     N_cat     = N_cat,
+                     C_hat     = C_hat,
+                     F_IS_SAMPLED = as.numeric(sample_F),
+                     USE_VAR_MASK = as.numeric(variance_mask),
+                     VERBOSE   = as.numeric(verbose),
+                     DELTA     = DELTA
   )
   
   # Get some variables related to diseased individuals
-  stan_dis  <- get_diseased_info(D, 
-                                 X_final, 
-                                 X_notnan_final,
+  stan_dis  <- get_diseased_info(D, X, X_notnan,
                                  uncertain_effect_time, 
                                  equal_effect,
                                  SCL$TSCL)
   
   # Parse the prior
-  stan_prior <- prior_to_stan(D, 
-                              prior, 
+  stan_prior <- prior_to_stan(D, prior, 
                               stan_dis$HMGNS, 
                               stan_dis$UNCRT, 
                               stan_dis$N_cases,
