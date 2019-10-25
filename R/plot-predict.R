@@ -4,23 +4,18 @@
 #' @description This is a wrapper for \code{\link{plot_posterior_components}}.
 #' and \code{\link{plot_posterior_predictions}}.
 #' @param fit An object of class \code{lgpfit}.
-#' @param componentwise A boolean value.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @param n_sds number of standard deviations for the uncertainty band width
+#' @param data_marker pch for data points
 #' 
 #' @return a ggplot object
 plot_posterior_f <- function(fit, 
                              PRED             = NULL, 
-                             componentwise    = FALSE, 
                              plot_uncertainty = TRUE,
+                             data_marker      = 16,
                              n_sds            = 2){
-  if(componentwise){
-    h <- plot_posterior_components(fit, 
-                                   PRED             = PRED, 
-                                   plot_uncertainty = plot_uncertainty,
-                                   n_sds            = n_sds)
-  }else{
+
     plot_obs_onset     <- FALSE
     plot_onset_samples <- FALSE
     if(fit@model@stan_dat$UNCRT == 1){
@@ -39,8 +34,8 @@ plot_posterior_f <- function(fit,
                                     n_sds              = n_sds,
                                     plot_obs_onset     = plot_obs_onset,
                                     plot_onset_samples = plot_onset_samples,
-                                    alpha_line         = alpha_line)
-  }
+                                    alpha_line         = alpha_line,
+                                    data_marker        = data_marker)
   return(h)
 }
 
@@ -54,25 +49,26 @@ plot_posterior_f <- function(fit,
 #' @param uncertainty Either "none", "ribbon" or "errorbar".
 #' @param test_data Test data set.
 #' @param n_sds number of standard deviations for the uncertainty band width
+#' @param data_marker pch for data points
 #' @return a ggplot object
 plot_posterior_y <- function(fit, PRED, 
                              uncertainty = "ribbon", 
                              test_data = NULL,
+                             data_marker = 16,
                              n_sds = 2){
-  if(is.null(PRED)){
-    stop("You must specify the PRED argument!")
-  }
+
   if(uncertainty=="ribbon"){
     h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
-                                    test_data = test_data, n_sds = n_sds)
+                                    test_data = test_data, n_sds = n_sds,
+                                    data_marker = data_marker)
   }else if(uncertainty=="errorbar"){
-    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
+    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
                                     error_bar = TRUE, test_data = test_data,
-                                    n_sds = n_sds)
+                                    n_sds = n_sds, data_marker = data_marker)
   }else{
     h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
                                     plot_uncertainty = FALSE, test_data = test_data,
-                                    n_sds = n_sds) 
+                                    n_sds = n_sds, data_marker = data_marker) 
   }
   return(h)
 }
@@ -80,7 +76,6 @@ plot_posterior_y <- function(fit, PRED,
 
 #' Plot posterior of f or predictive distribution for y
 #' 
-#' @export
 #' @param fit An object of class \code{lgpfit}.
 #' @param mode Must be either "posterior" or "predictive".
 #' @param PRED Predictions computed using \code{lgp_predict}.

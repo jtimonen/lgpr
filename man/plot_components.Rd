@@ -4,22 +4,16 @@
 \alias{plot_components}
 \title{Visualize the (average) inferred components evaluated at data points}
 \usage{
-plot_components(fit, title = NULL, sample_idx = NULL, linealpha = 1,
-  linetype = 3, return_list = FALSE, ncol = NULL, nrow = NULL,
-  legend = NULL, labels = "auto", ylim = NULL, font_size = 9,
-  theme = ggplot2::theme_minimal())
+plot_components(fit, title = NULL, return_list = FALSE, ncol = NULL,
+  nrow = NULL, legend = NULL, labels = NULL, ylim = NULL,
+  font_size = 9, theme = ggplot2::theme_linedraw(),
+  legend.direction = "horizontal", xlabel = NULL, ylabel = NULL,
+  linealpha = 0.2, linetype = 1, subsamples = 100)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
 \item{title}{optional prefix to plot title}
-
-\item{sample_idx}{If given, only one sample will be plotted, else the average
-components over all samples.}
-
-\item{linealpha}{line alpha}
-
-\item{linetype}{line type}
 
 \item{return_list}{should this return a list of ggplot objects?}
 
@@ -36,6 +30,18 @@ components over all samples.}
 \item{font_size}{font size for plots}
 
 \item{theme}{ggplot theme}
+
+\item{legend.direction}{direction of legend}
+
+\item{xlabel}{x-axis label}
+
+\item{ylabel}{y-axis label}
+
+\item{linealpha}{line alpha}
+
+\item{linetype}{line type}
+
+\item{subsamples}{how many samples to plot}
 }
 \value{
 alist of ggplot objects or one combined plot

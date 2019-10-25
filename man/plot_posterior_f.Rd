@@ -4,17 +4,17 @@
 \alias{plot_posterior_f}
 \title{Plot posterior of f}
 \usage{
-plot_posterior_f(fit, PRED = NULL, componentwise = FALSE,
-  plot_uncertainty = TRUE, n_sds = 2)
+plot_posterior_f(fit, PRED = NULL, plot_uncertainty = TRUE,
+  data_marker = 16, n_sds = 2)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
 \item{PRED}{Predictions computed using \code{lgp_predict}.}
 
-\item{componentwise}{A boolean value.}
-
 \item{plot_uncertainty}{Should an uncertainty ribbon be plotted?}
+
+\item{data_marker}{pch for data points}
 
 \item{n_sds}{number of standard deviations for the uncertainty band width}
 }

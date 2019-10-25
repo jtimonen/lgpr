@@ -16,9 +16,6 @@ create_test_points <- function(object, t_test){
     model <- object@model
   }
   sdat     <- model@stan_dat
-  if(sdat$n_test != 0){
-    warning("The model already contains test points!")
-  }
   D        <- model@stan_dat$D
   if(D[4] > 0){
     stop("There are non-time-related continuous covariates in the data. There is no",
@@ -115,7 +112,7 @@ predict_preproc <- function(fit, X_test, samples){
   
   # Other model info
   fields   <- c("HMGNS", "UNCRT", "caseID_to_rows", "row_to_caseID", 
-                "DELTA", "USE_VAR_MASK", "vm_params", "cat_interact_kernel")
+                "DELTA", "USE_VAR_MASK", "vm_params")
   info     <- stan_dat[fields]
   
   # Input checking
@@ -275,7 +272,7 @@ compute_predictions <- function(X_data, y_data, X_test,
   # Get kernel hyperparameters and other needed parameters
   nam   <- names(params)
   alpha <- params[which(grepl("alpha_", nam))]
-  ell   <- params[which(grepl("lengthscale_", nam))]
+  ell   <- params[which(grepl("ell_", nam))]
   if(D[3]){
     stp <- params[which(grepl("warp_steepness", nam))]
     if(info$HMGNS==0){
@@ -286,7 +283,7 @@ compute_predictions <- function(X_data, y_data, X_test,
     if(info$UNCRT==1){
       t_ons <- params[which(grepl("T_onset", nam))]
       t_ons <- rbind(info$case_ids, t_ons)
-      rownames(t_ons) <- c("case id", "onset time")
+      rownames(t_ons) <- c("case id", "effect time")
     }else{
       t_ons <- NULL
     }
@@ -396,7 +393,6 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
   VM    <- info$USE_VAR_MASK
   vm_params <- info$vm_params
   TSCL  <- kernel_info$TSCL
-  cat_interact_kernel <- info$cat_interact_kernel
   
   # Get dimensions and age and id covariates
   n1   <- dim(X1)[1]
@@ -494,12 +490,7 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
       idx <- 2 + D[3] + D[4] + j
       x1  <- X1[,idx]
       x2  <- X2[,idx]
-      if(cat_interact_kernel == 1){
-        KK[,,r] <- kernel_cat(x1, x2) * kernel_se(age1, age2, mag, len)
-      }else{
-        KK[,,r] <- kernel_bin(x1, x2) * kernel_se(age1, age2, mag, len)
-      }
-      
+      KK[,,r] <- kernel_cat(x1, x2) * kernel_se(age1, age2, mag, len)
     }
   }
   if(D[6]>0){

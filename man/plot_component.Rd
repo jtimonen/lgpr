@@ -4,20 +4,19 @@
 \alias{plot_component}
 \title{Visualize one (average) inferred component evaluated at data points}
 \usage{
-plot_component(fit, idx, sample_idx = NULL, linealpha = 1,
-  linetype = 3)
+plot_component(fit, idx, linealpha = 0.2, linetype = 1,
+  subsamples = 100)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
 \item{idx}{Index of component to be plotted.}
 
-\item{sample_idx}{If given, only one sample will be plotted, else the average
-components over all samples.}
-
 \item{linealpha}{line alpha}
 
 \item{linetype}{line type}
+
+\item{subsamples}{how many samples to plot}
 }
 \value{
 a ggplot object

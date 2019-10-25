@@ -20,7 +20,7 @@ get_function_component_samples <- function(fit)
       F_cmp <- aperm(F_cmp, c(1,3,2))
       F_tot <- rstan::extract(sf, pars = "F_mean_tot")$F_mean_tot[,1,]
     }else{
-      #only one component
+      # only one component
       F_tot <- F_cmp
     }
     
