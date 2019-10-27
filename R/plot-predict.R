@@ -1,8 +1,7 @@
 #' Plot posterior of f
 #' 
 #' @export
-#' @description This is a wrapper for \code{\link{plot_posterior_components}}.
-#' and \code{\link{plot_posterior_predictions}}.
+#' @description This is a wrapper for \code{\link{plot_posterior_predictions}}.
 #' @param fit An object of class \code{lgpfit}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
@@ -260,90 +259,6 @@ plot_posterior_predictions <- function(fit,
   if(!is.null(ylim)){h <- h + ggplot2::coord_cartesian(ylim = ylim)}
   
   # Return modified ggplot object
-  return(h)
-}
-
-
-
-#' Plot posterior of the components of f
-#' 
-#' @param fit An object of class \code{lgpfit}.
-#' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param color_scheme Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.
-#' @param alpha Ribbon fill opacity.
-#' @param alpha_line Line opacity
-#' @param plot_uncertainty Should an uncertainty ribbon be plotted?
-#' @param title optional prefix to plot title
-#' @param ylim y axis limits
-#' @param original_y_scale should the predictions be scaled back to original data scale
-#' @param n_sds number of standard deviations for the uncertainty band width
-#' @return a ggplot object
-plot_posterior_components <- function(fit, 
-                                      PRED               = NULL, 
-                                      color_scheme       = "red",
-                                      alpha              = 0.1,
-                                      alpha_line         = 1,
-                                      plot_uncertainty   = TRUE,
-                                      title              = NULL,
-                                      ylim               = NULL,
-                                      n_sds              = 2,
-                                      original_y_scale   = FALSE)
-{
-  
-  # Input checks and options
-  cwise     <- TRUE
-  test_data <- NULL
-  cs_onset  <- color_scheme
-  mode      <- "posterior"
-  OPT       <- plot_predictions_options(fit, color_scheme,
-                                        cwise, original_y_scale, 
-                                        PRED, test_data, cs_onset, mode,
-                                        n_sds)
-  
-  # Make some variables easily accessible
-  DF      <- OPT$DF
-  idvar   <- OPT$idvar
-  timevar <- OPT$timevar
-  respvar <- OPT$respvar
-  model   <- fit@model
-  info    <- model@info
-  
-  # Title and labels
-  ptitle  <- "Posteriors of components of f"
-  ylab    <- " "
-  
-  # Create ggplot object
-  if(info$sample_F){
-    group_var <- "idx"
-    y_var     <- "pred"
-  }else{
-    group_var <- idvar
-    y_var     <- "mu"
-  }
-  h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
-  
-  # Edit plot title
-  if(!is.null(title)){
-    ptitle <- paste(title, ": ", ptitle, sep="")
-  }
-  h <- h + ggplot2::ggtitle(label = ptitle)
-  h <- h + ggplot2::labs(y = ylab)
-  
-  # Plot uncertainty ribbon or error bars
-  if(plot_uncertainty && !info$sample_F){
-    h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = 'lower', ymax = 'upper'),
-                                  fill  = OPT$fill, 
-                                  alpha = alpha)
-  }
-  
-  # Plot mean prediction
-  h <- h + ggplot2::geom_line(color = OPT$linecolor, alpha = alpha_line)
-  
-  # Faceting and limits
-  h <- h + ggplot2::facet_wrap(. ~ component)
-  if(!is.null(ylim)){h <- h + ggplot2::coord_cartesian(ylim = ylim)}
-  
-  # Return ggplot object
   return(h)
 }
 

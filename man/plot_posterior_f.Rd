@@ -22,6 +22,5 @@ plot_posterior_f(fit, PRED = NULL, plot_uncertainty = TRUE,
 a ggplot object
 }
 \description{
-This is a wrapper for \code{\link{plot_posterior_components}}.
-and \code{\link{plot_posterior_predictions}}.
+This is a wrapper for \code{\link{plot_posterior_predictions}}.
 }

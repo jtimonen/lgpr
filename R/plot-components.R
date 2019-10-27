@@ -1,10 +1,79 @@
-#' Visualize the (average) inferred components evaluated at data points
+
+#' Visualize average inferred components or component samples,
+#' evaluated at data points
 #' @export
 #' @param fit An object of class \code{lgpfit}.
-#' @param title optional prefix to plot title
-#' @param linealpha line alpha
-#' @param linetype line type
-#' @param return_list should this return a list of ggplot objects?
+#' @param time_is_xvar is age the x-axis variable?
+#' @param subsamples How many samples to plot. If this is NULL,
+#' average over all samples is plotted. If this is "all", all
+#' samples are plotted.
+#' @param ... additional arguments for \code{\link{plot_components}}
+#' @return an object returned by ggpubr::ggarrange
+plot_components_posterior <- function(fit, subsamples = NULL,
+                                      time_is_xvar = TRUE, ...)
+{
+  # Check input correctness
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  model <- fit@model
+  
+  # Create plot
+  FFF <- get_function_component_samples(fit)
+  ddd <- dim(FFF)[3]
+  FFF <- FFF[,,1:(ddd-1)]
+  
+  if(is.null(subsamples)){
+    FFF_1 <- apply(FFF, c(2,3), mean)
+    nnn     <- dim(FFF_1)[1]
+    FFF     <- array(0, dim = c(1, nnn, ddd-1))
+    FFF[1,,]<- as.matrix(FFF_1)
+  }else if(is.character(subsamples)){
+    if(subsamples=="all"){
+      # all samples
+    }else{
+      stop("invalid input for subsamples!")
+    }
+  }else if(is.numeric(subsamples)){
+    n_smp   <- dim(FFF)[1]
+    i_sub   <- sample.int(n_smp, subsamples)
+    FFF     <- FFF[i_sub,,] 
+  }else{
+    stop("invalid input for subsamples!")
+  }
+  
+  h <- plot_components(FFF, NULL, model, time_is_xvar, ...)
+  
+  # Return ggplot object
+  return(h)
+  
+}
+
+
+#' Visualize the components of a simulated data set
+#' @export
+#' @param simData simulated data object (list)
+#' @param time_is_xvar is the time variable the x-axis variable?
+#' @param ... additional arguments for \code{\link{plot_components}}
+#' @return an object returned by ggpubr::ggarrange
+plot_components_simdata <- function(simData, time_is_xvar = TRUE, ...)
+{
+  data  <- simData$data
+  FFF   <- simData$components
+  model <- full_model(data)
+  
+  # Create plot
+  nnn     <- dim(FFF)[1]
+  ddd     <- dim(FFF)[2]
+  FFF_1   <- FFF[,1:(ddd-3)]
+  FFF     <- array(0, dim = c(1, nnn, ddd-3))
+  FFF[1,,]<- as.matrix(FFF_1)
+  
+  h <- plot_components(FFF, NULL, model, time_is_xvar, ...)
+  return(h)
+}
+
+#' Helper function for plotting components
+#' 
+#' @inheritParams plot_component 
 #' @param ncol number of plot columns
 #' @param nrow number of plot rows
 #' @param legend legend argument for ggarrange, use "none" to remove legends
@@ -12,35 +81,35 @@
 #' @param ylim y axis limits
 #' @param font_size font size for plots
 #' @param theme ggplot theme
-#' @param legend.direction direction of legend
+#' @param legend_dir direction of legend
 #' @param xlabel x-axis label
 #' @param ylabel y-axis label 
-#' @param subsamples how many samples to plot
-#' @return alist of ggplot objects or one combined plot
-plot_components <- function(fit, 
-                            title = NULL,
-                            return_list = FALSE,
-                            ncol = NULL,
-                            nrow = NULL,
-                            legend = NULL,
-                            labels = NULL,
-                            ylim = NULL,
-                            font_size = 9,
-                            theme = ggplot2::theme_linedraw(),
-                            legend.direction = "horizontal",
-                            xlabel = NULL,
-                            ylabel = NULL,
-                            linealpha = 0.2,
-                            linetype = 1,
-                            subsamples = 100){
+#' @return an object returned by ggpubr::ggarrange
+plot_components <- function(MMM, SSS, model, time_is_xvar,
+                            linealpha   = 1,
+                            linetype    = 1, 
+                            ncol        = NULL,
+                            nrow        = NULL,
+                            legend      = NULL,
+                            labels      = NULL,
+                            ylim        = NULL,
+                            font_size   = 9,
+                            theme       = ggplot2::theme_linedraw(),
+                            legend_dir  = "horizontal",
+                            xlabel      = NULL,
+                            ylabel      = " "){
   
   GG <- list()
-  D <- fit@model@stan_dat$D
-  sum_D <- sum(D)
+  sum_D <- sum(model@stan_dat$D) + 1
   for(d in 1:sum_D){
-    gg <- plot_component(fit, d, linealpha, linetype, subsamples)
+    gg <- plot_component(MMM, SSS, model, d, time_is_xvar,
+                         linealpha, linetype)
     if(is.null(ylim)){
-      ylim <- range(fit@components)
+      if(!is.null(SSS)){
+        ylim <- c(min(MMM - SSS), max(MMM + SSS))
+      }else{
+        ylim <- range(MMM)
+      }
     }
     gg <- gg + theme + ggplot2::ylim(ylim)
     if(!is.null(xlabel)){gg <- gg + ggplot2::xlab(xlabel)}
@@ -53,153 +122,125 @@ plot_components <- function(fit,
         legend.background = ggplot2::element_rect(fill = "gray95"),
         panel.grid.minor = ggplot2::element_blank(),
         panel.grid.major = ggplot2::element_blank(),
-        legend.direction = legend.direction
+        legend.direction = legend_dir
       )
     }
     GG[[d]] <- gg + ggplot2::theme(text=ggplot2::element_text(size=font_size))
   }
-  if(return_list){
-    return(GG)
-  }else{
-    p <- ggpubr::ggarrange(plotlist = GG, ncol = ncol, nrow = nrow,
-                           legend = legend,
-                           labels = labels)
-    return(p)
-  }
+  p <- ggpubr::ggarrange(plotlist = GG, ncol = ncol, nrow = nrow,
+                         legend = legend,
+                         labels = labels)
+  return(p)
 }
 
-#' Visualize one (average) inferred component evaluated at data points
-#' @export
-#' @param fit An object of class \code{lgpfit}.
+#' Helper function for plotting one component
+#' @param MMM a n array of size n_samples x n_data x n_components
+#' @param SSS a n array of size n_samples x n_data x n_components
+#' @param model an object of class 'lgpmodel'
 #' @param idx Index of component to be plotted.
+#' @param time_is_xvar boolean value 
 #' @param linealpha line alpha
 #' @param linetype line type
-#' @param subsamples how many samples to plot
 #' @return a ggplot object
-plot_component <- function(fit, idx,
-                           linealpha = 0.2,
-                           linetype = 1,
-                           subsamples = 100)
+plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
+                           linealpha, linetype)
 {
-  # Check input correctness
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  model <- fit@model
-  info  <- model@info
-  n     <- model@stan_dat$n
-  D     <- model@stan_dat$D
-  sum_D <- sum(D)
-  if(idx < 1 || idx > sum_D){
-    stop("idx must be and integer between 1 and ", sum_D, "!")
+  sdat  <- model@stan_dat
+  X     <- t(sdat$X)
+  Xnn   <- sdat$X_notnan
+  D     <- sdat$D
+  SCL   <- model@scalings
+  sum_D <- sum(D) + 1
+  S     <- dim(MMM)[1]
+  n     <- dim(MMM)[2]
+  d     <- dim(MMM)[3]
+  cpn   <- model@info$component_names
+  cvn   <- model@info$covariate_names
+  if(sum_D!=d){ stop("dim(MMM)[3] must be ", sum_D) }
+  if(idx < 1 || idx > sum_D){ stop("idx must be between 1 and ", sum_D) }
+  if(idx < sum_D){
+    ctype <- component_index_to_type(D, idx)
+    cind  <- component_index_to_covariate_index(D, idx)
+  }else{
+    ctype <- 7 # sum 
   }
   
-  # Create plot
-  EFF     <- get_function_component_samples(fit)
-  ddd     <- dim(EFF)[3]
-  EFF     <- EFF[,,1:(ddd-2)]
-  names   <- colnames(EFF[1,,])
-  title   <- names[idx]
-  EFF     <- EFF[,,idx] # EFF is now n_samples x n_data
+  plot_eb  <- !is.null(SSS)
+  MMM_i    <- MMM[,,idx]
+  f        <- as.numeric(t(MMM_i))
+  if(plot_eb){
+    UUU_i <- MMM_i + SSS[,,idx]
+    LLL_i <- MMM_i - SSS[,,idx]
+    ub    <- as.numeric(t(UUU_i))
+    lb    <- as.numeric(t(LLL_i))
+  }
+  sample <- rep(1:S, each = n)
+  id     <- rep(X[,1], S)
   
-  n_smp   <- dim(EFF)[1]
-  i_sub   <- sample.int(n_smp, subsamples)
-  EFF     <- EFF[i_sub,] 
+  if(ctype %in% c(1,2,5,6,7)){
+    time_is_xvar <- TRUE
+  }
+  if(time_is_xvar){
+    xvar  <- rep(SCL$TSCL$fun_inv(X[,2]), S)
+    xvar_name <- model@info$varInfo$time_variable
+  }else{
+    xvar  <- rep(X[,cind], S)
+    if(ctype==4){
+      xvar_name <- cvn[cind]
+      warning('covariate', cvn[cind], 'is not on original scale!')
+    }
+  }
   
-  TSCL    <- model@scalings$TSCL
-  X       <- t(model@stan_dat$X)[1:n,]
-  age     <- TSCL$fun_inv(X[,2])
-  id      <- X[,1]
-  ptitle  <- title
-  
-  cvn <- model@info$covariate_names
-  h   <- plot_component_create_gg(EFF, id, age, idx, D, cvn, X)
-  h   <- h + ggplot2::geom_line(linetype = linetype, alpha = linealpha) + 
-    ggplot2::ggtitle(label = ptitle)
-  
-  # Return ggplot object
-  return(h)
-  
-}
-
-
-#' Subroutine for plot_component
-#' 
-#' @param EFF a matrix of size n_samples x n_data
-#' @param id id covariate
-#' @param age age covariate
-#' @param idx covariate index
-#' @param D an integer vector of length 6
-#' @param covariate_names covariate names
-#' @param X covariate matrix
-#' @return a ggplot object
-plot_component_create_gg <- function(EFF, id, age, idx, D, covariate_names, X){
-
-  # Create
-  ctype    <- component_index_to_type(D, idx)
-  yname    <- " "
-  cind     <- component_index_to_covariate_index(D, idx)
-  leg      <- ggplot2::theme(legend.position = "none")
-  if(ctype==2){
-    df     <- plot_component_create_df(EFF, NULL, NULL, age)
-    aes    <- ggplot2::aes_string(x = 'timevar', y = 'f', group = 'sample')
+  # Create df and aes
+  if(ctype %in% c(1,4,7)){
+    leg      <- ggplot2::theme(legend.position = "none")
+    grpvar   <- as.factor(paste(id, sample))
+    df       <- data.frame(xvar, f, grpvar)
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', group = 'grpvar')
+  }else if(ctype==2){
+    leg      <- ggplot2::theme(legend.position = "none")
+    grpvar   <- as.factor(sample)
+    df       <- data.frame(xvar, f, grpvar)
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', group = 'grpvar')
   }else if(ctype==3){
-    colorvar <- as.factor(model@stan_dat$X_notnan)
-    leg <- ggplot2::labs(color = 'Group')
-    aes <- ggplot2::aes_string(x = 'timevar', y = 'f', 
-                               group = 'groupvar',
-                               color = 'colorvar')
-    df  <- plot_component_create_df(EFF, id, colorvar, age)
+    colorvar <- as.factor(rep(Xnn, S))
+    leg      <- ggplot2::labs(color = 'Group')
+    grpvar   <- as.factor(paste(id, sample))
+    df       <- data.frame(xvar, f, grpvar, colorvar)
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                    group = 'grpvar', color = 'colorvar')
   }else if(ctype == 5 || ctype == 6){
-    cname    <- covariate_names[cind]
-    leg      <- ggplot2::labs(color = cname)
-    groupvar <- as.factor(X[,cind])
-    colorvar <- as.factor(X[,cind])
-    df       <- plot_component_create_df(EFF, groupvar, colorvar, age)
-    df$grp   <- paste(df$groupvar, df$sample)
-    aes      <- ggplot2::aes_string(x = 'timevar', y = 'f', 
-                                    group = 'grp',
-                                    color = 'colorvar')
+    leg      <- ggplot2::labs(color = cvn[cind])
+    colorvar <- rep(X[,cind], S)
+    grpvar   <- as.factor(paste(colorvar, sample))
+    colorvar <- as.factor(colorvar)
+    df       <- data.frame(xvar, f, grpvar, colorvar)
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                    group = 'grpvar', color = 'colorvar')
   }else{
-    df     <- plot_component_create_df(EFF, id, NULL, age)
-    df$grp <- paste(df$groupvar, df$sample)
-    aes    <- ggplot2::aes_string(x = 'timevar', y = 'f', group = 'grp')
+    stop("invalid ctype!")
   }
-
+  
+  # Create title
+  if(ctype!=7){
+    title <- parse(text = cpn[idx])
+  }else{
+    title <- parse(text = "f[sum]")
+  }
+  
   # Create ggplot object
-  colnames(df)[1] <- 'timevar'
-  h <- ggplot2::ggplot(df, aes) + leg + ggplot2::labs(y = yname)
+  h   <- ggplot2::ggplot(df, aes) + leg
+  h   <- h + ggplot2::geom_line(linetype = linetype, alpha = linealpha)
+  h   <- h + ggplot2::ggtitle(title)
+  h   <- h + ggplot2::xlab(xvar_name)
+  # Add errorbar
+  if(plot_eb){
+    h <- h + ggplot2::geom_ribbon(ggplot2::aes(ymin=lb, ymax=ub))
+  }
   return(h)
   
 }
 
-
-#' Create dataframe for componentwise plotting
-#' @export
-#' @param FFF a matrix of size n_samples x n_data
-#' @param groupvar grouping variable
-#' @param colorvar coloring variable
-#' @param timevar time variable
-#' @return a data frame
-plot_component_create_df <- function(FFF, groupvar, colorvar, timevar){
-  n_smp    <- dim(FFF)[1]
-  n        <- dim(FFF)[2]
-  f        <- as.numeric(t(FFF))
-  sample   <- as.factor(rep(1:n_smp, each = n))
-  timevar  <- rep(timevar, n_smp)
-  if(is.null(colorvar) && is.null(groupvar)){
-    df <- data.frame(timevar, f, sample)
-  }else if(is.null(colorvar)){
-    groupvar <- as.factor(rep(groupvar, n_smp))
-    df <- data.frame(timevar, groupvar, f, sample)
-  }else if(is.null(groupvar)){
-    colorvar <- as.factor(rep(colorvar, n_smp))
-    df <- data.frame(timevar, colorvar, f, sample)
-  }else{
-    groupvar <- as.factor(rep(groupvar, n_smp))
-    colorvar <- as.factor(rep(colorvar, n_smp))
-    df <- data.frame(timevar, f, groupvar, colorvar, sample)
-  }
-  return(df)
-}
 
 #' Component index to component type
 #' @param D integer vector of length 

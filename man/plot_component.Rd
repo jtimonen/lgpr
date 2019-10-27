@@ -2,25 +2,28 @@
 % Please edit documentation in R/plot-components.R
 \name{plot_component}
 \alias{plot_component}
-\title{Visualize one (average) inferred component evaluated at data points}
+\title{Helper function for plotting one component}
 \usage{
-plot_component(fit, idx, linealpha = 0.2, linetype = 1,
-  subsamples = 100)
+plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype)
 }
 \arguments{
-\item{fit}{An object of class \code{lgpfit}.}
+\item{MMM}{a n array of size n_samples x n_data x n_components}
+
+\item{SSS}{a n array of size n_samples x n_data x n_components}
+
+\item{model}{an object of class 'lgpmodel'}
 
 \item{idx}{Index of component to be plotted.}
+
+\item{time_is_xvar}{boolean value}
 
 \item{linealpha}{line alpha}
 
 \item{linetype}{line type}
-
-\item{subsamples}{how many samples to plot}
 }
 \value{
 a ggplot object
 }
 \description{
-Visualize one (average) inferred component evaluated at data points
+Helper function for plotting one component
 }

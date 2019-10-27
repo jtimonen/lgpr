@@ -2,20 +2,26 @@
 % Please edit documentation in R/plot-components.R
 \name{plot_components}
 \alias{plot_components}
-\title{Visualize the (average) inferred components evaluated at data points}
+\title{Helper function for plotting components}
 \usage{
-plot_components(fit, title = NULL, return_list = FALSE, ncol = NULL,
-  nrow = NULL, legend = NULL, labels = NULL, ylim = NULL,
-  font_size = 9, theme = ggplot2::theme_linedraw(),
-  legend.direction = "horizontal", xlabel = NULL, ylabel = NULL,
-  linealpha = 0.2, linetype = 1, subsamples = 100)
+plot_components(MMM, SSS, model, time_is_xvar, linealpha = 1,
+  linetype = 1, ncol = NULL, nrow = NULL, legend = NULL,
+  labels = NULL, ylim = NULL, font_size = 9,
+  theme = ggplot2::theme_linedraw(), legend_dir = "horizontal",
+  xlabel = NULL, ylabel = " ")
 }
 \arguments{
-\item{fit}{An object of class \code{lgpfit}.}
+\item{MMM}{a n array of size n_samples x n_data x n_components}
 
-\item{title}{optional prefix to plot title}
+\item{SSS}{a n array of size n_samples x n_data x n_components}
 
-\item{return_list}{should this return a list of ggplot objects?}
+\item{model}{an object of class 'lgpmodel'}
+
+\item{time_is_xvar}{boolean value}
+
+\item{linealpha}{line alpha}
+
+\item{linetype}{line type}
 
 \item{ncol}{number of plot columns}
 
@@ -31,21 +37,15 @@ plot_components(fit, title = NULL, return_list = FALSE, ncol = NULL,
 
 \item{theme}{ggplot theme}
 
-\item{legend.direction}{direction of legend}
+\item{legend_dir}{direction of legend}
 
 \item{xlabel}{x-axis label}
 
 \item{ylabel}{y-axis label}
-
-\item{linealpha}{line alpha}
-
-\item{linetype}{line type}
-
-\item{subsamples}{how many samples to plot}
 }
 \value{
-alist of ggplot objects or one combined plot
+an object returned by ggpubr::ggarrange
 }
 \description{
-Visualize the (average) inferred components evaluated at data points
+Helper function for plotting components
 }

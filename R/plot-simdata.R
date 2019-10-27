@@ -1,41 +1,7 @@
-#' Visualize simulated data
-#'
-#' @export
-#' @description This is a wrapper for \code{plot_simdata_by_individual} and
-#' \code{plot_simdata_by_component}
-#' @param simData a list returned by \code{\link{simulate_data}}
-#' @param componentwise should each component be plotted separately?
-#' @param nrow an argument for \code{ggplot2::facet_wrap}
-#' @param ncol an argument for \code{ggplot2::facet_wrap}
-#' @param i_test test point indices
-#' @param color_test test point color
-#' @param y_transform function to transform y
-#' @return a ggplot object
-plot_simdata <- function(simData, 
-                         componentwise = FALSE,
-                         nrow          = NULL, 
-                         ncol          = NULL,
-                         i_test        = NULL,
-                         color_test    = "steelblue2",
-                         y_transform   = function(x){x})
-{
-  
-  if(componentwise){
-    if(!is.null(i_test)){
-      stop("cannot specify test points when plotting componentwise")
-    }
-    linecolor    <- "gray50"
-    h <- plot_simdata_by_component(simData, linecolor, nrow, ncol)
-  }else{
-    linecolor    <- "gray70"
-    h <- plot_simdata_by_individual(simData, linecolor, nrow, ncol, i_test, color_test, y_transform)
-  }
-  return(h)
-}
-
 
 #' Plot a simulated longitudinal data set for each individual separately
 #'
+#' @export
 #' @param simData a list returned by \code{\link{simulate_data}}
 #' @param linecolor line color
 #' @param nrow an argument for \code{ggplot2::facet_wrap}
@@ -43,14 +9,16 @@ plot_simdata <- function(simData,
 #' @param i_test test point indices
 #' @param color_test test point color
 #' @param y_transform function to transform y
+#' @seealso For plotting each component separately,
+#'  see \code{\link{plot_components_simdata}}
 #' @return a ggplot object
-plot_simdata_by_individual <- function(simData, 
-                                       linecolor   = "gray70", 
-                                       nrow        = NULL, 
-                                       ncol        = NULL,
-                                       i_test      = NULL,
-                                       color_test  = "steelblue2",
-                                       y_transform = function(x){x}){
+plot_simdata <- function(simData, 
+                         linecolor   = "gray70", 
+                         nrow        = NULL, 
+                         ncol        = NULL,
+                         i_test      = NULL,
+                         color_test  = "steelblue2",
+                         y_transform = function(x){x}){
   vlinecolors <- c("firebrick3", "firebrick4")
   vlinetypes <- c(1,5)
   dat  <- simData$data
@@ -140,42 +108,5 @@ plot_simdata_by_individual <- function(simData,
   if(!is.null(i_test)){
     h <- h + ggplot2::scale_color_manual(values=c(color_test, "black"))
   }
-  return(h)
-}
-
-
-#' Plot each component of a simulated longitudinal data set separately
-#'
-#' @param simData a list returned by \code{\link{simulate_data}}
-#' @param linecolor line color
-#' @param nrow an argument for \code{ggplot2::facet_wrap}
-#' @param ncol an argument for \code{ggplot2::facet_wrap}
-#' @param plot_point should points be plotted also
-#' @param linealpha line alpha
-#' @return a ggplot object
-plot_simdata_by_component <- function(simData, 
-                                      linecolor = "black", 
-                                      nrow = NULL, 
-                                      ncol = NULL,
-                                      plot_point = TRUE,
-                                      linealpha = 1){
-  pointcolor <- "black"
-  linetype   <- 3
-  DF <- create_simdata_plot_df(simData)
-  h <- ggplot2::ggplot(DF, ggplot2::aes_string(x='age', y='value', group='id'))
-  h <- h + ggplot2::geom_line(color = linecolor, alpha = linealpha, lty = linetype)
-  if(plot_point){
-    h <- h + ggplot2::geom_point(color = pointcolor)
-  }
-  h <- h + ggplot2::facet_wrap(.~ component, nrow = nrow, ncol = ncol)
-  
-  dat  <- simData$data
-  N    <- length(unique(dat$id))
-  n    <- length(dat$id)
-  subt <- paste(N, " individuals (dotted lines connect an individual)", sep="")
-  h <- h + ggplot2::ggtitle("Simulated data", subtitle = subt)
-  h <- h + ggplot2::labs(x = "Age", y = "value")
-  h <- h + ggplot2::theme(legend.title=ggplot2::element_blank())
-  
   return(h)
 }

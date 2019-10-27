@@ -2,16 +2,16 @@
 % Please edit documentation in R/plot-simdata.R
 \name{plot_simdata}
 \alias{plot_simdata}
-\title{Visualize simulated data}
+\title{Plot a simulated longitudinal data set for each individual separately}
 \usage{
-plot_simdata(simData, componentwise = FALSE, nrow = NULL,
-  ncol = NULL, i_test = NULL, color_test = "steelblue2",
-  y_transform = function(x) {     x })
+plot_simdata(simData, linecolor = "gray70", nrow = NULL, ncol = NULL,
+  i_test = NULL, color_test = "steelblue2", y_transform = function(x)
+  {     x })
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
 
-\item{componentwise}{should each component be plotted separately?}
+\item{linecolor}{line color}
 
 \item{nrow}{an argument for \code{ggplot2::facet_wrap}}
 
@@ -27,6 +27,9 @@ plot_simdata(simData, componentwise = FALSE, nrow = NULL,
 a ggplot object
 }
 \description{
-This is a wrapper for \code{plot_simdata_by_individual} and
-\code{plot_simdata_by_component}
+Plot a simulated longitudinal data set for each individual separately
+}
+\seealso{
+For plotting each component separately,
+ see \code{\link{plot_components_simdata}}
 }

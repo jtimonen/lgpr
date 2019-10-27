@@ -16,7 +16,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "##"
+  comment = "#"
 )
 ```
 
@@ -42,8 +42,8 @@ simData <- simulate_data(N           = 8,
                         snr          = 5)    # signal-to-noise ratio
 
 data <- simData$data # data frame
-plot_simdata(simData, componentwise = F)
-plot_simdata(simData, componentwise = T)
+plot_simdata(simData)
+plot_components_simdata(simData)
 
 # create and fit a model --------------------------------------------------
 fit <- lgp(formula  = y ~ id + age + sex + location, # model formula
@@ -54,7 +54,7 @@ fit <- lgp(formula  = y ~ id + age + sex + location, # model formula
 
 # visualization -----------------------------------------------------------
 plot(fit)
-plot_components(fit)
+plot_components_posterior(fit)
 
 # prediction --------------------------------------------------------------
 t_test <- seq(0, 40, length.out = 60)

@@ -5,7 +5,7 @@
 \title{Create an lgp model}
 \usage{
 lgp_model(formula, data, likelihood = "Gaussian",
-  prior = prior_default(likelihood), uncertain_effect_time = FALSE,
+  prior = prior_default(), uncertain_effect_time = FALSE,
   equal_effect = TRUE, C_hat = NULL, DELTA = 1e-08,
   sample_F = (likelihood != "Gaussian"), id_variable = "id",
   time_variable = "age", disAge_variable = NULL,

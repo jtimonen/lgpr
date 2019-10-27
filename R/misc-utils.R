@@ -78,7 +78,7 @@ lgp_component_names <- function(stan_dat){
   }
   cn  <- compnam[which(idx==1)]
   cn  <- gsub("\\*", ", ", cn)
-  cn  <- paste("f_",1:length(cn),"(",cn,")", sep="")
+  cn  <- paste("f[(",1:length(cn),")](",cn,")", sep="")
   return(cn)
 }
 
@@ -243,3 +243,26 @@ get_stan_model <- function(){
   return(stanmodels[["lgp"]])
 }
 
+
+#' Get formula of a full model with all covariates included
+#' @export
+#' @param data a data frame, where the response variable is the last column
+#' @return a formula
+full_model_formula <- function(data){
+  cn   <- colnames(data)
+  ddd  <- length(cn)
+  rhs  <- paste(cn[1:(ddd-1)], collapse = " + ")
+  form <- stats::formula(paste(cn[ddd], "~", rhs))
+  return(form)
+}
+
+#' Create a full model with all covariates included
+#' @export
+#' @param data a data frame
+#' @param ... additional parameters to \code{\link{lgp_model}}
+#' @return a ggplot object
+full_model <- function(data, ...){
+  form  <- full_model_formula(data)
+  model <- lgp_model(form, data, ...)
+  return(model)
+}

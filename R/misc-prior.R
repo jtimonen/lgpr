@@ -35,7 +35,7 @@ prior_default <- function(sigma_alpha = 1)
   prior_st  <- list(type = "inv-gamma",  shape  = 9,   scale = 5)
   prior_sig <- list(type = "log-normal", mu = 0, sigma = 1, transform = "square")
   prior_phi <- list(type = "log-normal", mu = 1, sigma = 1, transform = "square")
-  prior_bet <- list(shape1 = 0.2,        shape2 = 0.2)
+  prior_bet <- list(shape1 = 0.2, shape2 = 0.2)
   
   # Uncertain disease onset
   prior_ons <- list(type = "uniform_whole")
@@ -102,13 +102,7 @@ print_prior <- function(object)
 #' @param stan_dat The list that is passed as data to \code{rstan::sampling}.
 #' @return Info as a string.
 prior_stan_to_readable <- function(stan_dat){
-  HS   <- stan_dat$HS
   info <- " ---------- PRIOR SPECIFICATIONS ----------\n"
-  
-  if(sum(HS)>0){
-    info <- paste(info, "* A HS prior is used.\n")
-    return(info)
-  }
   
   D  <- stan_dat$D
   dist <- c("Uniform","Normal","Student-t","Gamma","Inverse-Gamma","Log-Normal","Beta")
@@ -122,7 +116,7 @@ prior_stan_to_readable <- function(stan_dat){
     TYP <- stan_dat$t_ID
     P   <- stan_dat$p_ID
     for(j in 1:D[1]){
-      parnames <- c("alpha_id","lengthscale_id")
+      parnames <- c("alpha_id","ell_id")
       str1     <- prior_statement(parnames[1],TYP[j,1:2],P[j,1:3],dist)
       info_mag <- paste(info_mag, str1)
       str2     <- prior_statement(parnames[2],TYP[j,3:4],P[j,4:6],dist)
@@ -135,7 +129,7 @@ prior_stan_to_readable <- function(stan_dat){
     TYP <- stan_dat$t_A
     P <- stan_dat$p_A
     for(j in 1:D[2]){
-      parnames <- c("alpha_age","lengthscale_age")
+      parnames <- c("alpha_age","ell_age")
       str      <- prior_statement(parnames[1],TYP[j,1:2],P[j,1:3],dist)
       info_mag <- paste(info_mag, str)
       str      <- prior_statement(parnames[2],TYP[j,3:4],P[j,4:6],dist)
@@ -148,7 +142,7 @@ prior_stan_to_readable <- function(stan_dat){
     TYP <- stan_dat$t_D
     P <- stan_dat$p_D
     for(j in 1:D[3]){
-      parnames <- c("alpha_diseaseAge","lengthscale_diseaseAge","warp_steepness")
+      parnames <- c("alpha_diseaseAge","ell_diseaseAge","warp_steepness")
       str      <- prior_statement(parnames[1],TYP[j,1:2],P[j,1:3],dist)
       info_mag <- paste(info_mag, str)
       str      <- prior_statement(parnames[2],TYP[j,3:4],P[j,4:6],dist)
@@ -166,10 +160,10 @@ prior_stan_to_readable <- function(stan_dat){
     for(j in 1:D[4]){
       if(D[4]>1){
         parnames <- c(paste("alpha_continuous[",j,"]",sep=""),
-                      paste("lengthscale_continuous[",j,"]",sep=""))
+                      paste("ell_continuous[",j,"]",sep=""))
       }else{
         parnames <- c(paste("alpha_continuous",sep=""),
-                      paste("lengthscale_continuous",sep=""))
+                      paste("ell_continuous",sep=""))
       }
       
       str      <- prior_statement(parnames[1],TYP[j,1:2],P[j,1:3],dist)
@@ -186,10 +180,10 @@ prior_stan_to_readable <- function(stan_dat){
     for(j in 1:D[5]){
       if(D[5]>1){
         parnames <- c(paste("alpha_categAge[",j,"]",sep=""),
-                      paste("lengthscale_categAge[",j,"]",sep=""))
+                      paste("ell_categAge[",j,"]",sep=""))
       }else{
         parnames <- c(paste("alpha_categAge",sep=""),
-                      paste("lengthscale_categAge",sep=""))
+                      paste("ell_categAge",sep=""))
       }
       str      <- prior_statement(parnames[1],TYP[j,1:2],P[j,1:3],dist)
       info_mag <- paste(info_mag, str)
@@ -250,17 +244,17 @@ prior_stan_to_readable <- function(stan_dat){
         TYP <- stan_dat$t_ONS[k,]
         P   <- stan_dat$p_ONS[k,]
         pname <- paste("T_onset[1,",k,"]",sep="")
-        if(stan_dat$backwards==1){
+        if(stan_dat$BACKWARDS==1){
           pn_base <- pname
           pname <- paste("T_obs[",k,"] - ", pname, sep="")
         }
-        if(stan_dat$relative==1){
+        if(stan_dat$RELATIVE==1){
           pn_base <- pname
           pname <- paste("- T_obs[",k,"] + ", pname, sep="")
         }
         ps  <- prior_statement(pname, TYP[1:2], P[1:3], dist, FALSE)
         str <- paste("[lower=", LB[k], ", upper=", UB[k], "]", sep="")
-        if(stan_dat$backwards==1 || stan_dat$relative==1){
+        if(stan_dat$BACKWARDS==1 || stan_dat$RELATIVE==1){
           str <- paste(str, " (bound is for ", pn_base, ")", sep="")
         }
         ps <- paste(ps, str, sep = "")
