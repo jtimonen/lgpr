@@ -24,7 +24,7 @@
 #' is a function, that function is used to generate the effect. If \code{dis_fun}
 #' is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
 #' prior (vm is the variance masked version of it).
-#' @param useBinKernel Should the binary kernel be used for categorical covariates? 
+#' @param bin_kernel Should the binary kernel be used for categorical covariates? 
 #' If this is \code{TRUE}, the effect will exist only for group 1.
 #' @param steepness Steepness of the input warping function. This is only used
 #' if the disease component is in the model.
@@ -37,7 +37,7 @@ create_F <- function(X,
                      lengthscales,
                      X_affected,
                      dis_fun,
-                     useBinKernel,
+                     bin_kernel,
                      steepness,
                      vm_params)
 {
@@ -55,8 +55,8 @@ create_F <- function(X,
     }
   }
   
-  KK    <- simulate_kernels(X, D, lengthscales,
-                            X_affected, useBinKernel, 
+  KK <- simulate_kernels(X, D, lengthscales,
+                            X_affected, bin_kernel, 
                             useMaskedVarianceKernel, 
                             steepness, vm_params)
 
@@ -94,7 +94,7 @@ create_F <- function(X,
 #' }
 #' @param lengthscales vector of lengthscales
 #' @param X_affected which individuals are affected by the disease
-#' @param useBinKernel whether or not binary (mask) kernel should be used for
+#' @param bin_kernel whether or not binary (mask) kernel should be used for
 #' categorical covariates
 #' @param useMaskedVarianceKernel should the masked variance kernel be used 
 #' for drawing the disease component
@@ -105,7 +105,7 @@ simulate_kernels <- function(X,
                              types, 
                              lengthscales, 
                              X_affected, 
-                             useBinKernel,
+                             bin_kernel,
                              useMaskedVarianceKernel,
                              steepness,
                              vm_params
@@ -127,7 +127,8 @@ simulate_kernels <- function(X,
     xj <- X[,j]
     if(types[j]==1){
       j_ell <- j_ell + 1
-      Kj <- kernel_cat(id,id)*kernel_se(t,t,ell=ell[j_ell])
+      N_tot <- length(unique(xj))
+      Kj <- kernel_zerosum(id,id,N_tot)*kernel_se(t,t,ell=ell[j_ell])
     }else if(types[j]==2){
       j_ell <- j_ell + 1
       Kj <- kernel_se(t,t,ell=ell[j_ell])
@@ -144,16 +145,18 @@ simulate_kernels <- function(X,
       Kj <- kernel_se(xj,xj,ell=ell[j_ell])
     }else if(types[j]==5){
       j_ell <- j_ell + 1
-      if(useBinKernel){
+      if(bin_kernel){
         Kj <- kernel_bin(xj,xj)*kernel_se(t,t,ell=ell[j_ell])
       }else{
-        Kj <- kernel_cat(xj,xj)*kernel_se(t,t,ell=ell[j_ell])
+        N_cat <- length(unique(xj))
+        Kj <- kernel_zerosum(xj,xj,N_cat)*kernel_se(t,t,ell=ell[j_ell])
       }
     }else if(types[j]==6){
-      if(useBinKernel){
+      if(bin_kernel){
         Kj <- kernel_bin(xj,xj)
       }else{
-        Kj <- kernel_cat(xj,xj)
+        N_cat <- length(unique(xj))
+        Kj <- kernel_zerosum(xj,xj,N_cat)
       }
     }else{
       stop('types contains invalid values')

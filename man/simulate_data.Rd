@@ -11,7 +11,7 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   noise_type = "Gaussian", snr = 3, phi = 1,
   N_affected = round(N/2), t_effect_range = "auto",
   t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
-  useBinKernel = TRUE, steepness = 0.5, vm_params = c(0.025, 1),
+  bin_kernel = FALSE, steepness = 0.5, vm_params = c(0.025, 1),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
   1)), N_trials = 1, verbose = FALSE)
 }
@@ -79,7 +79,7 @@ is a function, that function is used to generate the effect. If \code{dis_fun}
 is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
 prior (vm is the variance masked version of it).}
 
-\item{useBinKernel}{Should the binary kernel be used for categorical covariates? 
+\item{bin_kernel}{Should the binary kernel be used for categorical covariates? 
 If this is \code{TRUE}, the effect will exist only for group 1.}
 
 \item{steepness}{Steepness of the input warping function. This is only used

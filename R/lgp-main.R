@@ -279,7 +279,7 @@ lgp_fit <- function(model,
 #' }
 lgp_predict <- function(fit, 
                         X_test, 
-                        samples        = "mean",
+                        samples        = "map",
                         print_progress = TRUE,
                         print_params   = FALSE)
 {

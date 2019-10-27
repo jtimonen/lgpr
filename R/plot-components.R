@@ -1,16 +1,45 @@
 
-#' Visualize average inferred components or component samples,
-#' evaluated at data points
+#' Visualize inferred components
 #' @export
+#' @inheritParams plot_components_posterior_sub1
+#' @inheritParams plot_components_posterior_sub2
+#' @return an object returned by ggpubr::ggarrange
+plot_components_posterior <- function(fit, subsamples = NULL,
+                                      time_is_xvar = TRUE, 
+                                      PRED = NULL, 
+                                      marker = NULL, 
+                                      sample_idx = 1,
+                                      n_sd = 2,
+                                      ...)
+{
+  if(is.null(PRED)){
+    if(is.null(marker) && is.null(subsamples)){
+      marker <- 16
+    }
+    h <- plot_components_posterior_sub1(fit, subsamples, 
+                                        time_is_xvar, marker, ...)
+  }else{
+    h <- plot_components_posterior_sub2(fit, PRED, sample_idx,
+                                        time_is_xvar, n_sd, ...)
+  }
+  return(h)
+}
+
+
+
+#' Helper for \code{\link{plot_components_posterior}}
 #' @param fit An object of class \code{lgpfit}.
-#' @param time_is_xvar is age the x-axis variable?
+#' @param time_is_xvar is the time variable the x-axis variable
+#' in all subplots?
 #' @param subsamples How many samples to plot. If this is NULL,
 #' average over all samples is plotted. If this is "all", all
 #' samples are plotted.
+#' @param marker point type
 #' @param ... additional arguments for \code{\link{plot_components}}
 #' @return an object returned by ggpubr::ggarrange
-plot_components_posterior <- function(fit, subsamples = NULL,
-                                      time_is_xvar = TRUE, ...)
+plot_components_posterior_sub1 <- function(fit, subsamples,
+                                      time_is_xvar, marker,
+                                      ...)
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
@@ -40,21 +69,54 @@ plot_components_posterior <- function(fit, subsamples = NULL,
     stop("invalid input for subsamples!")
   }
   
-  h <- plot_components(FFF, NULL, model, time_is_xvar, ...)
+  h <- plot_components(FFF, NULL, model, 
+                       time_is_xvar, marker = marker, ...)
   
   # Return ggplot object
   return(h)
   
 }
 
+#' Helper for \code{\link{plot_components_posterior}}
+#' @param fit An object of class \code{lgpfit}.
+#' @param n_sd number of standard deviations (ribbon width)
+#' @param PRED object returned by \code{\link{lgp_predict}}
+#' @param time_is_xvar is the time variable the x-axis variable
+#' in all subplots?
+#' @param sample_idx Which sample to plot. 
+#' @param ... additional arguments for \code{\link{plot_components}}
+#' @return an object returned by ggpubr::ggarrange
+plot_components_posterior_sub2 <- function(fit, PRED, sample_idx,
+                                           time_is_xvar,
+                                           n_sd, ...)
+{
+  # Check input correctness
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  model <- fit@model
+  # Create plot
+  AAA <- PRED_to_arrays(PRED)
+  MMM <- AAA$MMM
+  SSS <- n_sd * AAA$SSS
+  X_test <- PRED$X_test_scaled
+  
+  h <- plot_components(MMM, SSS, model, time_is_xvar, X_test, ...)
+  
+  # Return ggplot object
+  return(h)
+  
+}
 
 #' Visualize the components of a simulated data set
 #' @export
 #' @param simData simulated data object (list)
-#' @param time_is_xvar is the time variable the x-axis variable?
+#' @param time_is_xvar is the time variable the x-axis variable
+#' in all subplots?
+#' @param marker point marker
 #' @param ... additional arguments for \code{\link{plot_components}}
 #' @return an object returned by ggpubr::ggarrange
-plot_components_simdata <- function(simData, time_is_xvar = TRUE, ...)
+plot_components_simdata <- function(simData, 
+                                    time_is_xvar = TRUE, 
+                                    marker = 16, ...)
 {
   data  <- simData$data
   FFF   <- simData$components
@@ -67,7 +129,8 @@ plot_components_simdata <- function(simData, time_is_xvar = TRUE, ...)
   FFF     <- array(0, dim = c(1, nnn, ddd-3))
   FFF[1,,]<- as.matrix(FFF_1)
   
-  h <- plot_components(FFF, NULL, model, time_is_xvar, ...)
+  h <- plot_components(FFF, NULL, model, time_is_xvar, 
+                       marker = marker, ...)
   return(h)
 }
 
@@ -86,8 +149,12 @@ plot_components_simdata <- function(simData, time_is_xvar = TRUE, ...)
 #' @param ylabel y-axis label 
 #' @return an object returned by ggpubr::ggarrange
 plot_components <- function(MMM, SSS, model, time_is_xvar,
+                            X_test        = NULL,
+                            sum_highlight = NULL,
                             linealpha   = 1,
                             linetype    = 1, 
+                            fill_alpha  = 0.3,
+                            marker      = NULL,
                             ncol        = NULL,
                             nrow        = NULL,
                             legend      = NULL,
@@ -103,7 +170,8 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
   sum_D <- sum(model@stan_dat$D) + 1
   for(d in 1:sum_D){
     gg <- plot_component(MMM, SSS, model, d, time_is_xvar,
-                         linealpha, linetype)
+                         linealpha, linetype, fill_alpha,
+                         X_test, marker, sum_highlight)
     if(is.null(ylim)){
       if(!is.null(SSS)){
         ylim <- c(min(MMM - SSS), max(MMM + SSS))
@@ -138,16 +206,27 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
 #' @param SSS a n array of size n_samples x n_data x n_components
 #' @param model an object of class 'lgpmodel'
 #' @param idx Index of component to be plotted.
-#' @param time_is_xvar boolean value 
+#' @param time_is_xvar is the time variable the x-axis variable 
 #' @param linealpha line alpha
 #' @param linetype line type
+#' @param fill_alpha fill alpha for geom_ribbons
+#' @param X_test optional matrix of test points
+#' @param marker point type
+#' @param sum_highlight name of a categorical covariate to be highlighted
+#' by colour in the sum plot
 #' @return a ggplot object
 plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
-                           linealpha, linetype)
+                           linealpha, linetype, fill_alpha,
+                           X_test, marker, sum_highlight)
 {
   sdat  <- model@stan_dat
-  X     <- t(sdat$X)
-  Xnn   <- sdat$X_notnan
+  if(is.null(X_test)){
+    X     <- t(sdat$X)
+    Xnn   <- sdat$X_notnan
+  }else{
+    X     <- X_test
+    Xnn   <- as.numeric(!is.nan(X_test[,3]))
+  }
   D     <- sdat$D
   SCL   <- model@scalings
   sum_D <- sum(D) + 1
@@ -165,7 +244,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
     ctype <- 7 # sum 
   }
   
-  plot_eb  <- !is.null(SSS)
+  plot_eb  <- !is.null(SSS) && !(ctype %in% c(1,7))
   MMM_i    <- MMM[,,idx]
   f        <- as.numeric(t(MMM_i))
   if(plot_eb){
@@ -185,38 +264,77 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
     xvar_name <- model@info$varInfo$time_variable
   }else{
     xvar  <- rep(X[,cind], S)
+    xvar_name <- cvn[cind]
     if(ctype==4){
-      xvar_name <- cvn[cind]
-      warning('covariate', cvn[cind], 'is not on original scale!')
+      warning('covariate', xvar_name, 'is not on original scale!')
     }
   }
+
   
   # Create df and aes
-  if(ctype %in% c(1,4,7)){
+  if(ctype %in% c(1,4)){
     leg      <- ggplot2::theme(legend.position = "none")
     grpvar   <- as.factor(paste(id, sample))
     df       <- data.frame(xvar, f, grpvar)
-    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', group = 'grpvar')
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                    group = 'grpvar')
+    aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub')
   }else if(ctype==2){
     leg      <- ggplot2::theme(legend.position = "none")
     grpvar   <- as.factor(sample)
     df       <- data.frame(xvar, f, grpvar)
     aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', group = 'grpvar')
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                    group = 'grpvar')
+    aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub')
   }else if(ctype==3){
     colorvar <- as.factor(rep(Xnn, S))
-    leg      <- ggplot2::labs(color = 'Group')
+    leg      <- ggplot2::labs(color = 'Group', fill = 'Group')
     grpvar   <- as.factor(paste(id, sample))
     df       <- data.frame(xvar, f, grpvar, colorvar)
     aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
                                     group = 'grpvar', color = 'colorvar')
+    aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub', fill = 'colorvar')
   }else if(ctype == 5 || ctype == 6){
-    leg      <- ggplot2::labs(color = cvn[cind])
+    leg      <- ggplot2::labs(color = cvn[cind], fill = cvn[cind])
     colorvar <- rep(X[,cind], S)
     grpvar   <- as.factor(paste(colorvar, sample))
     colorvar <- as.factor(colorvar)
     df       <- data.frame(xvar, f, grpvar, colorvar)
     aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
                                     group = 'grpvar', color = 'colorvar')
+    aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub', fill = 'colorvar')
+  }else if(ctype==7){
+    if(!is.null(sum_highlight)){
+      if(sum_highlight=='group'){
+        colorvar <- as.factor(rep(Xnn, S))
+        leg      <- ggplot2::labs(color = 'Group', fill = 'Group')
+        grpvar   <- as.factor(paste(id, sample))
+        df       <- data.frame(xvar, f, grpvar, colorvar)
+        aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                        group = 'grpvar')
+        aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub')
+      }else {
+        cind <- which(cvn==sum_highlight)
+        if(length(cind)==0){stop("invalid sum_highlight (", sum_highlight,")")}
+        leg      <- ggplot2::labs(color = cvn[cind], fill = cvn[cind])
+        colorvar <- rep(X[,cind], S)
+        grpvar   <- as.factor(paste(id,sample))
+        colorvar <- as.factor(colorvar)
+        df       <- data.frame(xvar, f, grpvar, colorvar)
+        aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                        group = 'grpvar', 
+                                        color = 'colorvar')
+        aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub', 
+                                        fill = 'colorvar')
+      }
+    }else{
+      leg      <- ggplot2::theme(legend.position = "none")
+      grpvar   <- as.factor(paste(id, sample))
+      df       <- data.frame(xvar, f, grpvar)
+      aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', group = 'grpvar')
+      aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub')
+    }
   }else{
     stop("invalid ctype!")
   }
@@ -229,13 +347,19 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
   }
   
   # Create ggplot object
-  h   <- ggplot2::ggplot(df, aes) + leg
+  h   <- ggplot2::ggplot(df, aes)
+  if(plot_eb){
+    h <- h + ggplot2::geom_ribbon(aes_eb, alpha = fill_alpha, 
+                                  lty = 0)
+  }
+  h   <- h + leg
   h   <- h + ggplot2::geom_line(linetype = linetype, alpha = linealpha)
   h   <- h + ggplot2::ggtitle(title)
   h   <- h + ggplot2::xlab(xvar_name)
-  # Add errorbar
-  if(plot_eb){
-    h <- h + ggplot2::geom_ribbon(ggplot2::aes(ymin=lb, ymax=ub))
+  
+  # Add marker
+  if(!is.null(marker)){
+    h <- h + ggplot2::geom_point(pch = marker)
   }
   return(h)
   

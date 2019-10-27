@@ -4,7 +4,8 @@
 \alias{plot_component}
 \title{Helper function for plotting one component}
 \usage{
-plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype)
+plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype,
+  fill_alpha, X_test, marker, sum_highlight)
 }
 \arguments{
 \item{MMM}{a n array of size n_samples x n_data x n_components}
@@ -15,11 +16,20 @@ plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype)
 
 \item{idx}{Index of component to be plotted.}
 
-\item{time_is_xvar}{boolean value}
+\item{time_is_xvar}{is the time variable the x-axis variable}
 
 \item{linealpha}{line alpha}
 
 \item{linetype}{line type}
+
+\item{fill_alpha}{fill alpha for geom_ribbons}
+
+\item{X_test}{optional matrix of test points}
+
+\item{marker}{point type}
+
+\item{sum_highlight}{name of a categorical covariate to be highlighted
+by colour in the sum plot}
 }
 \value{
 a ggplot object

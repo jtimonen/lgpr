@@ -39,6 +39,32 @@ kernel_cat <- function(x1,x2,alpha=1){
   return(alpha^2*K)
 }
 
+#' Compute a zeros-sum kernel matrix
+#'
+#' @param x1 (integer) vector of length n
+#' @param x2 (integer) vector of length m
+#' @param M number of categories
+#' @param alpha marginal std (default = 1)
+#' @return A (binary) kernel matrix of size n x m
+kernel_zerosum <- function(x1,x2,M,alpha=1){
+  if(alpha <0){
+    stop("alpha cannot be negative")
+  }
+  n1 <- length(x1)
+  n2 <- length(x2)
+  K  <- matrix(0, n1, n2)
+  for(i in 1:n1){
+    for(j in 1:n2){
+      if(x1[i]==x2[j]){
+        K[i,j] = 1.0;
+      }else{
+        K[i,j] = -1.0/(M-1); 
+      }
+    }
+  }
+  return(alpha^2*K)
+}
+
 #' Compute a binary kernel matrix
 #'
 #' @param x1 (integer) vector of length n

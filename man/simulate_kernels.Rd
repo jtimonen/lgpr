@@ -4,7 +4,7 @@
 \alias{simulate_kernels}
 \title{Compute all kernel matrices when simulating data}
 \usage{
-simulate_kernels(X, types, lengthscales, X_affected, useBinKernel,
+simulate_kernels(X, types, lengthscales, X_affected, bin_kernel,
   useMaskedVarianceKernel, steepness, vm_params)
 }
 \arguments{
@@ -24,7 +24,7 @@ simulate_kernels(X, types, lengthscales, X_affected, useBinKernel,
 
 \item{X_affected}{which individuals are affected by the disease}
 
-\item{useBinKernel}{whether or not binary (mask) kernel should be used for
+\item{bin_kernel}{whether or not binary (mask) kernel should be used for
 categorical covariates}
 
 \item{useMaskedVarianceKernel}{should the masked variance kernel be used 

@@ -4,12 +4,15 @@
 \alias{plot_components_simdata}
 \title{Visualize the components of a simulated data set}
 \usage{
-plot_components_simdata(simData, time_is_xvar = TRUE, ...)
+plot_components_simdata(simData, time_is_xvar = TRUE, marker = 16, ...)
 }
 \arguments{
 \item{simData}{simulated data object (list)}
 
-\item{time_is_xvar}{is the time variable the x-axis variable?}
+\item{time_is_xvar}{is the time variable the x-axis variable
+in all subplots?}
+
+\item{marker}{point marker}
 
 \item{...}{additional arguments for \code{\link{plot_components}}}
 }

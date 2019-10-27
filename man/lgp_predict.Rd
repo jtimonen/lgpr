@@ -4,7 +4,7 @@
 \alias{lgp_predict}
 \title{Compute predictions for a fitted model}
 \usage{
-lgp_predict(fit, X_test, samples = "mean", print_progress = TRUE,
+lgp_predict(fit, X_test, samples = "map", print_progress = TRUE,
   print_params = FALSE)
 }
 \arguments{

@@ -4,9 +4,10 @@
 \alias{plot_components}
 \title{Helper function for plotting components}
 \usage{
-plot_components(MMM, SSS, model, time_is_xvar, linealpha = 1,
-  linetype = 1, ncol = NULL, nrow = NULL, legend = NULL,
-  labels = NULL, ylim = NULL, font_size = 9,
+plot_components(MMM, SSS, model, time_is_xvar, X_test = NULL,
+  sum_highlight = NULL, linealpha = 1, linetype = 1,
+  fill_alpha = 0.3, marker = NULL, ncol = NULL, nrow = NULL,
+  legend = NULL, labels = NULL, ylim = NULL, font_size = 9,
   theme = ggplot2::theme_linedraw(), legend_dir = "horizontal",
   xlabel = NULL, ylabel = " ")
 }
@@ -17,11 +18,20 @@ plot_components(MMM, SSS, model, time_is_xvar, linealpha = 1,
 
 \item{model}{an object of class 'lgpmodel'}
 
-\item{time_is_xvar}{boolean value}
+\item{time_is_xvar}{is the time variable the x-axis variable}
+
+\item{X_test}{optional matrix of test points}
+
+\item{sum_highlight}{name of a categorical covariate to be highlighted
+by colour in the sum plot}
 
 \item{linealpha}{line alpha}
 
 \item{linetype}{line type}
+
+\item{fill_alpha}{fill alpha for geom_ribbons}
+
+\item{marker}{point type}
 
 \item{ncol}{number of plot columns}
 

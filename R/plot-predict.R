@@ -151,9 +151,9 @@ plot_posterior_predictions <- function(fit,
   # Set title
   if(mode == "posterior"){
     if(info$sample_F){
-      ptitle <- "Posterior samples of g" 
+      ptitle <- " " 
     }else{
-      ptitle <- "Posterior distribution of g"
+      ptitle <- " "
     }
   }else{
     ptitle <- "Posterior predictive distribution"

@@ -266,3 +266,25 @@ full_model <- function(data, ...){
   model <- lgp_model(form, data, ...)
   return(model)
 }
+
+#' PRED object to arrays
+#' @param PRED an object returned by \code{\link{lgp_predict}}
+#' @return a list containing two arrays
+PRED_to_arrays <- function(PRED){
+  L <- PRED$LIST
+  S <- length(L)
+  FFF_1 <- L[[1]]$mu_cmp
+  nnn <- dim(FFF_1)[1]
+  ddd <- dim(FFF_1)[2]
+  MMM <- array(0, c(S,nnn,ddd+1))
+  SSS <- array(0, c(S,nnn,ddd+1))
+  for(s in 1:S){
+    MMM_s <- L[[s]]$mu_cmp
+    SSS_s <- sqrt(L[[s]]$s2_cmp)
+    mu    <- L[[s]]$mu_f
+    std   <- sqrt(L[[s]]$s2_f)
+    MMM[s,,] <- as.matrix(cbind(MMM_s, mu))
+    SSS[s,,] <- as.matrix(cbind(SSS_s, std))
+  }
+  return(list(MMM=MMM,SSS=SSS))
+}
