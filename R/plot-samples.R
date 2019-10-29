@@ -94,7 +94,7 @@ plot_samples <- function(object,
 #' @param prob_outer Outer interval
 #' @param point_est Point estimate type
 #' @return a ggplot object
-plot_onset <- function(fit, 
+plot_effect_times <- function(fit, 
                        color_scheme = "red",
                        prob         = 1,
                        prob_outer   = 1,
@@ -107,7 +107,7 @@ plot_onset <- function(fit,
     stop("The disease effect time was not modeled as uncertain!")
   }
   p <- plot_samples(fit, 
-                    regex_pars   = "T_onset", 
+                    regex_pars   = "T_effect", 
                     type         = "areas", 
                     point_est    = point_est, 
                     prob         = prob, 

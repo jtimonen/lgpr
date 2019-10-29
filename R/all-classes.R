@@ -115,7 +115,9 @@ setMethod(f = "show",
             diag <- object@diagnostics
             Rhat <- diag$Rhat
             imax <- which(Rhat==max(Rhat))
-            cat("* Largest R-hat value is ", round(max(Rhat), 4), " (", rownames(diag)[imax],")\n", sep="")
+            cat("* Largest R-hat value is ", round(max(Rhat), 4), 
+                " (", paste(rownames(diag)[imax], collapse = ', '), 
+                ")\n", sep="")
             
             sv   <- object@signal_variance
             rv   <- object@residual_variance
