@@ -93,7 +93,7 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
   p_BET <- c(prior$beta$shape1, prior$beta$shape2)
   
   # Parse prior of uncertain disease effect time
-  ONSET <- parse_prior_onset(prior$onset, N_cases, T_observed, T_last, UNCRT)
+  ONSET <- parse_prior_t_effect(prior$t_effect, N_cases, T_observed, T_last, UNCRT)
   
   # Things returned and given to Stan
   stan_priors <- list(t_ID  = t_ID,    t_A   = t_A,   
@@ -121,20 +121,21 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last){
 }
 
 
-#' Turn a list describing an onset prior distribution into things to be given to Stan
+#' Turn a list describing an effect time distribution into 
+#' things to be given to Stan
 #'
-#' @param dist This is \code{prior$onset}, where \code{prior} is an argument of
+#' @param dist This is \code{prior$effect}, where \code{prior} is an argument of
 #' \code{lgp_model}
 #' @param N_cases number of case individuals
-#' @param T_observed observed disease onsets
+#' @param T_observed observed disease onsets / initiation times
 #' @param T_last last time point for each diseased individual
 #' @param UNCRT 0 or 1
 #' @return a list with things to be given to Stan
-parse_prior_onset <- function(dist, N_cases, T_observed, T_last, UNCRT){
+parse_prior_t_effect <- function(dist, N_cases, T_observed, T_last, UNCRT){
   
   # Check type
   if(is.null(dist$type)){
-    stop("The onset prior must have a field 'type'!")
+    stop("The effect time prior must have a field 'type'!")
   }
   type <- dist$type
   

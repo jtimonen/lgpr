@@ -121,7 +121,7 @@ struct STAN_var_mask_functor__ {
 template <typename T0__, typename T1__, typename T2__>
 Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__, T2__>::type, Eigen::Dynamic, 1>
 STAN_get_x_tilde(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x_disAge,
-                     const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& T_onset,
+                     const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& T_effect,
                      const Eigen::Matrix<T2__, Eigen::Dynamic, 1>& T_observed,
                      const std::vector<std::vector<int> >& mapping,
                      const std::vector<int>& lengths, std::ostream* pstream__) {
@@ -161,7 +161,7 @@ STAN_get_x_tilde(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x_disAge,
             current_statement_begin__ = 40;
             stan::model::assign(x_tilde, 
                         stan::model::cons_list(stan::model::index_multi(inds), stan::model::nil_index_list()), 
-                        subtract(add(stan::model::rvalue(x_disAge, stan::model::cons_list(stan::model::index_multi(inds), stan::model::nil_index_list()), "x_disAge"), get_base1(T_observed, k, "T_observed", 1)), get_base1(T_onset, k, "T_onset", 1)), 
+                        subtract(add(stan::model::rvalue(x_disAge, stan::model::cons_list(stan::model::index_multi(inds), stan::model::nil_index_list()), "x_disAge"), get_base1(T_observed, k, "T_observed", 1)), get_base1(T_effect, k, "T_effect", 1)), 
                         "assigning variable x_tilde");
             }
         }
@@ -178,11 +178,11 @@ struct STAN_get_x_tilde_functor__ {
     template <typename T0__, typename T1__, typename T2__>
         Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__, T2__>::type, Eigen::Dynamic, 1>
     operator()(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x_disAge,
-                     const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& T_onset,
+                     const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& T_effect,
                      const Eigen::Matrix<T2__, Eigen::Dynamic, 1>& T_observed,
                      const std::vector<std::vector<int> >& mapping,
                      const std::vector<int>& lengths, std::ostream* pstream__) const {
-        return STAN_get_x_tilde(x_disAge, T_onset, T_observed, mapping, lengths, pstream__);
+        return STAN_get_x_tilde(x_disAge, T_effect, T_observed, mapping, lengths, pstream__);
     }
 };
 template <typename T0__, typename T1__>
@@ -589,7 +589,7 @@ STAN_compute_kernel_matrices(const std::vector<Eigen::Matrix<T0__, Eigen::Dynami
                                  const std::vector<int>& row_to_caseID_plus1,
                                  const std::vector<int>& caseID_nrows,
                                  const std::vector<Eigen::Matrix<T4__, Eigen::Dynamic, Eigen::Dynamic> >& KF,
-                                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_onset,
+                                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_effect,
                                  const Eigen::Matrix<T6__, Eigen::Dynamic, 1>& T_observed,
                                  const std::vector<int>& D,
                                  const int& UNCRT,
@@ -733,7 +733,7 @@ STAN_compute_kernel_matrices(const std::vector<Eigen::Matrix<T0__, Eigen::Dynami
                 stan::math::assign(x_tilde, get_base1(X, 3, "X", 1));
             } else {
                 current_statement_begin__ = 184;
-                stan::math::assign(x_tilde, STAN_get_x_tilde(get_base1(X, 3, "X", 1), get_base1(T_onset, 1, "T_onset", 1), T_observed, caseID_to_rows, caseID_nrows, pstream__));
+                stan::math::assign(x_tilde, STAN_get_x_tilde(get_base1(X, 3, "X", 1), get_base1(T_effect, 1, "T_effect", 1), T_observed, caseID_to_rows, caseID_nrows, pstream__));
             }
             current_statement_begin__ = 186;
             stan::math::assign(w, to_array_1d(STAN_warp_input(x_tilde, stp, pstream__)));
@@ -858,7 +858,7 @@ struct STAN_compute_kernel_matrices_functor__ {
                                  const std::vector<int>& row_to_caseID_plus1,
                                  const std::vector<int>& caseID_nrows,
                                  const std::vector<Eigen::Matrix<T4__, Eigen::Dynamic, Eigen::Dynamic> >& KF,
-                                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_onset,
+                                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_effect,
                                  const Eigen::Matrix<T6__, Eigen::Dynamic, 1>& T_observed,
                                  const std::vector<int>& D,
                                  const int& UNCRT,
@@ -878,7 +878,7 @@ struct STAN_compute_kernel_matrices_functor__ {
                                  const std::vector<T22__>& ell_categAge,
                                  const std::vector<T23__>& warp_steepness,
                                  const std::vector<Eigen::Matrix<T24__, Eigen::Dynamic, 1> >& beta, std::ostream* pstream__) const {
-        return STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID_plus1, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__);
+        return STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID_plus1, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__);
     }
 };
 template <typename T0__, typename T2__>
@@ -2372,11 +2372,11 @@ public:
             }
             // transformed parameters
             current_statement_begin__ = 399;
-            validate_non_negative_index("T_onset", "N_cases", N_cases);
-            validate_non_negative_index("T_onset", "UNCRT", UNCRT);
-            std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > T_onset(UNCRT, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(N_cases));
-            stan::math::initialize(T_onset, DUMMY_VAR__);
-            stan::math::fill(T_onset, DUMMY_VAR__);
+            validate_non_negative_index("T_effect", "N_cases", N_cases);
+            validate_non_negative_index("T_effect", "UNCRT", UNCRT);
+            std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > T_effect(UNCRT, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(N_cases));
+            stan::math::initialize(T_effect, DUMMY_VAR__);
+            stan::math::fill(T_effect, DUMMY_VAR__);
             current_statement_begin__ = 400;
             validate_non_negative_index("F", "n", n);
             validate_non_negative_index("F", "F_IS_SAMPLED", F_IS_SAMPLED);
@@ -2388,10 +2388,10 @@ public:
             current_statement_begin__ = 401;
             if (as_bool(UNCRT)) {
                 current_statement_begin__ = 402;
-                stan::model::assign(T_onset, 
+                stan::model::assign(T_effect, 
                             stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                             add(get_base1(L_ons, 1, "L_ons", 1), elt_multiply(subtract(get_base1(U_ons, 1, "U_ons", 1), get_base1(L_ons, 1, "L_ons", 1)), get_base1(T_raw, 1, "T_raw", 1))), 
-                            "assigning variable T_onset");
+                            "assigning variable T_effect");
             }
             current_statement_begin__ = 404;
             if (as_bool(F_IS_SAMPLED)) {
@@ -2403,7 +2403,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
-                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                 current_statement_begin__ = 406;
                 for (int r = 1; r <= sum_D; ++r) {
                     {
@@ -2434,14 +2434,14 @@ public:
             const char* function__ = "validate transformed params";
             (void) function__;  // dummy to suppress unused var warning
             current_statement_begin__ = 399;
-            size_t T_onset_k_0_max__ = UNCRT;
-            size_t T_onset_j_1_max__ = N_cases;
-            for (size_t k_0__ = 0; k_0__ < T_onset_k_0_max__; ++k_0__) {
-                for (size_t j_1__ = 0; j_1__ < T_onset_j_1_max__; ++j_1__) {
-                    if (stan::math::is_uninitialized(T_onset[k_0__](j_1__))) {
+            size_t T_effect_k_0_max__ = UNCRT;
+            size_t T_effect_j_1_max__ = N_cases;
+            for (size_t k_0__ = 0; k_0__ < T_effect_k_0_max__; ++k_0__) {
+                for (size_t j_1__ = 0; j_1__ < T_effect_j_1_max__; ++j_1__) {
+                    if (stan::math::is_uninitialized(T_effect[k_0__](j_1__))) {
                         std::stringstream msg__;
-                        msg__ << "Undefined transformed parameter: T_onset" << "[" << k_0__ << "]" << "(" << j_1__ << ")";
-                        stan::lang::rethrow_located(std::runtime_error(std::string("Error initializing variable T_onset: ") + msg__.str()), current_statement_begin__, prog_reader__());
+                        msg__ << "Undefined transformed parameter: T_effect" << "[" << k_0__ << "]" << "(" << j_1__ << ")";
+                        stan::lang::rethrow_located(std::runtime_error(std::string("Error initializing variable T_effect: ") + msg__.str()), current_statement_begin__, prog_reader__());
                     }
                 }
             }
@@ -2529,13 +2529,13 @@ public:
                     current_statement_begin__ = 467;
                     if (as_bool(logical_eq(RELATIVE, 1))) {
                         current_statement_begin__ = 468;
-                        stan::math::assign(tx, (-(get_base1(T_observed, k, "T_observed", 1)) + get_base1(get_base1(T_onset, 1, "T_onset", 1), k, "T_onset", 2)));
+                        stan::math::assign(tx, (-(get_base1(T_observed, k, "T_observed", 1)) + get_base1(get_base1(T_effect, 1, "T_effect", 1), k, "T_effect", 2)));
                     } else if (as_bool(logical_eq(BACKWARDS, 1))) {
                         current_statement_begin__ = 470;
-                        stan::math::assign(tx, (get_base1(T_observed, k, "T_observed", 1) - get_base1(get_base1(T_onset, 1, "T_onset", 1), k, "T_onset", 2)));
+                        stan::math::assign(tx, (get_base1(T_observed, k, "T_observed", 1) - get_base1(get_base1(T_effect, 1, "T_effect", 1), k, "T_effect", 2)));
                     } else {
                         current_statement_begin__ = 472;
-                        stan::math::assign(tx, get_base1(get_base1(T_onset, 1, "T_onset", 1), k, "T_onset", 2));
+                        stan::math::assign(tx, get_base1(get_base1(T_effect, 1, "T_effect", 1), k, "T_effect", 2));
                     }
                     current_statement_begin__ = 474;
                     lp_accum__.add(STAN_log_prior(tx, stan::model::rvalue(t_ONS, stan::model::cons_list(stan::model::index_uni(k), stan::model::cons_list(stan::model::index_min_max(1, 2), stan::model::nil_index_list())), "t_ONS"), stan::model::rvalue(p_ONS, stan::model::cons_list(stan::model::index_uni(k), stan::model::cons_list(stan::model::index_min_max(1, 3), stan::model::nil_index_list())), "p_ONS"), pstream__));
@@ -2666,7 +2666,7 @@ public:
                     std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                     stan::math::initialize(KX, DUMMY_VAR__);
                     stan::math::fill(KX, DUMMY_VAR__);
-                    stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                    stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                     current_statement_begin__ = 527;
                     if (as_bool(logical_neq(LH, 1))) {
                         current_statement_begin__ = 528;
@@ -2725,7 +2725,7 @@ public:
         names__.push_back("phi");
         names__.push_back("beta");
         names__.push_back("T_raw");
-        names__.push_back("T_onset");
+        names__.push_back("T_effect");
         names__.push_back("F");
         names__.push_back("F_mean_cmp");
         names__.push_back("F_var_cmp");
@@ -3027,11 +3027,11 @@ public:
         try {
             // declare and define transformed parameters
             current_statement_begin__ = 399;
-            validate_non_negative_index("T_onset", "N_cases", N_cases);
-            validate_non_negative_index("T_onset", "UNCRT", UNCRT);
-            std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > T_onset(UNCRT, Eigen::Matrix<double, Eigen::Dynamic, 1>(N_cases));
-            stan::math::initialize(T_onset, DUMMY_VAR__);
-            stan::math::fill(T_onset, DUMMY_VAR__);
+            validate_non_negative_index("T_effect", "N_cases", N_cases);
+            validate_non_negative_index("T_effect", "UNCRT", UNCRT);
+            std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > T_effect(UNCRT, Eigen::Matrix<double, Eigen::Dynamic, 1>(N_cases));
+            stan::math::initialize(T_effect, DUMMY_VAR__);
+            stan::math::fill(T_effect, DUMMY_VAR__);
             current_statement_begin__ = 400;
             validate_non_negative_index("F", "n", n);
             validate_non_negative_index("F", "F_IS_SAMPLED", F_IS_SAMPLED);
@@ -3043,10 +3043,10 @@ public:
             current_statement_begin__ = 401;
             if (as_bool(UNCRT)) {
                 current_statement_begin__ = 402;
-                stan::model::assign(T_onset, 
+                stan::model::assign(T_effect, 
                             stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                             add(get_base1(L_ons, 1, "L_ons", 1), elt_multiply(subtract(get_base1(U_ons, 1, "U_ons", 1), get_base1(L_ons, 1, "L_ons", 1)), get_base1(T_raw, 1, "T_raw", 1))), 
-                            "assigning variable T_onset");
+                            "assigning variable T_effect");
             }
             current_statement_begin__ = 404;
             if (as_bool(F_IS_SAMPLED)) {
@@ -3058,7 +3058,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
-                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                 current_statement_begin__ = 406;
                 for (int r = 1; r <= sum_D; ++r) {
                     {
@@ -3091,11 +3091,11 @@ public:
             (void) function__;  // dummy to suppress unused var warning
             // write transformed parameters
             if (include_tparams__) {
-                size_t T_onset_j_1_max__ = N_cases;
-                size_t T_onset_k_0_max__ = UNCRT;
-                for (size_t j_1__ = 0; j_1__ < T_onset_j_1_max__; ++j_1__) {
-                    for (size_t k_0__ = 0; k_0__ < T_onset_k_0_max__; ++k_0__) {
-                        vars__.push_back(T_onset[k_0__](j_1__));
+                size_t T_effect_j_1_max__ = N_cases;
+                size_t T_effect_k_0_max__ = UNCRT;
+                for (size_t j_1__ = 0; j_1__ < T_effect_j_1_max__; ++j_1__) {
+                    for (size_t k_0__ = 0; k_0__ < T_effect_k_0_max__; ++k_0__) {
+                        vars__.push_back(T_effect[k_0__](j_1__));
                     }
                 }
                 size_t F_j_1_max__ = n;
@@ -3178,7 +3178,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
-                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_onset, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                 current_statement_begin__ = 556;
                 for (int j = 1; j <= sum_D; ++j) {
                     current_statement_begin__ = 557;
@@ -3404,12 +3404,12 @@ public:
         }
         if (!include_gqs__ && !include_tparams__) return;
         if (include_tparams__) {
-            size_t T_onset_j_1_max__ = N_cases;
-            size_t T_onset_k_0_max__ = UNCRT;
-            for (size_t j_1__ = 0; j_1__ < T_onset_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < T_onset_k_0_max__; ++k_0__) {
+            size_t T_effect_j_1_max__ = N_cases;
+            size_t T_effect_k_0_max__ = UNCRT;
+            for (size_t j_1__ = 0; j_1__ < T_effect_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < T_effect_k_0_max__; ++k_0__) {
                     param_name_stream__.str(std::string());
-                    param_name_stream__ << "T_onset" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
+                    param_name_stream__ << "T_effect" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                     param_names__.push_back(param_name_stream__.str());
                 }
             }
@@ -3590,12 +3590,12 @@ public:
         }
         if (!include_gqs__ && !include_tparams__) return;
         if (include_tparams__) {
-            size_t T_onset_j_1_max__ = N_cases;
-            size_t T_onset_k_0_max__ = UNCRT;
-            for (size_t j_1__ = 0; j_1__ < T_onset_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < T_onset_k_0_max__; ++k_0__) {
+            size_t T_effect_j_1_max__ = N_cases;
+            size_t T_effect_k_0_max__ = UNCRT;
+            for (size_t j_1__ = 0; j_1__ < T_effect_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < T_effect_k_0_max__; ++k_0__) {
                     param_name_stream__.str(std::string());
-                    param_name_stream__ << "T_onset" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
+                    param_name_stream__ << "T_effect" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                     param_names__.push_back(param_name_stream__.str());
                 }
             }

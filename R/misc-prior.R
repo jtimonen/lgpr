@@ -46,7 +46,7 @@ prior_default <- function(sigma_alpha = 1)
                 sigma_n        = prior_sig,
                 phi            = prior_phi,
                 beta           = prior_bet,
-                onset          = prior_ons,
+                t_effect       = prior_ons,
                 vm_params      = c(0.025, 1))
   
   return(prior)
@@ -248,7 +248,7 @@ prior_stan_to_readable <- function(stan_dat){
       for(k in 1:NC){
         TYP <- stan_dat$t_ONS[k,]
         P   <- stan_dat$p_ONS[k,]
-        pname <- paste("T_onset[1,",k,"]",sep="")
+        pname <- paste("T_effect[1,",k,"]",sep="")
         if(stan_dat$BACKWARDS==1){
           pn_base <- pname
           pname <- paste("T_obs[",k,"] - ", pname, sep="")

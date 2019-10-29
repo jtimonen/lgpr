@@ -50,11 +50,11 @@ if(UNCRT){
   real tx;
   for(k in 1:N_cases){
     if(RELATIVE==1){
-      tx = - T_observed[k] + T_onset[1,k];
+      tx = - T_observed[k] + T_effect[1,k];
     }else if(BACKWARDS==1){
-      tx = T_observed[k] - T_onset[1,k];
+      tx = T_observed[k] - T_effect[1,k];
     }else{
-      tx = T_onset[1,k];
+      tx = T_effect[1,k];
     }
     target += STAN_log_prior(tx, t_ONS[k,1:2], p_ONS[k,1:3]);
   }

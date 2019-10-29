@@ -282,7 +282,7 @@ compute_predictions <- function(X_data, y_data, X_test,
       beta <- NULL
     }
     if(info$UNCRT==1){
-      t_ons <- params[which(grepl("T_onset", nam))]
+      t_ons <- params[which(grepl("T_effect", nam))]
       t_ons <- rbind(info$case_ids, t_ons)
       rownames(t_ons) <- c("case id", "effect time")
     }else{

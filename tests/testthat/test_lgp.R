@@ -82,7 +82,8 @@ test_that("lgp can sample F", {
   
 })
 
-test_that("lgp can be used without the vm kernel", {
+test_that(paste0("lgp can be used without the vm kernel",
+" and with special disease modeling features"), {
   
   expect_identical(suppressWarnings({
     as.vector(lgp(formula = y ~ id + age + diseaseAge + group,
@@ -94,6 +95,8 @@ test_that("lgp can be used without the vm kernel", {
                   chains  = 1,
                   refresh = 0,
                   offset_vars = c("group"),
+                  equal_effect = FALSE,
+                  uncertain_effect_time = TRUE,
                   variance_mask = FALSE)@model@stan_dat$D)
   }),
   c(1,1,1,0,0,1)
