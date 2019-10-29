@@ -3,8 +3,8 @@ library(lgpr)
 
 test_that("base kernels work correctly", {
   expect_equal(
-    kernel_cat(c(1,2),c(3,2,1), alpha = 2),
-    matrix(c(0,0,0,4,4,0), nrow = 2, ncol = 3, byrow = FALSE)
+    kernel_zerosum(c(1,2),c(3,2,1), M = 3, alpha = 1),
+    matrix(c(-0.5,-0.5,1.0,-0.5,1.0,-0.5), nrow = 2, ncol = 3, byrow = TRUE)
   )
   expect_equal(
     kernel_bin(c(1,2),c(3,2,1), pos_class = 2),

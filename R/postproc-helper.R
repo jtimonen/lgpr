@@ -147,50 +147,6 @@ get_predicted <- function(fit)
 }
 
 
-#' Separate the covariate effects from an interaction components of a categorical 
-#' covariate and age
-#'
-#' @param f_post a matrix of size \code{n} x \code{sum(D)}
-#' @param D a vector of length 6
-#' @param ell kernel lengthscale
-#' @param t vector of \code{n} time points corresponding to \code{f_post}
-#' @param i_edit Indices of columns whose effect should be moved to shared age.
-#' @return a corrected \code{f_post}
-separate_effects <- function(f_post, t, D, ell, i_edit){
-  if(is.null(ell)){
-    return(f_post)
-  }else{
-    i_shared <- D[1] + 1
-    if(any(i_edit<=0)){stop("invalid input 'i_edit'!")}
-    for(j in i_edit){
-      fj                <- f_post[,j]
-      ks                <- kernel_smoothing(fj, t, t, ell)
-      f_post[,i_shared] <- f_post[,i_shared] + ks
-      f_post[,j]        <- f_post[,j] - ks
-    }
-    return(f_post)
-  }
-}
-
-
-#' Estimate conditional mean time profile using gaussian kernel smoothing
-#'
-#' @param v a vector of length \code{n} to be smoothed
-#' @param t vector of \code{n} time points corresponding to \code{y}
-#' @param t_out the set of \code{p} time points where the smoothing should be evaluated
-#' @param ell kernel lengthscale
-#' @return a vector of length \code{p}
-kernel_smoothing <- function(v, t, t_out, ell){
-  p <- length(t_out)
-  n <- length(t)
-  K <- kernel_se(t_out, t, alpha = 1, ell = ell)
-  for(idx in 1:p){
-    K[idx,] <- K[idx,]/sum(K[idx,]) # normalize kernel rows to sum to 1
-  }
-  y_out <- K%*%v
-  return(y_out)
-}
-
 
 #' Get a posterior estimate of model (hyper)parameters
 #'

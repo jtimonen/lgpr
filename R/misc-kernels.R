@@ -21,23 +21,17 @@ kernel_se <- function(x1,x2,alpha=1,ell=1){
 }
 
 
-#' Compute a categorical kernel matrix
-#'
-#' @param x1 (integer) vector of length n
-#' @param x2 (integer) vector of length m
-#' @param alpha marginal std (default = 1)
-#' @return A (binary) kernel matrix of size n x m
-kernel_cat <- function(x1,x2,alpha=1){
-  if(alpha <0){
-    stop("alpha cannot be negative")
-  }
-  n1 <- length(x1)
-  n2 <- length(x2)
-  X1 <- matrix(rep(x1,each=n2),n1,n2,byrow=T)
-  X2 <- matrix(rep(x2,n1),n1,n2,byrow=T)
-  K  <- matrix(as.numeric(X1==X2),n1,n2)
-  return(alpha^2*K)
-}
+#kernel_cat <- function(x1,x2,alpha=1){
+#  if(alpha <0){
+#    stop("alpha cannot be negative")
+#  }
+#  n1 <- length(x1)
+#  n2 <- length(x2)
+#  X1 <- matrix(rep(x1,each=n2),n1,n2,byrow=T)
+#  X2 <- matrix(rep(x2,n1),n1,n2,byrow=T)
+#  K  <- matrix(as.numeric(X1==X2),n1,n2)
+#  return(alpha^2*K)
+#}
 
 #' Compute a zeros-sum kernel matrix
 #'

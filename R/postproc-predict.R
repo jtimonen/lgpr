@@ -169,6 +169,7 @@ predict_preproc <- function(fit, X_test, samples){
   }
   
   info$case_ids <- get_case_ids(fit)
+  info$NCAT <- stan_dat$N_cat
   
   # Return
   ret <- list(X_data   = X_data, 
@@ -301,7 +302,8 @@ compute_predictions <- function(X_data, y_data, X_test,
                       beta    = beta,
                       t_ons   = t_ons,
                       info    = info,
-                      TSCL    = TSCL)
+                      TSCL    = TSCL,
+                      NCAT    = info$NCAT)
   
   # Compute kernel matrices
   KK   <- compute_kernel_matrices(X_data, X_data, KERNEL_INFO)
@@ -390,6 +392,7 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
   beta  <- as.numeric(kernel_info$beta)
   t_ons <- kernel_info$t_ons
   info  <- kernel_info$info
+  NCAT  <- kernel_info$NCAT
   VM    <- info$USE_VAR_MASK
   vm_params <- info$vm_params
   TSCL  <- kernel_info$TSCL
@@ -415,7 +418,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     r   <- r + 1
     mag <- alpha[1]
     len <- ell[1]
-    KK[,,r] <- kernel_cat(id1, id2) * kernel_se(age1, age2, mag, len)
+    N_tot  <- NCAT[1]
+    KK[,,r] <-  kernel_zerosum(id1, id2, N_tot)  * kernel_se(age1, age2, mag, len)
   }
   if(D[2]==1){
     r   <- r + 1
@@ -490,7 +494,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
       idx <- 2 + D[3] + D[4] + j
       x1  <- X1[,idx]
       x2  <- X2[,idx]
-      KK[,,r] <- kernel_cat(x1, x2) * kernel_se(age1, age2, mag, len)
+      N_cat  <- NCAT[1+j]
+      KK[,,r] <- kernel_zerosum(x1, x2, N_cat) * kernel_se(age1, age2, mag, len)
     }
   }
   if(D[6]>0){
@@ -500,7 +505,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
       idx <- 2 + D[3] + D[4] + D[5] + j
       x1  <- X1[,idx]
       x2  <- X2[,idx]
-      KK[,,r] <- mag^2 * kernel_cat(x1, x2)
+      N_cat  <- NCAT[1+D[5]+j]
+      KK[,,r] <- mag^2 * kernel_zerosum(x1, x2, N_cat) 
     }
   }
   return(KK)
