@@ -11,7 +11,8 @@ test_that("lgp runs", {
                   data    = simulate_data(N = 4, 10*c(1,2,3,4,5))$data, 
                   iter    = 100,
                   chains  = 1, 
-                  refresh = 0)@model@stan_dat$D)
+                  refresh = 0,
+                  verbose = TRUE)@model@stan_dat$D)
   }),
   c(1,1,0,0,0,0)
   )

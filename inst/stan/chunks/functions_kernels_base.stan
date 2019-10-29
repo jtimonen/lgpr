@@ -65,12 +65,45 @@ matrix STAN_K_var_mask(vector x_tilde, real stp, real[] vm_params){
 
 
 // Multiplier matrix to enable heterogeneous diseaseAge effect
-matrix STAN_K_beta(vector beta, int[] r2cIDp1){
-  int n = num_elements(r2cIDp1);
-  vector[n] b;
-  int N_cases = num_elements(beta);
-  vector[N_cases+1] beta1p = rep_vector(0, N_cases+1);
-  beta1p[2:(N_cases+1)] = beta; 
-  b = beta1p[r2cIDp1];
-  return( tcrossprod(to_matrix(sqrt(b))) );
+matrix STAN_K_beta(vector beta, int[] row_to_caseID){
+  int n = num_elements(row_to_caseID);
+  int i_caseID = 0;
+  int j_caseID = 0;
+  real tmp;
+  matrix[n,n] BETA;
+  for(i in 1:(n-1)){
+    i_caseID = row_to_caseID[i];
+    for(j in (i+1):n){
+      j_caseID = row_to_caseID[j];
+      if(i_caseID*j_caseID > 0){
+        tmp = sqrt(beta[i_caseID]*beta[j_caseID]);
+      }else{
+        tmp = 0;
+      }
+      BETA[i,j] = tmp;
+      BETA[j,i] = tmp;
+    }
+    if(i_caseID > 0){
+      BETA[i,i] = beta[i_caseID];
+    }else{
+      BETA[i,i] = 0;
+    }
+  }
+  i_caseID = row_to_caseID[n];
+  if(i_caseID > 0){
+    BETA[n,n] = beta[i_caseID];
+  }else{
+    BETA[n,n] = 0;
+  }
+  return(BETA);
 }
+
+//matrix STAN_K_beta(vector beta, int[] r2cIDp1){
+//  int n = num_elements(r2cIDp1);
+//  vector[n] b;
+//  int N_cases = num_elements(beta);
+//  vector[N_cases+1] beta1p = rep_vector(0, N_cases+1);
+//  beta1p[2:(N_cases+1)] = beta; 
+//  b = beta1p[r2cIDp1];
+//  return( tcrossprod(to_matrix(sqrt(b))) );
+//}

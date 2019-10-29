@@ -11,10 +11,10 @@ The package features
 \itemize{
   \item Additive Gaussian process modeling of longitudinal data
   \item Posterior inference of the model (hyper)parameters using Stan
-  \item Computation of covariate relevances, i.e. how much each covariate explains the target variable
+  \item Computation of covariate relevances
   \item Specialized modeling of a non-stationary disease effect
   \item Functions for visualizing longitudinal data, posterior samples and model predictions
-  \item Gaussian, Poisson or Negative Binomial observation models
+  \item Gaussian, Poisson, binomial or negative binomial observation models
 }
 }
 \section{Basic usage}{
@@ -22,17 +22,7 @@ The package features
 \itemize{
 \item See the main function \code{\link{lgp}} for creating and fitting additive 
  longitudinal GP models.
-\item Predictions outside the data can be computed using the function \code{\link[lgpr]{lgp_predict}}.
-\item See documentation of the function \code{\link[lgpr]{simulate_data}} for generating
- artificial data.
-\item For visualizing the data and results, see for example the functions 
-  \itemize{
-    \item \code{\link[lgpr]{plot_data}}
-    \item \code{\link[lgpr]{plot_samples}}
-    \item \code{\link[lgpr]{plot_components}}
-    \item \code{\link[lgpr]{plot_posterior_y}}
-    \item \code{\link[lgpr]{plot_simdata}}
-  }
+ \item See tutorials at \url{https://jtimonen.github.io/lgpr-usage/}
 }
 }
 

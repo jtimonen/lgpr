@@ -238,7 +238,7 @@ lgp_fit <- function(model,
   tryCatch({
     if(!skip_postproc){
       if(verbose){ cat("* Begin postprocessing. \n") }
-      fit@Rhat <- assess_convergence(fit)
+      fit@diagnostics <- assess_convergence(fit, skip_generated_quantities = TRUE)
       fit      <- postproc(fit, 
                            threshold = threshold, 
                            verbose   = verbose)

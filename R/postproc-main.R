@@ -81,12 +81,6 @@ selection <- function(object, threshold = 0.95, verbose = FALSE)
     h <- sum(rel[1:j])
     if(h > threshold){
       selected <- names(rel[1:j])
-      if(verbose){
-        cat("* The following components explain ", round(h*100,2), "% of variance: {", sep="")
-        str <- paste(selected, collapse=", ")
-        cat(str)
-        cat("}.\n")
-      }
       res <- list(selected = selected, ev_sum = h, 
                   prop_ev = rel, threshold = threshold)
       return(res)
@@ -101,38 +95,17 @@ selection <- function(object, threshold = 0.95, verbose = FALSE)
 #' Assess convergence of the chains
 #'
 #' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @param verbose should convergence info be printed?
-#' @param recompute Should the Rhat statistics be recomputed?
-#' @return Potential scale reduction factors (R_hat).
-assess_convergence <- function(fit, verbose = FALSE, recompute = F){
-  
-  if(length(fit@Rhat)==0 || recompute){
-    info     <- fit@model@info
-    stan_fit <- fit@stan_fit
-    LH       <- info$likelihood
-    smr      <- rstan::summary(stan_fit)
-    Rhat     <- smr$summary[,"Rhat"]
-    
-    # Skip  derived quantities
-    if(!info$sample_F){
-      i1 <- which(grepl("F_mean_cmp", names(Rhat)))
-      i2 <- which(grepl("F_var_cmp", names(Rhat)))
-      i3 <- which(grepl("F_mean_tot", names(Rhat)))
-      i4 <- which(grepl("F_var_tot", names(Rhat)))
-      i_skip <- unique(c(i1, i2, i3, i4))
-    }else{
-      i_skip <- which(grepl("F", names(Rhat)))
-    }
-    Rhat   <- Rhat[-i_skip]
-  }else{
-    Rhat <- fit@Rhat
+#' @param skip_generated_quantities Should F_mean, F_var etc. be ignored
+#' @return A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
+assess_convergence <- function(fit, skip_generated_quantities = TRUE){
+  m  <- rstan::monitor(fit@stan_fit, print = FALSE)
+  m  <- as.data.frame(m)
+  m  <- m[c("Rhat", "Bulk_ESS", "Tail_ESS")]
+  if(skip_generated_quantities){
+    i1 <- which(grepl("F_mean_", rownames(m)))
+    i2 <- which(grepl("F_var_", rownames(m)))
+    m  <- m[-c(i1,i2),]
   }
-  
-  rmax <- max(Rhat)
-  imax <- which(Rhat == rmax)
-  imax <- imax[1]
-  rmax <- round(rmax, 3)
-  if(verbose) cat("* The largest R_hat value (ignoring generated quantities) is ", rmax, " (", names(Rhat)[imax], ").\n", sep="")
-  return(Rhat)
+  return(m)
 }
 

@@ -73,7 +73,7 @@ setMethod(f = "show",
 #' @slot signal_variance Signal variance.
 #' @slot residual_variance Residual variance.
 #' @slot pkg_version Package version number.
-#' @slot Rhat Split Rhat statistics.
+#' @slot diagnostics  A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
 #'
 lgpfit <- setClass(
   # Set the name for the class
@@ -89,7 +89,7 @@ lgpfit <- setClass(
     signal_variance      = "numeric",
     residual_variance    = "numeric",
     pkg_version          = "character",
-    Rhat                 = "numeric"
+    diagnostics          = "data.frame"
   )
 )
 
@@ -112,9 +112,13 @@ setMethod(f = "show",
                 runtime$warmup, " s (warmup) and ",
                 runtime$sampling, " s (sampling)\n", sep="")
             
-            assess_convergence(object, verbose = TRUE)
-            sv <- object@signal_variance
-            rv <- object@residual_variance
+            diag <- object@diagnostics
+            Rhat <- diag$Rhat
+            imax <- which(Rhat==max(Rhat))
+            cat("* Largest R-hat value is ", round(max(Rhat), 4), " (", rownames(diag)[imax],")\n", sep="")
+            
+            sv   <- object@signal_variance
+            rv   <- object@residual_variance
             pevf <- mean(sv/(sv+rv))
             sel  <- object@selection
             tr   <- sel$threshold

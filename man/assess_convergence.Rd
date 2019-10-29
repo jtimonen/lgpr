@@ -4,17 +4,15 @@
 \alias{assess_convergence}
 \title{Assess convergence of the chains}
 \usage{
-assess_convergence(fit, verbose = FALSE, recompute = F)
+assess_convergence(fit, skip_generated_quantities = TRUE)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
 
-\item{verbose}{should convergence info be printed?}
-
-\item{recompute}{Should the Rhat statistics be recomputed?}
+\item{skip_generated_quantities}{Should F_mean, F_var etc. be ignored}
 }
 \value{
-Potential scale reduction factors (R_hat).
+A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
 }
 \description{
 Assess convergence of the chains

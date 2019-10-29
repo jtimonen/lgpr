@@ -3,10 +3,6 @@ int nf = 1 + D[3] + D[5] + D[6];     // number of fixed kernel matrices
 int sum_D = sum(D);                  // total number of covariates
 matrix[n,n] KF[nf] = STAN_compute_fixed_kernel_matrices(X, X_notnan, D, N_tot, N_cat);
 vector[n] mu = rep_vector(C_hat, n); // GP mean
-int row_to_caseID_plus1[n] = rep_array(0, n);
-for(i in 1:n){
-  row_to_caseID_plus1[i] = row_to_caseID[i] + 1;
-}
 
 if(VERBOSE==1){
   print(" ")
