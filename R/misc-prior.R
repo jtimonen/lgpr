@@ -20,9 +20,7 @@ prior_default <- function(sigma_alpha = 1)
                     offset      = pmag)
   
   # Lengthscale parameters
-  plen <- list(type      = "log-normal", 
-               mu        = 0, 
-               sigma     = (log(1)-log(0.1))/2)
+  plen <- list(type = "log-normal", mu = 0, sigma = 1)
   
   prior_ls <- list(idAge       = plen,
                    sharedAge   = plen,
@@ -30,9 +28,8 @@ prior_default <- function(sigma_alpha = 1)
                    continuous  = plen,
                    categorical = plen)
   
-  
   # Other parameters
-  prior_st  <- list(type = "inv-gamma",  shape  = 9,   scale = 5)
+  prior_st  <- list(type = "inv-gamma",  shape = 14, scale = 5)
   prior_sig <- list(type = "log-normal", mu = 0, sigma = 1, transform = "square")
   prior_phi <- list(type = "log-normal", mu = 1, sigma = 1, transform = "square")
   prior_bet <- list(shape1 = 0.2, shape2 = 0.2)
@@ -63,14 +60,20 @@ prior_LonGP <- function()
   
   # Start by creating the default prior
   prior <- prior_default()
-  t4    <- list(type = "student-t", mu = 0, sigma  = 1, nu = 4)
-  p_sig <- list(type = "inv-gamma", shape  = 1/2, scale = 0.01/2, transform = "square")
   
   # Edit some parts of the default prior
+  ln  <- list(type = "log-normal", mu = 0, sigma = (log(1)-log(0.1))/2)
+  t4  <- list(type = "student-t", mu = 0, sigma = 1, nu = 4)
+  ig  <- list(type = "inv-gamma", shape  = 1/2, scale = 0.01/2, transform = "square")
+  
+  prior$lengthscale <- list(idAge       = t4,
+                            sharedAge   = ln,
+                            diseaseAge  = ln,
+                            continuous  = ln,
+                            categorical = t4)
+
   prior$alpha$offset <- t4
-  prior$lengthscale$idAge <- t4 # these are dangerous, lengthscale ~ 0 is possible
-  prior$lengthscale$categorical <- t4 # these are dangerous, lengthscale ~ 0 is possible
-  prior$sigma_n <- p_sig
+  prior$sigma_n <- ig
   return(prior)
 }
 

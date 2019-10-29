@@ -1,16 +1,12 @@
 
 // INPUT WARP
-vector STAN_warp_input(vector x, real a, real b, real c){
-  int n_tot = num_elements(x);
-  vector[n_tot] w = 2*c*(-0.5 + rep_vector(1, n_tot)./(1+exp(-a*(x-b))));
-  return(w);
+vector STAN_warp_input(vector x, real a){
+  return( -1 + 2*inv(1+exp(-a*x)) );
 }
 
 // VARIANCE MASK
 vector STAN_var_mask(vector x, real a){
-  int n_tot = num_elements(x);
-  vector[n_tot] s = rep_vector(1, n_tot)./(1+exp(-a*x));
-  return(s);
+  return( inv(1+exp(-a*x)) );
 }
 
 // COMPUTE X_TILDE
@@ -33,9 +29,9 @@ matrix STAN_K_zerosum(vector x1, vector x2, int M){
   for(i in 1:n1){
     for(j in 1:n2){
       if(x1[i]==x2[j]){
-        K[i,j] = 1.0;
+        K[i,j] = 1;
       }else{
-       K[i,j] = -1.0/(M-1); 
+       K[i,j] = -inv(M-1); 
       }
     }
   }
@@ -58,51 +54,23 @@ matrix STAN_K_bin(int[] x1, int[] x2, int c){
 
 
 // Multiplier matrix to enable variance masking
-matrix STAN_K_var_mask(vector x1_tilde, vector x2_tilde, real stp, real[] vm_params){
-  int n1 = num_elements(x1_tilde);
-  int n2 = num_elements(x2_tilde);
+matrix STAN_K_var_mask(vector x_tilde, real stp, real[] vm_params){
+  int n = num_elements(x_tilde);
   real a = stp * vm_params[2];
-  real h = vm_params[1];
-  real r = 1/a*log(h/(1-h));
-  vector[n1] s1 = STAN_var_mask(x1_tilde - r, a);
-  vector[n2] s2 = STAN_var_mask(x2_tilde - r, a);
-  matrix[n1,n2] S1 = rep_matrix(s1, n2);
-  matrix[n1,n2] S2 = transpose(rep_matrix(s2, n1));
-  matrix[n1,n2] MASK = S1 .* S2;
+  real r = inv(a)*logit(vm_params[1]);
+  vector[n] s = STAN_var_mask(x_tilde - r, a);
+  matrix[n,n] MASK = tcrossprod(to_matrix(s));
   return(MASK);
 }
 
 
 // Multiplier matrix to enable heterogeneous diseaseAge effect
-matrix STAN_K_beta(vector beta, int[] row_to_caseID){
-  int n = num_elements(row_to_caseID);
-  int i_caseID = 0;
-  int j_caseID = 0;
-  real tmp;
-  matrix[n,n] BETA;
-  for(i in 1:(n-1)){
-    i_caseID = row_to_caseID[i];
-    for(j in (i+1):n){
-      j_caseID = row_to_caseID[j];
-      if(i_caseID*j_caseID > 0){
-        tmp = sqrt(beta[i_caseID]*beta[j_caseID]);
-      }else{
-        tmp = 0;
-      }
-      BETA[i,j] = tmp;
-      BETA[j,i] = tmp;
-    }
-    if(i_caseID > 0){
-      BETA[i,i] = beta[i_caseID];
-    }else{
-      BETA[i,i] = 0;
-    }
-  }
-  i_caseID = row_to_caseID[n];
-  if(i_caseID > 0){
-    BETA[n,n] = beta[i_caseID];
-  }else{
-    BETA[n,n] = 0;
-  }
-  return(BETA);
+matrix STAN_K_beta(vector beta, int[] r2cIDp1){
+  int n = num_elements(r2cIDp1);
+  vector[n] b;
+  int N_cases = num_elements(beta);
+  vector[N_cases+1] beta1p = rep_vector(0, N_cases+1);
+  beta1p[2:(N_cases+1)] = beta; 
+  b = beta1p[r2cIDp1];
+  return( tcrossprod(to_matrix(sqrt(b))) );
 }
