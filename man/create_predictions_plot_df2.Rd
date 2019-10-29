@@ -4,8 +4,7 @@
 \alias{create_predictions_plot_df2}
 \title{Create a plotting data frame for ggplot}
 \usage{
-create_predictions_plot_df2(model, PRED, scale_f = TRUE,
-  componentwise = FALSE, mode, n_sds)
+create_predictions_plot_df2(model, PRED, scale_f = TRUE, mode, n_sds)
 }
 \arguments{
 \item{model}{An object of class \code{lgpmodel}.}
@@ -13,8 +12,6 @@ create_predictions_plot_df2(model, PRED, scale_f = TRUE,
 \item{PRED}{Predictions computed using \code{lgp_predict}.}
 
 \item{scale_f}{Should the predictions be scaled back to the original data scale?}
-
-\item{componentwise}{Should the predictions be plotted componentwise?}
 
 \item{mode}{mode}
 

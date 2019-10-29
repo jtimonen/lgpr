@@ -14,27 +14,27 @@ plot_posterior_f <- function(fit,
                              plot_uncertainty = TRUE,
                              data_marker      = 16,
                              n_sds            = 2){
-
-    plot_obs_onset     <- FALSE
-    plot_onset_samples <- FALSE
-    if(fit@model@stan_dat$UNCRT == 1){
-      plot_obs_onset     <- TRUE
-      plot_onset_samples <- TRUE
-    }
-    if(fit@model@info$sample_F){
-      alpha_line <- 0.1
-    }else{
-      alpha_line <- 1
-    }
-    h <- plot_posterior_predictions(fit, 
-                                    mode               = "posterior", 
-                                    PRED               = PRED, 
-                                    plot_uncertainty   = plot_uncertainty,
-                                    n_sds              = n_sds,
-                                    plot_obs_onset     = plot_obs_onset,
-                                    plot_onset_samples = plot_onset_samples,
-                                    alpha_line         = alpha_line,
-                                    data_marker        = data_marker)
+  
+  plot_obs_onset     <- FALSE
+  plot_t_effect_samples <- FALSE
+  if(fit@model@stan_dat$UNCRT == 1){
+    plot_obs_onset     <- TRUE
+    plot_t_effect_samples <- TRUE
+  }
+  if(fit@model@info$sample_F){
+    alpha_line <- 0.1
+  }else{
+    alpha_line <- 1
+  }
+  h <- plot_posterior_predictions(fit, 
+                                  mode               = "posterior", 
+                                  PRED               = PRED, 
+                                  plot_uncertainty   = plot_uncertainty,
+                                  n_sds              = n_sds,
+                                  plot_obs_onset     = plot_obs_onset,
+                                  plot_t_effect_samples = plot_t_effect_samples,
+                                  alpha_line         = alpha_line,
+                                  data_marker        = data_marker)
   return(h)
 }
 
@@ -55,7 +55,7 @@ plot_posterior_y <- function(fit, PRED,
                              test_data = NULL,
                              data_marker = 16,
                              n_sds = 2){
-
+  
   if(uncertainty=="ribbon"){
     h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
                                     test_data = test_data, n_sds = n_sds,
@@ -85,9 +85,10 @@ plot_posterior_y <- function(fit, PRED,
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
-#' @param plot_obs_onset should the observed disease onset/initiation time be plotted by a vertical line
-#' @param plot_onset_samples should a distribution of sampled effect times be plotted
-#' @param color_scheme_onset color scheme name for effect time density plotting
+#' @param plot_obs_onset should the observed disease onset/initiation time be plotted
+#' by a vertical line
+#' @param plot_t_effect_samples should a distribution of sampled effect times be plotted
+#' @param color_scheme_t_effect color scheme name for effect time density plotting
 #' @param ypos_dens y-position of the density plot
 #' @param test_data Test data frame
 #' @param color_test test point color
@@ -95,8 +96,8 @@ plot_posterior_y <- function(fit, PRED,
 #' @param size_test test point size
 #' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
 #' @param n_sds number of standard deviations for the uncertainty band width
-#' @param reference_onsets reference onset times 
-#' @param post_onset_statistic statistic computed from effect time samples (mean or median)
+#' @param reference_times reference onset times 
+#' @param post_t_effect_stat statistic computed from effect time samples (mean or median)
 #' @param ons_linetypes onset line types
 #' @param ons_linecolors onset line colors
 #' @param data_marker data marker type
@@ -107,7 +108,7 @@ plot_posterior_predictions <- function(fit,
                                        mode,
                                        PRED               = NULL, 
                                        color_scheme       = "red",
-                                       color_scheme_onset = "gray",
+                                       color_scheme_t_effect = "gray",
                                        alpha              = 0.5, 
                                        alpha_line         = 1,
                                        alpha2             = 0.5,
@@ -115,7 +116,7 @@ plot_posterior_predictions <- function(fit,
                                        title              = NULL,
                                        ylim               = NULL,
                                        plot_obs_onset     = FALSE,
-                                       plot_onset_samples = FALSE,
+                                       plot_t_effect_samples = FALSE,
                                        ypos_dens          = NULL,
                                        test_data          = NULL,
                                        color_test         = "deepskyblue2",
@@ -123,8 +124,8 @@ plot_posterior_predictions <- function(fit,
                                        size_test          = 2,
                                        error_bar          = FALSE,
                                        n_sds              = 2,
-                                       reference_onsets   = NULL,
-                                       post_onset_statistic = "none",
+                                       reference_times   = NULL,
+                                       post_t_effect_stat = "none",
                                        original_y_scale   = TRUE,
                                        data_color         = "black",
                                        data_marker        = 21,
@@ -133,10 +134,9 @@ plot_posterior_predictions <- function(fit,
 {
   
   # Input checks and options
-  cwise <- FALSE
-  OPT <- plot_predictions_options(fit, color_scheme, cwise,
+  OPT <- plot_predictions_options(fit, color_scheme,
                                   original_y_scale, PRED, test_data, 
-                                  color_scheme_onset, mode, n_sds)
+                                  color_scheme_t_effect, mode, n_sds)
   DF      <- OPT$DF
   idvar   <- OPT$idvar
   timevar <- OPT$timevar
@@ -207,9 +207,9 @@ plot_posterior_predictions <- function(fit,
   }
   
   # Add onsets
-  h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
+  h <- plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_t_effect_samples,
                                    idvar, timevar, ypos_dens, OPT$cs_onset,
-                                   reference_onsets, post_onset_statistic,
+                                   reference_times, post_t_effect_stat,
                                    ons_linetypes, ons_linecolors)
   
   # Plot also the data
@@ -266,9 +266,8 @@ plot_posterior_predictions <- function(fit,
 #' Do input checks and set options for plotting predictions
 #' @param fit An object of class \code{lgpfit}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param componentwise Should the predictions be plotted componentwise?
 #' @param color_scheme Name of bayesplot color scheme.
-#' @param color_scheme_onset Another color scheme.
+#' @param color_scheme_t_effect Another color scheme.
 #' @param original_y_scale Boolean value.
 #' @param test_data test data
 #' @param mode mode
@@ -276,11 +275,10 @@ plot_posterior_predictions <- function(fit,
 #' @return a list
 plot_predictions_options <- function(fit, 
                                      color_scheme, 
-                                     componentwise,
                                      original_y_scale,
                                      PRED,
                                      test_data,
-                                     color_scheme_onset,
+                                     color_scheme_t_effect,
                                      mode,
                                      n_sds){
   # Check input correctness
@@ -291,46 +289,29 @@ plot_predictions_options <- function(fit,
   idvar   <- info$varInfo$id_variable
   timevar <- info$varInfo$time_variable
   respvar <- info$varInfo$response_variable
-  if(componentwise && !is.null(test_data)){
-    stop("componentwise must be FALSE if test data is given!")
-  }
   
   # Get color
   if(class(color_scheme)=="character"){
     color_scheme <- bayesplot::color_scheme_get(color_scheme)
   }
-  if(class(color_scheme_onset)=="character"){
-    color_scheme_onset <- bayesplot::color_scheme_get(color_scheme_onset)
+  if(class(color_scheme_t_effect)=="character"){
+    color_scheme_t_effect <- bayesplot::color_scheme_get(color_scheme_t_effect)
   }
   linecolor <- color_scheme$dark_highlight
-  if(!componentwise){
-    fill      <- color_scheme$mid
-    hlcolor   <- color_scheme$mid_highlight
-  }else{
-    fill      <- color_scheme$dark
-    hlcolor   <- color_scheme$dark_highlight
-  }
+  fill      <- color_scheme$mid
+  hlcolor   <- color_scheme$mid_highlight
+  
   # Create plot data frame
   if(is.null(PRED)){
-    if(mode=="predictive"){
-      stop("Plotting predictive distribution not implemented in this case!")
-    }
-    if(componentwise){
-      stop("Plotting predictions componentwise not implemented in this case!")
-    }
-    DF <- create_predictions_plot_df1(fit, 
-                                      scale_f = original_y_scale,
+    if(mode=="predictive"){ stop("PRED not given") }
+    DF <- create_predictions_plot_df1(fit,  scale_f = original_y_scale,
                                       n_sds = n_sds)
   }else{
     if(info$sample_F){
       stop("Do not give predictions as input for a model where F was sampled!")
     }
-    DF <- create_predictions_plot_df2(model, 
-                                      PRED, 
-                                      scale_f = original_y_scale, 
-                                      componentwise = componentwise,
-                                      mode = mode,
-                                      n_sds = n_sds)
+    DF <- create_predictions_plot_df2(model, PRED, scale_f = original_y_scale, 
+                                      mode = mode, n_sds = n_sds)
   }
   
   # Return
@@ -341,7 +322,7 @@ plot_predictions_options <- function(fit,
               idvar     = idvar,
               timevar   = timevar,
               respvar   = respvar,
-              cs_onset  = color_scheme_onset)
+              cs_onset  = color_scheme_t_effect)
   
   return(ret)
 }
@@ -352,26 +333,26 @@ plot_predictions_options <- function(fit,
 #' @param fit An object of class \code{lgpfit}.
 #' @param h a ggplot object
 #' @param plot_obs_onset a boolean value
-#' @param plot_onset_samples a boolean value
+#' @param plot_t_effect_samples a boolean value
 #' @param idvar id variable name
 #' @param timevar time variable name
 #' @param ypos_dens y position of the estimated onset density
-#' @param color_scheme_onset color scheme
-#' @param reference_onsets reference onset times 
+#' @param color_scheme_t_effect color scheme
+#' @param reference_times reference onset times 
 #' @param linetypes onset line types
 #' @param linecolors onset line colors
-#' @param post_onset_statistic statistic computed from effect time samples
+#' @param post_t_effect_stat statistic computed from effect time samples
 #' @param alpha2 alpha parameter
 #' @return a modified ggplot object
 plot_predictions_add_onsets <- function(fit, h, 
                                         plot_obs_onset, 
-                                        plot_onset_samples,
+                                        plot_t_effect_samples,
                                         idvar,
                                         timevar,
                                         ypos_dens,
-                                        color_scheme_onset,
-                                        reference_onsets,
-                                        post_onset_statistic,
+                                        color_scheme_t_effect,
+                                        reference_times,
+                                        post_t_effect_stat,
                                         linetypes = c(1,2,3),
                                         linecolors = c("black", "red", "gray50"),
                                         alpha2 = 1)
@@ -381,18 +362,18 @@ plot_predictions_add_onsets <- function(fit, h,
   if(D[3]==1 && plot_obs_onset){
     df    <- model@data
     davar <- model@info$varInfo$disAge_variable
-    t_ons <- get_onset_times(id = df[[idvar]], age = df[[timevar]], disAge = df[[davar]])
+    t_ons <- get_obs_onset_times(id = df[[idvar]], age = df[[timevar]], disAge = df[[davar]])
     vline.data <- data.frame(zzz = t_ons, facet_var = names(t_ons))
     
-
+    
     # First possible reference onsets
-    if(!is.null(reference_onsets)){
-      l1 <- length(reference_onsets)
+    if(!is.null(reference_times)){
+      l1 <- length(reference_times)
       l2 <- length(t_ons)
       if(l1!=l2){
-        stop("invalid length of reference_onsets (", l1, "), must be ", l2)
+        stop("invalid length of reference_times (", l1, "), must be ", l2)
       }
-      refline.data <- data.frame(zzz = reference_onsets, facet_var = names(t_ons))
+      refline.data <- data.frame(zzz = reference_times, facet_var = names(t_ons))
       h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"), 
                                    na.rm    = TRUE,
                                    data     = refline.data, 
@@ -410,9 +391,9 @@ plot_predictions_add_onsets <- function(fit, h,
   
   # Plot effect time samples
   UNCRT <- model@stan_dat$UNCRT
-  if(UNCRT==1 && D[3]==1 & plot_onset_samples){
+  if(UNCRT==1 && D[3]==1 & plot_t_effect_samples){
     
-    T_smp <- extract_t_onset_samples(fit)
+    T_smp <- extract_t_effect_samples(fit)
     n_smp <- dim(T_smp)[1]
     t_smp <- as.numeric(T_smp)
     df    <- model@data
@@ -425,9 +406,9 @@ plot_predictions_add_onsets <- function(fit, h,
     
     # Plot effect time mean or median
     cid_str   <- colnames(T_smp)
-    if(post_onset_statistic=="mean"){
+    if(post_t_effect_stat=="mean"){
       statistic <- colMeans(T_smp)
-    }else if(post_onset_statistic=="median"){
+    }else if(post_t_effect_stat=="median"){
       statistic <- apply(T_smp, 2, stats::median)
     }else{
       statistic <- NULL
@@ -447,11 +428,13 @@ plot_predictions_add_onsets <- function(fit, h,
     # Plot kernel density estimate of posterior of effect time
     fv        <- as.factor(rep(cid_str, each = n_smp))
     dens.data <- data.frame(zzz = t_smp, facet_var = fv, id = fv)
-    h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", y = paste(dens_scale,"*..scaled..",sep="")), 
+    h <- h + ggplot2::geom_density(ggplot2::aes_string(x = "zzz", 
+                                                       y = paste(dens_scale,
+                                                                 "*..scaled..",sep="")), 
                                    na.rm    = TRUE,
                                    data     = dens.data, 
-                                   color    = color_scheme_onset$mid_highlight,
-                                   fill     = color_scheme_onset$mid,
+                                   color    = color_scheme_t_effect$mid_highlight,
+                                   fill     = color_scheme_t_effect$mid,
                                    alpha    = alpha2,
                                    inherit.aes = F, 
                                    position = ggplot2::position_nudge(x=0, y=ypos_dens),
@@ -544,14 +527,12 @@ create_predictions_plot_df1 <- function(fit, scale_f = TRUE, n_sds){
 #' @param model An object of class \code{lgpmodel}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
 #' @param scale_f Should the predictions be scaled back to the original data scale?
-#' @param componentwise Should the predictions be plotted componentwise?
 #' @param mode mode
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a data frame
 create_predictions_plot_df2 <- function(model, 
                                         PRED, 
-                                        scale_f = TRUE, 
-                                        componentwise = FALSE, 
+                                        scale_f = TRUE,
                                         mode,
                                         n_sds){
   
@@ -577,28 +558,16 @@ create_predictions_plot_df2 <- function(model,
   cn  <- model@info$component_names
   
   # Create data frame columns
-  if(componentwise){
-    if(mode=="predictive"){
-      stop("cannot compute posterior predictive distribution when plotting componentwise")
-    }
-    MU        <- pred$mu_cmp
-    S2        <- pred$s2_cmp
-    d         <- dim(MU)[2]
-    id        <- rep(ID, d)
-    age       <- rep(AGE, d)
-    component <- rep(cn, each = n)
+  MU  <- pred$mu_f
+  if(mode=="predictive"){
+    S2 <- pred$s2_y
+  }else if(mode=="posterior"){
+    S2  <- pred$s2_f
   }else{
-    MU  <- pred$mu_f
-    if(mode=="predictive"){
-      S2 <- pred$s2_y
-    }else if(mode=="posterior"){
-      S2  <- pred$s2_f
-    }else{
-      stop("mode must be 'posterior' or 'predictive' !")
-    }
-    id  <- ID
-    age <- AGE
+    stop("mode must be 'posterior' or 'predictive' !")
   }
+  id  <- ID
+  age <- AGE
   mu  <- as.numeric(MU)
   std <- sqrt(as.numeric(S2))
   
@@ -620,9 +589,6 @@ create_predictions_plot_df2 <- function(model,
   )
   colnames(DF)[1] <- idvar
   colnames(DF)[2] <- timevar
-  if(componentwise){
-    DF$component <- as.factor(component)
-  }
   return(DF)
 }
 

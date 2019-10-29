@@ -5,13 +5,13 @@
 \title{Plot posterior of f or predictive distribution for y}
 \usage{
 plot_posterior_predictions(fit, mode, PRED = NULL,
-  color_scheme = "red", color_scheme_onset = "gray", alpha = 0.5,
+  color_scheme = "red", color_scheme_t_effect = "gray", alpha = 0.5,
   alpha_line = 1, alpha2 = 0.5, plot_uncertainty = TRUE,
   title = NULL, ylim = NULL, plot_obs_onset = FALSE,
-  plot_onset_samples = FALSE, ypos_dens = NULL, test_data = NULL,
+  plot_t_effect_samples = FALSE, ypos_dens = NULL, test_data = NULL,
   color_test = "deepskyblue2", pch_test = 21, size_test = 2,
-  error_bar = FALSE, n_sds = 2, reference_onsets = NULL,
-  post_onset_statistic = "none", original_y_scale = TRUE,
+  error_bar = FALSE, n_sds = 2, reference_times = NULL,
+  post_t_effect_stat = "none", original_y_scale = TRUE,
   data_color = "black", data_marker = 21, ons_linetypes = c(1, 2, 3),
   ons_linecolors = c("black", "red", "gray50"))
 }
@@ -24,7 +24,7 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{color_scheme}{Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.}
 
-\item{color_scheme_onset}{color scheme name for effect time density plotting}
+\item{color_scheme_t_effect}{color scheme name for effect time density plotting}
 
 \item{alpha}{Ribbon fill opacity.}
 
@@ -38,9 +38,10 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{ylim}{y axis limits}
 
-\item{plot_obs_onset}{should the observed disease onset/initiation time be plotted by a vertical line}
+\item{plot_obs_onset}{should the observed disease onset/initiation time be plotted
+by a vertical line}
 
-\item{plot_onset_samples}{should a distribution of sampled effect times be plotted}
+\item{plot_t_effect_samples}{should a distribution of sampled effect times be plotted}
 
 \item{ypos_dens}{y-position of the density plot}
 
@@ -56,9 +57,9 @@ plot_posterior_predictions(fit, mode, PRED = NULL,
 
 \item{n_sds}{number of standard deviations for the uncertainty band width}
 
-\item{reference_onsets}{reference onset times}
+\item{reference_times}{reference onset times}
 
-\item{post_onset_statistic}{statistic computed from effect time samples (mean or median)}
+\item{post_t_effect_stat}{statistic computed from effect time samples (mean or median)}
 
 \item{original_y_scale}{should the predictions be scaled back to original data scale}
 

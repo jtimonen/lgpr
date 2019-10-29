@@ -4,9 +4,9 @@
 \alias{plot_predictions_add_onsets}
 \title{Add disease onset / effect times to predictions plot}
 \usage{
-plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
-  idvar, timevar, ypos_dens, color_scheme_onset, reference_onsets,
-  post_onset_statistic, linetypes = c(1, 2, 3), linecolors = c("black",
+plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_t_effect_samples,
+  idvar, timevar, ypos_dens, color_scheme_t_effect, reference_times,
+  post_t_effect_stat, linetypes = c(1, 2, 3), linecolors = c("black",
   "red", "gray50"), alpha2 = 1)
 }
 \arguments{
@@ -16,7 +16,7 @@ plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
 
 \item{plot_obs_onset}{a boolean value}
 
-\item{plot_onset_samples}{a boolean value}
+\item{plot_t_effect_samples}{a boolean value}
 
 \item{idvar}{id variable name}
 
@@ -24,11 +24,11 @@ plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_onset_samples,
 
 \item{ypos_dens}{y position of the estimated onset density}
 
-\item{color_scheme_onset}{color scheme}
+\item{color_scheme_t_effect}{color scheme}
 
-\item{reference_onsets}{reference onset times}
+\item{reference_times}{reference onset times}
 
-\item{post_onset_statistic}{statistic computed from effect time samples}
+\item{post_t_effect_stat}{statistic computed from effect time samples}
 
 \item{linetypes}{onset line types}
 

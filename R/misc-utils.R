@@ -167,7 +167,7 @@ model_info <- function(object, print = TRUE){
 #' @param age the age covariate, vector of length \code{n}
 #' @param disAge the observed disease-related age covariate, vector of length \code{n}
 #' @return vector of observed onset times
-get_onset_times <- function(id, age, disAge){
+get_obs_onset_times <- function(id, age, disAge){
   uid          <- unique(id)
   t_ons        <- rep(0, length(uid))
   formatter    <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
@@ -190,16 +190,16 @@ get_onset_times <- function(id, age, disAge){
 }
 
 
-#' Extract samples of T_onset
+#' Extract samples of T_effect
 #'
 #' @param fit an object of class \code{lgpfit}
 #' @return a matrix
-extract_t_onset_samples <- function(fit){
+extract_t_effect_samples <- function(fit){
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   if(fit@model@stan_dat$UNCRT==0){
     stop("uncertainty was not modeled!")
   }else{
-    SMP <- rstan::extract(fit@stan_fit, pars = "T_onset")$T_onset[,1,]
+    SMP <- rstan::extract(fit@stan_fit, pars = "T_effect")$T_effect[,1,]
     cid <- get_case_ids(fit)
     formatter <- function(x){formatC(x, width = 2, format = "d", flag = "0")}
     cid_str <- formatter(cid) # zero padded format for the IDs

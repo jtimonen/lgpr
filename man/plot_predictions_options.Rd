@@ -4,15 +4,13 @@
 \alias{plot_predictions_options}
 \title{Do input checks and set options for plotting predictions}
 \usage{
-plot_predictions_options(fit, color_scheme, componentwise,
-  original_y_scale, PRED, test_data, color_scheme_onset, mode, n_sds)
+plot_predictions_options(fit, color_scheme, original_y_scale, PRED,
+  test_data, color_scheme_t_effect, mode, n_sds)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
 \item{color_scheme}{Name of bayesplot color scheme.}
-
-\item{componentwise}{Should the predictions be plotted componentwise?}
 
 \item{original_y_scale}{Boolean value.}
 
@@ -20,7 +18,7 @@ plot_predictions_options(fit, color_scheme, componentwise,
 
 \item{test_data}{test data}
 
-\item{color_scheme_onset}{Another color scheme.}
+\item{color_scheme_t_effect}{Another color scheme.}
 
 \item{mode}{mode}
 
