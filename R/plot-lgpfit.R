@@ -3,9 +3,12 @@
 #'
 #' @export
 #' @param object an object of class \code{lgpfit}
+#' @param violin Should a violin plot be used instead of a boxplot
 #' @param color_scheme bayesplot color scheme name
+#' @param ... Additional arguments to \code{ggplot2::geom_boxplot} or
+#' \code{ggplot2::geom_violin}. 
 #' @return a ggplot object
-plot_relevances <- function(object, color_scheme = "red")
+plot_relevances <- function(object, violin = FALSE, color_scheme = "red", ...)
 {
   # Colors
   bpc <- bayesplot::color_scheme_get(color_scheme)
@@ -14,17 +17,27 @@ plot_relevances <- function(object, color_scheme = "red")
   
   # Covariates
   info      <- object@model@info
-  Covariate <- c(info$covariate_names, "noise")
-  Relevance <- as.vector(object@relevances$average)
-  df <- data.frame(cbind(Relevance, Covariate))
-  df$Relevance <- as.numeric(as.vector(df$Relevance))
-  h <- ggplot2::ggplot(df, ggplot2::aes(x=Covariate, y=Relevance)) +
-    ggplot2::geom_bar(stat = "identity", color = color, fill = fill) +
-    ggplot2::theme_minimal()
+  Covariate <- c(info$component_names, "noise")
+  Relevance <- as.matrix(object@relevances$samples)
+  n_smp     <- dim(Relevance)[1]
+  n_cmp     <- dim(Relevance)[2]
+  rel       <- as.numeric(Relevance)
+  cname     <- as.factor(rep(Covariate, n_smp))
+  
+  df <- data.frame(cname, rel)
+  colnames(df) <- c("Component", "Relevance")
+  h <- ggplot2::ggplot(df, ggplot2::aes_string(x='Component', y='Relevance')) 
+  if(violin){
+    h <- h + ggplot2::geom_violin(color = color, fill = fill, ...)
+  }else{
+    h <- h + ggplot2::geom_boxplot(color = color, fill = fill, ...)
+  }
+   
+  h <- h + ggplot2::theme_minimal()
   h <- h + ggplot2::labs(
     y = "Relevance",
-    subtitle = paste("Model:", info$formula),
-    title = "Relevances"
+    title = paste0('Component relevances'), 
+    subtitle = paste0('Distribution over ', n_smp, " posterior samples")
   )
   return(h)
 }

@@ -155,7 +155,7 @@ setMethod(f = "plot",
           signature = "lgpfit",
           definition = function(fit, x = 1, y = 1, color_scheme = "red")
           {
-            h <- plot_relevances(fit, color_scheme)
+            h <- plot_relevances(fit, color_scheme = color_scheme)
             return(h)
           }
 )

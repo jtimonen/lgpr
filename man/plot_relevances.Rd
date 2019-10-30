@@ -4,12 +4,17 @@
 \alias{plot_relevances}
 \title{Barplot of covariate relevances}
 \usage{
-plot_relevances(object, color_scheme = "red")
+plot_relevances(object, violin = FALSE, color_scheme = "red", ...)
 }
 \arguments{
 \item{object}{an object of class \code{lgpfit}}
 
+\item{violin}{Should a violin plot be used instead of a boxplot}
+
 \item{color_scheme}{bayesplot color scheme name}
+
+\item{...}{Additional arguments to \code{ggplot2::geom_boxplot} or
+\code{ggplot2::geom_violin}.}
 }
 \value{
 a ggplot object
