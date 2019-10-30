@@ -4,12 +4,12 @@
 \alias{assess_convergence}
 \title{Assess convergence of the chains}
 \usage{
-assess_convergence(fit, skip_generated_quantities = TRUE)
+assess_convergence(fit, skip_F = TRUE)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
 
-\item{skip_generated_quantities}{Should F_mean, F_var etc. be ignored}
+\item{skip_F}{Should F_mean, F_var etc. be ignored}
 }
 \value{
 A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.

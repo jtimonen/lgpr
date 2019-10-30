@@ -7,11 +7,10 @@
 lgp_model(formula, data, likelihood = "Gaussian",
   prior = prior_default(), uncertain_effect_time = FALSE,
   equal_effect = TRUE, C_hat = NULL, DELTA = 1e-08,
-  sample_F = (likelihood != "Gaussian"), id_variable = "id",
-  time_variable = "age", disAge_variable = NULL,
-  continuous_vars = NULL, categorical_vars = NULL,
-  offset_vars = NULL, variance_mask = TRUE, N_trials = NULL,
-  verbose = FALSE)
+  sample_F = NULL, id_variable = "id", time_variable = "age",
+  disAge_variable = NULL, continuous_vars = NULL,
+  categorical_vars = NULL, offset_vars = NULL, variance_mask = TRUE,
+  N_trials = NULL, skip_gen_quant = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -64,6 +63,8 @@ variance to zero before disease onset?}
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
+
+\item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
 
 \item{verbose}{Should more verbose output be printed?}
 }

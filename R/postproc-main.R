@@ -95,13 +95,13 @@ selection <- function(object, threshold = 0.95, verbose = FALSE)
 #' Assess convergence of the chains
 #'
 #' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @param skip_generated_quantities Should F_mean, F_var etc. be ignored
+#' @param skip_F Should F_mean, F_var etc. be ignored
 #' @return A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
-assess_convergence <- function(fit, skip_generated_quantities = TRUE){
+assess_convergence <- function(fit, skip_F = TRUE){
   m  <- rstan::monitor(fit@stan_fit, print = FALSE)
   m  <- as.data.frame(m)
   m  <- m[c("Rhat", "Bulk_ESS", "Tail_ESS")]
-  if(skip_generated_quantities){
+  if(skip_F){
     i1 <- which(grepl("F_mean_", rownames(m)))
     i2 <- which(grepl("F_var_", rownames(m)))
     m  <- m[-c(i1,i2),]

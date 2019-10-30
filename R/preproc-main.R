@@ -23,15 +23,16 @@ create_stan_input <- function(formula,
                               sample_F,
                               verbose,
                               variance_mask,
-                              N_trials)
+                              N_trials,
+                              skip_gen_quant)
 {
   
   # Parse likelihood
   LH  <- likelihood_as_int(likelihood)
   
   # Check sample_F input
-  if(!sample_F && LH!=1){
-    stop("sample_F must be true if likelihood is not Gaussian")
+  if(!sample_F && !(LH %in% c(0,1)) ){
+    stop("sample_F must be true if likelihood is not Gaussian or none")
   }
   
   # Check the model formula
@@ -60,7 +61,7 @@ create_stan_input <- function(formula,
   
   # Check and possibly edit N_trials and C_hat
   N_trials <- set_N_trials(N_trials, response, LH)
-  C_hat <- set_C_hat(C_hat, response, LH)
+  C_hat    <- set_C_hat(C_hat, response, LH)
   
   # Create the list that is the Stan input
   stan_dat   <- list(X         = t(X),
@@ -74,7 +75,8 @@ create_stan_input <- function(formula,
                      F_IS_SAMPLED = as.numeric(sample_F),
                      USE_VAR_MASK = as.numeric(variance_mask),
                      VERBOSE   = as.numeric(verbose),
-                     DELTA     = DELTA
+                     DELTA     = DELTA,
+                     SKIP_GQ   = as.numeric(skip_gen_quant)
   )
   
   # Get some variables related to diseased individuals

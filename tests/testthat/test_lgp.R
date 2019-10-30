@@ -105,6 +105,19 @@ test_that(paste0("lgp can be used without the vm kernel",
 })
 
 
+test_that("lgp can sample from prior", {
+  
+  expect_equal(suppressWarnings({
+    dim(lgp(formula = y ~ id + age + z, data = simulate_data(N = 4, 
+                      t_data = 10*c(1,2,3,4,5), covariates = c(2))$data,
+        iter    = 100,
+        chains  = 1, 
+        refresh = 0, skip_postproc = TRUE, likelihood = "none")@diagnostics)
+  }),
+  c(9,3)
+  )
+})
+
 test_that("lgp can be run using Poisson observation model", {
   
   expect_identical(suppressWarnings({
@@ -133,6 +146,7 @@ test_that("lgp can be run using NB observation model", {
   }), length(integer(30)))
   
 })
+
 
 test_that("lgp can be run using binomial observation model", {
   

@@ -6,7 +6,7 @@
 \usage{
 create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
   uncertain_effect_time, equal_effect, C_hat, DELTA, sample_F, verbose,
-  variance_mask, N_trials)
+  variance_mask, N_trials, skip_gen_quant)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -47,6 +47,8 @@ variance to zero before disease onset?}
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
+
+\item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
 }
 \value{
 A list containing the data to be given to \code{rstan::sampling}, some info about

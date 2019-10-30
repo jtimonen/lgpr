@@ -29,6 +29,7 @@ int<lower=0,upper=1> VERBOSE; // is model info printed?
 int<lower=0,upper=1> USE_VAR_MASK; // is variance mask kernel used?
 int<lower=0,upper=1> BACKWARDS; // is prior of effect time "backwards"?
 int<lower=0,upper=1> RELATIVE;  // is prior of effect time rel. to obs. one?
+int<lower=0,upper=1> SKIP_GQ;   // should the generated quantities block be skipped?
 
 // Prior types and transforms
 int t_ID[D[1],4];         // for id*age component

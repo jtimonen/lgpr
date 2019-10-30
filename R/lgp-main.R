@@ -21,7 +21,7 @@ lgp <- function(formula,
                 offset_vars      = NULL,
                 C_hat            = NULL,
                 DELTA            = 1e-8,
-                sample_F         = (likelihood!= "Gaussian"),
+                sample_F         = NULL,
                 parallel         = FALSE,
                 skip_postproc    = FALSE,
                 threshold        = 0.95,
@@ -48,6 +48,7 @@ lgp <- function(formula,
                      offset_vars      = offset_vars,
                      variance_mask    = variance_mask,
                      N_trials         = N_trials,
+                     skip_gen_quant   = skip_postproc,
                      verbose          = verbose)
   
   if(verbose){ show(model) }
@@ -103,6 +104,7 @@ lgp <- function(formula,
 #' @param N_trials This argument (number of trials) is only needed when likelihood is binomial.
 #' Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 #' Bernoulli observation model.
+#' @param skip_gen_quant If this is true, the generated quantities block of Stan is skipped.
 #' @param verbose Should more verbose output be printed?
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
@@ -114,7 +116,7 @@ lgp_model <- function(formula,
                       equal_effect     = TRUE,
                       C_hat            = NULL,
                       DELTA            = 1e-8,
-                      sample_F         = (likelihood!= "Gaussian"),
+                      sample_F         = NULL,
                       id_variable      = "id",
                       time_variable    = "age",
                       disAge_variable  = NULL,
@@ -123,12 +125,20 @@ lgp_model <- function(formula,
                       offset_vars      = NULL,
                       variance_mask    = TRUE,
                       N_trials         = NULL,
+                      skip_gen_quant   = FALSE,
                       verbose          = FALSE
 )
 {
   # Model as a string
   fc <- as.character(formula)
   f  <- paste(fc[2], fc[1], fc[3])
+
+  # Is F sampled
+  likelihood <- tolower(likelihood)
+  lh_gauss_or_none <- likelihood %in% c("gaussian", "none")
+  if(is.null(sample_F)){
+    sample_F <- !lh_gauss_or_none
+  }
   
   # Variable type info
   varInfo <- list(id_variable       = id_variable,
@@ -145,7 +155,7 @@ lgp_model <- function(formula,
                                prior          = prior,
                                likelihood     = likelihood,
                                varInfo        = varInfo,
-                               standardize    = (likelihood %in% c("Gaussian", "none")),
+                               standardize    = lh_gauss_or_none,
                                uncertain_effect_time = uncertain_effect_time,
                                equal_effect   = equal_effect,
                                C_hat          = C_hat,
@@ -153,7 +163,8 @@ lgp_model <- function(formula,
                                sample_F       = sample_F,
                                verbose        = verbose,
                                variance_mask  = variance_mask,
-                               N_trials       = N_trials)
+                               N_trials       = N_trials,
+                               skip_gen_quant = skip_gen_quant)
   
   # Data to Stan
   stan_dat <- PREPROC$stan_dat
@@ -224,21 +235,22 @@ lgp_fit <- function(model,
   stan_fit  <- rstan::sampling(object = stanmodels[["lgp"]], data = stan_dat, ...)
   
   # Initialize the 'lgpfit' object
-  ver <- "NOT SET"
+  ver <- " "
   tryCatch({
     ver <- get_pkg_description()$Version
   }, error = function(e){
-    ver <- "NOT FOUND"
+    ver <- "NA"
   })
   fit <- new("lgpfit", stan_fit = stan_fit, model = model, 
              pkg_version = ver)
   
-
+  if(verbose){ cat("* Begin postprocessing. \n") }
+  F_was_sampled <- as.logical(model@stan_dat$F_IS_SAMPLED)
+  fit@diagnostics <- assess_convergence(fit, skip_F = F_was_sampled)
+  
   # Finalize the 'lgpfit' object
   tryCatch({
     if(!skip_postproc){
-      if(verbose){ cat("* Begin postprocessing. \n") }
-      fit@diagnostics <- assess_convergence(fit, skip_generated_quantities = TRUE)
       fit      <- postproc(fit, 
                            threshold = threshold, 
                            verbose   = verbose)

@@ -1,10 +1,10 @@
 
-vector[n] F_mean_cmp[1 - F_IS_SAMPLED, sum_D];
-vector[n] F_var_cmp[ 1 - F_IS_SAMPLED, sum_D];
-vector[n] F_mean_tot[1 - F_IS_SAMPLED];
-vector[n] F_var_tot[ 1 - F_IS_SAMPLED];
+vector[n] F_mean_cmp[DO_GEN_QUANT, sum_D];
+vector[n] F_var_cmp[DO_GEN_QUANT, sum_D];
+vector[n] F_mean_tot[DO_GEN_QUANT];
+vector[n] F_var_tot[DO_GEN_QUANT];
 
-if(F_IS_SAMPLED==0){
+if(DO_GEN_QUANT){
   matrix[n,n] A;
   vector[n] v;
   matrix[n,n] Ky;

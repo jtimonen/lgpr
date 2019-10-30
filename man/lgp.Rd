@@ -8,10 +8,9 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   uncertain_effect_time = FALSE, equal_effect = TRUE,
   id_variable = "id", time_variable = "age", disAge_variable = NULL,
   continuous_vars = NULL, categorical_vars = NULL,
-  offset_vars = NULL, C_hat = NULL, DELTA = 1e-08,
-  sample_F = (likelihood != "Gaussian"), parallel = FALSE,
-  skip_postproc = FALSE, threshold = 0.95, variance_mask = TRUE,
-  N_trials = NULL, verbose = FALSE, ...)
+  offset_vars = NULL, C_hat = NULL, DELTA = 1e-08, sample_F = NULL,
+  parallel = FALSE, skip_postproc = FALSE, threshold = 0.95,
+  variance_mask = TRUE, N_trials = NULL, verbose = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the form
