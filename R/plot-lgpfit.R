@@ -22,7 +22,7 @@ plot_relevances <- function(object, violin = FALSE, color_scheme = "red", ...)
   n_smp     <- dim(Relevance)[1]
   n_cmp     <- dim(Relevance)[2]
   rel       <- as.numeric(Relevance)
-  cname     <- as.factor(rep(Covariate, n_smp))
+  cname     <- as.factor(rep(Covariate, each = n_smp))
   
   df <- data.frame(cname, rel)
   colnames(df) <- c("Component", "Relevance")

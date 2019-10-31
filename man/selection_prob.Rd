@@ -4,7 +4,7 @@
 \alias{selection_prob}
 \title{Probabilistic selection of relevant components}
 \usage{
-selection_prob(object, p = function(x) {     stats::dbeta(x, 30, 3) },
+selection_prob(object, p = function(x) {     stats::dbeta(x, 100, 5) },
   h = 0.01)
 }
 \arguments{

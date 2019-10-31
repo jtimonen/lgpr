@@ -40,7 +40,7 @@ selection <- function(object, threshold = 0.95)
 #' @param h discretization parameter for computing a quadrature
 #' @return Selection probabilities for each component
 selection_prob <- function(object, 
-                           p = function(x){stats::dbeta(x, 30, 3)},
+                           p = function(x){stats::dbeta(x, 100, 5)},
                              h = 0.01)
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
