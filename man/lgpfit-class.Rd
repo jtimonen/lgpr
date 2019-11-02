@@ -15,15 +15,9 @@ An S4 class to represent the output of the \code{lgp_fit} function
 
 \item{\code{model}}{The \code{lgpmodel} object returned by \code{lgp_model}.}
 
-\item{\code{components}}{Inferred components.}
-
 \item{\code{relevances}}{Inferred component relevances.}
 
-\item{\code{selection}}{Covariate selection info.}
-
-\item{\code{signal_variance}}{Signal variance.}
-
-\item{\code{residual_variance}}{Residual variance.}
+\item{\code{selection}}{Component selection info.}
 
 \item{\code{pkg_version}}{Package version number.}
 

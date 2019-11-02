@@ -4,19 +4,23 @@
 \alias{lgp_fit}
 \title{Fit an lgp model}
 \usage{
-lgp_fit(model, threshold, parallel = FALSE, skip_postproc = FALSE,
+lgp_fit(model, threshold = 0.95, parallel = FALSE,
+  skip_postproc = FALSE, relevance_method = "f_mean",
   verbose = FALSE, ...)
 }
 \arguments{
 \item{model}{An object of class \code{lgpmodel}.}
 
-\item{threshold}{Covariate selection threshold.}
+\item{threshold}{Component selection threshold for relevance sum.}
 
 \item{parallel}{Determines if the chain will be run in parallel (\code{default = FALSE}).
 If \code{TRUE}, then Stan is run by first defining 
 \code{options(mc.cores = } \code{parallel::detectCores())}.}
 
 \item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
+
+\item{relevance_method}{Component relevance determination method. 
+Must be either \code{"f_mean"} or \code{"alpha"}.}
 
 \item{verbose}{should some output be printed?}
 

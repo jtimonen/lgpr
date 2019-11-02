@@ -1,33 +1,36 @@
 
-#' Selection of relevant components using a threshold
-#' for the total proportion of explained variance
+#' Selection of relevant components
 #'
 #' @export
 #' @param object An object of class \code{lgpfit}.
-#' @param threshold A value between 0 and 1
+#' @param threshold Threshold for relevance sum. 
+#' Must be a value between 0 and 1.
 #' @return A named list
 selection <- function(object, threshold = 0.95)
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
-  if(threshold > 1 || threshold < 0) stop("'threshold' must be between 0 and 1!")
-  info       <- object@model@info
-  rel        <- object@relevances$average
-  rel        <- sort(rel, decreasing = TRUE)
-  i_noise    <- which(names(rel)=="noise")
-  rel_rem    <- rel[-i_noise]
-  rel        <- c(rel[i_noise], rel_rem)
-  names(rel) <- c("noise", names(rel_rem))
-  for(j in 1:length(rel)){
-    h <- sum(rel[1:j])
-    if(h > threshold){
-      selected <- names(rel[1:j])
-      res <- list(selected = selected, ev_sum = h, 
-                  prop_ev = rel, threshold = threshold)
-      return(res)
-    }
+  if(threshold > 1 || threshold < 0) {
+    stop("'threshold' must be between 0 and 1!")
   }
-  res <- list(selected = names(rel), ev_sum = 1,
-              prop_ev = rel, threshold = threshold)
+  
+  # Get relevances
+  relevances  <- object@relevances
+  rel_avg     <- relevances$average
+  rel_smp     <- relevances$samples
+  
+  # Strict selection using average relevances
+  info     <- object@model@info
+  rel_avg  <- object@relevances$average
+  i_sel    <- selection_fixed_threshold(rel_avg, threshold)
+  nam      <- c(info$component_names, "noise")
+  selected <- nam[i_sel]
+  
+  # Selection probabilities
+  prob     <- selection_prob_fixed_threshold(rel_smp, threshold)
+  
+  res <- list(selected  = selected,
+              prob      = prob,
+              threshold = threshold)
   return(res)
 }
 
@@ -45,17 +48,23 @@ selection_prob <- function(object,
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
   if(!is.function(p)){stop('p must be a function')}
+  
+  # Get relevances
+  rel_smp     <- object@relevances$samples
+  
   info <- object@model@info
   H    <- seq(0, 1, by = h)
   L    <- length(H)
   P    <- rep(0, L)
-  prob <- selection_prob_fixed_threshold(object, threshold = 0)
+  prob <- selection_prob_fixed_threshold(rel_smp, threshold = 0)
+  D    <- length(prob) - 1 
+  prob <- prob[1:D]
   nam  <- names(prob)
-  D    <- length(nam)
   PROB <- matrix(0, L, D)
   for(i in 1:L){
     P[i] <- p(H[i])
-    PROB[i,] <- selection_prob_fixed_threshold(object, threshold = H[i])
+    prob <- selection_prob_fixed_threshold(rel_smp, threshold = H[i])
+    PROB[i,] <- prob[1:D]
   }
   colnames(PROB) <- nam
   P <- matrix(rep(P, D), L, D, byrow = FALSE)
@@ -68,55 +77,55 @@ selection_prob <- function(object,
 
 #' Selection probabilities using a fixed threshold
 #'
-#' @param object An object of class \code{lgpfit}.
+#' @param relevances The \code{relevances$samples} slot of an 
+#' \code{lgpfit} object.
 #' @param threshold value between 0 and 1
-#' @return selection probabilities for each component
-selection_prob_fixed_threshold <- function(object, threshold = 0.95)
+#' @return proportion of times each component was selected
+selection_prob_fixed_threshold <- function(relevances, threshold)
 {
-  if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
-  if(threshold > 1 || threshold < 0) stop("'threshold' must be between 0 and 1!")
-  info  <- object@model@info
-  names <- info$component_names
-  REL   <- object@relevances$samples
-  n_cmp <- length(names)
-  n_smp <- dim(REL)[1]
-  SEL   <- matrix(0, n_smp, n_cmp)
+  n_smp <- dim(relevances)[1]
+  n_cmp <- dim(relevances)[2]-1
+  names <- colnames(relevances)
+  sel   <- matrix(0, n_smp, n_cmp+1)
   for(i in 1:n_smp){
-    rel <- REL[i,]
-    selected <- selection_helper(rel, threshold)
-    for(j in 1:n_cmp){
-      if(names[j] %in% selected){
-        SEL[i,j] <- 1
-      }
-    }
+    i_sel <- selection_fixed_threshold(relevances[i,], threshold)
+    sel[i,i_sel] <- 1
   }
-  colnames(SEL) <- names
-  return(colMeans(SEL))
+  colnames(sel) <- names
+  return(colMeans(sel))
 }
 
 
-#' Select relevant components (one MCMC sample)
+#' Select relevant components
 #'
 #' @param rel a named vector of component relevances
 #' @param threshold value between 0 and 1
-#' @return names of selected components (including "noise" always)
-selection_helper <- function(rel, threshold)
+#' @return indices of selected components (including "noise" always)
+selection_fixed_threshold <- function(rel, threshold)
 {
-  rel        <- sort(rel, decreasing = TRUE)
-  i_noise    <- which(names(rel)=="noise")
-  rel_rem    <- rel[-i_noise]
-  rel        <- c(rel[i_noise], rel_rem)
-  names(rel) <- c("noise", names(rel_rem))
-  for(j in 1:length(rel)){
-    h <- sum(rel[1:j])
-    if(h > threshold){
-      SEL <- names(rel)[1:j]
-      return(SEL)
+  n_cmp      <- length(rel) - 1
+  i_noise    <- n_cmp + 1
+  p_noise    <- rel[i_noise]
+  rel        <- as.numeric(rel[1:n_cmp])
+  s          <- sort(rel, decreasing = TRUE, index.return = TRUE)
+  rel        <- s$x
+  if(p_noise >= threshold){
+    i_sel <- i_noise
+    return(i_sel)
+  }else{
+    for(j in 1:length(rel)){
+      h <- p_noise + sum(rel[1:j])
+      if(h >= threshold){
+        i_sel <- c(i_noise, s$ix[1:j])
+        return(i_sel)
+      }
     }
+    i_sel <- c(1:(n_cmp+1))
+    return(i_sel)
   }
-  SEL <- names(rel)
-  return(SEL)
+
 }
+
 
 #' Plot of probabilistic selection of relevant components
 #'

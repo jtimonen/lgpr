@@ -2,20 +2,19 @@
 % Please edit documentation in R/postproc-selection.R
 \name{selection}
 \alias{selection}
-\title{Selection of relevant components using a threshold
-for the total proportion of explained variance}
+\title{Selection of relevant components}
 \usage{
 selection(object, threshold = 0.95)
 }
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}
 
-\item{threshold}{A value between 0 and 1}
+\item{threshold}{Threshold for relevance sum. 
+Must be a value between 0 and 1.}
 }
 \value{
 A named list
 }
 \description{
-Selection of relevant components using a threshold
-for the total proportion of explained variance
+Selection of relevant components
 }

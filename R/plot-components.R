@@ -46,7 +46,8 @@ plot_components_posterior_sub1 <- function(fit, subsamples,
   model <- fit@model
   
   # Create plot
-  FFF <- get_function_component_samples(fit)
+  df  <- as.data.frame(fit@stan_fit)
+  FFF <- get_function_components_from_df_all(df, model)
   ddd <- dim(FFF)[3]
   FFF <- FFF[,,1:(ddd-1)]
   

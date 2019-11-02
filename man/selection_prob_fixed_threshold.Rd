@@ -4,15 +4,16 @@
 \alias{selection_prob_fixed_threshold}
 \title{Selection probabilities using a fixed threshold}
 \usage{
-selection_prob_fixed_threshold(object, threshold = 0.95)
+selection_prob_fixed_threshold(relevances, threshold)
 }
 \arguments{
-\item{object}{An object of class \code{lgpfit}.}
+\item{relevances}{The \code{relevances$samples} slot of an 
+\code{lgpfit} object.}
 
 \item{threshold}{value between 0 and 1}
 }
 \value{
-selection probabilities for each component
+proportion of times each component was selected
 }
 \description{
 Selection probabilities using a fixed threshold

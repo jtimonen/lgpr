@@ -1,9 +1,10 @@
 #' The main function of the `lgpr` package
 #'
 #' @export
-#' @description This is a wrapper for both \code{\link{lgp_model}} and \code{\link{lgp_fit}}.
-#' It first creates an \code{lgpmodel} object and then fits the model, finally returning an
-#' \code{lgpfit} object.
+#' @description This is a wrapper for both \code{\link{lgp_model}}
+#'  and \code{\link{lgp_fit}}. It first creates an 
+#'  \code{lgpmodel} object and then fits the model, 
+#'  finally returning an \code{lgpfit} object.
 #' @inheritParams lgp_model
 #' @inheritParams lgp_fit
 #' @return An object of class \code{lgpfit}.
@@ -27,6 +28,7 @@ lgp <- function(formula,
                 threshold        = 0.95,
                 variance_mask    = TRUE,
                 N_trials         = NULL,
+                relevance_method = "f_mean",
                 verbose          = FALSE,
                 ...)
 {
@@ -58,6 +60,7 @@ lgp <- function(formula,
                  threshold     = threshold,
                  parallel      = parallel, 
                  skip_postproc = skip_postproc,
+                 relevance_method  = relevance_method,
                  verbose       = verbose,
                  ...)
   
@@ -206,16 +209,19 @@ lgp_model <- function(formula,
 #' If \code{TRUE}, then Stan is run by first defining 
 #' \code{options(mc.cores = } \code{parallel::detectCores())}.
 #' @param skip_postproc In this mode the postprocessing after running Stan is skipped.
-#' @param threshold Covariate selection threshold.
+#' @param threshold Component selection threshold for relevance sum.
+#' @param relevance_method Component relevance determination method. 
+#' Must be either \code{"f_mean"} or \code{"alpha"}.
 #' @param verbose should some output be printed?
 #' @return An object of class \code{lgpfit}.
 #' @seealso For the possible additional arguments, see \code{\link[rstan]{sampling}}.
 #' For creating the \code{lgpmodel} input, see \code{\link{lgp_model}}.
 #'
 lgp_fit <- function(model, 
-                    threshold, 
+                    threshold         = 0.95, 
                     parallel          = FALSE, 
-                    skip_postproc     = FALSE, 
+                    skip_postproc     = FALSE,
+                    relevance_method  = "f_mean",
                     verbose           = FALSE,
                     ...)
 {
@@ -245,14 +251,14 @@ lgp_fit <- function(model,
              pkg_version = ver)
   
   if(verbose){ cat("* Begin postprocessing. \n") }
-  F_was_sampled <- as.logical(model@stan_dat$F_IS_SAMPLED)
-  fit@diagnostics <- assess_convergence(fit, skip_F = F_was_sampled)
+  fit@diagnostics <- assess_convergence(fit, skip_F_gen = TRUE)
   
   # Finalize the 'lgpfit' object
   tryCatch({
     if(!skip_postproc){
       fit      <- postproc(fit, 
-                           threshold = threshold, 
+                           threshold = threshold,
+                           relevance_method = relevance_method,
                            verbose   = verbose)
       if(verbose){ show(fit) }
     }else{

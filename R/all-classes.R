@@ -67,11 +67,8 @@ setMethod(f = "show",
 #' 
 #' @slot stan_fit The \code{stanfit} object returned by \code{rstan::sampling}.
 #' @slot model The \code{lgpmodel} object returned by \code{lgp_model}.
-#' @slot components Inferred components.
 #' @slot relevances Inferred component relevances.
-#' @slot selection Covariate selection info.
-#' @slot signal_variance Signal variance.
-#' @slot residual_variance Residual variance.
+#' @slot selection Component selection info.
 #' @slot pkg_version Package version number.
 #' @slot diagnostics  A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
 #'
@@ -83,11 +80,8 @@ lgpfit <- setClass(
   slots = c(
     stan_fit             = "stanfit",
     model                = "lgpmodel",
-    components           = "data.frame",
     relevances           = "list",
     selection            = "list",
-    signal_variance      = "numeric",
-    residual_variance    = "numeric",
     pkg_version          = "character",
     diagnostics          = "data.frame"
   )
@@ -119,15 +113,10 @@ setMethod(f = "show",
                 " (", paste(rownames(diag)[imax], collapse = ', '), 
                 ")\n", sep="")
             
-            sv   <- object@signal_variance
-            rv   <- object@residual_variance
-            pevf <- mean(sv/(sv+rv))
             sel  <- object@selection
             tr   <- sel$threshold
+            cat("* Used selection threshold = ", tr, "\n", sep ="")
             
-            cat("* Proportion of signal = ", round(pevf, 3), "\n", sep="")
-            cat("* Selection threshold = ", tr, "\n", sep ="")
-
             rel  <- object@relevances$average
             cn   <- names(rel)
             r1   <- round(rel,3)
@@ -140,7 +129,6 @@ setMethod(f = "show",
             cat("\n")
           }
 )
-
 
 #' Visualize a fitted `lgpfit` object
 #'

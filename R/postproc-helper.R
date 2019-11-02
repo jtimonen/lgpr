@@ -1,152 +1,50 @@
 
-#' Get values of sampled function components at data points
-#' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @return An array of size \code{n_samples} x \code{n_data} x \code{n_components+2}
-get_function_component_samples <- function(fit)
+#' Get values of function components at data points
+#' @param df A \code{stanfit} object as data frame,
+#' obtained as \code{as.data.frame(stanfit)}
+#' @param model An object of class \code{lgpmodel}
+#' @return An array of size 
+#' \code{n_samples} x \code{n_data} x \code{n_components+2}
+get_function_components_from_df_all <- function(df, model)
 {
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  info  <- fit@model@info
-  sf    <- fit@stan_fit
-  sd    <- fit@model@stan_dat
-  LH    <- sd$LH
-  C_hat <- sd$C_hat
-  
-  # Get function components
-  if(!info$sample_F){
-    F_cmp <- rstan::extract(sf, pars = "F_mean_cmp")$F_mean_cmp[,1,,]
-    n_dim <- length(dim(F_cmp))
-    if(n_dim==3){
-      # many components
-      F_cmp <- aperm(F_cmp, c(1,3,2))
-      F_tot <- rstan::extract(sf, pars = "F_mean_tot")$F_mean_tot[,1,]
-    }else{
-      # only one component
-      F_tot <- F_cmp
-    }
-    
-  }else{
-    F_cmp <- rstan::extract(sf, pars = "F")$F[,1,,]
-    n_dim <- length(dim(F_cmp))
-    if(n_dim==3){
-      # many components
-      F_cmp <- aperm(F_cmp, c(1,3,2))
-      F_tot <- apply(F_cmp, c(1,2), sum)
-    }else{
-      # only one component
-      F_tot <- F_cmp
-    }
-    
+  n_samples <- dim(df)[1]
+  n  <- model@stan_dat$n
+  d  <- sum(model@stan_dat$D)
+  res <- array(0, c(n_samples, n, d+2))
+  for(i in 1:n_samples){
+    res[i,,] <- get_function_components_from_df(df[i,], model)
   }
-  
-  # Get sampled signal
-  if(LH==1 || LH==0){
-    G_tot <- F_tot
-  }else if(LH==2 || LH==3){
-    G_tot <- exp(F_tot + C_hat)
-  }else if(LH==4){
-    G_tot <- sd$N_trials * 1/(1 + exp(-F_tot))
-  }else{
-    stop("Unknown likelihood!")
-  }
-  
-  # Concatenate
-  n_smp <- dim(F_cmp)[1]
-  n_tot <- dim(F_cmp)[2]
-  if(n_dim == 3){
-    n_cmp <- dim(F_cmp)[3]
-  }else{
-    n_cmp <- 1
-  }
-  FFF   <- array(0, c(n_smp, n_tot, n_cmp + 2))
-  FFF[,,1:n_cmp]  <- F_cmp
-  FFF[,,n_cmp+1]  <- F_tot
-  FFF[,,n_cmp+2]  <- G_tot
-  
-  nam <- info$component_names
-  nam <- c(nam, "f", "g")
-  dimnames(FFF)[[3]] <- nam
-  return(FFF)
+  return(res)
 }
 
 
-#' Covariate and component relevance calculations
-#' @param FFF a data frame of size \code{n_data} x \code{n_components+2}
-#' @param y_data (scaled) measurements of the response variable
-#' @param info model info
-#' @param D a vector of length 6
-#' @return a list
-compute_relevances <- function(FFF, y_data, info, D){
-  
-  # Signal variance
-  y_pred   <- FFF$g
-  svar     <- stats::var(y_pred)
-  
-  # Noise variance
-  resid  <- y_pred - y_data
-  n_data <- dim(FFF)[1]
-  evar   <- sum(resid^2)/(n_data-1)
-  
-  # Component relevances
-  n_cmp <- length(info$component_names)
-  p_signal <- svar/(svar + evar)
-  if(n_cmp > 1){
-    p_comp  <- apply(FFF[,1:n_cmp], 2, stats::var)
-    p_comp  <- p_comp/sum(p_comp)*p_signal  
-  }else{
-    p_comp <- p_signal
-  }
-  nam           <- c(info$component_names, "noise")
-  p_comp        <- c(p_comp, 1-p_signal)
-  names(p_comp) <- nam
-  p_comp        <- t(as.matrix(p_comp))
-  
-  # Create the returned list
-  ret <- list(p_comp   = p_comp,
-              p_signal = p_signal,
-              svar     = svar,
-              evar     = evar)
-  return(ret)
-}
-
-
-#' A helper function 
-#' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @return a list
-get_predicted <- function(fit)
+#' Get values of function components at data points, for one MCMC sample
+#' @param pars A data frame representing one parameter sample,
+#' i.e one row of \code{as.data.frame(stanfit)}, where stanfit
+#' is an object of class \code{stanfit}
+#' @param model An object of class \code{lgpmodel}
+#' @return A matrix of size \code{n_data} x \code{n_components+2}
+get_function_components_from_df <- function(pars, model)
 {
-  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  info <- fit@model@info
-  sf   <- fit@stan_fit
-  sdat <- fit@model@stan_dat
-  n    <- sdat$n
-  if(!info$sample_F){
-    F_mean <- rstan::extract(sf, pars = "F_mean_tot")$F_mean_tot[,1,]
-    F_var  <- rstan::extract(sf, pars = "F_var_tot")$F_var_tot[,1,]
-    pred   <- colMeans(F_mean)
-    std    <- sqrt(colMeans(F_var))
-    ret    <- list(pred = pred, std = std)
+  F_sampled <- as.numeric(model@stan_dat$F_IS_SAMPLED)
+  n  <- model@stan_dat$n
+  d  <- sum(model@stan_dat$D)
+  pn <- names(pars)
+  if(!F_sampled){
+    i1 <- which(grepl('F_mean_cmp', pn))
+    i2 <- which(grepl('F_mean_tot', pn))
+    F_cmp <- matrix(as.numeric(pars[i1]), n, d, byrow = TRUE)
+    F_tot <- matrix(as.numeric(pars[i2]), n, 1, byrow = TRUE)
   }else{
-    F_smp <- rstan::extract(sf, pars = "F")$F[,1,,]
-    F_smp <- aperm(F_smp, c(1,3,2))
-    F_smp <- apply(F_smp, c(1,2), sum)
-    LH    <- fit@model@stan_dat$LH
-    C_hat <- fit@model@stan_dat$C_hat
-    if(LH == 1){
-      G_smp <- F_smp
-    }else if(LH == 2 || LH == 3){
-      G_smp <- exp(F_smp + C_hat)
-    }else if(LH == 4){
-      N_trials <- sdat$N_trials
-      G_smp <- N_trials * 1/(1 + exp(-F_smp))
-    }else{
-      stop("Unknown likelihood!")
-    }
-    ret <- list(F_smp = F_smp, G_smp = G_smp)
+    i1 <- which(grepl('F', pn))
+    F_cmp <- matrix(as.numeric(pars[i1]), n, d, byrow = TRUE)
+    F_tot <- matrix(rowSums(F_cmp), n, 1, byrow = TRUE)
   }
-  return(ret)
+  G_tot <- get_g_from_f(F_tot, model)
+  res   <- cbind(F_cmp, F_tot, G_tot)
+  colnames(res) <- c(model@info$component_names, "f", "g")
+  return(res)
 }
-
-
 
 #' Get a posterior estimate of model (hyper)parameters
 #'
@@ -204,7 +102,6 @@ hyperparam_samples <- function(object, samples = NULL){
 
 
 #' Get average runtime of a chain
-#' @export
 #' @param object An object of class \code{lgpfit}.
 #' @return Average runtimes for warmup and sampling
 get_runtime <- function(object){
@@ -215,28 +112,21 @@ get_runtime <- function(object){
   return(list(warmup = t1, sampling = t2))
 }
 
-
-#' Select the affected individuals
-#' @export
-#' @param object An object of class \code{lgpfit}.
-#' @param medians.return Should the medians of beta parameters also be returned?
-#' @param threshold A value that the median of beta has to exceed 
-#' @return A binary vector indicating the individuals for which the disease effect is inferred
-#' to exist.
-affected <- function(object, medians.return = FALSE, threshold = 0.5){
-  DF <- as.data.frame(object@stan_fit)
-  i_beta <- grep("beta", names(DF))
-  if(length(i_beta)==0){
-    stop("The disease effect was not modeled heterogeneously!")
-  }
-  BET      <- DF[i_beta]
-  b50      <- apply(BET, 2, stats::median)
-  affected <- (b50 >= threshold)
-  cid      <- get_case_ids(object)
-  names(affected) <- cid
-  if(medians.return){
-    return(list(affected = affected, medians = b50))
+#' Get signal on data scale from process f
+#' @param f A vector
+#' @param model an object of class \code{lgpmodel}
+#' @return A vector g
+get_g_from_f <- function(f, model){
+  sdat <- model@stan_dat
+  LH   <- sdat$LH
+  if(LH==1 || LH==0){
+    g <- f
+  }else if(LH==2 || LH==3){
+    g <- exp(f + sdat$C_hat)
+  }else if(LH==4){
+    g <- sdat$N_trials * 1/(1 + exp(-f))
   }else{
-    return(affected)
+    stop("Unknown likelihood!")
   }
+  return(g)
 }

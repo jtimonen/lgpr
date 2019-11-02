@@ -467,7 +467,7 @@ create_predictions_plot_df1 <- function(fit, scale_f = TRUE, n_sds){
   age  <- X[,2]
   age  <- TSCL$fun_inv(age)
   LH   <- model@stan_dat$LH
-  
+
   PRED  <- get_predicted(fit)
   if(!info$sample_F){
     
@@ -592,3 +592,30 @@ create_predictions_plot_df2 <- function(model,
   return(DF)
 }
 
+
+#' A helper function 
+#' @param fit An (incomplete) object of class \code{lgpfit}.
+#' @return a list
+get_predicted <- function(fit)
+{
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  model <- fit@model
+  info <- model@info
+  sf   <- fit@stan_fit
+  sdat <- fit@model@stan_dat
+  n    <- sdat$n
+  if(!info$sample_F){
+    F_mean <- rstan::extract(sf, pars = "F_mean_tot")$F_mean_tot[,1,]
+    F_var  <- rstan::extract(sf, pars = "F_var_tot")$F_var_tot[,1,]
+    pred   <- colMeans(F_mean)
+    std    <- sqrt(colMeans(F_var))
+    ret    <- list(pred = pred, std = std)
+  }else{
+    F_smp <- rstan::extract(sf, pars = "F")$F[,1,,]
+    F_smp <- aperm(F_smp, c(1,3,2))
+    F_smp <- apply(F_smp, c(1,2), sum)
+    G_smp <- get_g_from_f(F_smp, model)
+    ret <- list(F_smp = F_smp, G_smp = G_smp)
+  }
+  return(ret)
+}

@@ -1,78 +1,61 @@
 #' Finalize the lgpfit object after sampling
 #'
-#' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @param threshold Covariate selection threshold.
-#' @param verbose Should some output be printed?
+#' @inheritParams postproc_relevances
+#' @inheritParams selection
 #' @return An updated object of class \code{lgpfit}.
-postproc <- function(fit, threshold = 0.95, verbose = FALSE){
-  
-  model  <- fit@model
-  info   <- model@info
-  sdat   <- model@stan_dat
-  y_data <- as.numeric(sdat$y)
-  n      <- length(y_data)
-  D      <- sdat$D
-  n_cmp  <- length(info$component_names)
-  NAMES1 <- c(info$component_names, "noise")
-  NAMES2 <- c(info$covariate_names, "noise")
-  
-  # Get function component samples
-  FFF      <- get_function_component_samples(fit)
-  n_smp    <- dim(FFF)[1]
-  n_dat    <- dim(FFF)[2]
-  n_cmp    <- dim(FFF)[3] - 2
-  
-  # Get average inferred components
-  FFF_avg  <- apply(FFF, c(2,3), mean)
-  FFF_avg  <- matrix_to_df(FFF_avg)
-  if(n != n_dat){ stop("Data size sanity check failed!") }
-  
-  
-  # Compute relevances for each sample
-  if(verbose){ cat("* Computing relevances over", n_smp, "posterior samples.\n") }
-  p_comp   <- matrix(0, n_smp, n_cmp + 1)
-  p_signal <- rep(0, n_smp)
-  svar     <- rep(0, n_smp)
-  evar     <- rep(0, n_smp)
-  for(i in 1:n_smp){
-    FFF_i           <- data.frame(FFF[i,,])
-    colnames(FFF_i) <- colnames(FFF_avg)
-    REL             <- compute_relevances(FFF_i, y_data, info, D)
-    p_comp[i,]      <- REL$p_comp
-    p_signal[i]     <- REL$p_signal
-    svar[i]         <- REL$svar
-    evar[i]         <- REL$evar
-  }
-  colnames(p_comp)  <- NAMES1
-  
-  if(verbose){ cat("\n") }
+postproc <- function(fit, 
+                     threshold = 0.95,
+                     relevance_method = 'f_mean', 
+                     verbose   = FALSE){
   
   # Set slot values
-  fit@components         <- FFF_avg
-  fit@relevances         <- list(samples = p_comp, 
-                                 average = colMeans(p_comp))
-  fit@signal_variance    <- svar
-  fit@residual_variance  <- evar
-  fit@selection          <- selection(fit, threshold = threshold)
+  fit@relevances <- postproc_relevances(fit, relevance_method, verbose)
+  fit@selection  <- selection(fit, threshold)
   return(fit)
-  
 }
 
 
 #' Assess convergence of the chains
 #'
 #' @param fit An (incomplete) object of class \code{lgpfit}.
-#' @param skip_F Should F_mean, F_var etc. be ignored
+#' @param skip_F_gen Should F_mean, F_var etc. be ignored
 #' @return A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
-assess_convergence <- function(fit, skip_F = TRUE){
+assess_convergence <- function(fit, skip_F_gen = TRUE){
   m  <- rstan::monitor(fit@stan_fit, print = FALSE)
   m  <- as.data.frame(m)
   m  <- m[c("Rhat", "Bulk_ESS", "Tail_ESS")]
-  if(skip_F){
+  if(skip_F_gen){
     i1 <- which(grepl("F_mean_", rownames(m)))
     i2 <- which(grepl("F_var_", rownames(m)))
-    m  <- m[-c(i1,i2),]
+    if(length(i1)*length(i2)>0){
+      m  <- m[-c(i1,i2),] 
+    }
   }
   return(m)
 }
 
+
+#' Select the affected individuals
+#' @export
+#' @param object An object of class \code{lgpfit}.
+#' @param medians.return Should the medians of beta parameters also be returned?
+#' @param threshold A value that the median of beta has to exceed 
+#' @return A binary vector indicating the individuals for which the disease effect is inferred
+#' to exist.
+affected <- function(object, medians.return = FALSE, threshold = 0.5){
+  DF <- as.data.frame(object@stan_fit)
+  i_beta <- grep("beta", names(DF))
+  if(length(i_beta)==0){
+    stop("The disease effect was not modeled heterogeneously!")
+  }
+  BET      <- DF[i_beta]
+  b50      <- apply(BET, 2, stats::median)
+  affected <- (b50 >= threshold)
+  cid      <- get_case_ids(object)
+  names(affected) <- cid
+  if(medians.return){
+    return(list(affected = affected, medians = b50))
+  }else{
+    return(affected)
+  }
+}

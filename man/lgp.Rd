@@ -10,7 +10,8 @@ lgp(formula, data, likelihood = "Gaussian", prior = prior_default(),
   continuous_vars = NULL, categorical_vars = NULL,
   offset_vars = NULL, C_hat = NULL, DELTA = 1e-08, sample_F = NULL,
   parallel = FALSE, skip_postproc = FALSE, threshold = 0.95,
-  variance_mask = TRUE, N_trials = NULL, verbose = FALSE, ...)
+  variance_mask = TRUE, N_trials = NULL, relevance_method = "f_mean",
+  verbose = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the form
@@ -63,7 +64,7 @@ If \code{TRUE}, then Stan is run by first defining
 
 \item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
 
-\item{threshold}{Covariate selection threshold.}
+\item{threshold}{Component selection threshold for relevance sum.}
 
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
@@ -71,6 +72,9 @@ variance to zero before disease onset?}
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
+
+\item{relevance_method}{Component relevance determination method. 
+Must be either \code{"f_mean"} or \code{"alpha"}.}
 
 \item{verbose}{Should more verbose output be printed?}
 
@@ -81,7 +85,8 @@ Bernoulli observation model.}
 An object of class \code{lgpfit}.
 }
 \description{
-This is a wrapper for both \code{\link{lgp_model}} and \code{\link{lgp_fit}}.
-It first creates an \code{lgpmodel} object and then fits the model, finally returning an
-\code{lgpfit} object.
+This is a wrapper for both \code{\link{lgp_model}}
+ and \code{\link{lgp_fit}}. It first creates an 
+ \code{lgpmodel} object and then fits the model, 
+ finally returning an \code{lgpfit} object.
 }
