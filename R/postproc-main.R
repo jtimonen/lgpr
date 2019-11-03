@@ -1,5 +1,6 @@
 #' Finalize the lgpfit object after sampling
 #'
+#' @export
 #' @inheritParams postproc_relevances
 #' @inheritParams selection
 #' @return An updated object of class \code{lgpfit}.

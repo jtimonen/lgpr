@@ -5,7 +5,7 @@
 \title{Probabilistic selection of relevant components}
 \usage{
 selection_prob(object, p = function(x) {     stats::dbeta(x, 100, 5) },
-  h = 0.01)
+  h = 0.01, show_progbar = FALSE)
 }
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}
@@ -13,6 +13,8 @@ selection_prob(object, p = function(x) {     stats::dbeta(x, 100, 5) },
 \item{p}{a function defining a density over interval [0,1]}
 
 \item{h}{discretization parameter for computing a quadrature}
+
+\item{show_progbar}{Should this show a progress bar?}
 }
 \value{
 Selection probabilities for each component

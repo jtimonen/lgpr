@@ -41,17 +41,20 @@ selection <- function(object, threshold = 0.95)
 #' @param object An object of class \code{lgpfit}.
 #' @param p a function defining a density over interval [0,1]
 #' @param h discretization parameter for computing a quadrature
+#' @param show_progbar Should this show a progress bar?
 #' @return Selection probabilities for each component
 selection_prob <- function(object, 
                            p = function(x){stats::dbeta(x, 100, 5)},
-                             h = 0.01)
+                           h = 0.01,
+                           show_progbar = FALSE)
 {
   if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
   if(!is.function(p)){stop('p must be a function')}
   
   # Get relevances
-  rel_smp     <- object@relevances$samples
-  
+  rel_smp <- as.matrix(object@relevances$samples)
+
+  # Set variables  
   info <- object@model@info
   H    <- seq(0, 1, by = h)
   L    <- length(H)
@@ -61,14 +64,35 @@ selection_prob <- function(object,
   prob <- prob[1:D]
   nam  <- names(prob)
   PROB <- matrix(0, L, D)
+  
+  # Setup progress bar
+  if(show_progbar){
+    str    <- paste("|   ", seq(10,100,by=10), "%", sep="")
+    top    <- paste(formatC(str, width = 4), collapse = " ")
+    top    <- paste(top, "|")
+    barlen <- nchar(top) - 1
+    iprint <- ceiling(seq(1, L, length.out = barlen))
+    if(L >=100){
+      cat(top, "\n ")
+    }
+  }
+  
+  # Run probability computations
   for(i in 1:L){
     P[i] <- p(H[i])
-    prob <- selection_prob_fixed_threshold(rel_smp, threshold = H[i])
+    prob <- selection_prob_fixed_threshold(rel_smp,
+                                           threshold = H[i])
     PROB[i,] <- prob[1:D]
+    if(show_progbar){
+      if(i %in% iprint){cat('=')}
+      if(i == L){ cat('\n\n')}
+    }
   }
   colnames(PROB) <- nam
   P <- matrix(rep(P, D), L, D, byrow = FALSE)
-  res <- h * colSums(PROB * P)
+  res <- h * colSums(PROB * P) # numeric integration
+  ones <- rep(1, length(res))
+  res <- pmin(ones, res) # ensure max prob is 1
   plt <- selection_prob_plot(PROB, H, P)
   ret <- list(prob = res, plot = plt)
   return(ret)
