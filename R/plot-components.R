@@ -313,8 +313,10 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
         grpvar   <- as.factor(paste(id, sample))
         df       <- data.frame(xvar, f, grpvar, colorvar)
         aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
-                                        group = 'grpvar')
-        aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub')
+                                        group = 'grpvar',
+                                        color = 'colorvar')
+        aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub',
+                                        fill ='colorvar')
       }else {
         cind <- which(cvn==sum_highlight)
         if(length(cind)==0){stop("invalid sum_highlight (", sum_highlight,")")}
