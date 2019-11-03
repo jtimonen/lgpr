@@ -93,6 +93,7 @@ selection_prob <- function(object,
   res <- h * colSums(PROB * P) # numeric integration
   ones <- rep(1, length(res))
   res <- pmin(ones, res) # ensure max prob is 1
+  names(res) <- nam
   plt <- selection_prob_plot(PROB, H, P)
   ret <- list(prob = res, plot = plt)
   return(ret)
