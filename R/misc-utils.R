@@ -288,3 +288,23 @@ PRED_to_arrays <- function(PRED){
   }
   return(list(MMM=MMM,SSS=SSS))
 }
+
+
+#' Create an example fit object
+#' @param N number of individuals
+#' @param t time points
+#' @param iter number of iterations
+#' @param chains number of chains
+#' @return an object of class \code{\link{lgpfit}}
+create_example_fit <- function(N = 4, 
+                               t = 10*c(1,2,3,4,5),
+                               iter = 100,
+                               chains = 1){
+  fit <- lgp(formula = y ~ id + age, 
+             data    = simulate_data(N = 4, t)$data, 
+             iter    = iter,
+             chains  = chains, 
+             refresh = 0,
+             verbose = FALSE)
+  return(fit)
+}

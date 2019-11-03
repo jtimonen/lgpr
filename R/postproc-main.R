@@ -9,7 +9,10 @@ postproc <- function(fit,
                      verbose   = FALSE){
   
   # Set slot values
-  fit@relevances <- postproc_relevances(fit, relevance_method, verbose)
+  fit@relevances <- postproc_relevances(fit, 
+                                        relevance_method, 
+                                        "SSE",
+                                        verbose)
   fit@selection  <- selection(fit, threshold)
   return(fit)
 }

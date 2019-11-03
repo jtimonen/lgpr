@@ -12,7 +12,8 @@ test_that("lgp runs", {
                   iter    = 100,
                   chains  = 1, 
                   refresh = 0,
-                  verbose = TRUE)@model@stan_dat$D)
+                  verbose = TRUE,
+                  relevance_method = 'alpha')@model@stan_dat$D)
   }),
   c(1,1,0,0,0,0)
   )

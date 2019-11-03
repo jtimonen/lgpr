@@ -114,17 +114,20 @@ setMethod(f = "show",
                 ")\n", sep="")
             
             sel  <- object@selection
+            rel_method <- object@relevances$method
+            r3   <- sel$prob
             tr   <- sel$threshold
+            cat("* Used relevance method = ", rel_method, "\n", sep ="")
             cat("* Used selection threshold = ", tr, "\n", sep ="")
             
             rel  <- object@relevances$average
             cn   <- names(rel)
             r1   <- round(rel,3)
             r2   <- cn %in% sel$selected
-            DF   <- data.frame(r1,r2)
+            DF   <- data.frame(r1,r2,r3)
             cat("\n")
             
-            colnames(DF) <- c("Relevance", "Selected" )
+            colnames(DF) <- c("Relevance", "Selected", "Prob." )
             print(DF)
             cat("\n")
           }

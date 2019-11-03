@@ -5,7 +5,7 @@
 \title{Compute component relevances and estimate amount of noise
 (one MCMC sample)}
 \usage{
-compute_relevances(pars, model, method = "f_mean")
+compute_relevances(pars, model, method, noise_method)
 }
 \arguments{
 \item{pars}{A data frame representing one parameter sample,
@@ -16,6 +16,8 @@ is an object of class \code{stanfit}}
 
 \item{method}{Relevance determination method. Must be either
 \code{"f_mean"} or \code{"alpha"}.}
+
+\item{noise_method}{Noise level estimation method.}
 }
 \value{
 a matrix of size \code{1} x \code{n_components + 1}

@@ -14,7 +14,7 @@ is an object of class \code{stanfit}}
 \item{model}{An object of class \code{lgpmodel}}
 }
 \value{
-a matrix of size \code{1} x \code{n_components + 1}
+a vector of length \code{n_components}
 }
 \description{
 The alpha relevance determination method
