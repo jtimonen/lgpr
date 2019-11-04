@@ -9,7 +9,7 @@ plot_components(MMM, SSS, model, time_is_xvar, X_test = NULL,
   fill_alpha = 0.3, marker = NULL, ncol = NULL, nrow = NULL,
   legend = NULL, labels = NULL, ylim = NULL, font_size = 9,
   theme = ggplot2::theme_linedraw(), legend_dir = "horizontal",
-  xlabel = NULL, ylabel = " ")
+  xlabel = NULL, ylabel = " ", viridis_option = "viridis")
 }
 \arguments{
 \item{MMM}{a n array of size n_samples x n_data x n_components}
@@ -22,8 +22,7 @@ plot_components(MMM, SSS, model, time_is_xvar, X_test = NULL,
 
 \item{X_test}{optional matrix of test points}
 
-\item{sum_highlight}{name of a categorical covariate to be highlighted
-by colour in the sum plot}
+\item{sum_highlight}{name of a categorical covariate to be highlighted}
 
 \item{linealpha}{line alpha}
 
@@ -52,6 +51,9 @@ by colour in the sum plot}
 \item{xlabel}{x-axis label}
 
 \item{ylabel}{y-axis label}
+
+\item{viridis_option}{the option argument of \code{ggplot2::scale_colour_viridis_c}
+by colour in the sum plot}
 }
 \value{
 an object returned by ggpubr::ggarrange

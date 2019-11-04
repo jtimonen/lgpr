@@ -38,8 +38,8 @@ plot_components_posterior <- function(fit, subsamples = NULL,
 #' @param ... additional arguments for \code{\link{plot_components}}
 #' @return an object returned by ggpubr::ggarrange
 plot_components_posterior_sub1 <- function(fit, subsamples,
-                                      time_is_xvar, marker,
-                                      ...)
+                                           time_is_xvar, marker,
+                                           ...)
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
@@ -165,14 +165,15 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
                             theme       = ggplot2::theme_linedraw(),
                             legend_dir  = "horizontal",
                             xlabel      = NULL,
-                            ylabel      = " "){
+                            ylabel      = " ",
+                            viridis_option = "viridis"){
   
   GG <- list()
   sum_D <- sum(model@stan_dat$D) + 1
   for(d in 1:sum_D){
     gg <- plot_component(MMM, SSS, model, d, time_is_xvar,
                          linealpha, linetype, fill_alpha,
-                         X_test, marker, sum_highlight)
+                         X_test, marker, sum_highlight, viridis_option)
     if(is.null(ylim)){
       if(!is.null(SSS)){
         ylim <- c(min(MMM - SSS), max(MMM + SSS))
@@ -214,11 +215,12 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
 #' @param X_test optional matrix of test points
 #' @param marker point type
 #' @param sum_highlight name of a categorical covariate to be highlighted
+#' @param viridis_option the option argument of \code{ggplot2::scale_colour_viridis_c}
 #' by colour in the sum plot
 #' @return a ggplot object
 plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
                            linealpha, linetype, fill_alpha,
-                           X_test, marker, sum_highlight)
+                           X_test, marker, sum_highlight, viridis_option)
 {
   sdat  <- model@stan_dat
   if(is.null(X_test)){
@@ -270,10 +272,10 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
       warning('covariate', xvar_name, 'is not on original scale!')
     }
   }
-
+  
   
   # Create df and aes
-  if(ctype %in% c(1,4)){
+  if(ctype==1){
     leg      <- ggplot2::theme(legend.position = "none")
     grpvar   <- as.factor(paste(id, sample))
     df       <- data.frame(xvar, f, grpvar)
@@ -296,6 +298,15 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
     aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
                                     group = 'grpvar', color = 'colorvar')
     aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub', fill = 'colorvar')
+  }else if(ctype==4){
+    leg      <- ggplot2::theme(legend.position = "none")
+    grpvar   <- as.factor(paste(id, sample))
+    colorvar <- rep(X[,cind], S)
+    df       <- data.frame(xvar, f, grpvar, colorvar)
+    aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
+                                    group = 'grpvar',
+                                    color = 'colorvar')
+    aes_eb   <- ggplot2::aes_string(ymin='lb', ymax='ub')
   }else if(ctype == 5 || ctype == 6){
     leg      <- ggplot2::labs(color = cvn[cind], fill = cvn[cind])
     colorvar <- rep(X[,cind], S)
@@ -354,6 +365,9 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
   if(plot_eb){
     h <- h + ggplot2::geom_ribbon(aes_eb, alpha = fill_alpha, 
                                   lty = 0)
+  }
+  if(ctype==4){
+    h <- h + ggplot2::scale_colour_viridis_c(option = viridis_option) 
   }
   h   <- h + leg
   h   <- h + ggplot2::geom_line(linetype = linetype, alpha = linealpha)

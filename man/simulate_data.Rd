@@ -13,7 +13,7 @@ simulate_data(N, t_data, covariates = c(), names = NULL,
   t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
   bin_kernel = FALSE, steepness = 0.5, vm_params = c(0.025, 1),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
-  1)), N_trials = 1, verbose = FALSE)
+  1)), N_trials = 1, verbose = FALSE, force_zeromean = TRUE)
 }
 \arguments{
 \item{N}{Number of individuals.}
@@ -101,6 +101,9 @@ covariates are generated so that \code{x <- sin(a*t + b) + c}, where
 \item{N_trials}{The number of trials parameter for binomial data.}
 
 \item{verbose}{verbosity mode}
+
+\item{force_zeromean}{Should each component (excluding the disease age component)
+be forced to have a zero mean?}
 }
 \value{
 A list \code{out}, where 

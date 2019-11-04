@@ -5,7 +5,7 @@
 \title{Helper function for plotting one component}
 \usage{
 plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype,
-  fill_alpha, X_test, marker, sum_highlight)
+  fill_alpha, X_test, marker, sum_highlight, viridis_option)
 }
 \arguments{
 \item{MMM}{a n array of size n_samples x n_data x n_components}
@@ -28,7 +28,9 @@ plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype,
 
 \item{marker}{point type}
 
-\item{sum_highlight}{name of a categorical covariate to be highlighted
+\item{sum_highlight}{name of a categorical covariate to be highlighted}
+
+\item{viridis_option}{the option argument of \code{ggplot2::scale_colour_viridis_c}
 by colour in the sum plot}
 }
 \value{

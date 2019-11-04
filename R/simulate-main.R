@@ -51,7 +51,8 @@ simulate_data <- function(N,
                           continuous_info = list(mu = c(pi/8,pi,-0.5), 
                                                  lambda = c(pi/8,pi,1)),
                           N_trials        = 1,
-                          verbose = FALSE)
+                          verbose         = FALSE,
+                          force_zeromean  = TRUE)
 {
   if(N < 2) stop("There must be at least 2 individuals!")
   if(length(t_data) < 3) stop("There must be at least 3 time points per individual!")
@@ -88,7 +89,8 @@ simulate_data <- function(N,
                   dis_fun,
                   bin_kernel,
                   steepness,
-                  vm_params
+                  vm_params,
+                  force_zeromean
   )
   FFF <- COMP$FFF
   

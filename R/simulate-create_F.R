@@ -30,6 +30,8 @@
 #' if the disease component is in the model.
 #' @param vm_params Parameters of the variance mask function. This is only 
 #' needed if \code{useMaskedVarianceKernel = TRUE}.
+#' @param force_zeromean Should each component (excluding the disease age component)
+#' be forced to have a zero mean?
 #' @return a data frame FFF where one column corresponds to one additive data component
 create_F <- function(X,
                      covariates,
@@ -39,7 +41,8 @@ create_F <- function(X,
                      dis_fun,
                      bin_kernel,
                      steepness,
-                     vm_params)
+                     vm_params,
+                     force_zeromean)
 {
   i4 <- which(covariates==4)
   covariates[i4] <- 3
@@ -73,7 +76,7 @@ create_F <- function(X,
     #do nothing, keep the component drawn from a GP
   }
 
-  FFF   <- scaleRelevances(FFF, relevances, force_zero_mean = TRUE, i_dis)
+  FFF   <- scaleRelevances(FFF, relevances, force_zeromean = force_zeromean, i_dis)
   colnames(FFF) <- labs
   ret <- list(FFF = data.frame(FFF), KKK = KK)
   return(ret)
@@ -193,10 +196,11 @@ nameComponents <- function(types,names){
 #'
 #' @param FFF matrix where one column corresponds to one additive data component
 #' @param relevances the desired variance of each component (column)
-#' @param force_zero_mean should each component be forced to have zero mean?
+#' @param force_zeromean Should each component (excluding the disease age component)
+#' be forced to have a zero mean.
 #' @param i_dis index of a component for which the zero-mean forcing is skipped
 #' @return a new matrix \code{FFF}
-scaleRelevances <- function(FFF, relevances, force_zero_mean = TRUE, i_dis){
+scaleRelevances <- function(FFF, relevances, force_zeromean, i_dis){
   
   # Some input checking
   d <- dim(FFF)[2]
@@ -210,7 +214,7 @@ scaleRelevances <- function(FFF, relevances, force_zero_mean = TRUE, i_dis){
     std <- stats::sd(FFF[,j])
     if(std > 0){
       FFF[,j] <- sqrt(relevances[j])/std*FFF[,j]
-      if(force_zero_mean && j != i_dis){
+      if(force_zeromean && (j != i_dis)){
         FFF[,j] <- FFF[,j] - mean(FFF[,j])
       }
     }
