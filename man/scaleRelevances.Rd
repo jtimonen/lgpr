@@ -4,7 +4,7 @@
 \alias{scaleRelevances}
 \title{Scale the effect sizes}
 \usage{
-scaleRelevances(FFF, relevances, force_zeromean, i_dis)
+scaleRelevances(FFF, relevances, force_zeromean, i_skip)
 }
 \arguments{
 \item{FFF}{matrix where one column corresponds to one additive data component}
@@ -14,7 +14,7 @@ scaleRelevances(FFF, relevances, force_zeromean, i_dis)
 \item{force_zeromean}{Should each component (excluding the disease age component)
 be forced to have a zero mean.}
 
-\item{i_dis}{index of a component for which the zero-mean forcing is skipped}
+\item{i_skip}{induces of components for which the zero-mean forcing is skipped}
 }
 \value{
 a new matrix \code{FFF}

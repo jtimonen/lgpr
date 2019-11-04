@@ -76,7 +76,14 @@ create_F <- function(X,
     #do nothing, keep the component drawn from a GP
   }
 
-  FFF   <- scaleRelevances(FFF, relevances, force_zeromean = force_zeromean, i_dis)
+  if(!bin_kernel){
+    i_zm <- c(which(D==1), which(D==5))
+    i_skip <- c(i_dis, i_zm)
+  }else{
+    i_skip <- c(i_dis)
+  }
+  
+  FFF <- scaleRelevances(FFF, relevances, force_zeromean = force_zeromean, i_skip)
   colnames(FFF) <- labs
   ret <- list(FFF = data.frame(FFF), KKK = KK)
   return(ret)
@@ -198,9 +205,10 @@ nameComponents <- function(types,names){
 #' @param relevances the desired variance of each component (column)
 #' @param force_zeromean Should each component (excluding the disease age component)
 #' be forced to have a zero mean.
-#' @param i_dis index of a component for which the zero-mean forcing is skipped
+#' @param i_skip induces of components for which the zero-mean forcing is skipped
 #' @return a new matrix \code{FFF}
-scaleRelevances <- function(FFF, relevances, force_zeromean, i_dis){
+scaleRelevances <- function(FFF, relevances, 
+                            force_zeromean, i_skip){
   
   # Some input checking
   d <- dim(FFF)[2]
@@ -214,7 +222,7 @@ scaleRelevances <- function(FFF, relevances, force_zeromean, i_dis){
     std <- stats::sd(FFF[,j])
     if(std > 0){
       FFF[,j] <- sqrt(relevances[j])/std*FFF[,j]
-      if(force_zeromean && (j != i_dis)){
+      if(force_zeromean && !(j %in% i_skip)){
         FFF[,j] <- FFF[,j] - mean(FFF[,j])
       }
     }

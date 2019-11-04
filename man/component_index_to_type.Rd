@@ -7,7 +7,7 @@
 component_index_to_type(D, idx)
 }
 \arguments{
-\item{D}{integer vector of length}
+\item{D}{integer vector of length 6}
 
 \item{idx}{integer}
 }

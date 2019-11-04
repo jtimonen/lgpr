@@ -222,6 +222,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
                            linealpha, linetype, fill_alpha,
                            X_test, marker, sum_highlight, viridis_option)
 {
+  
   sdat  <- model@stan_dat
   if(is.null(X_test)){
     X     <- t(sdat$X)
@@ -259,6 +260,12 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
   sample <- rep(1:S, each = n)
   id     <- rep(X[,1], S)
   
+  
+  if(ctype==4){
+    icnt <- idx_to_cont_index(D, idx)
+    cscl <- model@scalings$CSCL[[icnt]]
+  }
+  
   if(ctype %in% c(1,2,5,6,7)){
     time_is_xvar <- TRUE
   }
@@ -269,10 +276,11 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
     xvar  <- rep(X[,cind], S)
     xvar_name <- cvn[cind]
     if(ctype==4){
-      warning('covariate', xvar_name, 'is not on original scale!')
+      xvar <- cscl$fun_inv(xvar)
     }
   }
   
+
   
   # Create df and aes
   if(ctype==1){
@@ -301,7 +309,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
   }else if(ctype==4){
     leg      <- ggplot2::theme(legend.position = "none")
     grpvar   <- as.factor(paste(id, sample))
-    colorvar <- rep(X[,cind], S)
+    colorvar <- cscl$fun_inv(rep(X[,cind], S))
     df       <- data.frame(xvar, f, grpvar, colorvar)
     aes      <- ggplot2::aes_string(x = 'xvar', y = 'f', 
                                     group = 'grpvar',
@@ -384,7 +392,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
 
 
 #' Component index to component type
-#' @param D integer vector of length 
+#' @param D integer vector of length 6
 #' @param idx integer
 #' @return an integer
 component_index_to_type <- function(D, idx){
@@ -394,10 +402,29 @@ component_index_to_type <- function(D, idx){
 }
 
 #' Component index to covariate index
-#' @param D integer vector of length 
+#' @param D integer vector of length 6
 #' @param idx integer
 #' @return an integer
 component_index_to_covariate_index <- function(D, idx){
   covr_idx <- 2 - sum(D[1:2]) + idx
   return(covr_idx)
+}
+
+
+#' Component index to how manyth continuous covariate it is
+#' @param D integer vector of length 6
+#' @param idx an integer
+#' @return an integer
+idx_to_cont_index <- function(D, idx){
+  type <- component_index_to_type(D, idx)
+  if(type!=4){ stop('This is not a continuous covariate') }
+  all <- c(rep(1,D[1]), rep(2,D[2]), rep(3,D[3]), 
+           rep(4,D[4]), rep(5,D[5]), rep(6,D[6]))
+  n_moved <- 1
+  for(j in 1:D[4]){
+    if(all[idx-j]==4){
+      n_moved <- n_moved + 1
+    }
+  }
+  return(n_moved)
 }
