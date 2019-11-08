@@ -3,7 +3,8 @@
 #' @export
 #' @inheritParams plot_components_posterior_sub1
 #' @inheritParams plot_components_posterior_sub2
-#' @return an object returned by ggpubr::ggarrange
+#' @return an object returned by ggpubr::ggarrange or a
+#' list of ggplot2 objects
 plot_components_posterior <- function(fit, subsamples = NULL,
                                       time_is_xvar = TRUE, 
                                       PRED = NULL, 
@@ -36,7 +37,7 @@ plot_components_posterior <- function(fit, subsamples = NULL,
 #' samples are plotted.
 #' @param marker point type
 #' @param ... additional arguments for \code{\link{plot_components}}
-#' @return an object returned by ggpubr::ggarrange
+#' @return an object returned by ggpubr::ggarrange or a list
 plot_components_posterior_sub1 <- function(fit, subsamples,
                                            time_is_xvar, marker,
                                            ...)
@@ -86,7 +87,7 @@ plot_components_posterior_sub1 <- function(fit, subsamples,
 #' in all subplots?
 #' @param sample_idx Which sample to plot. 
 #' @param ... additional arguments for \code{\link{plot_components}}
-#' @return an object returned by ggpubr::ggarrange
+#' @return an object returned by ggpubr::ggarrange or a list
 plot_components_posterior_sub2 <- function(fit, PRED, sample_idx,
                                            time_is_xvar,
                                            n_sd, ...)
@@ -114,7 +115,7 @@ plot_components_posterior_sub2 <- function(fit, PRED, sample_idx,
 #' in all subplots?
 #' @param marker point marker
 #' @param ... additional arguments for \code{\link{plot_components}}
-#' @return an object returned by ggpubr::ggarrange
+#' @return an object returned by ggpubr::ggarrange or list
 plot_components_simdata <- function(simData, 
                                     time_is_xvar = TRUE, 
                                     marker = 16, ...)
@@ -148,7 +149,9 @@ plot_components_simdata <- function(simData,
 #' @param legend_dir direction of legend
 #' @param xlabel x-axis label
 #' @param ylabel y-axis label 
-#' @return an object returned by ggpubr::ggarrange
+#' @param return_list should this return a list of ggplot objects 
+#' instead of doing ggarrange
+#' @return an object returned by ggpubr::ggarrange or list
 plot_components <- function(MMM, SSS, model, time_is_xvar,
                             X_test        = NULL,
                             sum_highlight = NULL,
@@ -166,7 +169,8 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
                             legend_dir  = "horizontal",
                             xlabel      = NULL,
                             ylabel      = " ",
-                            viridis_option = "viridis"){
+                            viridis_option = "viridis",
+                            return_list = FALSE){
   
   GG <- list()
   sum_D <- sum(model@stan_dat$D) + 1
@@ -197,9 +201,13 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
     }
     GG[[d]] <- gg + ggplot2::theme(text=ggplot2::element_text(size=font_size))
   }
-  p <- ggpubr::ggarrange(plotlist = GG, ncol = ncol, nrow = nrow,
-                         legend = legend,
-                         labels = labels)
+  if(return_list){
+    p <- GG
+  }else{
+    p <- ggpubr::ggarrange(plotlist = GG, ncol = ncol, nrow = nrow,
+                           legend = legend,
+                           labels = labels)
+  }
   return(p)
 }
 
@@ -280,7 +288,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
     }
   }
   
-
+  
   
   # Create df and aes
   if(ctype==1){
@@ -377,6 +385,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
   if(ctype==4){
     h <- h + ggplot2::scale_colour_viridis_c(option = viridis_option) 
   }
+  
   h   <- h + leg
   h   <- h + ggplot2::geom_line(linetype = linetype, alpha = linealpha)
   h   <- h + ggplot2::ggtitle(title)

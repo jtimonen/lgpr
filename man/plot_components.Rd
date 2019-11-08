@@ -9,7 +9,8 @@ plot_components(MMM, SSS, model, time_is_xvar, X_test = NULL,
   fill_alpha = 0.3, marker = NULL, ncol = NULL, nrow = NULL,
   legend = NULL, labels = NULL, ylim = NULL, font_size = 9,
   theme = ggplot2::theme_linedraw(), legend_dir = "horizontal",
-  xlabel = NULL, ylabel = " ", viridis_option = "viridis")
+  xlabel = NULL, ylabel = " ", viridis_option = "viridis",
+  return_list = FALSE)
 }
 \arguments{
 \item{MMM}{a n array of size n_samples x n_data x n_components}
@@ -54,9 +55,12 @@ plot_components(MMM, SSS, model, time_is_xvar, X_test = NULL,
 
 \item{viridis_option}{the option argument of \code{ggplot2::scale_colour_viridis_c}
 by colour in the sum plot}
+
+\item{return_list}{should this return a list of ggplot objects 
+instead of doing ggarrange}
 }
 \value{
-an object returned by ggpubr::ggarrange
+an object returned by ggpubr::ggarrange or list
 }
 \description{
 Helper function for plotting components

@@ -28,7 +28,8 @@ in all subplots?}
 \item{...}{additional arguments for \code{\link{plot_components}}}
 }
 \value{
-an object returned by ggpubr::ggarrange
+an object returned by ggpubr::ggarrange or a
+list of ggplot2 objects
 }
 \description{
 Visualize inferred components
