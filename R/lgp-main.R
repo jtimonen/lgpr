@@ -361,7 +361,7 @@ lgp_predict <- function(fit,
       LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D, info, cnames, TSCL)
       
       # Print progress
-      if(print_progress %% ns > 1){
+      if(print_progress && (ns > 1)){
         if(i_smp %in% iprint){cat('=')}
         if(i_smp == ns){ cat('\n\n')}
       }

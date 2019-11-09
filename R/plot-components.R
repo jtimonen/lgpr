@@ -6,11 +6,11 @@
 #' @return an object returned by ggpubr::ggarrange or a
 #' list of ggplot2 objects
 plot_components_posterior <- function(fit, subsamples = NULL,
-                                      time_is_xvar = TRUE, 
-                                      PRED = NULL, 
-                                      marker = NULL, 
-                                      sample_idx = 1,
-                                      n_sd = 2,
+                                      time_is_xvar    = TRUE, 
+                                      PRED            = NULL, 
+                                      marker          = NULL, 
+                                      sample_idx      = 1,
+                                      n_sd            = 2,
                                       ...)
 {
   if(is.null(PRED)){
@@ -378,7 +378,7 @@ plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
   
   # Create ggplot object
   h   <- ggplot2::ggplot(df, aes)
-  if(plot_eb){
+  if(plot_eb && (fill_alpha > 0)){
     h <- h + ggplot2::geom_ribbon(aes_eb, alpha = fill_alpha, 
                                   lty = 0)
   }
