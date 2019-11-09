@@ -5,7 +5,7 @@
 \title{Plot posterior of f}
 \usage{
 plot_posterior_f(fit, PRED = NULL, plot_uncertainty = TRUE,
-  data_marker = 16, n_sds = 2)
+  data_marker = 16, n_sds = 2, ...)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -17,6 +17,8 @@ plot_posterior_f(fit, PRED = NULL, plot_uncertainty = TRUE,
 \item{data_marker}{pch for data points}
 
 \item{n_sds}{number of standard deviations for the uncertainty band width}
+
+\item{...}{additional arguments to \code{\link{plot_posterior_predictions}}}
 }
 \value{
 a ggplot object
