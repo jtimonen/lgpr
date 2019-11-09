@@ -99,37 +99,58 @@ setMethod(f = "show",
           definition = function(object)
           {
             cat("\n ---------- LGPFIT SUMMARY ----------\n\n")
-            n_chains <- length(object@stan_fit@inits)
-            runtime  <- get_runtime(object)
             
-            cat("* Average runtime per chain: ",
-                runtime$warmup, " s (warmup) and ",
-                runtime$sampling, " s (sampling)\n", sep="")
+            # Runtime info
+            tryCatch({
+              n_chains <- length(object@stan_fit@inits)
+              runtime  <- get_runtime(object)
+              cat("* Average runtime per chain: ",
+                  runtime$warmup, " s (warmup) and ",
+                  runtime$sampling, " s (sampling)\n", sep="")
+            }, error = function(e) {
+              cat("* Unable to show runtime info. Reason:\n")
+              print(e)
+            })
             
-            diag <- object@diagnostics
-            Rhat <- diag$Rhat
-            imax <- which(Rhat==max(Rhat))
-            cat("* Largest R-hat value is ", round(max(Rhat), 4), 
-                " (", paste(rownames(diag)[imax], collapse = ', '), 
-                ")\n", sep="")
+
+            # Convergence info
+            tryCatch({
+              diag <- object@diagnostics
+              Rhat <- diag$Rhat
+              imax <- which(Rhat==max(Rhat))
+              cat("* Largest R-hat value is ", round(max(Rhat), 4), 
+                  " (", paste(rownames(diag)[imax], collapse = ', '), 
+                  ")\n", sep="")
+            }, error = function(e) {
+              cat("* Unable to show convergence info. Reason:\n")
+              print(e)
+            })
             
-            sel  <- object@selection
-            rel_method <- object@relevances$method
-            r3   <- sel$prob
-            tr   <- sel$threshold
-            cat("* Used relevance method = ", rel_method, "\n", sep ="")
-            cat("* Used selection threshold = ", tr, "\n", sep ="")
+            # Relevance info
+            tryCatch({
+              sel  <- object@selection
+              rel_method <- object@relevances$method
+              r3   <- sel$prob
+              tr   <- sel$threshold
+              cat("* Used relevance method = ", rel_method, "\n", sep ="")
+              cat("* Used selection threshold = ", tr, "\n", sep ="")
+              
+              rel  <- object@relevances$average
+              cn   <- names(rel)
+              r1   <- round(rel,3)
+              r2   <- cn %in% sel$selected
+              DF   <- data.frame(r1,r2,r3)
+              cat("\n")
+              
+              colnames(DF) <- c("Relevance", "Selected", "Prob." )
+              print(DF)
+              cat("\n")
+            }, error = function(e) {
+              cat("* Unable to show component relevance info. Reason:\n")
+              print(e)
+            })
             
-            rel  <- object@relevances$average
-            cn   <- names(rel)
-            r1   <- round(rel,3)
-            r2   <- cn %in% sel$selected
-            DF   <- data.frame(r1,r2,r3)
-            cat("\n")
-            
-            colnames(DF) <- c("Relevance", "Selected", "Prob." )
-            print(DF)
-            cat("\n")
+
           }
 )
 
