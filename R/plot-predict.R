@@ -219,10 +219,14 @@ plot_posterior_predictions <- function(fit,
   
   # Plot also the data
   dat  <- model@data
+  y    <- as.numeric(dat[[respvar]])
+  if(!original_y_scale){
+    y  <- model@scalings$YSCL$fun(y)
+  }
   X_id <- as.numeric(dat[[idvar]])
   df   <- data.frame(idvar   = X_id, 
                      timevar = as.numeric(dat[[timevar]]),
-                     y       = as.numeric(dat[[respvar]]),
+                     y       = y,
                      facet_var = formatter(X_id))
   colnames(df)[1] <- idvar
   colnames(df)[2] <- timevar
