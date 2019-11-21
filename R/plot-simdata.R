@@ -7,17 +7,21 @@
 #' @param nrow an argument for \code{ggplot2::facet_wrap}
 #' @param ncol an argument for \code{ggplot2::facet_wrap}
 #' @param i_test test point indices
+#' @param color_point data point color
 #' @param color_test test point color
-#' @param y_transform function to transform y
+#' @param y_transform function to transform the data y
+#' @param signal_name name of signal
 #' @seealso For plotting each component separately,
 #'  see \code{\link{plot_components_simdata}}
 #' @return a ggplot object
 plot_simdata <- function(simData, 
-                         linecolor   = "gray70", 
+                         linecolor   = "gray50", 
                          nrow        = NULL, 
                          ncol        = NULL,
                          i_test      = NULL,
+                         color_point = "black",
                          color_test  = "steelblue2",
+                         signal_name = "signal",
                          y_transform = function(x){x}){
   vlinecolors <- c("firebrick3", "firebrick4")
   vlinetypes <- c(1,5)
@@ -28,7 +32,7 @@ plot_simdata <- function(simData,
   g    <- comp$g
   y    <- y_transform(dat$y)
   yval <- c(g,y)
-  leg  <- rep(c("g", "y"), each = length(g))
+  leg  <- rep(c(signal_name, "y (data)"), each = length(g))
   id   <- rep(dat$id, 2)
   age  <- rep(dat$age, 2)
   N    <- length(unique(dat$id))
@@ -90,7 +94,7 @@ plot_simdata <- function(simData,
   
   if(is.null(i_test)){
     h <- h + ggplot2::geom_point(ggplot2::aes_string(shape = 'leg'),
-                                 na.rm = TRUE)
+                                 na.rm = TRUE, color = color_point)
   }else{
     h <- h + ggplot2::geom_point(ggplot2::aes_string(shape = 'leg', 
                                                      color = 'is_test'),
@@ -103,10 +107,11 @@ plot_simdata <- function(simData,
   h <- h + ggplot2::ggtitle("Simulated data", subtitle = subt)
   h <- h + ggplot2::theme_bw()
   h <- h + ggplot2::theme(legend.title=ggplot2::element_blank())
+  h <- h + ggplot2::theme(legend.position = "top")
   
   # Point color and type
   if(!is.null(i_test)){
-    h <- h + ggplot2::scale_color_manual(values=c(color_test, "black"))
+    h <- h + ggplot2::scale_color_manual(values=c(color_test, color_point))
   }
   return(h)
 }

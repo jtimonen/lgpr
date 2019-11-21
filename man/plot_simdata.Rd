@@ -4,9 +4,9 @@
 \alias{plot_simdata}
 \title{Plot a simulated longitudinal data set for each individual separately}
 \usage{
-plot_simdata(simData, linecolor = "gray70", nrow = NULL, ncol = NULL,
-  i_test = NULL, color_test = "steelblue2", y_transform = function(x)
-  {     x })
+plot_simdata(simData, linecolor = "gray50", nrow = NULL, ncol = NULL,
+  i_test = NULL, color_point = "black", color_test = "steelblue2",
+  signal_name = "signal", y_transform = function(x) {     x })
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}
@@ -19,9 +19,13 @@ plot_simdata(simData, linecolor = "gray70", nrow = NULL, ncol = NULL,
 
 \item{i_test}{test point indices}
 
+\item{color_point}{data point color}
+
 \item{color_test}{test point color}
 
-\item{y_transform}{function to transform y}
+\item{signal_name}{name of signal}
+
+\item{y_transform}{function to transform the data y}
 }
 \value{
 a ggplot object

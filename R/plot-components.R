@@ -27,7 +27,6 @@ plot_components_posterior <- function(fit, subsamples = NULL,
 }
 
 
-
 #' Helper for \code{\link{plot_components_posterior}}
 #' @param fit An object of class \code{lgpfit}.
 #' @param time_is_xvar is the time variable the x-axis variable
