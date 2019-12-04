@@ -4,7 +4,7 @@
                                                         lib.loc = Lib))
   if (length(pkgdesc) > 1) {
     builddate <- gsub(';.*$', '', pkgdesc$Packaged)
-    packageStartupMessage(paste("Hello, this is lgpr (version ", 
-                                pkgdesc$Version,").", sep = ""))
+    packageStartupMessage(paste("This is lgpr, version ", 
+                                pkgdesc$Version,".", sep = ""))
   }
 }

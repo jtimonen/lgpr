@@ -17,7 +17,10 @@ check_formula <- function(formula, data){
   yName <- vars[resp]
   if(!(yName  %in% colnames(data))) stop(paste('The data frame does not contain the response variable', yName))
   for(i in 1:length(vars)){
-    if(!(vars[i] %in% colnames(data))) stop(paste("Variable", vars[i], "not found in the data frame!"))
+    if(!(vars[i] %in% colnames(data))){
+      stop(paste("Variable", vars[i], "not found in the data frame!",
+                 "Type ?lgp for help.")) 
+    }
   }
 }
 
@@ -332,23 +335,31 @@ set_N_cat <- function(X, D){
   return(as.array(N_cat))
 }
 
-#' Set C_hat (Poisson and NB observation models)
+#' Set C_hat (Non-gaussian observation models)
 #'
 #' @param C_hat the C_hat argument given as input to \code{lgp}
 #' @param response response variable
 #' @param LH likelihood as int
+#' @param N_trials the N_trials data (binomial likelihood)
 #' @return a real number
-set_C_hat <- function(C_hat, response, LH){
+set_C_hat <- function(C_hat, response, LH, N_trials){
   nb_or_pois <- LH %in% c(2,3)
+  binomial   <- LH==4
   if(is.null(C_hat)){
     if(nb_or_pois){
       C_hat <- log(mean(response))
+    }else if(binomial){
+      p <- mean(response/N_trials)
+      C_hat <- log(p/(1-p))
     }else{
       C_hat <- 0
     }
   }else{
-    if(!nb_or_pois){
-      stop("Only give the C_hat argument if observation model is Poisson or NB!")
+    if(LH==1){
+      stop("Only give the C_hat argument if observation model is not Gaussian!",
+           " With Gaussian likelihood, you should use",
+           " C_hat = NULL, in which case the GP mean will be set to zero",
+           " and the response variable is standardized to have mean zero.")
     }
   }
   return(C_hat)
@@ -376,5 +387,24 @@ set_N_trials <- function(N_trials, response, LH){
     }
   }
   return(N_trials)
+}
+
+
+#' Check that variable types make sense
+#'
+#' @param varInfo a named list
+#' @return nothing
+check_varInfo <- function(varInfo){
+  
+  # Check that id variable is not in offsets
+  if(varInfo$id_variable %in% varInfo$offset_vars){
+    stop("The subject identifier variable cannot currently be included in", 
+         " 'offset_vars'. If you wish to model the effect of 'id_variable'",
+         " as a constant offset,",
+         " you can create another covariate with the same values and",
+         " use it in your 'formula' and 'offset_vars' instead.")
+  }
+  
+  # TODO: more checks
 }
 

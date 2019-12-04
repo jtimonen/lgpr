@@ -11,16 +11,28 @@ create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
 \arguments{
 \item{formula}{A formula of the form
 \code{y ~ } \code{x1 + x2 + x3}
-defining the response variable \code{y} and covariates \code{xi}. All variables that
-appear in the formula must exist as columns of \code{data}.}
+defining the response variable \code{y} and covariates \code{xi}. The formula must
+contain exatly one tilde (~), with response variable on the left-hand side and 
+covariates on the right-hand side. Covariates should be separated by a plus (+)
+sign. All variables that appear in the formula must exist as columns of \code{data}.
+Note that effects of categorical covariates are by default defined
+as interactions with \code{time_variable}. If you wish to change
+this, see the argument \code{offset_vars}. The subject identifier
+variable cannot currently be included in \code{offset_vars}. If you wish
+to model the effect of \code{id_variable} as a constant offset,
+you can create another covariate with the same values and
+use it in your \code{formula} and \code{offset_vars} instead.}
 
-\item{data}{A data frame containing (at least) the variables given in \code{formula}.}
+\item{data}{A data frame containing the variables given in \code{formula} as columns.}
 
-\item{prior}{Prior distribution. Can be created for example using the function 
-\code{\link{prior_default}}.}
+\item{prior}{A named list, defining the prior distribution of model (hyper)parameters.
+It is recommended to first create this using the function \code{\link{prior_default}},
+and then possibly modify it.}
 
 \item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
-(default), \code{"Poisson"}, \code{"NB" (negative binomial) or "binomial"}.}
+(default), \code{"Poisson"}, \code{"NB"} (negative binomial) or \code{"binomial"}. To
+use Bernoulli likelihood, use \code{likelihood="binomial"} and set \code{N_trials} 
+as a vector of ones.}
 
 \item{varInfo}{Variable type info.}
 
@@ -28,16 +40,26 @@ appear in the formula must exist as columns of \code{data}.}
 
 \item{uncertain_effect_time}{Do we wish to model uncertainty in the disease effect time?}
 
-\item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased individuals?}
+\item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased 
+individuals?}
 
-\item{C_hat}{This can only be given if likelihood is Poisson or NB. The signal \code{f} 
-will the be transformed so that \code{g = } \code{exp(C_hat + f)}. If \code{NULL}, it will be
-set to \code{C_hat = } \code{log(mean(y))}, where \code{y} is the response variable.}
+\item{C_hat}{The constant GP mean. By default this is NULL, and 
+ set to
+ \itemize{
+ \item \code{C_hat = 0}, if \code{likelihood} is \code{"Gaussian"}, because with 
+ Gaussian likelihood the 
+ response variable is by default centered to have zero mean.
+\item \code{C_hat = } \code{log(mean(y))} if \code{likelihood} is \code{"Poisson"}
+or \code{"NB"},
+\item \code{C_hat = } \code{log(p/(1-p))}, where \code{p = mean(y/N_trials)} if 
+\code{likelihood} is \code{"binomial"}
+ }
+Above, \code{y} denotes the response variable.}
 
 \item{DELTA}{the amount of added jitter to ensure positive definiteness of the kernel}
 
 \item{sample_F}{Determines if the function values are be sampled (must be \code{TRUE} if
-likelihood is not Gaussian).}
+likelihood is not \code{"Gaussian"}).}
 
 \item{verbose}{Should more verbose output be printed?}
 

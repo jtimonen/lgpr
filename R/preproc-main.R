@@ -61,7 +61,10 @@ create_stan_input <- function(formula,
   
   # Check and possibly edit N_trials and C_hat
   N_trials <- set_N_trials(N_trials, response, LH)
-  C_hat    <- set_C_hat(C_hat, response, LH)
+  C_hat    <- set_C_hat(C_hat, response, LH, N_trials)
+  
+  # Check that variable types make sense
+  check_varInfo(varInfo)
   
   # Create the list that is the Stan input
   stan_dat   <- list(X         = t(X),

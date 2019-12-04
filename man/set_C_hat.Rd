@@ -2,9 +2,9 @@
 % Please edit documentation in R/preproc-helper.R
 \name{set_C_hat}
 \alias{set_C_hat}
-\title{Set C_hat (Poisson and NB observation models)}
+\title{Set C_hat (Non-gaussian observation models)}
 \usage{
-set_C_hat(C_hat, response, LH)
+set_C_hat(C_hat, response, LH, N_trials)
 }
 \arguments{
 \item{C_hat}{the C_hat argument given as input to \code{lgp}}
@@ -12,10 +12,12 @@ set_C_hat(C_hat, response, LH)
 \item{response}{response variable}
 
 \item{LH}{likelihood as int}
+
+\item{N_trials}{the N_trials data (binomial likelihood)}
 }
 \value{
 a real number
 }
 \description{
-Set C_hat (Poisson and NB observation models)
+Set C_hat (Non-gaussian observation models)
 }
