@@ -12,9 +12,7 @@ if(VERBOSE==1){
   print("* Number of model components = ", sum_D);
   print("* Number of individuals = ", N_tot);
   print("* Additional model info:")
-  if(LH==2 || LH==3){
-    print("  - C_hat = ", C_hat);
-  }
+  print("  - C_hat = ", C_hat);
   print("  - D = ", D);
   print("  - F_IS_SAMPLED = ", F_IS_SAMPLED)
   if(D[3]==1){

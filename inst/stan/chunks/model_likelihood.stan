@@ -23,7 +23,7 @@ if(F_IS_SAMPLED){
     target += neg_binomial_2_log_lpmf(y_int | LOG_MU, PHI);
   }else if(LH==4){
     // 4. Bernoulli or binomial observation model
-    real LOGIT_P[n] = to_array_1d(F_sum[1:n]); // p success (log-scale)
+    real LOGIT_P[n] = to_array_1d(F_sum[1:n] + C_hat); // p success (log-scale)
     target += binomial_logit_lpmf(y_int | N_trials, LOGIT_P);
   }else{
     reject("Unknown observation model!")
