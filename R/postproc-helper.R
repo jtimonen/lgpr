@@ -124,7 +124,8 @@ get_g_from_f <- function(f, model){
   }else if(LH==2 || LH==3){
     g <- exp(f + sdat$C_hat)
   }else if(LH==4){
-    g <- sdat$N_trials * 1/(1 + exp(-f))
+    logistic <- function(x){1/(1 + exp(-x))}
+    g <- sdat$N_trials * logistic(sdat$C_hat + f)
   }else{
     stop("Unknown likelihood!")
   }
