@@ -1,19 +1,16 @@
-citHeader("Preprint to come soon.")
+citHeader("If you use lgpr, please cite the preprint below.")
 
-citEntry(entry = "Article",
-  title        = "lgpr: Longitudinal Gaussian Process Regression",
+citEntry(entry = "article",
+  title        = "An interpretable probabilistic machine learning method for heterogeneous longitudinal studies",
   author       = personList(as.person("Juho Timonen"),
+                   as.person("Henrik Mannerström"),
                    as.person("Aki Vehtari"),
                    as.person("Harri Lähdesmäki")),
-  journal      = "-",
-  year         = "2019",
-  volume       = "-",
-  number       = "-",
-  pages        = "0--0",
-  url          = "https://github.com/jtimonen/lgpr",
-
+  journal       = "arXiv:1912.03549",
+  year          = "2019",
+  url           = "https://arxiv.org/abs/1912.03549",
   textVersion  =
-  paste("Juho Timonen, Aki Vehtari and Harri Lähdesmäki (2019).",
-        "lgpr: Longitudinal Gaussian Process Regression.",
-        "URL https://github.com/jtimonen/lgpr")
+  paste("Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki (2019).",
+        "An interpretable probabilistic machine learning method for heterogeneous longitudinal studies.",
+        "https://arxiv.org/abs/1912.03549")
 )

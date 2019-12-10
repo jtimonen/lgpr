@@ -17,8 +17,14 @@
 #' \itemize{
 #' \item See the main function \code{\link{lgp}} for creating and fitting additive 
 #'  longitudinal GP models.
-#'  \item See tutorials at \url{https://jtimonen.github.io/lgpr-usage/}
+#'  \item See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}
 #' }
+#' @section Citation:
+#'
+#' \emph{An interpretable probabilistic machine learning method for heterogeneous longitudinal studies}.
+#' Juho Timonen, Henrik Mannerstrom, Aki Vehtari and Harri Lahdesmaki, 2019.
+#' \url{https://arxiv.org/abs/1912.03549}
+#' 
 #' @docType package
 #' @name lgpr-package
 #' @aliases lgpr
