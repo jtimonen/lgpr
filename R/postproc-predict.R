@@ -402,9 +402,7 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
   n2   <- dim(X2)[1]
   d1   <- dim(X1)[2]
   d2   <- dim(X2)[2]
-  if(d1!=d2){
-    stop("matrices X1 and X2 must have the same number of columns!")
-  }
+  if(d1!=d2){ stop("matrices X1 and X2 must have the same number of columns!") }
   d    <- sum(D)
   KK   <- array(0, c(n1,n2,d))
   id1  <- X1[,1]
@@ -457,7 +455,7 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     
     # alpha mask
     if(VM==1){
-      K_var_mask <- compute_K_var_mask(disAge1, disAge2, vm_params, stp)
+      K_var_mask <- kernel_var_mask(disAge1, disAge2, vm_params, stp)
     }else{
       K_var_mask <- matrix(1, n1, n2)
     }
@@ -466,7 +464,7 @@ compute_kernel_matrices <- function(X1, X2, kernel_info)
     if(info$HMGNS==0){
       caseID_1 <- X1[,d1] # case ids must be the last column
       caseID_2 <- X2[,d2]
-      K_beta   <- compute_K_beta(beta, caseID_1, caseID_2)
+      K_beta   <- kernel_beta(beta, caseID_1, caseID_2)
     }else{
       K_beta <- matrix(1, n1, n2)
     }

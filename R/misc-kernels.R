@@ -21,19 +21,7 @@ kernel_se <- function(x1,x2,alpha=1,ell=1){
 }
 
 
-#kernel_cat <- function(x1,x2,alpha=1){
-#  if(alpha <0){
-#    stop("alpha cannot be negative")
-#  }
-#  n1 <- length(x1)
-#  n2 <- length(x2)
-#  X1 <- matrix(rep(x1,each=n2),n1,n2,byrow=T)
-#  X2 <- matrix(rep(x2,n1),n1,n2,byrow=T)
-#  K  <- matrix(as.numeric(X1==X2),n1,n2)
-#  return(alpha^2*K)
-#}
-
-#' Compute a zeros-sum kernel matrix
+#' Compute a zero-sum kernel matrix
 #'
 #' @param x1 (integer) vector of length n
 #' @param x2 (integer) vector of length m
@@ -105,18 +93,6 @@ kernel_ns <- function(x1,x2=NULL,alpha=1,ell,a,b,c, nan_replace = 0){
   return(K)
 }
 
-#' Warp inputs
-#'
-#' @param t a vector
-#' @param a steepness of the rise
-#' @param b location of the effective time window
-#' @param c maximum range
-#' @return a vector of warped inputs \code{w(t)}
-warp_input <- function(t,a,b,c){
-  w <- 2*c*(-0.5 + 1/(1+exp(-a*(t-b))) )
-  return(w)
-}
-
 
 #' Compute the multiplier matrix K_beta (to eneable heterogeneous disease effect)
 #'
@@ -124,7 +100,7 @@ warp_input <- function(t,a,b,c){
 #' @param row_to_caseID_1 mapping from row index to case ID
 #' @param row_to_caseID_2 mapping from row index to case ID
 #' @return a matrix
-compute_K_beta <- function(beta, row_to_caseID_1, row_to_caseID_2){
+kernel_beta <- function(beta, row_to_caseID_1, row_to_caseID_2){
   n1   <- length(row_to_caseID_1)
   n2   <- length(row_to_caseID_2)
   BETA <- matrix(0, n1, n2)
@@ -157,10 +133,9 @@ compute_K_beta <- function(beta, row_to_caseID_1, row_to_caseID_2){
 #' @param stp input warping steepness
 #' @param nan_replace value to replace nans in disAge vectors
 #' @return a matrix of size \code{n1} x \code{n2}
-compute_K_var_mask <- function(disAge1, disAge2, vm_params, stp, nan_replace = 0){
+kernel_var_mask <- function(disAge1, disAge2, vm_params, stp, nan_replace = 0){
   disAge1[is.nan(disAge1)] <- nan_replace
   disAge2[is.nan(disAge2)] <- nan_replace
-  mask_fun <- function(x,a){1/(1+exp(-a*x))}
   a  <- stp * vm_params[2];
   h  <- vm_params[1];
   if(h >= 1 || h <=0){
@@ -171,8 +146,32 @@ compute_K_var_mask <- function(disAge1, disAge2, vm_params, stp, nan_replace = 0
   }
   
   r  <- 1/a*log(h/(1-h));
-  s1 <- mask_fun(disAge1 - r, a)
-  s2 <- mask_fun(disAge2 - r, a)
+  s1 <- var_mask(disAge1 - r, a)
+  s2 <- var_mask(disAge2 - r, a)
   M  <- tcrossprod(s1, s2)
   return(M)
+}
+
+
+#' Input warping function
+#'
+#' @param t a vector
+#' @param a steepness of the rise
+#' @param b location of the effective time window
+#' @param c maximum range
+#' @return a vector of warped inputs \code{w(t)}
+warp_input <- function(t,a,b,c){
+  w <- 2*c*(-0.5 + 1/(1+exp(-a*(t-b))) )
+  return(w)
+}
+
+
+#' Variance masking function
+#'
+#' @param x  vector of length \code{n}
+#' @param a a positive real number
+#' @return a vector of length \code{n}
+var_mask <- function(x,a){
+  y <- 1/(1+exp(-a*x))
+  return(y)
 }

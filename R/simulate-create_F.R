@@ -147,7 +147,7 @@ simulate_kernels <- function(X,
       Kj <- kernel_bin(X_affected, X_affected) *
         kernel_ns(xj,xj,ell=ell[j_ell], a = steepness, b = 0, c = 1)
       if(useMaskedVarianceKernel){
-        M  <- compute_K_var_mask(xj,xj, vm_params, stp = steepness)
+        M  <- kernel_var_mask(xj,xj, vm_params, stp = steepness)
         Kj <- Kj * M
       }
     }else if(types[j]==4){

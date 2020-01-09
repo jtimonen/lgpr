@@ -97,13 +97,3 @@ matrix STAN_K_beta(vector beta, int[] row_to_caseID){
   }
   return(BETA);
 }
-
-//matrix STAN_K_beta(vector beta, int[] r2cIDp1){
-//  int n = num_elements(r2cIDp1);
-//  vector[n] b;
-//  int N_cases = num_elements(beta);
-//  vector[N_cases+1] beta1p = rep_vector(0, N_cases+1);
-//  beta1p[2:(N_cases+1)] = beta; 
-//  b = beta1p[r2cIDp1];
-//  return( tcrossprod(to_matrix(sqrt(b))) );
-//}

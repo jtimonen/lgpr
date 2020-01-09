@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc-kernels.R
 \name{warp_input}
 \alias{warp_input}
-\title{Warp inputs}
+\title{Input warping function}
 \usage{
 warp_input(t, a, b, c)
 }
@@ -19,5 +19,5 @@ warp_input(t, a, b, c)
 a vector of warped inputs \code{w(t)}
 }
 \description{
-Warp inputs
+Input warping function
 }

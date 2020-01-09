@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc-kernels.R
 \name{kernel_zerosum}
 \alias{kernel_zerosum}
-\title{Compute a zeros-sum kernel matrix}
+\title{Compute a zero-sum kernel matrix}
 \usage{
 kernel_zerosum(x1, x2, M, alpha = 1)
 }
@@ -19,5 +19,5 @@ kernel_zerosum(x1, x2, M, alpha = 1)
 A (binary) kernel matrix of size n x m
 }
 \description{
-Compute a zeros-sum kernel matrix
+Compute a zero-sum kernel matrix
 }
