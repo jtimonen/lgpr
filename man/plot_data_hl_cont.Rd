@@ -4,9 +4,16 @@
 \alias{plot_data_hl_cont}
 \title{A spaghetti plot of longitudinal data, highlighting a continuous covariate.}
 \usage{
-plot_data_hl_cont(data, highlight = NULL, response = "y",
-  id_variable = "id", time_variable = "age", psize = 2, lwd = 0.5,
-  colgrad = ggplot2::scale_colour_gradient2())
+plot_data_hl_cont(
+  data,
+  highlight = NULL,
+  response = "y",
+  id_variable = "id",
+  time_variable = "age",
+  psize = 2,
+  lwd = 0.5,
+  colgrad = ggplot2::scale_colour_gradient2()
+)
 }
 \arguments{
 \item{data}{A data frame.}

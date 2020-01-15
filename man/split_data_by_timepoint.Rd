@@ -4,8 +4,12 @@
 \alias{split_data_by_timepoint}
 \title{Split data into training and test data according to time point indices}
 \usage{
-split_data_by_timepoint(data, test_idx, id_variable = "id",
-  time_variable = "age")
+split_data_by_timepoint(
+  data,
+  test_idx,
+  id_variable = "id",
+  time_variable = "age"
+)
 }
 \arguments{
 \item{data}{a data frame}

@@ -4,8 +4,15 @@
 \alias{plot_posterior_y}
 \title{Plot posterior predictive distribution}
 \usage{
-plot_posterior_y(fit, PRED, uncertainty = "ribbon", test_data = NULL,
-  data_marker = 16, n_sds = 2, ...)
+plot_posterior_y(
+  fit,
+  PRED,
+  uncertainty = "ribbon",
+  test_data = NULL,
+  data_marker = 16,
+  n_sds = 2,
+  ...
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

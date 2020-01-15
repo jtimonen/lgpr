@@ -4,8 +4,16 @@
 \alias{plot_data}
 \title{A spaghetti plot of longitudinal data.}
 \usage{
-plot_data(data, highlight = NULL, response = "y", id_variable = "id",
-  time_variable = "age", psize = 2, lwd = 0.5, title = NULL)
+plot_data(
+  data,
+  highlight = NULL,
+  response = "y",
+  id_variable = "id",
+  time_variable = "age",
+  psize = 2,
+  lwd = 0.5,
+  title = NULL
+)
 }
 \arguments{
 \item{data}{A data frame.}

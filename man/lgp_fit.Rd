@@ -4,9 +4,15 @@
 \alias{lgp_fit}
 \title{Fit an lgp model}
 \usage{
-lgp_fit(model, threshold = 0.95, parallel = FALSE,
-  skip_postproc = FALSE, relevance_method = "f_mean",
-  verbose = FALSE, ...)
+lgp_fit(
+  model,
+  threshold = 0.95,
+  parallel = FALSE,
+  skip_postproc = FALSE,
+  relevance_method = "f_mean",
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{model}{An object of class \code{lgpmodel}.}

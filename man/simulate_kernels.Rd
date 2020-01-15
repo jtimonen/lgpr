@@ -4,8 +4,16 @@
 \alias{simulate_kernels}
 \title{Compute all kernel matrices when simulating data}
 \usage{
-simulate_kernels(X, types, lengthscales, X_affected, bin_kernel,
-  useMaskedVarianceKernel, steepness, vm_params)
+simulate_kernels(
+  X,
+  types,
+  lengthscales,
+  X_affected,
+  bin_kernel,
+  useMaskedVarianceKernel,
+  steepness,
+  vm_params
+)
 }
 \arguments{
 \item{X}{covariates}

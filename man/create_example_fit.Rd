@@ -4,8 +4,7 @@
 \alias{create_example_fit}
 \title{Create an example fit object}
 \usage{
-create_example_fit(N = 4, t = 10 * c(1, 2, 3, 4, 5), iter = 100,
-  chains = 1)
+create_example_fit(N = 4, t = 10 * c(1, 2, 3, 4, 5), iter = 100, chains = 1)
 }
 \arguments{
 \item{N}{number of individuals}

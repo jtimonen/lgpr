@@ -4,10 +4,21 @@
 \alias{plot_predictions_add_onsets}
 \title{Add disease onset / effect times to predictions plot}
 \usage{
-plot_predictions_add_onsets(fit, h, plot_obs_onset, plot_t_effect_samples,
-  idvar, timevar, ypos_dens, color_scheme_t_effect, reference_times,
-  post_t_effect_stat, linetypes = c(1, 2, 3), linecolors = c("black",
-  "red", "gray50"), alpha2 = 1)
+plot_predictions_add_onsets(
+  fit,
+  h,
+  plot_obs_onset,
+  plot_t_effect_samples,
+  idvar,
+  timevar,
+  ypos_dens,
+  color_scheme_t_effect,
+  reference_times,
+  post_t_effect_stat,
+  linetypes = c(1, 2, 3),
+  linecolors = c("black", "red", "gray50"),
+  alpha2 = 1
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

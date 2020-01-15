@@ -4,8 +4,15 @@
 \alias{plot_data_hl_disease}
 \title{A spaghetti plot of longitudinal data, highlighting based on disease group.}
 \usage{
-plot_data_hl_disease(data, highlight = "diseaseAge", response = "y",
-  id_variable = "id", time_variable = "age", psize = 2, lwd = 0.5)
+plot_data_hl_disease(
+  data,
+  highlight = "diseaseAge",
+  response = "y",
+  id_variable = "id",
+  time_variable = "age",
+  psize = 2,
+  lwd = 0.5
+)
 }
 \arguments{
 \item{data}{A data frame.}

@@ -4,8 +4,14 @@
 \alias{plot_posterior_f}
 \title{Plot posterior of f}
 \usage{
-plot_posterior_f(fit, PRED = NULL, plot_uncertainty = TRUE,
-  data_marker = 16, n_sds = 2, ...)
+plot_posterior_f(
+  fit,
+  PRED = NULL,
+  plot_uncertainty = TRUE,
+  data_marker = 16,
+  n_sds = 2,
+  ...
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

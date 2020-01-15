@@ -4,8 +4,7 @@
 \alias{lgp_test}
 \title{Compute predictions and log-posterior predictive density at test points}
 \usage{
-lgp_test(fit, test_data, plot = FALSE, verbose = TRUE,
-  samples = "mean")
+lgp_test(fit, test_data, plot = FALSE, verbose = TRUE, samples = "mean")
 }
 \arguments{
 \item{fit}{an object of class \code{lgpfit}}

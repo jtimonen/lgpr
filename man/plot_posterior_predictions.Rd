@@ -4,16 +4,35 @@
 \alias{plot_posterior_predictions}
 \title{Plot posterior of f or predictive distribution for y}
 \usage{
-plot_posterior_predictions(fit, mode, PRED = NULL,
-  color_scheme = "red", color_scheme_t_effect = "gray", alpha = 0.5,
-  alpha_line = 1, alpha2 = 0.5, plot_uncertainty = TRUE,
-  title = NULL, ylim = NULL, plot_obs_onset = FALSE,
-  plot_t_effect_samples = FALSE, ypos_dens = NULL, test_data = NULL,
-  color_test = "deepskyblue2", pch_test = 21, size_test = 2,
-  error_bar = FALSE, n_sds = 2, reference_times = NULL,
-  post_t_effect_stat = "none", original_y_scale = TRUE,
-  data_color = "black", data_marker = 21, ons_linetypes = c(1, 2, 3),
-  ons_linecolors = c("black", "red", "gray50"))
+plot_posterior_predictions(
+  fit,
+  mode,
+  PRED = NULL,
+  color_scheme = "red",
+  color_scheme_t_effect = "gray",
+  alpha = 0.5,
+  alpha_line = 1,
+  alpha2 = 0.5,
+  plot_uncertainty = TRUE,
+  title = NULL,
+  ylim = NULL,
+  plot_obs_onset = FALSE,
+  plot_t_effect_samples = FALSE,
+  ypos_dens = NULL,
+  test_data = NULL,
+  color_test = "deepskyblue2",
+  pch_test = 21,
+  size_test = 2,
+  error_bar = FALSE,
+  n_sds = 2,
+  reference_times = NULL,
+  post_t_effect_stat = "none",
+  original_y_scale = TRUE,
+  data_color = "black",
+  data_marker = 21,
+  ons_linetypes = c(1, 2, 3),
+  ons_linecolors = c("black", "red", "gray50")
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

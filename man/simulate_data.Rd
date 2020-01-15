@@ -4,16 +4,32 @@
 \alias{simulate_data}
 \title{Generate an artificial longitudinal data set}
 \usage{
-simulate_data(N, t_data, covariates = c(), names = NULL,
-  relevances = c(1, 1, rep(1, length(covariates))), n_categs = rep(2,
-  sum(covariates \%in\% c(2, 3))), t_jitter = 0, lengthscales = rep(12,
-  2 + sum(covariates \%in\% c(0, 1, 2))), f_var = 1,
-  noise_type = "Gaussian", snr = 3, phi = 1,
-  N_affected = round(N/2), t_effect_range = "auto",
-  t_observed = "after_0", C_hat = 0, dis_fun = "gp_vm",
-  bin_kernel = FALSE, steepness = 0.5, vm_params = c(0.025, 1),
-  continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi,
-  1)), N_trials = 1, verbose = FALSE, force_zeromean = TRUE)
+simulate_data(
+  N,
+  t_data,
+  covariates = c(),
+  names = NULL,
+  relevances = c(1, 1, rep(1, length(covariates))),
+  n_categs = rep(2, sum(covariates \%in\% c(2, 3))),
+  t_jitter = 0,
+  lengthscales = rep(12, 2 + sum(covariates \%in\% c(0, 1, 2))),
+  f_var = 1,
+  noise_type = "Gaussian",
+  snr = 3,
+  phi = 1,
+  N_affected = round(N/2),
+  t_effect_range = "auto",
+  t_observed = "after_0",
+  C_hat = 0,
+  dis_fun = "gp_vm",
+  bin_kernel = FALSE,
+  steepness = 0.5,
+  vm_params = c(0.025, 1),
+  continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi, 1)),
+  N_trials = 1,
+  verbose = FALSE,
+  force_zeromean = TRUE
+)
 }
 \arguments{
 \item{N}{Number of individuals.}

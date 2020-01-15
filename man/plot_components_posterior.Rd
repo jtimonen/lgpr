@@ -4,8 +4,16 @@
 \alias{plot_components_posterior}
 \title{Visualize inferred components}
 \usage{
-plot_components_posterior(fit, subsamples = NULL, time_is_xvar = TRUE,
-  PRED = NULL, marker = NULL, sample_idx = 1, n_sd = 2, ...)
+plot_components_posterior(
+  fit,
+  subsamples = NULL,
+  time_is_xvar = TRUE,
+  PRED = NULL,
+  marker = NULL,
+  sample_idx = 1,
+  n_sd = 2,
+  ...
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

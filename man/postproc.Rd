@@ -4,8 +4,7 @@
 \alias{postproc}
 \title{Finalize the lgpfit object after sampling}
 \usage{
-postproc(fit, threshold = 0.95, relevance_method = "f_mean",
-  verbose = FALSE)
+postproc(fit, threshold = 0.95, relevance_method = "f_mean", verbose = FALSE)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}

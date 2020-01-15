@@ -4,9 +4,23 @@
 \alias{create_stan_input}
 \title{Create input for Stan}
 \usage{
-create_stan_input(formula, data, prior, likelihood, varInfo, standardize,
-  uncertain_effect_time, equal_effect, C_hat, DELTA, sample_F, verbose,
-  variance_mask, N_trials, skip_gen_quant)
+create_stan_input(
+  formula,
+  data,
+  prior,
+  likelihood,
+  varInfo,
+  standardize,
+  uncertain_effect_time,
+  equal_effect,
+  C_hat,
+  DELTA,
+  sample_F,
+  verbose,
+  variance_mask,
+  N_trials,
+  skip_gen_quant
+)
 }
 \arguments{
 \item{formula}{A formula of the form

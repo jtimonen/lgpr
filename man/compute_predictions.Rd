@@ -4,8 +4,17 @@
 \alias{compute_predictions}
 \title{Compute component-wise predictions at test points}
 \usage{
-compute_predictions(X_data, y_data, X_test, params, D, info, cnames, TSCL,
-  handle_extra = "warning")
+compute_predictions(
+  X_data,
+  y_data,
+  X_test,
+  params,
+  D,
+  info,
+  cnames,
+  TSCL,
+  handle_extra = "warning"
+)
 }
 \arguments{
 \item{X_data}{Covariate matrix (data points).}

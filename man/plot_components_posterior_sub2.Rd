@@ -4,8 +4,7 @@
 \alias{plot_components_posterior_sub2}
 \title{Helper for \code{\link{plot_components_posterior}}}
 \usage{
-plot_components_posterior_sub2(fit, PRED, sample_idx, time_is_xvar, n_sd,
-  ...)
+plot_components_posterior_sub2(fit, PRED, sample_idx, time_is_xvar, n_sd, ...)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

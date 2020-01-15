@@ -4,8 +4,7 @@
 \alias{get_diseased_info}
 \title{Get some variables related to diseased individuals}
 \usage{
-get_diseased_info(D, X, X_notnan, uncertain_effect_time, equal_effect,
-  TSCL)
+get_diseased_info(D, X, X_notnan, uncertain_effect_time, equal_effect, TSCL)
 }
 \arguments{
 \item{D}{an integer vector of length 6}

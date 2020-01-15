@@ -4,8 +4,12 @@
 \alias{selection_prob}
 \title{Probabilistic selection of relevant components}
 \usage{
-selection_prob(object, p = function(x) {     stats::dbeta(x, 100, 5) },
-  h = 0.01, show_progbar = FALSE)
+selection_prob(
+  object,
+  p = function(x) {     stats::dbeta(x, 100, 5) },
+  h = 0.01,
+  show_progbar = FALSE
+)
 }
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}

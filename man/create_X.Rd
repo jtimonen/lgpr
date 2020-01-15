@@ -4,8 +4,17 @@
 \alias{create_X}
 \title{Simulate an input data frame X}
 \usage{
-create_X(N, covariates, names, n_categs, t_data, t_jitter, t_effect_range,
-  continuous_info, verbose)
+create_X(
+  N,
+  covariates,
+  names,
+  n_categs,
+  t_data,
+  t_jitter,
+  t_effect_range,
+  continuous_info,
+  verbose
+)
 }
 \arguments{
 \item{N}{Number of individuals.}

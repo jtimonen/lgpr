@@ -4,9 +4,17 @@
 \alias{plot_simdata}
 \title{Plot a simulated longitudinal data set for each individual separately}
 \usage{
-plot_simdata(simData, linecolor = "gray50", nrow = NULL, ncol = NULL,
-  i_test = NULL, color_point = "black", color_test = "steelblue2",
-  signal_name = "signal", y_transform = function(x) {     x })
+plot_simdata(
+  simData,
+  linecolor = "gray50",
+  nrow = NULL,
+  ncol = NULL,
+  i_test = NULL,
+  color_point = "black",
+  color_test = "steelblue2",
+  signal_name = "signal",
+  y_transform = function(x) {     x }
+)
 }
 \arguments{
 \item{simData}{a list returned by \code{\link{simulate_data}}}

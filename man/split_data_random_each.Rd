@@ -4,8 +4,12 @@
 \alias{split_data_random_each}
 \title{Split data into training and test data by selecting randomly k points from each individual}
 \usage{
-split_data_random_each(data, n_test = 1, id_variable = "id",
-  time_variable = "age")
+split_data_random_each(
+  data,
+  n_test = 1,
+  id_variable = "id",
+  time_variable = "age"
+)
 }
 \arguments{
 \item{data}{a data frame}

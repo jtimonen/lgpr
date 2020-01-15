@@ -5,8 +5,12 @@
 \title{Compute component relevances and estimate amount of noise
 (one MCMC sample)}
 \usage{
-postproc_relevances(fit, relevance_method = "f_mean",
-  noise_method = "SSE", verbose = FALSE)
+postproc_relevances(
+  fit,
+  relevance_method = "f_mean",
+  noise_method = "SSE",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}

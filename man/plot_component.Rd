@@ -4,8 +4,20 @@
 \alias{plot_component}
 \title{Helper function for plotting one component}
 \usage{
-plot_component(MMM, SSS, model, idx, time_is_xvar, linealpha, linetype,
-  fill_alpha, X_test, marker, sum_highlight, viridis_option)
+plot_component(
+  MMM,
+  SSS,
+  model,
+  idx,
+  time_is_xvar,
+  linealpha,
+  linetype,
+  fill_alpha,
+  X_test,
+  marker,
+  sum_highlight,
+  viridis_option
+)
 }
 \arguments{
 \item{MMM}{a n array of size n_samples x n_data x n_components}

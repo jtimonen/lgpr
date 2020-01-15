@@ -4,8 +4,13 @@
 \alias{plot_effect_times}
 \title{Visualize posterior uncertainty in the disease effect times}
 \usage{
-plot_effect_times(fit, color_scheme = "red", prob = 1,
-  prob_outer = 1, point_est = "none")
+plot_effect_times(
+  fit,
+  color_scheme = "red",
+  prob = 1,
+  prob_outer = 1,
+  point_est = "none"
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}

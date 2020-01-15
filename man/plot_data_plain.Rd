@@ -4,8 +4,14 @@
 \alias{plot_data_plain}
 \title{A spaghetti plot of longitudinal data without highlighting.}
 \usage{
-plot_data_plain(data, response = "y", id_variable = "id",
-  time_variable = "age", psize = 2, lwd = 0.5)
+plot_data_plain(
+  data,
+  response = "y",
+  id_variable = "id",
+  time_variable = "age",
+  psize = 2,
+  lwd = 0.5
+)
 }
 \arguments{
 \item{data}{A data frame.}

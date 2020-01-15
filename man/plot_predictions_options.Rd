@@ -4,8 +4,16 @@
 \alias{plot_predictions_options}
 \title{Do input checks and set options for plotting predictions}
 \usage{
-plot_predictions_options(fit, color_scheme, original_y_scale, PRED,
-  test_data, color_scheme_t_effect, mode, n_sds)
+plot_predictions_options(
+  fit,
+  color_scheme,
+  original_y_scale,
+  PRED,
+  test_data,
+  color_scheme_t_effect,
+  mode,
+  n_sds
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
