@@ -1,7 +1,7 @@
 #' Create input for Stan
 #'
-#' @description Parses the \code{formula} and \code{data} input to \code{\link{lgp_model}}. Also performs
-#' many input checks.
+#' @description Parses the \code{formula} and \code{data} input to 
+#' \code{\link{lgp_model}}. Also performs many input checks.
 #' @inheritParams lgp_model
 #' @param standardize Should the response variable be standardized?
 #' @param varInfo Variable type info.
@@ -24,6 +24,7 @@ create_stan_input <- function(formula,
                               verbose,
                               variance_mask,
                               N_trials,
+                              norm_factors,
                               skip_gen_quant)
 {
   
@@ -59,27 +60,29 @@ create_stan_input <- function(formula,
   SCL       <- standardize_inputs(X, D)
   X         <- SCL$X
   
-  # Check and possibly edit N_trials and C_hat
-  N_trials <- set_N_trials(N_trials, response, LH)
-  C_hat    <- set_C_hat(C_hat, response, LH, N_trials)
+  # Check and possibly edit N_trials, C_hat and norm_factors
+  N_trials     <- set_N_trials(N_trials, response, LH)
+  C_hat        <- set_C_hat(C_hat, response, LH, N_trials)
+  norm_factors <- set_norm_factors(norm_factors, response, LH)
   
   # Check that variable types make sense
   check_varInfo(varInfo)
   
   # Create the list that is the Stan input
-  stan_dat   <- list(X         = t(X),
-                     X_notnan  = X_notnan,
-                     y         = response,
-                     y_int     = round(response),
-                     LH        = LH,
-                     N_trials  = N_trials,
-                     N_cat     = N_cat,
-                     C_hat     = C_hat,
+  stan_dat   <- list(X            = t(X),
+                     X_notnan     = X_notnan,
+                     y            = response,
+                     y_int        = round(response),
+                     LH           = LH,
+                     N_trials     = N_trials,
+                     norm_factors = norm_factors,
+                     N_cat        = N_cat,
+                     C_hat        = C_hat,
                      F_IS_SAMPLED = as.numeric(sample_F),
                      USE_VAR_MASK = as.numeric(variance_mask),
-                     VERBOSE   = as.numeric(verbose),
-                     DELTA     = DELTA,
-                     SKIP_GQ   = as.numeric(skip_gen_quant)
+                     VERBOSE      = as.numeric(verbose),
+                     DELTA        = DELTA,
+                     SKIP_GQ      = as.numeric(skip_gen_quant)
   )
   
   # Get some variables related to diseased individuals

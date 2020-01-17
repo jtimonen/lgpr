@@ -22,6 +22,7 @@ lgp_model(
   offset_vars = NULL,
   variance_mask = TRUE,
   N_trials = NULL,
+  norm_factors = NULL,
   skip_gen_quant = FALSE,
   verbose = FALSE
 )
@@ -99,6 +100,12 @@ variance to zero before disease onset?}
 \item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
+
+\item{norm_factors}{Normalizing factors for each data point. If not \code{NULL}, this must be a 
+vector with length \code{dim(data)[1]}, specifying a multiplicative factor that scales
+the signal for the obsevation model at each data point. Setting this to \code{NULL} is
+effectively same as setting this to a vector of ones. With Gaussian likelihood, do not
+use this, normalize the data beforehand instead.}
 
 \item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
 

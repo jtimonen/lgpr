@@ -309,6 +309,26 @@ get_model_dims <- function(X, D){
   return(ret)
 }
 
+
+#' Check that variable types make sense
+#'
+#' @param varInfo a named list
+#' @return nothing
+check_varInfo <- function(varInfo){
+  
+  # Check that id variable is not in offsets
+  if(varInfo$id_variable %in% varInfo$offset_vars){
+    stop("The subject identifier variable cannot currently be included in", 
+         " 'offset_vars'. If you wish to model the effect of 'id_variable'",
+         " as a constant offset,",
+         " you can create another covariate with the same values and",
+         " use it in your 'formula' and 'offset_vars' instead.")
+  }
+  
+  # TODO: more checks
+}
+
+
 #' Count numbers of different categories for each categorical variable
 #'
 #' @param X the design matrix
@@ -335,9 +355,11 @@ set_N_cat <- function(X, D){
   return(as.array(N_cat))
 }
 
+
+
 #' Set C_hat (Non-gaussian observation models)
 #'
-#' @param C_hat the C_hat argument given as input to \code{lgp}
+#' @param C_hat the \code{C_hat} argument given as input to \code{lgp_model}
 #' @param response response variable
 #' @param LH likelihood as int
 #' @param N_trials the N_trials data (binomial likelihood)
@@ -368,7 +390,7 @@ set_C_hat <- function(C_hat, response, LH, N_trials){
 
 #' Set N_trials (binomial and Bernoulli observation models)
 #'
-#' @param N_trials the N_trials argument given as input to \code{lgp}
+#' @param N_trials the \code{N_trials} argument given as input to \code{lgp_model}
 #' @param response response variable
 #' @param LH likelihood as int
 #' @return a numeric vector
@@ -390,21 +412,29 @@ set_N_trials <- function(N_trials, response, LH){
 }
 
 
-#' Check that variable types make sense
+#' Check and possibly edit the norm_factors input
 #'
-#' @param varInfo a named list
-#' @return nothing
-check_varInfo <- function(varInfo){
-  
-  # Check that id variable is not in offsets
-  if(varInfo$id_variable %in% varInfo$offset_vars){
-    stop("The subject identifier variable cannot currently be included in", 
-         " 'offset_vars'. If you wish to model the effect of 'id_variable'",
-         " as a constant offset,",
-         " you can create another covariate with the same values and",
-         " use it in your 'formula' and 'offset_vars' instead.")
+#' @param norm_factors the \code{norm_factors} argument given as input to 
+#' \code{lgp_model}
+#' @param response response variable
+#' @param LH likelihood as int
+#' @return a numeric vector
+set_norm_factors <- function(norm_factors, response, LH){
+  n <- length(response)
+  if(is.null(norm_factors)){
+    norm_factors <- rep(1, n)
+  }else{
+    if(LH==1){
+      stop("Only give the norm_factors argument if observation model is not Gaussian!",
+           " With Gaussian likelihood, you should can",
+           " normalize the data before using lgpr.")
+    }
   }
-  
-  # TODO: more checks
+  if(length(norm_factors)!=n){
+    stop("norm_factors must have length equal to number of data points!")
+  }
+  return(norm_factors)
 }
+
+
 

@@ -20,16 +20,17 @@ vector[n] y;              // the response variable (as a vector of reals)
 int       y_int[n];       // the response variable (as an array of integers)
 int<lower=1> N_trials[n]; // numbers of trials (ones for bernoulli model)
 int<lower=1> N_cat[1+D[5]+D[6]]; // number of categs for each categ. covar.
+vector[n] norm_factors;   // normalizing factors to scale the signal
 
 // Option switches
-int<lower=0,upper=1> UNCRT;  // are diseaseAge measurements uncertain?
-int<lower=0,upper=1> HMGNS;  // is diseaseAge effect is homogenous?
+int<lower=0,upper=1> UNCRT;        // are diseaseAge measurements uncertain?
+int<lower=0,upper=1> HMGNS;        // is diseaseAge effect is homogenous?
 int<lower=0,upper=1> F_IS_SAMPLED; // are function values be sampled?
-int<lower=0,upper=1> VERBOSE; // is model info printed?
+int<lower=0,upper=1> VERBOSE;      // is model info printed?
 int<lower=0,upper=1> USE_VAR_MASK; // is variance mask kernel used?
-int<lower=0,upper=1> BACKWARDS; // is prior of effect time "backwards"?
-int<lower=0,upper=1> RELATIVE;  // is prior of effect time rel. to obs. one?
-int<lower=0,upper=1> SKIP_GQ;   // should the generated quantities block be skipped?
+int<lower=0,upper=1> BACKWARDS;    // is prior of effect time "backwards"?
+int<lower=0,upper=1> RELATIVE;     // is prior of effect time rel. to obs. one?
+int<lower=0,upper=1> SKIP_GQ;      // should the generated quantities block be skipped?
 
 // Prior types and transforms
 int t_ID[D[1],4];         // for id*age component

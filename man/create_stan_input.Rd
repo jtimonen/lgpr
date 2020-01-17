@@ -19,6 +19,7 @@ create_stan_input(
   verbose,
   variance_mask,
   N_trials,
+  norm_factors,
   skip_gen_quant
 )
 }
@@ -84,6 +85,12 @@ variance to zero before disease onset?}
 Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 Bernoulli observation model.}
 
+\item{norm_factors}{Normalizing factors for each data point. If not \code{NULL}, this must be a 
+vector with length \code{dim(data)[1]}, specifying a multiplicative factor that scales
+the signal for the obsevation model at each data point. Setting this to \code{NULL} is
+effectively same as setting this to a vector of ones. With Gaussian likelihood, do not
+use this, normalize the data beforehand instead.}
+
 \item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
 }
 \value{
@@ -92,6 +99,6 @@ preprocessing and all the information about scaling the inputs and response, and
 variable type info.
 }
 \description{
-Parses the \code{formula} and \code{data} input to \code{\link{lgp_model}}. Also performs
-many input checks.
+Parses the \code{formula} and \code{data} input to 
+\code{\link{lgp_model}}. Also performs many input checks.
 }

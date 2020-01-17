@@ -38,6 +38,7 @@ lgp <- function(formula,
                 threshold        = 0.95,
                 variance_mask    = TRUE,
                 N_trials         = NULL,
+                norm_factors     = NULL,
                 relevance_method = "f_mean",
                 verbose          = FALSE,
                 ...)
@@ -60,6 +61,7 @@ lgp <- function(formula,
                      offset_vars      = offset_vars,
                      variance_mask    = variance_mask,
                      N_trials         = N_trials,
+                     norm_factors     = norm_factors,
                      skip_gen_quant   = skip_postproc,
                      verbose          = verbose)
   
@@ -139,6 +141,11 @@ lgp <- function(formula,
 #' @param N_trials This argument (number of trials) is only needed when likelihood is binomial.
 #' Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
 #' Bernoulli observation model.
+#' @param norm_factors Normalizing factors for each data point. If not \code{NULL}, this must be a 
+#' vector with length \code{dim(data)[1]}, specifying a multiplicative factor that scales
+#' the signal for the obsevation model at each data point. Setting this to \code{NULL} is
+#' effectively same as setting this to a vector of ones. With Gaussian likelihood, do not
+#' use this, normalize the data beforehand instead.
 #' @param skip_gen_quant If this is true, the generated quantities block of Stan is skipped.
 #' @param verbose Should more verbose output be printed?
 #' @return An object of class \code{lgpmodel}.
@@ -160,6 +167,7 @@ lgp_model <- function(formula,
                       offset_vars      = NULL,
                       variance_mask    = TRUE,
                       N_trials         = NULL,
+                      norm_factors     = NULL,
                       skip_gen_quant   = FALSE,
                       verbose          = FALSE
 )
@@ -199,6 +207,7 @@ lgp_model <- function(formula,
                                verbose        = verbose,
                                variance_mask  = variance_mask,
                                N_trials       = N_trials,
+                               norm_factors   = norm_factors,
                                skip_gen_quant = skip_gen_quant)
   
   # Data to Stan
@@ -216,7 +225,8 @@ lgp_model <- function(formula,
                covariate_names = lgp_covariate_names(stan_dat),
                response_name   = fc[2],
                variance_mask   = variance_mask,
-               N_trials        = N_trials)
+               N_trials        = N_trials,
+               norm_factors    = stan_dat$norm_factors)
   
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",
