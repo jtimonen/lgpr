@@ -312,7 +312,7 @@ create_example_fit <- function(N = 4,
 }
 
 
-#' Add a categorical covariate to a data frame in long format
+#' Easily add a categorical covariate to a data frame
 #' 
 #' @export
 #' @param data the original data frame

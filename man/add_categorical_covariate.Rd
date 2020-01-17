@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc-utils.R
 \name{add_categorical_covariate}
 \alias{add_categorical_covariate}
-\title{Add a categorical covariate to a data frame in long format}
+\title{Easily add a categorical covariate to a data frame}
 \usage{
 add_categorical_covariate(data, x, id_var = "id")
 }
@@ -19,5 +19,5 @@ A data frame with one column added. The new column will
 have same name as the variable passed as input \code{x}.
 }
 \description{
-Add a categorical covariate to a data frame in long format
+Easily add a categorical covariate to a data frame
 }
