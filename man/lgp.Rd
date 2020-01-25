@@ -25,7 +25,6 @@ lgp(
   threshold = 0.95,
   variance_mask = TRUE,
   N_trials = NULL,
-  norm_factors = NULL,
   relevance_method = "f_mean",
   verbose = FALSE,
   ...
@@ -66,32 +65,34 @@ individuals?}
 
 \item{time_variable}{Name of the time variable (default = \code{"age"}).}
 
-\item{disAge_variable}{Name of the disease-related age variable. If {NULL} (default),
+\item{disAge_variable}{Name of the disease-related age variable. If \code{NULL},
 this will be chosen to be \code{"diseaseAge"}, if such covariate is found in the data.}
 
 \item{continuous_vars}{Names of other continuous covariates. If \code{NULL}, the
 remaining covariates that have floating point values are interpreted as continuous.}
 
-\item{categorical_vars}{Names of categorical covariates that interact with the time variable.
-If \code{NULL} (default), the remaining covariates that have integer values are interpreted 
-as categorical.}
+\item{categorical_vars}{Names of categorical covariates that interact with the time 
+variable.
+If \code{NULL} (default), the remaining covariates that have integer values are 
+interpreted as categorical.}
 
 \item{offset_vars}{Names of the categorical covariates that are treated as 
-time-independent group offsets. If \code{NULL} (default), no variables are interpreted as such
-covariates.}
+time-independent group offsets. If \code{NULL} (default), no variables are 
+interpreted as such covariates.}
 
-\item{C_hat}{The constant GP mean. By default this is NULL, and 
- set to
+\item{C_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or a real
+number defining a constant GP mean. If \code{NULL}, this is set to
  \itemize{
  \item \code{C_hat = 0}, if \code{likelihood} is \code{"Gaussian"}, because with 
- Gaussian likelihood the 
- response variable is by default centered to have zero mean.
+ Gaussian likelihood the response variable is by default centered to have zero mean.
 \item \code{C_hat = } \code{log(mean(y))} if \code{likelihood} is \code{"Poisson"}
 or \code{"NB"},
 \item \code{C_hat = } \code{log(p/(1-p))}, where \code{p = mean(y/N_trials)} if 
-\code{likelihood} is \code{"binomial"}
+\code{likelihood} is \code{"binomial"},
  }
-Above, \code{y} denotes the response variable.}
+where \code{y} denotes the response variable. You can modify this vector to account for
+normalization between data points. With Gaussian likelihood though, do not modify
+this argument, normalize the data beforehand instead.}
 
 \item{DELTA}{the amount of added jitter to ensure positive definiteness of the kernel}
 
@@ -109,15 +110,9 @@ If \code{TRUE}, then Stan is run by first defining
 \item{variance_mask}{Should a variance mask be used to force disease component
 variance to zero before disease onset?}
 
-\item{N_trials}{This argument (number of trials) is only needed when likelihood is binomial.
-Must have length one or equal to number of data points. Setting \code{N_trials=1} corresponds to 
-Bernoulli observation model.}
-
-\item{norm_factors}{Normalizing factors for each data point. If not \code{NULL}, this must be a 
-vector with length \code{dim(data)[1]}, specifying a multiplicative factor that scales
-the signal for the obsevation model at each data point. Setting this to \code{NULL} is
-effectively same as setting this to a vector of ones. With Gaussian likelihood, do not
-use this, normalize the data beforehand instead.}
+\item{N_trials}{This argument (number of trials) is only needed when likelihood 
+is binomial. Must have length one or equal to number of data points. Setting 
+\code{N_trials=1} corresponds to Bernoulli observation model.}
 
 \item{relevance_method}{Component relevance determination method. 
 Must be either \code{"f_mean"} or \code{"alpha"}.}

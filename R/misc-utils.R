@@ -1,4 +1,26 @@
 
+#' Create the GP mean input for \code{lgp}, so that it accounts
+#' for normalization between data points in the Poisson or NB
+#' observation model
+#'
+#' @export
+#' @param y response variable, vector of length \code{n}
+#' @param norm_factors normalization factors, vector of length \code{n}
+#' @return a vector of length \code{n}, which can be used as
+#' the \code{C_hat} input to the \code{lgp} function
+adjusted_Chat <- function(y, norm_factors){
+  
+  if(length(norm_factors)!=length(y)){stop("inputs must have same length!")}
+  if(sum(y<0) > 0){stop("y cannot have negative values!")}
+  if(sum(round(y)!=y) > 0){stop("y must have only integer values!")}
+  if(sum(norm_factors<=0) > 0){stop("norm_factors must be all positive!")}
+  
+  C_hat <- log(mean(y))
+  C_hat <- rep(C_hat, length(y))
+  C_hat <- C_hat + log(norm_factors)
+  return(C_hat)
+}
+
 
 #' Repeat a vector as a rows of an array
 #'
@@ -309,6 +331,23 @@ create_example_fit <- function(N = 4,
              refresh = 0,
              verbose = FALSE)
   return(fit)
+}
+
+#' Returns a valid example call of the \code{lgp} function
+#' witi valid data input
+#' 
+#' @export
+#' @return a string
+example_call <- function(){
+  code <- "
+  fit <- lgp(formula = y ~ id + age, 
+             data    = simulate_data(N = 4, t_data=10*c(1,2,3,4,5))$data, 
+             iter    = 100,
+             chains  = 1, 
+             refresh = 0,
+             verbose = FALSE)
+  "
+  return(code)
 }
 
 

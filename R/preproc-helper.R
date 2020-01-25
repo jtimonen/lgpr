@@ -384,6 +384,14 @@ set_C_hat <- function(C_hat, response, LH, N_trials){
            " and the response variable is standardized to have mean zero.")
     }
   }
+  n <- length(response)
+  L <- length(C_hat)
+  if(L != 1 && L !=n){
+    stop("C_hat must have length 1 or equal to the number of data points!")
+  }
+  if(L==1){
+    C_hat <-rep(C_hat, n)
+  }
   return(C_hat)
 }
 
@@ -411,30 +419,6 @@ set_N_trials <- function(N_trials, response, LH){
   return(N_trials)
 }
 
-
-#' Check and possibly edit the norm_factors input
-#'
-#' @param norm_factors the \code{norm_factors} argument given as input to 
-#' \code{lgp_model}
-#' @param response response variable
-#' @param LH likelihood as int
-#' @return a numeric vector
-set_norm_factors <- function(norm_factors, response, LH){
-  n <- length(response)
-  if(is.null(norm_factors)){
-    norm_factors <- rep(1, n)
-  }else{
-    if(LH==1){
-      stop("Only give the norm_factors argument if observation model is not Gaussian!",
-           " With Gaussian likelihood, you should can",
-           " normalize the data before using lgpr.")
-    }
-  }
-  if(length(norm_factors)!=n){
-    stop("norm_factors must have length equal to number of data points!")
-  }
-  return(norm_factors)
-}
 
 
 

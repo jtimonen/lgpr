@@ -2,17 +2,15 @@
 int nf = 1 + D[3] + D[5] + D[6];     // number of fixed kernel matrices
 int sum_D = sum(D);                  // total number of covariates
 matrix[n,n] KF[nf] = STAN_compute_fixed_kernel_matrices(X, X_notnan, D, N_tot, N_cat);
-vector[n] mu = rep_vector(C_hat, n) .* norm_factors; // GP mean (Gaussian likelihood)
 int DO_GEN_QUANT = (1 - F_IS_SAMPLED) * (1 - SKIP_GQ);
 
 if(VERBOSE==1){
   print(" ")
-  print("* Observation model = ", LH);
   print("* Number of data points = ", n);
   print("* Number of model components = ", sum_D);
   print("* Number of individuals = ", N_tot);
   print("* Additional model info:")
-  print("  - C_hat = ", C_hat);
+  print("  - LH = ", LH);
   print("  - D = ", D);
   print("  - F_IS_SAMPLED = ", F_IS_SAMPLED)
   if(D[3]==1){

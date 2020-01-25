@@ -50,7 +50,6 @@ setMethod(f = "show",
             
             minfo <- model_info(object, print = FALSE)
             cat(minfo)
-            cat(paste("  Observation model: ", str1, "\n", sep=""))
             if(D[3]==1){
               cat(str_dis)
             }

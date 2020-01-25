@@ -24,7 +24,6 @@ create_stan_input <- function(formula,
                               verbose,
                               variance_mask,
                               N_trials,
-                              norm_factors,
                               skip_gen_quant)
 {
   
@@ -63,7 +62,6 @@ create_stan_input <- function(formula,
   # Check and possibly edit N_trials, C_hat and norm_factors
   N_trials     <- set_N_trials(N_trials, response, LH)
   C_hat        <- set_C_hat(C_hat, response, LH, N_trials)
-  norm_factors <- set_norm_factors(norm_factors, response, LH)
   
   # Check that variable types make sense
   check_varInfo(varInfo)
@@ -75,7 +73,6 @@ create_stan_input <- function(formula,
                      y_int        = round(response),
                      LH           = LH,
                      N_trials     = N_trials,
-                     norm_factors = norm_factors,
                      N_cat        = N_cat,
                      C_hat        = C_hat,
                      F_IS_SAMPLED = as.numeric(sample_F),

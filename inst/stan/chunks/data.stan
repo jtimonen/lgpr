@@ -20,7 +20,7 @@ vector[n] y;              // the response variable (as a vector of reals)
 int       y_int[n];       // the response variable (as an array of integers)
 int<lower=1> N_trials[n]; // numbers of trials (ones for bernoulli model)
 int<lower=1> N_cat[1+D[5]+D[6]]; // number of categs for each categ. covar.
-vector[n] norm_factors;   // normalizing factors to scale the signal
+vector[n] C_hat;  // GP mean vector (should be zeros when using Gaussian lh)
 
 // Option switches
 int<lower=0,upper=1> UNCRT;        // are diseaseAge measurements uncertain?
@@ -68,5 +68,4 @@ vector[N_cases] U_ons[UNCRT];   // up bounds for disease effect times
 
 // Other
 real DELTA;         // jitter to ensure pos. def. kernel matrices
-real C_hat;         // C_hat parameter for Poisson and NB models
 real vm_params[2];  // variance mask parameters
