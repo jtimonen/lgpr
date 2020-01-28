@@ -1,82 +1,82 @@
-#' Plot posterior of f
-#' 
-#' @export
-#' @description This is a wrapper for \code{\link{plot_posterior_predictions}}.
+
+#' Helper for \code{\link{plot_posterior_components}}
 #' @param fit An object of class \code{lgpfit}.
-#' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param plot_uncertainty Should an uncertainty ribbon be plotted?
-#' @param n_sds number of standard deviations for the uncertainty band width
-#' @param data_marker pch for data points
-#' @param ... additional arguments to \code{\link{plot_posterior_predictions}}
-#' 
-#' @return a ggplot object
-plot_posterior_f <- function(fit, 
-                             PRED             = NULL, 
-                             plot_uncertainty = TRUE,
-                             data_marker      = 16,
-                             n_sds            = 2,
-                             ...){
+#' @param time_is_xvar is the time variable the x-axis variable
+#' in all subplots?
+#' @param subsamples How many samples to plot. If this is \code{NULL},
+#' average over all samples is plotted. If this is \code{"all"}, all
+#' samples are plotted.
+#' @param marker point type
+#' @param ... additional arguments for \code{\link{plot_components}}
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
+plot_posterior_components_sub1 <- function(fit, subsamples,
+                                           time_is_xvar, marker,
+                                           ...)
+{
+  # Check input correctness
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  model <- fit@model
   
-  plot_obs_onset     <- FALSE
-  plot_t_effect_samples <- FALSE
-  if(fit@model@stan_dat$UNCRT == 1){
-    plot_obs_onset     <- TRUE
-    plot_t_effect_samples <- TRUE
-  }
-  if(fit@model@info$sample_F){
-    alpha_line <- 0.1
+  # Create plot
+  df  <- as.data.frame(fit@stan_fit)
+  FFF <- get_function_components_from_df_all(df, model)
+  ddd <- dim(FFF)[3]
+  FFF <- FFF[,,1:(ddd-1)]
+  
+  if(is.null(subsamples)){
+    FFF_1 <- apply(FFF, c(2,3), mean)
+    nnn     <- dim(FFF_1)[1]
+    FFF     <- array(0, dim = c(1, nnn, ddd-1))
+    FFF[1,,]<- as.matrix(FFF_1)
+  }else if(is.character(subsamples)){
+    if(subsamples=="all"){
+      # all samples
+    }else{
+      stop("invalid input for subsamples!")
+    }
+  }else if(is.numeric(subsamples)){
+    if(length(subsamples)<2){
+      stop("Length of 'subsamples' must be at least 2! If you want to plot one sample, use the ",
+           "'sample_idx' argument instead!")
+    }
+    n_smp   <- dim(FFF)[1]
+    i_sub   <- sample.int(n_smp, subsamples)
+    FFF     <- FFF[i_sub,,] 
   }else{
-    alpha_line <- 1
+    stop("invalid input for subsamples!")
   }
-  h <- plot_posterior_predictions(fit, 
-                                  mode               = "posterior", 
-                                  PRED               = PRED, 
-                                  plot_uncertainty   = plot_uncertainty,
-                                  n_sds              = n_sds,
-                                  plot_obs_onset     = plot_obs_onset,
-                                  plot_t_effect_samples = plot_t_effect_samples,
-                                  alpha_line         = alpha_line,
-                                  data_marker        = data_marker,
-                                  ...)
+  
+  h <- plot_components(FFF, NULL, model, time_is_xvar, marker = marker, ...)
   return(h)
+  
 }
 
 
-#' Plot posterior predictive distribution
-#' 
-#' @export
-#' @description This is a wrapper for \code{\link{plot_posterior_predictions}}.
+#' Helper for \code{\link{plot_posterior_components}}
 #' @param fit An object of class \code{lgpfit}.
-#' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param uncertainty Either "none", "ribbon" or "errorbar".
-#' @param test_data Test data set.
-#' @param n_sds number of standard deviations for the uncertainty band width
-#' @param data_marker pch for data points
-#' @param ... additional arguments to \code{\link{plot_posterior_predictions}}
-#' @return a ggplot object
-plot_posterior_y <- function(fit, PRED, 
-                             uncertainty = "ribbon", 
-                             test_data = NULL,
-                             data_marker = 16,
-                             n_sds = 2,
-                             ...){
+#' @param n_sd number of standard deviations (ribbon width)
+#' @param PRED object returned by \code{\link{lgp_predict}}
+#' @param time_is_xvar is the time variable the x-axis variable
+#' in all subplots?
+#' @param sample_idx Which sample to plot. 
+#' @param ... additional arguments for \code{\link{plot_components}}
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
+plot_posterior_components_sub2 <- function(fit, PRED, sample_idx,
+                                           time_is_xvar,
+                                           n_sd, ...)
+{
+  # Check input correctness
+  if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  model <- fit@model
   
-  if(uncertainty=="ribbon"){
-    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
-                                    test_data = test_data, n_sds = n_sds,
-                                    data_marker = data_marker, ...)
-  }else if(uncertainty=="errorbar"){
-    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED,
-                                    error_bar = TRUE, test_data = test_data,
-                                    n_sds = n_sds, data_marker = data_marker, ...)
-  }else{
-    h <- plot_posterior_predictions(fit, mode = "predictive", PRED = PRED, 
-                                    plot_uncertainty = FALSE, test_data = test_data,
-                                    n_sds = n_sds, data_marker = data_marker, ...) 
-  }
+  # Create plot
+  AAA <- PRED_to_arrays(PRED)
+  MMM <- AAA$MMM
+  SSS <- n_sd * AAA$SSS
+  X_test <- PRED$X_test_scaled
+  h <- plot_components(MMM, SSS, model, time_is_xvar, X_test, ...)
   return(h)
 }
-
 
 #' Plot posterior of f or predictive distribution for y
 #' 
@@ -476,7 +476,7 @@ create_predictions_plot_df1 <- function(fit, scale_f = TRUE, n_sds){
   age  <- X[,2]
   age  <- TSCL$fun_inv(age)
   LH   <- model@stan_dat$LH
-
+  
   PRED  <- get_predicted(fit)
   if(!info$sample_F){
     

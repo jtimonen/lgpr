@@ -1,5 +1,5 @@
 # lgpr
-This repository contains the source code for the R-package *lgpr*. 
+This repository contains the source code for the R-package **lgpr**. 
 
 ### Getting started
 See tutorials, installation instructions and documentation [here](https://jtimonen.github.io/lgpr-usage/index.html).

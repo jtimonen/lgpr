@@ -246,3 +246,54 @@ plot_data_hl_individual <- function(data,
                         psize, lwd)
   return(p)
 }
+
+#' Create a plotting data frame for ggplot
+#' 
+#' @description A helper function for \code{plot_data}.
+#' @param data a data frame
+#' @param hl_1 highlighting by color
+#' @param hl_2 highlighting by linestyle
+#' @param hl_cont highlighting continuous
+#' @return an extended data frame
+create_data_plot_df <- function(data, hl_1, hl_2, hl_cont){
+  
+  # Color highlight
+  hl <- hl_1
+  if(!is.null(hl)){
+    if(hl == "diseaseAge" || hl == "disease" || hl == "group"){
+      hl <- "Group"
+    }
+    ihl <- which(colnames(data)==hl)
+    if(hl!="id"){
+      data[[ihl]] <- as.factor(data[[ihl]])
+      colnames(data)[ihl] <- "Z1" 
+    }else{
+      Z1 <- data[[ihl]]
+      data <- cbind(data, Z1)
+    }
+  }
+  
+  # Linestyle highlight
+  hl <- hl_2
+  if(!is.null(hl)){
+    if(hl == "diseaseAge" || hl == "disease" || hl == "group"){
+      hl <- "Group"
+    }
+    ihl <- which(colnames(data)==hl)
+    if(hl!="id"){
+      data[[ihl]] <- as.factor(data[[ihl]])
+      colnames(data)[ihl] <- "Z2" 
+    }else{
+      Z2 <- data[[ihl]]
+      data <- cbind(data, Z2)
+    }
+  }
+  
+  # Continuous covariate highlight
+  if(!is.null(hl_cont)){
+    ihl <- which(colnames(data)==hl_cont)
+    colnames(data)[ihl] <- "Value"
+  }
+  return(data)
+}
+

@@ -115,3 +115,70 @@ plot_simdata <- function(simData,
   }
   return(h)
 }
+
+
+#' Visualize the components of a simulated data set
+#' @export
+#' @param simData simulated data object (list)
+#' @param time_is_xvar is the time variable the x-axis variable
+#' in all subplots?
+#' @param marker point marker
+#' @param ... additional arguments for \code{\link{plot_components}}
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
+plot_components_simdata <- function(simData, 
+                                    time_is_xvar = TRUE, 
+                                    marker = 16, ...)
+{
+  data  <- simData$data
+  FFF   <- simData$components
+  model <- full_model(data)
+  
+  # Create plot
+  nnn     <- dim(FFF)[1]
+  ddd     <- dim(FFF)[2]
+  FFF_1   <- FFF[,1:(ddd-3)]
+  FFF     <- array(0, dim = c(1, nnn, ddd-3))
+  FFF[1,,]<- as.matrix(FFF_1)
+  
+  h <- plot_components(FFF, NULL, model, time_is_xvar, 
+                       marker = marker, ...)
+  return(h)
+}
+
+#' Create a plotting data frame for ggplot
+#' 
+#' @description A helper function for \code{plot_simdata_by_component}.
+#' @param simData An object created using \code{simulate_data}.
+#' @return a data frame
+create_simdata_plot_df <- function(simData){
+  data <- simData$data
+  comp <- simData$components
+  id   <- data$id
+  age  <- data$age
+  n    <- length(id)
+  d    <- dim(comp)[2] - 4
+  CMP  <- comp[,1:(d+1)]
+  cn   <- colnames(CMP)
+  cn   <- cn[1:(length(cn)-1)]
+  cn   <- simdata_colnames_pretty(cn)
+  cn   <- c(cn, "f")
+  id   <- rep(id, d+1)
+  age  <- rep(age, d+1)
+  component <- rep(cn, each = n)
+  value <- as.numeric(as.matrix(CMP))
+  DF    <- data.frame(id        = as.factor(id),
+                      age       = as.numeric(age),
+                      component = as.factor(component),
+                      value     = as.numeric(value))
+  return(DF)
+}
+
+#' Simulated data column names in a prettier form
+#'
+#' @param cn column names
+#' @return names of model components
+simdata_colnames_pretty <- function(cn){
+  cn  <- gsub("\\.", ", ", cn)
+  cn  <- paste("f_",1:length(cn),"(",cn,")", sep="")
+  return(cn)
+}

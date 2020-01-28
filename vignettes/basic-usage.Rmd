@@ -27,10 +27,10 @@ require("lgpr")
 set.seed(123)
 ```
 
-## Example
+## Simulating data
 Here we simulate data with 8 individuals. We simulate individual-specific and shared age effects, as well as a sex-specific age effect. Also a categorial 'location' covariate is simulated, but it has no effect.
 
-```{r example, fig.width=6.6, fig.height=4}
+```{r simulate, fig.width=6.6, fig.height=6}
 # generate artificial data -----------------------------------------------
 simData <- simulate_data(N           = 8,
                         t_data       = seq(6, 30, by = 6),
@@ -43,18 +43,27 @@ simData <- simulate_data(N           = 8,
 
 data <- simData$data # data frame
 plot_simdata(simData)
-plot_components_simdata(simData)
+```
 
+```{r components, fig.width=6.6, fig.height=5}
+plot_components_simdata(simData)
+```
+
+## Creating and fitting a model
+``````{r fit, fig.width=6.6, fig.height=6}
 # create and fit a model --------------------------------------------------
 fit <- lgp(formula  = y ~ id + age + sex + location, # model formula
            data     = data,
            iter     = 1000, 
            chains   = 1,
            refresh  = 500)
+```
 
+## Visualizing inferred components and predictions
+```{r vis, fig.width=6.6, fig.height=5}
 # visualization -----------------------------------------------------------
 plot(fit)
-plot_components_posterior(fit)
+plot_posterior_components(fit)
 
 # prediction --------------------------------------------------------------
 t_test <- seq(0, 40, length.out = 60)
