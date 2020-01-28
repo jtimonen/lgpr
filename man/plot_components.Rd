@@ -54,7 +54,7 @@ plot_components(
 
 \item{nrow}{number of plot rows}
 
-\item{legend}{legend argument for ggarrange, use "none" to remove legends}
+\item{legend}{legend argument for ggarrange, use \code{"none"} to remove legends}
 
 \item{labels}{labels argument for ggarrange}
 
@@ -77,7 +77,7 @@ by colour in the sum plot}
 instead of doing ggarrange}
 }
 \value{
-an object returned by ggpubr::ggarrange or list
+an object returned by \code{ggpubr::ggarrange} or a list
 }
 \description{
 Helper function for plotting components

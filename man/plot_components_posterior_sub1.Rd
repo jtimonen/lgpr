@@ -9,8 +9,8 @@ plot_components_posterior_sub1(fit, subsamples, time_is_xvar, marker, ...)
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
 
-\item{subsamples}{How many samples to plot. If this is NULL,
-average over all samples is plotted. If this is "all", all
+\item{subsamples}{How many samples to plot. If this is \code{NULL},
+average over all samples is plotted. If this is \code{"all"}, all
 samples are plotted.}
 
 \item{time_is_xvar}{is the time variable the x-axis variable
@@ -21,7 +21,7 @@ in all subplots?}
 \item{...}{additional arguments for \code{\link{plot_components}}}
 }
 \value{
-an object returned by ggpubr::ggarrange or a list
+an object returned by \code{ggpubr::ggarrange} or a list
 }
 \description{
 Helper for \code{\link{plot_components_posterior}}

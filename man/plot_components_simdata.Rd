@@ -17,7 +17,7 @@ in all subplots?}
 \item{...}{additional arguments for \code{\link{plot_components}}}
 }
 \value{
-an object returned by ggpubr::ggarrange or list
+an object returned by \code{ggpubr::ggarrange} or a list
 }
 \description{
 Visualize the components of a simulated data set

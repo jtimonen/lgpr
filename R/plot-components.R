@@ -3,7 +3,7 @@
 #' @export
 #' @inheritParams plot_components_posterior_sub1
 #' @inheritParams plot_components_posterior_sub2
-#' @return an object returned by ggpubr::ggarrange or a
+#' @return an object returned by \code{ggpubr::ggarrange} or a
 #' list of ggplot2 objects
 plot_components_posterior <- function(fit, subsamples = NULL,
                                       time_is_xvar    = TRUE, 
@@ -31,12 +31,12 @@ plot_components_posterior <- function(fit, subsamples = NULL,
 #' @param fit An object of class \code{lgpfit}.
 #' @param time_is_xvar is the time variable the x-axis variable
 #' in all subplots?
-#' @param subsamples How many samples to plot. If this is NULL,
-#' average over all samples is plotted. If this is "all", all
+#' @param subsamples How many samples to plot. If this is \code{NULL},
+#' average over all samples is plotted. If this is \code{"all"}, all
 #' samples are plotted.
 #' @param marker point type
 #' @param ... additional arguments for \code{\link{plot_components}}
-#' @return an object returned by ggpubr::ggarrange or a list
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
 plot_components_posterior_sub1 <- function(fit, subsamples,
                                            time_is_xvar, marker,
                                            ...)
@@ -63,6 +63,10 @@ plot_components_posterior_sub1 <- function(fit, subsamples,
       stop("invalid input for subsamples!")
     }
   }else if(is.numeric(subsamples)){
+    if(length(subsamples)<2){
+      stop("Length of 'subsamples' must be at least 2! If you want to plot one sample, use the ",
+           "'sample_idx' argument instead!")
+    }
     n_smp   <- dim(FFF)[1]
     i_sub   <- sample.int(n_smp, subsamples)
     FFF     <- FFF[i_sub,,] 
@@ -70,10 +74,7 @@ plot_components_posterior_sub1 <- function(fit, subsamples,
     stop("invalid input for subsamples!")
   }
   
-  h <- plot_components(FFF, NULL, model, 
-                       time_is_xvar, marker = marker, ...)
-  
-  # Return ggplot object
+  h <- plot_components(FFF, NULL, model, time_is_xvar, marker = marker, ...)
   return(h)
   
 }
@@ -86,7 +87,7 @@ plot_components_posterior_sub1 <- function(fit, subsamples,
 #' in all subplots?
 #' @param sample_idx Which sample to plot. 
 #' @param ... additional arguments for \code{\link{plot_components}}
-#' @return an object returned by ggpubr::ggarrange or a list
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
 plot_components_posterior_sub2 <- function(fit, PRED, sample_idx,
                                            time_is_xvar,
                                            n_sd, ...)
@@ -94,17 +95,14 @@ plot_components_posterior_sub2 <- function(fit, PRED, sample_idx,
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   model <- fit@model
+  
   # Create plot
   AAA <- PRED_to_arrays(PRED)
   MMM <- AAA$MMM
   SSS <- n_sd * AAA$SSS
   X_test <- PRED$X_test_scaled
-  
   h <- plot_components(MMM, SSS, model, time_is_xvar, X_test, ...)
-  
-  # Return ggplot object
   return(h)
-  
 }
 
 #' Visualize the components of a simulated data set
@@ -114,7 +112,7 @@ plot_components_posterior_sub2 <- function(fit, PRED, sample_idx,
 #' in all subplots?
 #' @param marker point marker
 #' @param ... additional arguments for \code{\link{plot_components}}
-#' @return an object returned by ggpubr::ggarrange or list
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
 plot_components_simdata <- function(simData, 
                                     time_is_xvar = TRUE, 
                                     marker = 16, ...)
@@ -140,7 +138,7 @@ plot_components_simdata <- function(simData,
 #' @inheritParams plot_component 
 #' @param ncol number of plot columns
 #' @param nrow number of plot rows
-#' @param legend legend argument for ggarrange, use "none" to remove legends
+#' @param legend legend argument for ggarrange, use \code{"none"} to remove legends
 #' @param labels labels argument for ggarrange
 #' @param ylim y axis limits
 #' @param font_size font size for plots
@@ -150,7 +148,7 @@ plot_components_simdata <- function(simData,
 #' @param ylabel y-axis label 
 #' @param return_list should this return a list of ggplot objects 
 #' instead of doing ggarrange
-#' @return an object returned by ggpubr::ggarrange or list
+#' @return an object returned by \code{ggpubr::ggarrange} or a list
 plot_components <- function(MMM, SSS, model, time_is_xvar,
                             X_test        = NULL,
                             sum_highlight = NULL,
