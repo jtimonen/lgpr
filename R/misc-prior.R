@@ -319,6 +319,51 @@ prior_statement <- function(parname, TYP, P, dist, row_change = TRUE){
 }
 
 
+#' Visual checking of what kind of input warping functions a given prior
+#' allows
+#'
+#' @export
+#' @param prior A valid \code{prior} argument to \code{\link{lgpmodel}}.
+#' @param ... other arguments to \code{\link{plot_invgamma}}
+#' @param L time scale
+#' @return a ggplot object
+check_warp_prior <- function(prior, L = 24, ...){
+  dist <- prior$warp_steepness
+  if(dist$type!="inv-gamma"){
+    stop("this function currently works only if prior of warp_steepness ",
+         "is inv-gamma")
+  }
+  out <- plot_invgamma(dist$shape, dist$scale, return_quantiles = TRUE, ...)
+  t   <- seq(-L,L,length.out=300)
+  w1  <- warp_input(t, a=out$lower, b=0, c=1)
+  w2  <- warp_input(t, a=out$upper, b=0, c=1)
+  w0  <- warp_input(t, a=out$mean, b=0, c=1)
+  s1  <- round(out$lower, 3)
+  s2  <- round(out$mean, 3)
+  s3  <- round(out$upper, 3)
+  w   <- c(w1,w2,w0)
+  t   <- rep(t, 3)
+  stp <- as.character(c(s1, s3, s2))
+  Steepness <- as.factor(rep(stp, each=length(t)/3))
+  df  <- data.frame(t,w,Steepness)
+  p   <- ggplot2::ggplot(df, ggplot2::aes(x = t, y = w, 
+                                          group = Steepness,
+                                          color = Steepness))
+  p   <- p + ggplot2::geom_line() + ggplot2::xlab('Time')
+  p   <- p + ggplot2::ylab('Warped value') + ggplot2::theme_bw()
+  p   <- p + ggplot2::theme(legend.position = c(0.75, 0.2))
+  subtitle <- paste0('Using steepness values {', s1,', ', s2, ', ', s3, '}')
+  p   <- p + ggplot2::ggtitle('Warping functions',
+                              subtitle = subtitle)
+  
+  
+  plots <- ggpubr::ggarrange(out$plot, p, labels="auto",
+                             nrow = 1, ncol = 2)
+  return(plots)
+}
+
+
+
 #' Validate prior by sampling the signal and noise from it
 #'
 #' @export
