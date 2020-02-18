@@ -1,5 +1,8 @@
-# lgpr
+# lgpr (with basis function approximation)
 This repository contains the source code for the R-package **lgpr**. 
+
+- ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) This is a development branch and not stable yet.
+
 
 ### Getting started
 See tutorials, installation instructions and documentation [here](https://jtimonen.github.io/lgpr-usage/index.html).
