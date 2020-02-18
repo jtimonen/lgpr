@@ -39,6 +39,8 @@ lgp <- function(formula,
                 variance_mask    = TRUE,
                 N_trials         = NULL,
                 relevance_method = "f_mean",
+                n_basisfun       = NULL,
+                L_basisfun       = NULL,
                 verbose          = FALSE,
                 ...)
 {
@@ -61,6 +63,8 @@ lgp <- function(formula,
                      variance_mask    = variance_mask,
                      N_trials         = N_trials,
                      skip_gen_quant   = skip_postproc,
+                     n_basisfun       = n_basisfun,
+                     L_basisfun       = L_basisfun,
                      verbose          = verbose)
   
   if(verbose){ show(model) }
@@ -142,6 +146,11 @@ lgp <- function(formula,
 #' is binomial. Must have length one or equal to number of data points. Setting 
 #' \code{N_trials=1} corresponds to Bernoulli observation model.
 #' @param skip_gen_quant If this is true, the generated quantities block of Stan is skipped.
+#' @param n_basisfun Number of basis functions. If this is \code{NULL} (default), then
+#' the basis function approximation is not used and exact GP inference is performed.
+#' @param L_basisfun Domain size for basis functions. This only has effect if 
+#' \code{n_basisfun} is not \code{NULL}. If this is is \code{NULL} and \code{n_basisfun} 
+#' is not \code{NULL}, the domain size is set automatically.
 #' @param verbose Should more verbose output be printed?
 #' @return An object of class \code{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
@@ -163,6 +172,8 @@ lgp_model <- function(formula,
                       variance_mask    = TRUE,
                       N_trials         = NULL,
                       skip_gen_quant   = FALSE,
+                      n_basisfun       = NULL,
+                      L_basisfun       = NULL,
                       verbose          = FALSE
 )
 {
@@ -201,7 +212,9 @@ lgp_model <- function(formula,
                                verbose        = verbose,
                                variance_mask  = variance_mask,
                                N_trials       = N_trials,
-                               skip_gen_quant = skip_gen_quant)
+                               skip_gen_quant = skip_gen_quant,
+                               n_basisfun     = n_basisfun,
+                               L_basisfun     = L_basisfun)
   
   # Data to Stan
   stan_dat <- PREPROC$stan_dat

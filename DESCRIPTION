@@ -1,6 +1,6 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 0.33.0
+Version: 0.34.0
 Authors@R: 
     person(given = "Juho",
            family = "Timonen",
@@ -11,7 +11,8 @@ Description: Implements interpretable nonparametric analysis and
              covariate selection for longitudinal data using additive
              Gaussian process regression. Includes specialized non-stationary disease
              effect modeling features for biomedical studies. Bayesian inference for
-             model parameters is performed using Stan.
+             model parameters is performed using Stan. Now more scalable with the
+             option to use basis function approximation of GPs!
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true

@@ -19,7 +19,9 @@ create_stan_input(
   verbose,
   variance_mask,
   N_trials,
-  skip_gen_quant
+  skip_gen_quant,
+  n_basisfun,
+  L_basisfun
 )
 }
 \arguments{
@@ -86,6 +88,13 @@ is binomial. Must have length one or equal to number of data points. Setting
 \code{N_trials=1} corresponds to Bernoulli observation model.}
 
 \item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
+
+\item{n_basisfun}{Number of basis functions. If this is \code{NULL} (default), then
+the basis function approximation is not used and exact GP inference is performed.}
+
+\item{L_basisfun}{Domain size for basis functions. This only has effect if 
+\code{n_basisfun} is not \code{NULL}. If this is is \code{NULL} and \code{n_basisfun} 
+is not \code{NULL}, the domain size is set automatically.}
 }
 \value{
 A list containing the data to be given to \code{rstan::sampling}, some info about

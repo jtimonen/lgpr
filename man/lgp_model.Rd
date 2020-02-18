@@ -23,6 +23,8 @@ lgp_model(
   variance_mask = TRUE,
   N_trials = NULL,
   skip_gen_quant = FALSE,
+  n_basisfun = NULL,
+  L_basisfun = NULL,
   verbose = FALSE
 )
 }
@@ -103,6 +105,13 @@ is binomial. Must have length one or equal to number of data points. Setting
 \code{N_trials=1} corresponds to Bernoulli observation model.}
 
 \item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
+
+\item{n_basisfun}{Number of basis functions. If this is \code{NULL} (default), then
+the basis function approximation is not used and exact GP inference is performed.}
+
+\item{L_basisfun}{Domain size for basis functions. This only has effect if 
+\code{n_basisfun} is not \code{NULL}. If this is is \code{NULL} and \code{n_basisfun} 
+is not \code{NULL}, the domain size is set automatically.}
 
 \item{verbose}{Should more verbose output be printed?}
 }

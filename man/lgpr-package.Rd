@@ -41,6 +41,7 @@ Juho Timonen, Henrik Mannerstrom, Aki Vehtari and Harri Lahdesmaki, 2019.
   Interfacing with 'Stan'}. R package version 2.0.0.
   \item Gabry, J. and Mahr, T. (2019). \emph{bayesplot: Plotting for Bayesian Models}. R package version 1.7.0, http://mc-stan.org/bayesplot.
   \item Stan Development Team (2019). \emph{RStan: the R interface to Stan.} R package version 2.19.2. http://mc-stan.org/.
+  \item Solin, A. and Särkkä, S. (2019). \emph{Hilbert space methods for reduced-rank Gaussian process regression}.  Statistics and Computing 30.
 }
 }
 \author{

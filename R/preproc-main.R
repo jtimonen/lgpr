@@ -24,7 +24,9 @@ create_stan_input <- function(formula,
                               verbose,
                               variance_mask,
                               N_trials,
-                              skip_gen_quant)
+                              skip_gen_quant,
+                              n_basisfun,
+                              L_basisfun)
 {
   
   # Parse likelihood
@@ -63,6 +65,9 @@ create_stan_input <- function(formula,
   N_trials     <- set_N_trials(N_trials, response, LH)
   C_hat        <- set_C_hat(C_hat, response, LH, N_trials)
   
+  # Set basis function info
+  BASIS <- set_basis(n_basisfun, L_basisfun)
+  
   # Check that variable types make sense
   check_varInfo(varInfo)
   
@@ -79,7 +84,9 @@ create_stan_input <- function(formula,
                      USE_VAR_MASK = as.numeric(variance_mask),
                      VERBOSE      = as.numeric(verbose),
                      DELTA        = DELTA,
-                     SKIP_GQ      = as.numeric(skip_gen_quant)
+                     SKIP_GQ      = as.numeric(skip_gen_quant),
+                     M_basis      = BASIS$M,
+                     L_basis      = BASIS$L
   )
   
   # Get some variables related to diseased individuals

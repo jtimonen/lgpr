@@ -420,5 +420,31 @@ set_N_trials <- function(N_trials, response, LH){
 }
 
 
+#' Set basis functions
+#'
+#' @param n_basisfun number of basis functions
+#' @param L_basisfun basis function domain size
+#' @return a list
+set_basis <- function(n_basisfun, L_basisfun){
+  
+  if(is.null(n_basisfun)){
+    if(!is.null(L_basisfun)){
+      stop("basis function approximation not being used!")
+    }
+    n_basisfun <- 0
+    L_basisfun <- 0
+  }else{
+    if(n_basisfun <= 0){
+      stop("Number of basis functions must be a positive integer.")
+    }
+    if(is.null(L_basisfun)){
+      L_basisfun <- 2
+    }
+    stop('basis function approximation not yet implemented!')
+  }
+  out <- list(M = n_basisfun, L = L_basisfun)
+  return(out)
+}
+
 
 
