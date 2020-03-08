@@ -288,9 +288,26 @@ get_response <- function(data, varInfo, standardize, LH){
     }
   }
   
+  # Response as integer and check categories for ordinal model
+  response_int <- round(response)
+  un <- sort(unique(response_int))
+  N_ordinal <- length(un)
+  if(LH==5){
+    is_ok <- all(diff(un) == 1) && (min(un)==1)
+    if(!is_ok){
+      msg <- paste("The ordinal response variable must take all values from the set",
+      "{1, 2, ..., K}, where K is the number of categories.")
+      msg <- paste(msg, "\n - Found values:", paste(un, collapse = ", "))
+      msg <- paste(msg, "\n - Found K:", N_ordinal)
+      stop(msg)
+    }
+  }
+  
   # Return
-  ret <- list(response = response,
-              SCL      = list(fun = sclfun, fun_inv = sclfun_inv) )
+  ret <- list(response     = response,
+              response_int = response_int,
+              N_ordinal    = N_ordinal,
+              SCL          = list(fun = sclfun, fun_inv = sclfun_inv) )
   return(ret)
 }
 
@@ -418,7 +435,4 @@ set_N_trials <- function(N_trials, response, LH){
   }
   return(N_trials)
 }
-
-
-
 

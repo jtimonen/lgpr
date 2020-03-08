@@ -44,9 +44,9 @@ It is recommended to first create this using the function \code{\link{prior_defa
 and then possibly modify it.}
 
 \item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
-(default), \code{"Poisson"}, \code{"NB"} (negative binomial) or \code{"binomial"}. To
-use Bernoulli likelihood, use \code{likelihood="binomial"} and set \code{N_trials} 
-as a vector of ones.}
+(default), \code{"Poisson"}, \code{"NB"} (negative binomial), \code{"binomial"} or
+\code{"ordinal"}. To use Bernoulli likelihood, use \code{likelihood="binomial"} 
+and set \code{N_trials} as a vector of ones.}
 
 \item{varInfo}{Variable type info.}
 

@@ -1,3 +1,23 @@
+#' Get all function components
+#' 
+#' @export
+#' @description Get samples or analytically computed means of all 
+#' function components. Returns a data frame \code{df} of size 
+#' \code{n_samples} \code{ x } \code{n_data} \code{ x } 
+#' \code{n_components+2}, so that 
+#' \itemize{
+#'   \item \code{df[ , , n_components+1]} is the sum of all f_j
+#'   \item \code{df[ , , n_components+2]} is a possible transformation
+#' }
+#' 
+#' @param fit An \code{lgpfit} object.
+#' @return A data frame. See description.
+get_function_components <- function(fit){
+  df  <- as.data.frame(fit@stan_fit)
+  model <- fit@model
+  FFF <- get_function_components_from_df_all(df, model)
+  return(FFF)
+}
 
 #' Get values of function components at data points
 #' @param df A \code{stanfit} object as data frame,
@@ -119,7 +139,7 @@ get_runtime <- function(object){
 get_g_from_f <- function(f, model){
   sdat <- model@stan_dat
   LH   <- sdat$LH
-  if(LH==1 || LH==0){
+  if(LH==1 || LH==0 || LH==5){
     g <- f
   }else if(LH==2 || LH==3){
     g <- exp(f + sdat$C_hat)

@@ -26,6 +26,10 @@ if(F_IS_SAMPLED){
     // 4. Bernoulli or binomial observation model
     real LOGIT_P[n] = to_array_1d(F_ss); // p success (logit-scale)
     target += binomial_logit_lpmf(y_int | N_trials, LOGIT_P);
+  }else if(LH==5){
+    // 5. Ordinal response observation model
+    vector[n] ETA_P = F_ss; // eta param
+    y_int ~ ordered_probit(ETA_P, cut_points[1]);
   }else{
     reject("Unknown observation model!")
   }

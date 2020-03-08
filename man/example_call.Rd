@@ -3,7 +3,7 @@
 \name{example_call}
 \alias{example_call}
 \title{Returns a valid example call of the \code{lgp} function
-witi valid data input}
+with valid data input}
 \usage{
 example_call()
 }
@@ -12,5 +12,5 @@ a string
 }
 \description{
 Returns a valid example call of the \code{lgp} function
-witi valid data input
+with valid data input
 }

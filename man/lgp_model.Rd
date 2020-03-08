@@ -44,9 +44,9 @@ use it in your \code{formula} and \code{offset_vars} instead.}
 \item{data}{A data frame containing the variables given in \code{formula} as columns.}
 
 \item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
-(default), \code{"Poisson"}, \code{"NB"} (negative binomial) or \code{"binomial"}. To
-use Bernoulli likelihood, use \code{likelihood="binomial"} and set \code{N_trials} 
-as a vector of ones.}
+(default), \code{"Poisson"}, \code{"NB"} (negative binomial), \code{"binomial"} or
+\code{"ordinal"}. To use Bernoulli likelihood, use \code{likelihood="binomial"} 
+and set \code{N_trials} as a vector of ones.}
 
 \item{prior}{A named list, defining the prior distribution of model (hyper)parameters.
 It is recommended to first create this using the function \code{\link{prior_default}},

@@ -15,11 +15,9 @@ plot_posterior_components_sub1 <- function(fit, subsamples,
 {
   # Check input correctness
   if(class(fit)!="lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  model <- fit@model
   
   # Create plot
-  df  <- as.data.frame(fit@stan_fit)
-  FFF <- get_function_components_from_df_all(df, model)
+  FFF <- get_function_components(fit)
   ddd <- dim(FFF)[3]
   FFF <- FFF[,,1:(ddd-1)]
   

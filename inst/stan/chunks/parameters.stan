@@ -15,10 +15,11 @@ real<lower=0> ell_continuous[D[4]];
 real<lower=0> ell_categAge[D[5]];
 
 // Miscellaneous
-real<lower=0> warp_steepness[D[3]];     // steepness of input warping
-real<lower=0> sigma_n[LH==1 || LH==0];  // noise std for Gaussian likelihood
-vector[n] ETA[F_IS_SAMPLED, sum_D];     // isotropic versions of F
-real<lower=0> phi[LH==3 || LH==0];      // parameter for NB likelihood
+real<lower=0> warp_steepness[D[3]];       // steepness of input warping
+real<lower=0> sigma_n[LH==1 || LH==0];    // noise std for Gaussian likelihood
+vector[n] ETA[F_IS_SAMPLED, sum_D];       // isotropic versions of F
+real<lower=0> phi[LH==3 || LH==0];        // parameter for NB likelihood
+ordered[N_ordinal-1] cut_points[LH==5];   // cut points in ordinal regression
 
 // Parameters related to diseased individuals
 vector<lower=0,upper=1>[N_cases] beta[HMGNS==0]; 

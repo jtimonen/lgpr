@@ -3,7 +3,7 @@ int<lower=1> N_tot;      // total number of individuals
 int<lower=0> N_cases;    // number of "diseased" individuals
 int<lower=2> d;          // number of covariates (id and age required)
 int<lower=1> n;          // number of observations
-int<lower=0,upper=4> LH; // observation model
+int<lower=0,upper=5> LH; // observation model
 
 // D is an array of six integers, so that
 //   D[1] = binary value indicating if f(id,age) is in model
@@ -21,6 +21,7 @@ int       y_int[n];       // the response variable (as an array of integers)
 int<lower=1> N_trials[n]; // numbers of trials (ones for bernoulli model)
 int<lower=1> N_cat[1+D[5]+D[6]]; // number of categs for each categ. covar.
 vector[n] C_hat;  // GP mean vector (should be zeros when using Gaussian lh)
+int<lower=1> N_ordinal;   // number of categories for ordinal response
 
 // Option switches
 int<lower=0,upper=1> UNCRT;        // are diseaseAge measurements uncertain?

@@ -34,51 +34,6 @@ repvec <- function(v, n){
 }
 
 
-#' Convert the Stan likelihood encoding to a string
-#'
-#' @param LH an integer
-#' @return a string
-likelihood_as_str <- function(LH){
-  if(LH==1 || LH==-1){
-    str <- "Gaussian"
-  }else if(LH==0){
-    str <- "none"
-  }else if(LH==2){
-    str <- "Poisson"
-  }else if(LH==3){
-    str <- "NB"
-  }else if(LH==4){
-    str <- "binomial"
-  }else{
-    str <- "Unknown likelihood"
-  }
-  return(str)
-}
-
-
-#' Convert likelihood string to Stan encoding
-#'
-#' @param likelihood a string
-#' @return an integer
-likelihood_as_int <- function(likelihood){
-  likelihood <- tolower(likelihood)
-  if(likelihood=="none"){
-    LH <- 0
-  }else if(likelihood=="gaussian"){
-    LH <- 1
-  }else if(likelihood=="poisson"){
-    LH <- 2
-  }else if(likelihood=="nb"){
-    LH <- 3
-  }else if(likelihood=="binomial"){
-    LH <- 4
-  }else{
-    stop("likelihood must be either 'none', 'Gaussian', 'Poisson', 'binomial', or 'NB'!")
-  }
-  return(LH)
-}
-
-
 #' Get names of model components
 #'
 #' @param stan_dat The data that was passed to \code{rstan::sampling}
@@ -319,22 +274,25 @@ PRED_to_arrays <- function(PRED){
 #' @param t time points
 #' @param iter number of iterations
 #' @param chains number of chains
+#' @param ... other possible arguments to \code{\link{lgp}}
 #' @return an object of class \code{\link{lgpfit}}
-create_example_fit <- function(N = 4, 
-                               t = 10*c(1,2,3,4,5),
-                               iter = 100,
-                               chains = 1){
+example_fit <- function(N = 4, 
+                        t = 10*c(1,2,3,4,5),
+                        iter = 100,
+                        chains = 1, 
+                        ...){
   fit <- lgp(formula = y ~ id + age, 
              data    = simulate_data(N = 4, t)$data, 
              iter    = iter,
              chains  = chains, 
              refresh = 0,
-             verbose = FALSE)
+             verbose = FALSE,
+             ...)
   return(fit)
 }
 
 #' Returns a valid example call of the \code{lgp} function
-#' witi valid data input
+#' with valid data input
 #' 
 #' @export
 #' @return a string
@@ -408,4 +366,17 @@ add_diseaseAges <- function(data, t_init, id_var="id", time_var="age"){
   }
   data$diseaseAge <-dage
   return(data)
+}
+
+#' Get samples of cutpoints for ordinal model
+#' 
+#' @export
+#' @param fit An \code{lgpfit} object
+#' @return A data frame.
+get_cutpoints <- function(fit){
+  LH <- fit@model@stan_dat$LH
+  if(LH!=5){ stop("cut points exist only for ordinal models (LH=5)") }
+  ext <- rstan::extract(fit@stan_fit, pars="cut_points")
+  samples <- ext$cut_points[,1,]
+  return(samples)
 }

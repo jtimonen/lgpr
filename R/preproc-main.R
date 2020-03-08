@@ -39,8 +39,10 @@ create_stan_input <- function(formula,
   check_formula(formula, data)
   
   # Get the (scaled) response variable
-  RESP       <- get_response(data, varInfo, standardize, LH)
-  response   <- RESP$response
+  RESP         <- get_response(data, varInfo, standardize, LH)
+  response     <- RESP$response
+  response_int <- RESP$response_int
+  N_ordinal    <- RESP$N_ordinal
   
   # Resolve covariate types
   TYP      <- check_data(data, varInfo, verbose)
@@ -70,7 +72,8 @@ create_stan_input <- function(formula,
   stan_dat   <- list(X            = t(X),
                      X_notnan     = X_notnan,
                      y            = response,
-                     y_int        = round(response),
+                     y_int        = response_int,
+                     N_ordinal    = N_ordinal,
                      LH           = LH,
                      N_trials     = N_trials,
                      N_cat        = N_cat,
