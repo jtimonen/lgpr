@@ -32,17 +32,16 @@ if(F_IS_SAMPLED){
 
 }else{
   // F NOT SAMPLED
-  matrix[n,n] Ky;
-  matrix[n,n] Ly;
-  matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
-  matrix[n,n] KX[sum_D] = STAN_kernels(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta);
-  if(LH!=1){
-    reject("Likelihood must be Gaussian if F is not sampled!")
+  if(M_basis<=0){
+    // Exact inference
+    matrix[n,n] Ky;
+    matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
+    matrix[n,n] KX[sum_D] = STAN_kernels(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta);
+    for(j in 1:sum_D){ Kx += KX[j];}
+    Ky = Kx + diag_matrix(rep_vector(square(sigma_n[1]), n));
+    target += multi_normal_lpdf(y | C_hat, Ky);
+  }else{
+    // Approximate inference
+    reject("Not implemented!");
   }
-  for(j in 1:sum_D){
-    Kx += KX[j];
-  }
-  Ky = Kx + diag_matrix(rep_vector(square(sigma_n[1]), n));
-  Ly = cholesky_decompose(Ky);
-  y ~ multi_normal_cholesky(C_hat, Ly);
 }
