@@ -223,9 +223,9 @@ STAN_spd_eq(const T0__& w,
         (void) B;  // dummy to suppress unused var warning
         stan::math::initialize(B, DUMMY_VAR__);
         stan::math::fill(B, DUMMY_VAR__);
-        stan::math::assign(B,((-(2) * pow(stan::math::pi(), 2)) * pow(ell, 2)));
+        stan::math::assign(B,((2 * pow(stan::math::pi(), 2)) * pow(ell, 2)));
         current_statement_begin__ = 50;
-        return stan::math::promote_scalar<fun_return_scalar_t__>((A * stan::math::exp((B * pow(w, 2)))));
+        return stan::math::promote_scalar<fun_return_scalar_t__>((A * stan::math::exp((-(B) * pow(w, 2)))));
         }
     } catch (const std::exception& e) {
         stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -612,11 +612,11 @@ struct STAN_K_beta_functor__ {
 };
 template <typename T0__>
 std::vector<Eigen::Matrix<typename boost::math::tools::promote_args<T0__>::type, Eigen::Dynamic, Eigen::Dynamic> >
-STAN_compute_fixed_kernel_matrices(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, 1> >& X,
-                                       const std::vector<int>& X_nn,
-                                       const std::vector<int>& D,
-                                       const int& N_tot,
-                                       const std::vector<int>& N_cat, std::ostream* pstream__) {
+STAN_kernels_fixed(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, 1> >& X,
+                       const std::vector<int>& X_nn,
+                       const std::vector<int>& D,
+                       const int& N_tot,
+                       const std::vector<int>& N_cat, std::ostream* pstream__) {
     typedef typename boost::math::tools::promote_args<T0__>::type local_scalar_t__;
     typedef local_scalar_t__ fun_return_scalar_t__;
     const static bool propto__ = true;
@@ -695,44 +695,44 @@ STAN_compute_fixed_kernel_matrices(const std::vector<Eigen::Matrix<T0__, Eigen::
         throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
     }
 }
-struct STAN_compute_fixed_kernel_matrices_functor__ {
+struct STAN_kernels_fixed_functor__ {
     template <typename T0__>
         std::vector<Eigen::Matrix<typename boost::math::tools::promote_args<T0__>::type, Eigen::Dynamic, Eigen::Dynamic> >
     operator()(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, 1> >& X,
-                                       const std::vector<int>& X_nn,
-                                       const std::vector<int>& D,
-                                       const int& N_tot,
-                                       const std::vector<int>& N_cat, std::ostream* pstream__) const {
-        return STAN_compute_fixed_kernel_matrices(X, X_nn, D, N_tot, N_cat, pstream__);
+                       const std::vector<int>& X_nn,
+                       const std::vector<int>& D,
+                       const int& N_tot,
+                       const std::vector<int>& N_cat, std::ostream* pstream__) const {
+        return STAN_kernels_fixed(X, X_nn, D, N_tot, N_cat, pstream__);
     }
 };
 template <typename T0__, typename T4__, typename T5__, typename T6__, typename T11__, typename T12__, typename T13__, typename T14__, typename T15__, typename T16__, typename T17__, typename T18__, typename T19__, typename T20__, typename T21__, typename T22__, typename T23__, typename T24__>
 std::vector<Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T4__, T5__, T6__, typename boost::math::tools::promote_args<T11__, T12__, T13__, T14__, typename boost::math::tools::promote_args<T15__, T16__, T17__, T18__, typename boost::math::tools::promote_args<T19__, T20__, T21__, T22__, typename boost::math::tools::promote_args<T23__, T24__>::type>::type>::type>::type>::type, Eigen::Dynamic, Eigen::Dynamic> >
-STAN_compute_kernel_matrices(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, 1> >& X,
-                                 const std::vector<std::vector<int> >& caseID_to_rows,
-                                 const std::vector<int>& row_to_caseID_plus1,
-                                 const std::vector<int>& caseID_nrows,
-                                 const std::vector<Eigen::Matrix<T4__, Eigen::Dynamic, Eigen::Dynamic> >& KF,
-                                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_effect,
-                                 const Eigen::Matrix<T6__, Eigen::Dynamic, 1>& T_observed,
-                                 const std::vector<int>& D,
-                                 const int& UNCRT,
-                                 const int& HMGNS,
-                                 const int& USE_VAR_MASK,
-                                 const std::vector<T11__>& vm_params,
-                                 const std::vector<T12__>& alpha_idAge,
-                                 const std::vector<T13__>& alpha_sharedAge,
-                                 const std::vector<T14__>& alpha_diseaseAge,
-                                 const std::vector<T15__>& alpha_continuous,
-                                 const std::vector<T16__>& alpha_categAge,
-                                 const std::vector<T17__>& alpha_categOffset,
-                                 const std::vector<T18__>& ell_idAge,
-                                 const std::vector<T19__>& ell_sharedAge,
-                                 const std::vector<T20__>& ell_diseaseAge,
-                                 const std::vector<T21__>& ell_continuous,
-                                 const std::vector<T22__>& ell_categAge,
-                                 const std::vector<T23__>& warp_steepness,
-                                 const std::vector<Eigen::Matrix<T24__, Eigen::Dynamic, 1> >& beta, std::ostream* pstream__) {
+STAN_kernels(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, 1> >& X,
+                 const std::vector<std::vector<int> >& caseID_to_rows,
+                 const std::vector<int>& row_to_caseID_plus1,
+                 const std::vector<int>& caseID_nrows,
+                 const std::vector<Eigen::Matrix<T4__, Eigen::Dynamic, Eigen::Dynamic> >& KF,
+                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_effect,
+                 const Eigen::Matrix<T6__, Eigen::Dynamic, 1>& T_observed,
+                 const std::vector<int>& D,
+                 const int& UNCRT,
+                 const int& HMGNS,
+                 const int& USE_VAR_MASK,
+                 const std::vector<T11__>& vm_params,
+                 const std::vector<T12__>& alpha_idAge,
+                 const std::vector<T13__>& alpha_sharedAge,
+                 const std::vector<T14__>& alpha_diseaseAge,
+                 const std::vector<T15__>& alpha_continuous,
+                 const std::vector<T16__>& alpha_categAge,
+                 const std::vector<T17__>& alpha_categOffset,
+                 const std::vector<T18__>& ell_idAge,
+                 const std::vector<T19__>& ell_sharedAge,
+                 const std::vector<T20__>& ell_diseaseAge,
+                 const std::vector<T21__>& ell_continuous,
+                 const std::vector<T22__>& ell_categAge,
+                 const std::vector<T23__>& warp_steepness,
+                 const std::vector<Eigen::Matrix<T24__, Eigen::Dynamic, 1> >& beta, std::ostream* pstream__) {
     typedef typename boost::math::tools::promote_args<T0__, T4__, T5__, T6__, typename boost::math::tools::promote_args<T11__, T12__, T13__, T14__, typename boost::math::tools::promote_args<T15__, T16__, T17__, T18__, typename boost::math::tools::promote_args<T19__, T20__, T21__, T22__, typename boost::math::tools::promote_args<T23__, T24__>::type>::type>::type>::type>::type local_scalar_t__;
     typedef local_scalar_t__ fun_return_scalar_t__;
     const static bool propto__ = true;
@@ -974,35 +974,35 @@ STAN_compute_kernel_matrices(const std::vector<Eigen::Matrix<T0__, Eigen::Dynami
         throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
     }
 }
-struct STAN_compute_kernel_matrices_functor__ {
+struct STAN_kernels_functor__ {
     template <typename T0__, typename T4__, typename T5__, typename T6__, typename T11__, typename T12__, typename T13__, typename T14__, typename T15__, typename T16__, typename T17__, typename T18__, typename T19__, typename T20__, typename T21__, typename T22__, typename T23__, typename T24__>
         std::vector<Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T4__, T5__, T6__, typename boost::math::tools::promote_args<T11__, T12__, T13__, T14__, typename boost::math::tools::promote_args<T15__, T16__, T17__, T18__, typename boost::math::tools::promote_args<T19__, T20__, T21__, T22__, typename boost::math::tools::promote_args<T23__, T24__>::type>::type>::type>::type>::type, Eigen::Dynamic, Eigen::Dynamic> >
     operator()(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, 1> >& X,
-                                 const std::vector<std::vector<int> >& caseID_to_rows,
-                                 const std::vector<int>& row_to_caseID_plus1,
-                                 const std::vector<int>& caseID_nrows,
-                                 const std::vector<Eigen::Matrix<T4__, Eigen::Dynamic, Eigen::Dynamic> >& KF,
-                                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_effect,
-                                 const Eigen::Matrix<T6__, Eigen::Dynamic, 1>& T_observed,
-                                 const std::vector<int>& D,
-                                 const int& UNCRT,
-                                 const int& HMGNS,
-                                 const int& USE_VAR_MASK,
-                                 const std::vector<T11__>& vm_params,
-                                 const std::vector<T12__>& alpha_idAge,
-                                 const std::vector<T13__>& alpha_sharedAge,
-                                 const std::vector<T14__>& alpha_diseaseAge,
-                                 const std::vector<T15__>& alpha_continuous,
-                                 const std::vector<T16__>& alpha_categAge,
-                                 const std::vector<T17__>& alpha_categOffset,
-                                 const std::vector<T18__>& ell_idAge,
-                                 const std::vector<T19__>& ell_sharedAge,
-                                 const std::vector<T20__>& ell_diseaseAge,
-                                 const std::vector<T21__>& ell_continuous,
-                                 const std::vector<T22__>& ell_categAge,
-                                 const std::vector<T23__>& warp_steepness,
-                                 const std::vector<Eigen::Matrix<T24__, Eigen::Dynamic, 1> >& beta, std::ostream* pstream__) const {
-        return STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID_plus1, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__);
+                 const std::vector<std::vector<int> >& caseID_to_rows,
+                 const std::vector<int>& row_to_caseID_plus1,
+                 const std::vector<int>& caseID_nrows,
+                 const std::vector<Eigen::Matrix<T4__, Eigen::Dynamic, Eigen::Dynamic> >& KF,
+                 const std::vector<Eigen::Matrix<T5__, Eigen::Dynamic, 1> >& T_effect,
+                 const Eigen::Matrix<T6__, Eigen::Dynamic, 1>& T_observed,
+                 const std::vector<int>& D,
+                 const int& UNCRT,
+                 const int& HMGNS,
+                 const int& USE_VAR_MASK,
+                 const std::vector<T11__>& vm_params,
+                 const std::vector<T12__>& alpha_idAge,
+                 const std::vector<T13__>& alpha_sharedAge,
+                 const std::vector<T14__>& alpha_diseaseAge,
+                 const std::vector<T15__>& alpha_continuous,
+                 const std::vector<T16__>& alpha_categAge,
+                 const std::vector<T17__>& alpha_categOffset,
+                 const std::vector<T18__>& ell_idAge,
+                 const std::vector<T19__>& ell_sharedAge,
+                 const std::vector<T20__>& ell_diseaseAge,
+                 const std::vector<T21__>& ell_continuous,
+                 const std::vector<T22__>& ell_categAge,
+                 const std::vector<T23__>& warp_steepness,
+                 const std::vector<Eigen::Matrix<T24__, Eigen::Dynamic, 1> >& beta, std::ostream* pstream__) const {
+        return STAN_kernels(X, caseID_to_rows, row_to_caseID_plus1, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__);
     }
 };
 template <typename T0__, typename T2__>
@@ -1778,7 +1778,7 @@ public:
             validate_non_negative_index("KF", "nf", nf);
             KF = std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >(nf, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(n, n));
             stan::math::fill(KF, DUMMY_VAR__);
-            stan::math::assign(KF,STAN_compute_fixed_kernel_matrices(X, X_notnan, D, N_tot, N_cat, pstream__));
+            stan::math::assign(KF,STAN_kernels_fixed(X, X_notnan, D, N_tot, N_cat, pstream__));
             current_statement_begin__ = 355;
             DO_GEN_QUANT = int(0);
             stan::math::fill(DO_GEN_QUANT, std::numeric_limits<int>::min());
@@ -2546,7 +2546,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
-                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                stan::math::assign(KX,STAN_kernels(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                 current_statement_begin__ = 419;
                 for (int r = 1; r <= sum_D; ++r) {
                     {
@@ -2809,7 +2809,7 @@ public:
                     std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                     stan::math::initialize(KX, DUMMY_VAR__);
                     stan::math::fill(KX, DUMMY_VAR__);
-                    stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                    stan::math::assign(KX,STAN_kernels(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                     current_statement_begin__ = 541;
                     if (as_bool(logical_neq(LH, 1))) {
                         current_statement_begin__ = 542;
@@ -3201,7 +3201,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
-                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                stan::math::assign(KX,STAN_kernels(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                 current_statement_begin__ = 419;
                 for (int r = 1; r <= sum_D; ++r) {
                     {
@@ -3321,7 +3321,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>  > KX(sum_D, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>(n, n));
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
-                stan::math::assign(KX,STAN_compute_kernel_matrices(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
+                stan::math::assign(KX,STAN_kernels(X, caseID_to_rows, row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS, USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge, alpha_diseaseAge, alpha_continuous, alpha_categAge, alpha_categOffset, ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge, warp_steepness, beta, pstream__));
                 current_statement_begin__ = 570;
                 for (int j = 1; j <= sum_D; ++j) {
                     current_statement_begin__ = 571;

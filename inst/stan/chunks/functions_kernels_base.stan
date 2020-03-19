@@ -25,8 +25,8 @@ real STAN_lambda(int m, real L){
 // SPECTRAL DENSITY OF EQ KERNEL
 real STAN_spd_eq(real w, real alpha, real ell){
   real A = alpha^2*ell*sqrt(2*pi());
-  real B = -2*pi()^2*ell^2;
-  return(A*exp(B*w^2));
+  real B = 2*pi()^2*ell^2;
+  return(A*exp(-B*w^2));
 }
 
 // COMPUTE X_TILDE

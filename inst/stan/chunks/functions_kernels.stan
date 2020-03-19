@@ -1,5 +1,5 @@
 // COMPUTE FIXED KERNEL MATRICES (do not depend on parameters)
-matrix[] STAN_compute_fixed_kernel_matrices(vector[] X, int[] X_nn, int[] D, int N_tot, int[] N_cat)
+matrix[] STAN_kernels_fixed(vector[] X, int[] X_nn, int[] D, int N_tot, int[] N_cat)
 {
   int n = num_elements(X[1]);
   int nf = 1 + D[3] + D[5] + D[6];
@@ -20,7 +20,7 @@ matrix[] STAN_compute_fixed_kernel_matrices(vector[] X, int[] X_nn, int[] D, int
 }
 
 // COMPUTE ALL KERNEL MATRICES
-matrix[] STAN_compute_kernel_matrices(vector[] X, int[,] caseID_to_rows, int[] row_to_caseID_plus1, int[] caseID_nrows, matrix[] KF, vector[] T_effect, vector T_observed, int[] D, int UNCRT, int HMGNS, int USE_VAR_MASK, real[] vm_params, real[] alpha_idAge, real[] alpha_sharedAge, real[] alpha_diseaseAge, real[] alpha_continuous, real[] alpha_categAge, real[] alpha_categOffset, real[] ell_idAge, real[] ell_sharedAge, real[] ell_diseaseAge, real[] ell_continuous, real[] ell_categAge, real[] warp_steepness, vector[] beta){
+matrix[] STAN_kernels(vector[] X, int[,] caseID_to_rows, int[] row_to_caseID_plus1, int[] caseID_nrows, matrix[] KF, vector[] T_effect, vector T_observed, int[] D, int UNCRT, int HMGNS, int USE_VAR_MASK, real[] vm_params, real[] alpha_idAge, real[] alpha_sharedAge, real[] alpha_diseaseAge, real[] alpha_continuous, real[] alpha_categAge, real[] alpha_categOffset, real[] ell_idAge, real[] ell_sharedAge, real[] ell_diseaseAge, real[] ell_continuous, real[] ell_categAge, real[] warp_steepness, vector[] beta){
     
   int n = num_elements(X[1]);
   real x_age[n] = to_array_1d(X[2]);   // age covariate as an array
