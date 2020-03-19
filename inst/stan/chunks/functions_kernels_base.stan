@@ -9,6 +9,26 @@ vector STAN_var_mask(vector x, real a){
   return( inv(1+exp(-a*x)) );
 }
 
+// BASIS FUNCTION
+vector STAN_phi(vector x, int m, real L){
+  real A = 1/(sqrt(L));
+  real B = pi()*m/(2*L);
+  return(A*sin(B*(x-L)));
+}
+
+// EIGENVALUE
+real STAN_lambda(int m, real L){
+  real A = pi()*m/(2*L);
+  return(A^2);
+}
+
+// SPECTRAL DENSITY OF EQ KERNEL
+real STAN_spd_eq(real w, real alpha, real ell){
+  real A = alpha^2*ell*sqrt(2*pi());
+  real B = -2*pi()^2*ell^2;
+  return(A*exp(B*w^2));
+}
+
 // COMPUTE X_TILDE
 vector STAN_get_x_tilde(vector x_disAge, vector T_effect, vector T_observed, int[,] mapping, int[] lengths){
   int n_tot = num_elements(x_disAge);
