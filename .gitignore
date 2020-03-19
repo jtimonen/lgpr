@@ -7,6 +7,7 @@ src/*.o
 src/*.so
 src/*.dll
 src/*.exe
+src/*.tmp
 src/stan_functions
 inst/doc
 *.exe
