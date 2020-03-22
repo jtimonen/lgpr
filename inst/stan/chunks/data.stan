@@ -66,11 +66,7 @@ int<lower=0,upper=M_max>    caseID_nrows[N_cases];
 vector[N_cases] T_observed;   // observed disease effect times
 vector[N_cases] L_ons[UNCRT]; // low bounds for disease effect times
 vector[N_cases] U_ons[UNCRT]; // upper bounds for disease effect times
-
-// Inputs related to possible basis function approximation
-real<lower=0> L_basis; // domain size
-int<lower=0> M_basis; // #{basis functions} (0 = approximation not used)
-
+  
 // Other
 real DELTA;         // jitter to ensure pos. def. kernel matrices
 real vm_params[2];  // variance mask parameters

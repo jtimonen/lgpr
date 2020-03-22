@@ -21,7 +21,6 @@
 functions{
 #include chunks/functions_kernels_base.stan
 #include chunks/functions_kernels.stan
-#include chunks/functions_bf.stan
 #include chunks/functions_log_prior.stan
 }
 
