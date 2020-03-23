@@ -35,15 +35,6 @@ for(j in 1:D[6]){
   target += STAN_log_prior(alpha_categOffset[j], t_OFS[j,1:2], p_OFS[j,1:3]);
 }
 
-// Noise level parameters
-if(LH==1){
-  target += STAN_log_prior(sigma_n[1], t_SIG[1:2], p_SIG[1:3]);
-}else if(LH==3){
-  target += STAN_log_prior(phi[1], t_PHI[1:2], p_PHI[1:3]);
-}else if(LH==0){
-  target += STAN_log_prior(sigma_n[1], t_SIG[1:2], p_SIG[1:3]);
-  target += STAN_log_prior(phi[1], t_PHI[1:2], p_PHI[1:3]);
-}
 
 // DiseaseAge uncertainty prior
 if(UNCRT){
@@ -61,13 +52,4 @@ if(UNCRT){
 }
 
 // Heterogeneous disease effect parameters
-if(HMGNS==0){
-  target += beta_lpdf(beta[1] | p_BET[1], p_BET[2]);
-}
-
-// Isotropic normals for auxiliary variables when F is sampled
-if(F_IS_SAMPLED){
-  for(j in 1:sum_D){
-    target += normal_lpdf(ETA[1,j] | 0, 1);
-  }
-}
+if(HMGNS==0){ target += beta_lpdf(beta[1] | p_BET[1], p_BET[2]); }
