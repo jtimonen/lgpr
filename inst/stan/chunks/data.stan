@@ -25,9 +25,10 @@ int<lower=0,upper=1> VERBOSE;      // is model info printed?
 int<lower=0,upper=1> USE_VAR_MASK; // is variance mask kernel used?
 int<lower=0,upper=1> UNCRT;        // are diseaseAge measurements uncertain?
 int<lower=0,upper=1> HMGNS;        // is diseaseAge effect is homogenous?
-int<lower=0,upper=1> SKIP_GQ;      // skip the generated quantities block?
 int<lower=0,upper=1> BACKWARDS;    // is prior of effect time "backwards"?
 int<lower=0,upper=1> RELATIVE;     // is prior of effect time rel. to obs. one?
+int<lower=0,upper=1> SKIP_LH;      // skip likelihood evaluation?
+int<lower=0,upper=1> SKIP_GQ;      // skip the generated quantities block?
 
 // Prior types and transforms
 int t_ID[D[1],4];         // for id*age component
@@ -51,7 +52,7 @@ real p_ONS[N_cases, 3];    // for onset, if uncertain
 // Inputs related to mapping from row index to case index and back
 int<lower=0,upper=n>        M_max;
 int<lower=0>                caseID_to_rows[N_cases, M_max];
-int<lower=0,upper=N_cases>  row_to_caseID[n];
+int<lower=0,upper=N_cases>  row_to_caseID_plus1[n];
 int<lower=0,upper=M_max>    caseID_nrows[N_cases];
 
 // Inputs related to uncertain disease onset

@@ -257,12 +257,14 @@ get_pkg_description <- function(){
 }
 
 
-#' Get main stan model of the package
+#' Get one of the stan models of the package
 #'
 #' @export
+#' @param idx model index (default = 1)
 #' @return an object of class stanmodel
-get_stan_model <- function(){
-  return(stanmodels[["lgp"]])
+get_stan_model <- function(idx=1){
+  model_name <- paste0("model", idx)
+  return(stanmodels[[model_name]])
 }
 
 

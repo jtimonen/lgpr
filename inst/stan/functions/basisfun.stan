@@ -1,4 +1,3 @@
-
 // BASIS FUNCTION
 vector STAN_phi(vector x, int m, real L){
   real A = 1.0/(sqrt(L));

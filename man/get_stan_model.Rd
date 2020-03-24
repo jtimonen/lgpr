@@ -2,13 +2,16 @@
 % Please edit documentation in R/misc-utils.R
 \name{get_stan_model}
 \alias{get_stan_model}
-\title{Get main stan model of the package}
+\title{Get one of the stan models of the package}
 \usage{
-get_stan_model()
+get_stan_model(idx = 1)
+}
+\arguments{
+\item{idx}{model index (default = 1)}
 }
 \value{
 an object of class stanmodel
 }
 \description{
-Get main stan model of the package
+Get one of the stan models of the package
 }

@@ -1,4 +1,3 @@
-
 // Kernel hyperparameters for idAge component
 if(D[1]==1){
   target += STAN_log_prior(alpha_idAge[1], t_ID[1,1:2], p_ID[1,1:3]);
@@ -34,7 +33,6 @@ for(j in 1:D[5]){
 for(j in 1:D[6]){
   target += STAN_log_prior(alpha_categOffset[j], t_OFS[j,1:2], p_OFS[j,1:3]);
 }
-
 
 // DiseaseAge uncertainty prior
 if(UNCRT){
