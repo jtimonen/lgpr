@@ -96,7 +96,13 @@ simulate_data <- function(N,
   
   # Total signal f is a (scaled) sum of the components plus a constant
   f <- rowSums(FFF)
-  f <- sqrt(f_var)/stats::sd(f) * f
+  SD <- stats::sd(f)
+  if(SD > 0 ){
+    f <- sqrt(f_var)/SD * f
+  }else{
+    # if the sum of components is zero, define total signal as just noise
+    f <- rnorm(n=length(f))
+  }
   f <- f + C_hat
   
   # Generate noise

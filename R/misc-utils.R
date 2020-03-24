@@ -311,7 +311,6 @@ PRED_to_arrays <- function(PRED){
   return(list(MMM=MMM,SSS=SSS))
 }
 
-
 #' Create an example fit object
 #' 
 #' @export
@@ -319,17 +318,19 @@ PRED_to_arrays <- function(PRED){
 #' @param t time points
 #' @param iter number of iterations
 #' @param chains number of chains
+#' @param ... other arguments to the \code{\link{lgp}} call
 #' @return an object of class \code{\link{lgpfit}}
-create_example_fit <- function(N = 4, 
-                               t = 10*c(1,2,3,4,5),
-                               iter = 100,
-                               chains = 1){
+example_fit <- function(N = 4, 
+                        t = 10*c(1,2,3,4,5),
+                        iter = 100,
+                        chains = 1,
+                        ...){
   fit <- lgp(formula = y ~ id + age, 
              data    = simulate_data(N = 4, t)$data, 
              iter    = iter,
              chains  = chains, 
              refresh = 0,
-             verbose = FALSE)
+             ...)
   return(fit)
 }
 
@@ -341,15 +342,14 @@ create_example_fit <- function(N = 4,
 example_call <- function(){
   code <- "
   fit <- lgp(formula = y ~ id + age, 
-             data    = simulate_data(N = 4, t_data=10*c(1,2,3,4,5))$data, 
-             iter    = 100,
-             chains  = 1, 
-             refresh = 0,
-             verbose = FALSE)
+  data    = simulate_data(N = 4, t_data=10*c(1,2,3,4,5))$data, 
+  iter    = 100,
+  chains  = 1, 
+  refresh = 0,
+  verbose = FALSE)
   "
   return(code)
 }
-
 
 #' Easily add a categorical covariate to a data frame
 #' 
