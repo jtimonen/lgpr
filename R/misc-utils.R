@@ -264,7 +264,11 @@ get_pkg_description <- function(){
 #' @return an object of class stanmodel
 get_stan_model <- function(idx=1){
   model_name <- paste0("model", idx)
-  return(stanmodels[[model_name]])
+  sm <- stanmodels[[model_name]]
+  if(is.null(sm)){
+    stop("model '", model_name, "' not found!")
+  }
+  return(sm)
 }
 
 
@@ -412,4 +416,24 @@ add_diseaseAges <- function(data, t_init, id_var="id", time_var="age"){
   }
   data$diseaseAge <-dage
   return(data)
+}
+
+
+#' Choose the correct stan model based on given options
+#' 
+#' @param info model info list
+#' @return an object of class \code{stanmodel}
+choose_stan_model <- function(info){
+  A <- info$sample_F
+  B <- info$use_approx
+  if(!A && !B){
+    stan_model <- get_stan_model(idx=1)
+  }else if(A && !B){
+    stan_model <- get_stan_model(idx=2)
+  }else if(!A && B){
+    stan_model <- get_stan_model(idx=3)
+  }else{
+    stop("cannot currently use basis function approximation when f is sampled")
+  }
+  return(stan_model)
 }

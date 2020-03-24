@@ -15,6 +15,8 @@ An S4 class to represent an lgp model
 
 \item{\code{stan_dat}}{The data to be given as input to \code{rstan::sampling}.}
 
+\item{\code{stan_model}}{An instance of S4 class \code{\link{stanmodel}}.}
+
 \item{\code{scalings}}{Preprocessing scaling functions and their inverse operations.}
 
 \item{\code{info}}{Model info.}

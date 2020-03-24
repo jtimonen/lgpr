@@ -85,6 +85,7 @@ create_stan_input <- function(formula,
                      VERBOSE      = as.numeric(verbose),
                      DELTA        = DELTA,
                      SKIP_GQ      = as.numeric(skip_gen_quant),
+                     SKIP_LH      = as.numeric(FALSE),
                      M_basis      = BASIS$M,
                      L_basis      = BASIS$L
   )

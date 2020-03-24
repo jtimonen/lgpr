@@ -21,7 +21,7 @@ get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time, equal_effec
     N_cases        = length(MAPS$caseID_nrows),
     caseID_to_rows = MAPS$caseID_to_rows,
     caseID_nrows   = MAPS$caseID_nrows,
-    row_to_caseID  = MAPS$row_to_caseID,
+    row_to_caseID_plus1 = MAPS$row_to_caseID,
     M_max          = M_max,
     T_observed     = ONS$t_obs,
     T_last         = ONS$t_last

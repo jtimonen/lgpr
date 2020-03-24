@@ -231,14 +231,21 @@ lgp_model <- function(formula,
                covariate_names = lgp_covariate_names(stan_dat),
                response_name   = fc[2],
                variance_mask   = variance_mask,
-               N_trials        = N_trials)
+               N_trials        = N_trials,
+               use_approx      = !is.null(n_basisfun))
+  
+  # Get the correct stan model
+  print(info)
+  stan_model <- choose_stan_model(info)
+  
   
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",
-             data     = data,
-             stan_dat = stan_dat,
-             scalings = PREPROC$scalings,
-             info     = info
+             data       = data,
+             stan_dat   = stan_dat,
+             stan_model = stan_model,
+             scalings   = PREPROC$scalings,
+             info       = info
   )
   return(out)
 }
@@ -285,7 +292,7 @@ lgp_fit <- function(model,
   
   # Run stan
   stan_dat  <- model@stan_dat
-  stan_fit  <- rstan::sampling(object = stanmodels[["lgp"]], data = stan_dat, ...)
+  stan_fit  <- rstan::sampling(object = model@stan_model, data = stan_dat, ...)
   
   # Initialize the 'lgpfit' object
   ver <- " "

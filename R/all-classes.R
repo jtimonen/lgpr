@@ -3,6 +3,7 @@
 #'
 #' @slot data The original unmodified data frame.
 #' @slot stan_dat The data to be given as input to \code{rstan::sampling}.
+#' @slot stan_model An instance of S4 class \code{\link{stanmodel}}.
 #' @slot scalings Preprocessing scaling functions and their inverse operations.
 #' @slot info Model info.
 #'
@@ -12,10 +13,11 @@ lgpmodel <- setClass(
   
   # Define the slots
   slots = c(
-    data     = "data.frame",
-    stan_dat = "list",
-    scalings = "list",
-    info     = "list"
+    data       = "data.frame",
+    stan_dat   = "list",
+    stan_model = "stanmodel",
+    scalings   = "list",
+    info       = "list"
   )
 )
 
