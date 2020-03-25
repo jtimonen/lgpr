@@ -25,6 +25,7 @@ create_stan_input <- function(formula,
                               variance_mask,
                               N_trials,
                               skip_gen_quant,
+                              skip_likelihood,
                               n_basisfun,
                               L_basisfun)
 {
@@ -85,7 +86,7 @@ create_stan_input <- function(formula,
                      VERBOSE      = as.numeric(verbose),
                      DELTA        = DELTA,
                      SKIP_GQ      = as.numeric(skip_gen_quant),
-                     SKIP_LH      = as.numeric(FALSE),
+                     SKIP_LH      = as.numeric(skip_likelihood),
                      M_basis      = BASIS$M,
                      L_basis      = BASIS$L
   )

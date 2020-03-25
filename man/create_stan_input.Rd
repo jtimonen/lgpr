@@ -20,6 +20,7 @@ create_stan_input(
   variance_mask,
   N_trials,
   skip_gen_quant,
+  skip_likelihood,
   n_basisfun,
   L_basisfun
 )
@@ -88,6 +89,8 @@ is binomial. Must have length one or equal to number of data points. Setting
 \code{N_trials=1} corresponds to Bernoulli observation model.}
 
 \item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
+
+\item{skip_likelihood}{If this is true, likelihood evaluation in Stan is skipped.}
 
 \item{n_basisfun}{Number of basis functions. If this is \code{NULL} (default), then
 the basis function approximation is not used and exact GP inference is performed.}

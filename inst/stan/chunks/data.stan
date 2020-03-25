@@ -14,8 +14,6 @@ int<lower=1> n;         // #{observations}
 vector[n] X[d];         // covariates, X[j] is the jth covariate
 int       X_notnan[n];  // X_notnan[i] tells if X_diseaseAge[i] isn't NaN
 vector[n] y;            // the response variable (as a vector of reals)
-int       y_int[n];     // the response variable (as an array of integers)
-vector[n] C_hat;        // GP mean vector (should be zeros when using Gaussian lh)
 
 // #{categs} for each categorical covariate
 int<lower=1> N_cat[1+D[5]+D[6]]; 

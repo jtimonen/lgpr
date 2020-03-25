@@ -22,6 +22,7 @@ lgp(
   sample_F = NULL,
   parallel = FALSE,
   skip_postproc = FALSE,
+  skip_likelihood = FALSE,
   threshold = 0.95,
   variance_mask = TRUE,
   N_trials = NULL,
@@ -106,6 +107,8 @@ If \code{TRUE}, then Stan is run by first defining
 \code{options(mc.cores = } \code{parallel::detectCores())}.}
 
 \item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
+
+\item{skip_likelihood}{If this is true, likelihood evaluation in Stan is skipped.}
 
 \item{threshold}{Component selection threshold for relevance sum.}
 

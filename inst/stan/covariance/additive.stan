@@ -1,4 +1,3 @@
-matrix[n,n] KX[sum_D];
 {
   int ix;
   int ikf;

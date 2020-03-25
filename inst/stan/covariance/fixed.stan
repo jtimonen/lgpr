@@ -1,5 +1,3 @@
-int nf = 1 + D[3] + D[5] + D[6];
-matrix[n,n] KF[nf];
 {
   int ix;
   KF[1] = STAN_K_zerosum(X[1], X[1], N_cat[1]);

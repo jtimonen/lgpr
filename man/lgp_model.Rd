@@ -23,6 +23,7 @@ lgp_model(
   variance_mask = TRUE,
   N_trials = NULL,
   skip_gen_quant = FALSE,
+  skip_likelihood = FALSE,
   n_basisfun = NULL,
   L_basisfun = NULL,
   verbose = FALSE
@@ -105,6 +106,8 @@ is binomial. Must have length one or equal to number of data points. Setting
 \code{N_trials=1} corresponds to Bernoulli observation model.}
 
 \item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
+
+\item{skip_likelihood}{If this is true, likelihood evaluation in Stan is skipped.}
 
 \item{n_basisfun}{Number of basis functions. If this is \code{NULL} (default), then
 the basis function approximation is not used and exact GP inference is performed.}

@@ -113,9 +113,9 @@ test_that("lgp can sample from prior", {
                       t_data = 10*c(1,2,3,4,5), covariates = c(2))$data,
         iter    = 100,
         chains  = 1, 
-        refresh = 0, skip_postproc = TRUE, likelihood = "none")@diagnostics)
+        refresh = 0, skip_postproc = TRUE, skip_likelihood = TRUE)@diagnostics)
   }),
-  c(9,3)
+  c(8,3)
   )
 })
 

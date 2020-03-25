@@ -18,6 +18,8 @@ transformed data{
   vector[n] mu = rep_vector(0.0, n);
   real x_age[n] = to_array_1d(X[2]);
   int sum_D = sum(D);
+  int nf = 1 + D[3] + D[5] + D[6];
+  matrix[n,n] KF[nf];
 #include covariance/fixed.stan
 #include chunks/info.stan
 }
@@ -32,13 +34,13 @@ transformed parameters{
 }
 
 model{
-  matrix[n,n] Ky = diag_matrix(rep_vector(DELTA + square(sigma_n), n));
   target += STAN_log_prior(sigma_n, t_SIG, p_SIG);
 #include chunks/priors.stan
   if(SKIP_LH==0){
+    matrix[n,n] KX[sum_D];
+    matrix[n,n] Ky = diag_matrix(rep_vector(DELTA + square(sigma_n), n));
 #include covariance/additive.stan
-    for(j in 1:sum_D){ Ky += KX[j];}
-    target += multi_normal_lpdf(y | mu, Ky);
+#include likelihood/marginalized.stan
   }
 }
 
@@ -53,6 +55,7 @@ generated quantities{
     matrix[n,n] Ky;
     matrix[n,n] Ly;
     matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
+    matrix[n,n] KX[sum_D];
 #include covariance/additive.stan
     for(j in 1:sum_D){Kx += KX[j];}
     Ky = Kx + diag_matrix(rep_vector(square(sigma_n), n));

@@ -35,6 +35,7 @@ lgp <- function(formula,
                 sample_F         = NULL,
                 parallel         = FALSE,
                 skip_postproc    = FALSE,
+                skip_likelihood  = FALSE,
                 threshold        = 0.95,
                 variance_mask    = TRUE,
                 N_trials         = NULL,
@@ -63,6 +64,7 @@ lgp <- function(formula,
                      variance_mask    = variance_mask,
                      N_trials         = N_trials,
                      skip_gen_quant   = skip_postproc,
+                     skip_likelihood  = skip_likelihood,
                      n_basisfun       = n_basisfun,
                      L_basisfun       = L_basisfun,
                      verbose          = verbose)
@@ -146,6 +148,7 @@ lgp <- function(formula,
 #' is binomial. Must have length one or equal to number of data points. Setting 
 #' \code{N_trials=1} corresponds to Bernoulli observation model.
 #' @param skip_gen_quant If this is true, the generated quantities block of Stan is skipped.
+#' @param skip_likelihood If this is true, likelihood evaluation in Stan is skipped.
 #' @param n_basisfun Number of basis functions. If this is \code{NULL} (default), then
 #' the basis function approximation is not used and exact GP inference is performed.
 #' @param L_basisfun Domain size for basis functions. This only has effect if 
@@ -172,6 +175,7 @@ lgp_model <- function(formula,
                       variance_mask    = TRUE,
                       N_trials         = NULL,
                       skip_gen_quant   = FALSE,
+                      skip_likelihood  = FALSE,
                       n_basisfun       = NULL,
                       L_basisfun       = NULL,
                       verbose          = FALSE
@@ -213,6 +217,7 @@ lgp_model <- function(formula,
                                variance_mask  = variance_mask,
                                N_trials       = N_trials,
                                skip_gen_quant = skip_gen_quant,
+                               skip_likelihood= skip_likelihood,
                                n_basisfun     = n_basisfun,
                                L_basisfun     = L_basisfun)
   
@@ -235,7 +240,6 @@ lgp_model <- function(formula,
                use_approx      = !is.null(n_basisfun))
   
   # Get the correct stan model
-  print(info)
   stan_model <- choose_stan_model(info)
   
   

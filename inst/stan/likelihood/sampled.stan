@@ -1,9 +1,3 @@
-// Compute total signal + offset c_hat
-vector[n] F_ss = C_hat;
-for (i in 1:n){
-  F_ss[i] += sum(F[1,,i]);
-}
-
 // Compute likelihood
 if(LH==1){
   // 1. Gaussian observation model
