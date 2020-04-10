@@ -96,7 +96,15 @@ lgp <- function(formula,
 #' to model the effect of \code{id_variable} as a constant offset,
 #' you can create another covariate with the same values and
 #' use it in your \code{formula} and \code{offset_vars} instead.
-#' @param data A data frame containing the variables given in \code{formula} as columns.
+#' @param data A data frame containing the variables given in \code{formula} as columns. NOTE:
+#' disease effect modeling can currently be ensured to work correctly only if 
+#' \itemize{
+#'   \item All data columns are in numeric format (especially \code{id_variable})
+#'   \item Rows are sorted so that the values of \code{id_variable} are increasing
+#'   \item The \code{id_variable} values belong in the integer set \code{{1, ..., N}}, 
+#'   where \code{N} is the total number of individuals.
+#' }
+#' Note that you need to indicate missing values of \code{disAge_variable} with \code{NaN}.
 #' @param likelihood Determines the observation model. Must be either \code{"Gaussian"} 
 #' (default), \code{"Poisson"}, \code{"NB"} (negative binomial) or \code{"binomial"}. To
 #' use Bernoulli likelihood, use \code{likelihood="binomial"} and set \code{N_trials} 
@@ -127,6 +135,7 @@ lgp <- function(formula,
 #' @param time_variable Name of the time variable (default = \code{"age"}).
 #' @param disAge_variable Name of the disease-related age variable. If \code{NULL},
 #' this will be chosen to be \code{"diseaseAge"}, if such covariate is found in the data.
+#' You need to indicate missing values of \code{disAge_variable} with \code{NaN} in \code{data}.
 #' @param continuous_vars Names of other continuous covariates. If \code{NULL}, the
 #' remaining covariates that have floating point values are interpreted as continuous.
 #' @param categorical_vars Names of categorical covariates that interact with the time 
@@ -239,16 +248,16 @@ lgp_model <- function(formula,
 #' @param model An object of class \code{lgpmodel}.
 #' @param ... Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
 #' \code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.
-#' @param parallel Determines if the chain will be run in parallel (\code{default = FALSE}).
-#' If \code{TRUE}, then Stan is run by first defining 
-#' \code{options(mc.cores = } \code{parallel::detectCores())}.
+#' @param parallel This argument has been deprecated and throws and error if \code{TRUE}. 
+#' Use the \code{cores} argument of \code{rstan::sampling} instead.
 #' @param skip_postproc In this mode the postprocessing after running Stan is skipped.
 #' @param threshold Component selection threshold for relevance sum.
 #' @param relevance_method Component relevance determination method. 
 #' Must be either \code{"f_mean"} or \code{"alpha"}.
 #' @param verbose should some output be printed?
+#' @param ... Additional arguments that are passed to \code{rstan::sampling}.
 #' @return An object of class \code{lgpfit}.
-#' @seealso For the possible additional arguments, see \code{\link[rstan]{sampling}}.
+#' @seealso For all possible additional arguments (\code{...}), see \code{?rstan::sampling}.
 #' For creating the \code{lgpmodel} input, see \code{\link{lgp_model}}.
 #'
 lgp_fit <- function(model, 
@@ -265,9 +274,8 @@ lgp_fit <- function(model,
   
   # Check if parallelization should be used
   if(parallel){
-    options(mc.cores = parallel::detectCores())
-  }else{
-    options(mc.cores = 1)
+    stop("The 'parallel' argument has been deprecated. Use the 'cores' argument instead. See",
+         ' ?rstan::sampling for help.')
   }
   
   # Run stan

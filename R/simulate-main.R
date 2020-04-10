@@ -101,7 +101,7 @@ simulate_data <- function(N,
     f <- sqrt(f_var)/SD * f
   }else{
     # if the sum of components is zero, define total signal as just noise
-    f <- rnorm(n=length(f))
+    f <- stats::rnorm(n=length(f))
   }
   f <- f + C_hat
   

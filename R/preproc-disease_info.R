@@ -10,6 +10,7 @@
 #' @return a list
 get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time, equal_effect, TSCL){
   X_id   <- X[, 1]
+  test_id_variable(X_id)
   M_max  <- max(table(X_id))
   MAPS   <- get_case_row_mappings(X_notnan, X_id)
   ONS    <- get_onset_info(D, X, MAPS, TSCL)
@@ -29,6 +30,23 @@ get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time, equal_effec
   return(ret)
 }
 
+#' Test that the id variable is correctly specified to allow disease effect modeling
+#'
+#' @param X_id the id covariate in X
+#' @return a list
+test_id_variable <- function(X_id){
+  if(!is.numeric(X_id)){ stop("id_variable must be numeric (integers)!") }
+  if(is.unsorted(X_id)){ stop("Values of id_variable must be increasing integers!") }
+  m <- min(X_id)
+  if(m != 1){ stop("smallest value of id_variable must be 1!")}
+  M <- max(X_id)
+  uid <- unique(X_id)
+  N <- length(uid)
+  if(M != N){ 
+    stop("id_variable should take values from the set ", 
+         paste0("{1, 2, ..., N}, where N is the number of unique individuals (", N, ")"))
+  }
+}
 
 #' Create case ID to rows and back mappings
 #'
@@ -49,6 +67,7 @@ get_case_row_mappings <- function(X_notnan, X_id, only_R2C = FALSE){
   N_cases <- sum(is_case)
   inn     <- which(X_notnan==1)
   tab     <- table(X_id[inn])
+  
   nrows   <- as.numeric(tab)
   M_max   <- max(table(X_id))
   

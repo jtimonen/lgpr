@@ -19,9 +19,8 @@ lgp_fit(
 
 \item{threshold}{Component selection threshold for relevance sum.}
 
-\item{parallel}{Determines if the chain will be run in parallel (\code{default = FALSE}).
-If \code{TRUE}, then Stan is run by first defining 
-\code{options(mc.cores = } \code{parallel::detectCores())}.}
+\item{parallel}{This argument has been deprecated and throws and error if \code{TRUE}. 
+Use the \code{cores} argument of \code{rstan::sampling} instead.}
 
 \item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
 
@@ -30,8 +29,7 @@ Must be either \code{"f_mean"} or \code{"alpha"}.}
 
 \item{verbose}{should some output be printed?}
 
-\item{...}{Optional arguments passed to \code{rstan::sampling}, for example \code{iter},
-\code{chains} or \code{control}. See \code{\link[rstan]{sampling}} for the possible arguments.}
+\item{...}{Additional arguments that are passed to \code{rstan::sampling}.}
 }
 \value{
 An object of class \code{lgpfit}.
@@ -41,6 +39,6 @@ Samples the posterior of an additive Gaussian process regression model
 using \code{\link{rstan}}.
 }
 \seealso{
-For the possible additional arguments, see \code{\link[rstan]{sampling}}.
+For all possible additional arguments (\code{...}), see \code{?rstan::sampling}.
 For creating the \code{lgpmodel} input, see \code{\link{lgp_model}}.
 }

@@ -12,7 +12,7 @@ test_that("lgp runs", {
                   iter    = 100,
                   chains  = 1, 
                   refresh = 0,
-                  verbose = TRUE,
+                  verbose = FALSE,
                   relevance_method = 'alpha')@model@stan_dat$D)
   }),
   c(1,1,0,0,0,0)
@@ -25,6 +25,7 @@ test_that("lgp runs", {
                                           covariates = c(2))$data,
                   iter    = 100,
                   chains  = 1, 
+                  verbose = FALSE,
                   refresh = 0)@model@stan_dat$D)
     }),
     c(1,1,0,0,1,0)
@@ -42,6 +43,7 @@ test_that("lgp runs without id*age component", {
                   chains  = 1,
                   time_variable = "age",
                   id_variable = "id",
+                  verbose = FALSE,
                   refresh = 0)@model@stan_dat$D)
     }),
     c(0,1,0,0,1,0)
@@ -57,6 +59,7 @@ test_that("lgp runs without age*id component but with shared age", {
                                           covariates = c(2))$data,
                   iter    = 100,
                   chains  = 1,
+                  verbose = FALSE,
                   refresh = 0)@model@stan_dat$D)
     }),
     c(0,1,0,0,1,0)
@@ -75,6 +78,7 @@ test_that("lgp can sample F", {
                   iter    = 100,
                   chains  = 1,
                   refresh = 0,
+                  verbose = FALSE,
                   offset_vars = c("offset"),
                   sample_F = T)@model@stan_dat$D)
     }),
@@ -95,6 +99,7 @@ test_that(paste0("lgp can be used without the vm kernel",
                   iter    = 100,
                   chains  = 1,
                   refresh = 0,
+                  verbose = FALSE,
                   offset_vars = c("group"),
                   equal_effect = FALSE,
                   uncertain_effect_time = TRUE,
@@ -127,6 +132,7 @@ test_that("lgp can be run using Poisson observation model", {
                   likelihood = 'Poisson',
                   iter    = 60,
                   chains  = 1,
+                  verbose = FALSE,
                   refresh = 0)@relevances$samples)
   }), c(30,3))
   
@@ -143,6 +149,7 @@ test_that("lgp can be run using NB observation model", {
                likelihood = 'NB',
                iter    = 60,
                chains  = 1,
+               verbose = FALSE,
                refresh = 0)@relevances$samples)
   }), c(30, 3) )
   
@@ -159,6 +166,7 @@ test_that("lgp can be run using binomial observation model", {
                N_trials = 20,
                iter    = 60,
                chains  = 1,
+               verbose = FALSE,
                refresh = 0)@relevances$samples)
   }), c(30,3) )
   

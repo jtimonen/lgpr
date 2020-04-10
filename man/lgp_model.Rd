@@ -41,7 +41,15 @@ to model the effect of \code{id_variable} as a constant offset,
 you can create another covariate with the same values and
 use it in your \code{formula} and \code{offset_vars} instead.}
 
-\item{data}{A data frame containing the variables given in \code{formula} as columns.}
+\item{data}{A data frame containing the variables given in \code{formula} as columns. NOTE:
+disease effect modeling can currently be ensured to work correctly only if 
+\itemize{
+  \item All data columns are in numeric format (especially \code{id_variable})
+  \item Rows are sorted so that the values of \code{id_variable} are increasing
+  \item The \code{id_variable} values belong in the integer set \code{{1, ..., N}}, 
+  where \code{N} is the total number of individuals.
+}
+Note that you need to indicate missing values of \code{disAge_variable} with \code{NaN}.}
 
 \item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
 (default), \code{"Poisson"}, \code{"NB"} (negative binomial) or \code{"binomial"}. To
@@ -81,7 +89,8 @@ likelihood is not \code{"Gaussian"}).}
 \item{time_variable}{Name of the time variable (default = \code{"age"}).}
 
 \item{disAge_variable}{Name of the disease-related age variable. If \code{NULL},
-this will be chosen to be \code{"diseaseAge"}, if such covariate is found in the data.}
+this will be chosen to be \code{"diseaseAge"}, if such covariate is found in the data.
+You need to indicate missing values of \code{disAge_variable} with \code{NaN} in \code{data}.}
 
 \item{continuous_vars}{Names of other continuous covariates. If \code{NULL}, the
 remaining covariates that have floating point values are interpreted as continuous.}

@@ -37,7 +37,15 @@ to model the effect of \code{id_variable} as a constant offset,
 you can create another covariate with the same values and
 use it in your \code{formula} and \code{offset_vars} instead.}
 
-\item{data}{A data frame containing the variables given in \code{formula} as columns.}
+\item{data}{A data frame containing the variables given in \code{formula} as columns. NOTE:
+disease effect modeling can currently be ensured to work correctly only if 
+\itemize{
+  \item All data columns are in numeric format (especially \code{id_variable})
+  \item Rows are sorted so that the values of \code{id_variable} are increasing
+  \item The \code{id_variable} values belong in the integer set \code{{1, ..., N}}, 
+  where \code{N} is the total number of individuals.
+}
+Note that you need to indicate missing values of \code{disAge_variable} with \code{NaN}.}
 
 \item{prior}{A named list, defining the prior distribution of model (hyper)parameters.
 It is recommended to first create this using the function \code{\link{prior_default}},
