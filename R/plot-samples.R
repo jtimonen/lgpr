@@ -141,8 +141,10 @@ plot_beta <- function(fit,
                       color_scheme = "red",
                       threshold = 0.5) {
   if (class(fit) != "lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  ptitle <- paste0("Posterior distribution of individual-specific ",
-                   "disease effect magnitudes")
+  ptitle <- paste0(
+    "Posterior distribution of individual-specific ",
+    "disease effect magnitudes"
+  )
   aff <- affected(fit, threshold = threshold)
   df <- as.data.frame(fit@stan_fit)
   ibeta <- grep("beta", names(df))
@@ -154,7 +156,9 @@ plot_beta <- function(fit,
   p <- p + ggplot2::xlab(expression(beta))
 
   str <- paste("Affected individuals: ",
-               paste(names(which(aff)), collapse = ", "), sep = "")
+    paste(names(which(aff)), collapse = ", "),
+    sep = ""
+  )
   p <- p + ggplot2::labs(
     subtitle = str,
     title = ptitle

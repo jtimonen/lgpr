@@ -77,8 +77,10 @@ check_data <- function(data, varInfo, verbose) {
       davar <- "diseaseAge"
       idx3 <- which(cols == davar)
       if (verbose) {
-        msg <- paste0("* Interpreting 'diseaseAge' as the ",
-                      "disease-related age variable.\n")
+        msg <- paste0(
+          "* Interpreting 'diseaseAge' as the ",
+          "disease-related age variable.\n"
+        )
         cat(msg)
       }
     } else {
@@ -87,8 +89,10 @@ check_data <- function(data, varInfo, verbose) {
   } else {
     idx3 <- which(cols == davar)
     if (length(idx3) == 0) {
-      stop("The given disease-related age variable ", davar,
-           " not found in the data!")
+      stop(
+        "The given disease-related age variable ", davar,
+        " not found in the data!"
+      )
     }
   }
   types[idx3] <- 3
@@ -193,8 +197,10 @@ stan_input_X_and_D <- function(data, varInfo, types, formula, verbose) {
 
   if (D[2] == 0) {
     if (D[1] != 0) {
-      stop("cannot model id effect as time-dependent ",
-           "if the time variable is not in model!")
+      stop(
+        "cannot model id effect as time-dependent ",
+        "if the time variable is not in model!"
+      )
     }
     if (D[5] != 0) {
       stop(
@@ -282,8 +288,10 @@ get_response <- function(data, varInfo, standardize, LH) {
   lh_not_01 <- !(LH %in% c(0, 1))
   if (standardize) {
     if (lh_not_01) {
-      stop("Standardization of response is only possible if ",
-           "likelihood is 'Gaussian' or 'none'!")
+      stop(
+        "Standardization of response is only possible if ",
+        "likelihood is 'Gaussian' or 'none'!"
+      )
     }
   }
 
@@ -310,16 +318,20 @@ get_response <- function(data, varInfo, standardize, LH) {
   # Check the response for negative values or non-integer values
   if (lh_not_01) {
     if (sum(response < 0) > 0) {
-      msg <- paste0("The response variable contains negative values. ",
-                    "Only the likelihoods 'Gaussian' and 'none' are allowed ",
-                    "in such case!\n")
+      msg <- paste0(
+        "The response variable contains negative values. ",
+        "Only the likelihoods 'Gaussian' and 'none' are allowed ",
+        "in such case!\n"
+      )
       stop(msg)
     }
     notint <- sum(response - round(response))
     if (notint > 0) {
-      msg <- paste0("The response variable contains non-integer values. ",
-                    "Only the likelihoods 'Gaussian' and 'none' are allowed ",
-                    "in such case!\n")
+      msg <- paste0(
+        "The response variable contains non-integer values. ",
+        "Only the likelihoods 'Gaussian' and 'none' are allowed ",
+        "in such case!\n"
+      )
       stop(msg)
     }
   }

@@ -94,8 +94,10 @@ create_X <- function(N,
         onsets[j] <- onset_range()
       }
     } else {
-      onsets <- stats::runif(N_cases, min = onset_range[1],
-                             max = onset_range[2])
+      onsets <- stats::runif(N_cases,
+        min = onset_range[1],
+        max = onset_range[2]
+      )
     }
     onsets <- c(onsets, rep(NaN, N - N_cases))
     disAge <- onsetsToDiseaseAge(onsets, age, k)
@@ -107,8 +109,10 @@ create_X <- function(N,
 
   # Other
   if (D[2] > 0) {
-    CONT <- drawContinuous(N, k, D[2],
-                           continuous_info$mu, continuous_info$lambda)
+    CONT <- drawContinuous(
+      N, k, D[2],
+      continuous_info$mu, continuous_info$lambda
+    )
     cont <- CONT$C
     par_cont <- list(A = CONT$A, B = CONT$B, OFS = CONT$OFS)
   } else {

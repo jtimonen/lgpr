@@ -142,7 +142,8 @@ plot_data_hl_cat <- function(data,
   p <- p + ggplot2::geom_line(ggplot2::aes_string(color = "Z1"), size = lwd)
   if (psize > 0) {
     p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"),
-                                 size = psize)
+      size = psize
+    )
   }
   return(p)
 }
@@ -184,7 +185,8 @@ plot_data_hl_cont <- function(data,
   p <- p + colgrad + ggplot2::labs(colour = highlight)
   if (psize > 0) {
     p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"),
-                                 size = psize)
+      size = psize
+    )
   }
   return(p)
 }

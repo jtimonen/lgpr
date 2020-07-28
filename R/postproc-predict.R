@@ -270,8 +270,10 @@ compute_predictions <- function(X_data, y_data, X_test,
   uid2 <- unique(X_test[, 1])
   extra <- setdiff(uid2, uid1)
   if (length(extra) > 0) {
-    msg <- paste0("The test data contains individuals that are not ",
-                  "in the training data! {")
+    msg <- paste0(
+      "The test data contains individuals that are not ",
+      "in the training data! {"
+    )
     msg <- paste(msg, paste(extra, collapse = ", "), "}", sep = "")
     if (handle_extra == "warning") {
       warning(msg)

@@ -39,10 +39,14 @@ prior_default <- function(sigma_alpha = 1) {
   # prior_sig <-
   # list(type = "log-normal", mu = 0, sigma = 1, transform = "square")
   # list(type = "inv-gamma", shape = 1/2, scale = 0.01/2, transform = "square")
-  prior_sig <- list(type = "inv-gamma", shape = 2, scale = 1,
-                    transform = "square")
-  prior_phi <- list(type = "log-normal", mu = 1, sigma = 1,
-                    transform = "square")
+  prior_sig <- list(
+    type = "inv-gamma", shape = 2, scale = 1,
+    transform = "square"
+  )
+  prior_phi <- list(
+    type = "log-normal", mu = 1, sigma = 1,
+    transform = "square"
+  )
   prior_bet <- list(shape1 = 0.2, shape2 = 0.2)
 
   # Uncertain disease onset
@@ -77,8 +81,10 @@ prior_LonGP <- function() {
   # Edit some parts of the default prior
   ln <- list(type = "log-normal", mu = 0, sigma = (log(1) - log(0.1)) / 2)
   t4 <- list(type = "student-t", mu = 0, sigma = 1, nu = 4)
-  ig <- list(type = "inv-gamma", shape = 1 / 2, scale = 0.01 / 2,
-             transform = "square")
+  ig <- list(
+    type = "inv-gamma", shape = 1 / 2, scale = 0.01 / 2,
+    transform = "square"
+  )
 
   prior$lengthscale <- list(
     idAge = t4,
@@ -125,8 +131,10 @@ prior_stan_to_readable <- function(stan_dat) {
   info <- " ---------- PRIOR SPECIFICATIONS ----------\n"
 
   D <- stan_dat$D
-  dist <- c("Uniform", "Normal", "Student-t", "Gamma", "Inverse-Gamma",
-            "Log-Normal", "Beta")
+  dist <- c(
+    "Uniform", "Normal", "Student-t", "Gamma", "Inverse-Gamma",
+    "Log-Normal", "Beta"
+  )
 
   info_mag <- ""
   info_ls <- ""
@@ -327,10 +335,13 @@ prior_statement <- function(parname, TYP, P, dist, row_change = TRUE) {
   # Get prior statement
   if (TYP[1] %in% c(2, 4, 5, 6, 7)) {
     str <- paste(parname, " ~ ", dist[TYP[1]], "(", P[1], ",", P[2], ")",
-                 sep = "")
+      sep = ""
+    )
   } else if (TYP[1] == 3) {
     str <- paste(parname, " ~ ", dist[TYP[1]], "(nu=", P[1], ",", "mu=0", ",",
-                 "sigma=", P[2], ")", sep = "")
+      "sigma=", P[2], ")",
+      sep = ""
+    )
   } else {
     str <- paste(parname, " ~ ", dist[TYP[1]], sep = "")
   }

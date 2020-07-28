@@ -88,7 +88,9 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
   i_train <- setdiff(1:n_total, i_test)
   data_train <- data[i_train, ]
   data_test <- data[i_test, ]
-  ret <- list(train = data_train, test = data_test,
-              i_train = i_train, i_test = i_test)
+  ret <- list(
+    train = data_train, test = data_test,
+    i_train = i_train, i_test = i_test
+  )
   return(ret)
 }

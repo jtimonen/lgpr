@@ -59,7 +59,6 @@ selection_prob <- function(object,
   rel_smp <- as.matrix(object@relevances$samples)
 
   # Set variables
-  info <- object@model@info
   H <- seq(0, 1, by = h)
   L <- length(H)
   P <- rep(0, L)

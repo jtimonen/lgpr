@@ -186,8 +186,10 @@ plot_posterior_predictions <- function(fit,
   if (error_bar) {
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var))
   } else {
-    h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var,
-                                                group = group_var))
+    h <- ggplot2::ggplot(DF, ggplot2::aes_string(
+      x = timevar, y = y_var,
+      group = group_var
+    ))
   }
 
   # Edit plot title
@@ -409,9 +411,11 @@ plot_predictions_add_onsets <- function(fit, h,
   if (D[3] == 1 && plot_obs_onset) {
     df <- model@data
     davar <- model@info$varInfo$disAge_variable
-    t_ons <- get_obs_onset_times(id = df[[idvar]],
-                                 age = df[[timevar]],
-                                 disAge = df[[davar]])
+    t_ons <- get_obs_onset_times(
+      id = df[[idvar]],
+      age = df[[timevar]],
+      disAge = df[[davar]]
+    )
     vline.data <- data.frame(zzz = t_ons, facet_var = names(t_ons))
 
 
@@ -422,8 +426,10 @@ plot_predictions_add_onsets <- function(fit, h,
       if (l1 != l2) {
         stop("invalid length of reference_times (", l1, "), must be ", l2)
       }
-      refline.data <- data.frame(zzz = reference_times,
-                                 facet_var = names(t_ons))
+      refline.data <- data.frame(
+        zzz = reference_times,
+        facet_var = names(t_ons)
+      )
       h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"),
         na.rm = TRUE,
         data = refline.data,

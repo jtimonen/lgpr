@@ -52,9 +52,11 @@ test_id_variable <- function(X_id) {
   N <- length(uid)
   if (M != N) {
     stop(
-      paste0("id_variable should take values from the set ",
-             "{1, 2, ..., N}, where N is the number of ",
-             "unique individuals (", N, ")")
+      paste0(
+        "id_variable should take values from the set ",
+        "{1, 2, ..., N}, where N is the number of ",
+        "unique individuals (", N, ")"
+      )
     )
   }
 }
@@ -128,7 +130,6 @@ get_case_row_mappings <- function(X_notnan, X_id, only_R2C = FALSE) {
 #' @param TSCL time scaling function and its inverse
 #' @return two vectors of length \code{N_cases}
 get_onset_info <- function(D, X, MAPS, TSCL) {
-  X_id <- X[, 1]
   M <- MAPS$caseID_nrows
   C2R <- MAPS$caseID_to_rows
   if (D[3] == 0) {

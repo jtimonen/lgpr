@@ -102,8 +102,10 @@ plot_invgamma <- function(alpha, beta, by = 0.01, max = 1.5,
     subtitle = msg
   )
   if (return_quantiles) {
-    out <- list(plot = p1, lower = q1, upper = q2,
-                mean = beta / (alpha - 1), IQR = IQR)
+    out <- list(
+      plot = p1, lower = q1, upper = q2,
+      mean = beta / (alpha - 1), IQR = IQR
+    )
   } else {
     out <- p1
   }

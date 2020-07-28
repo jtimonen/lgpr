@@ -25,12 +25,15 @@ test_that("variance masking function works similarly in Stan and R", {
 })
 
 test_that("STAN_get_x_tilde works properly", {
-  x_disAge <- c(-24, -12, 0, 12, -24, -12, 0, 12,
-                0, 0, 0, 0, 0, -12, 0, 12, 16)
+  x_disAge <- c(
+    -24, -12, 0, 12, -24, -12, 0, 12,
+    0, 0, 0, 0, 0, -12, 0, 12, 16
+  )
   T_effect <- c(-1, 2, 10)
   T_observed <- c(0, 6, 12)
   mapping <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17),
-                    ncol = 4, nrow = 3, byrow = TRUE)
+    ncol = 4, nrow = 3, byrow = TRUE
+  )
   map <- list(mapping[1, ], mapping[2, ], mapping[3, ])
   lengths <- c(4, 4, 4)
   expected <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)

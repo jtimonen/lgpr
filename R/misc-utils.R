@@ -154,7 +154,8 @@ model_info <- function(object, print = TRUE) {
 
   # Model formula and likelihood
   str <- paste("  Model:\n    f = ", paste(info$component_names,
-                                           collapse = " + "), sep = "")
+    collapse = " + "
+  ), sep = "")
   LH <- object@stan_dat$LH
   LH_str <- likelihood_as_str(LH)
   yvar <- info$varInfo$response_variable
@@ -175,19 +176,26 @@ model_info <- function(object, print = TRUE) {
   str <- paste(str, "    - Time variable: ", t2, "\n", sep = "")
   if (!is.null(t3)) {
     str <- paste(str, "    - Disease-related age variable: ", t3, "\n",
-                 sep = "")
+      sep = ""
+    )
   }
   if (!is.null(t4)) {
     str <- paste(str, "    - Other continuous variables: ",
-                 paste(t4, collapse = ", "), "\n", sep = "")
+      paste(t4, collapse = ", "), "\n",
+      sep = ""
+    )
   }
   if (!is.null(t5)) {
     str <- paste(str, "    - Other categorical variables: ",
-                 paste(t5, collapse = ", "), "\n", sep = "")
+      paste(t5, collapse = ", "), "\n",
+      sep = ""
+    )
   }
   if (!is.null(t6)) {
     str <- paste(str, "    - Group offset variables: ",
-                 paste(t6, collapse = ", "), "\n", sep = "")
+      paste(t6, collapse = ", "), "\n",
+      sep = ""
+    )
   }
 
   # Print info

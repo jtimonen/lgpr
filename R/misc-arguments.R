@@ -2,7 +2,7 @@
 #'
 #' @description Replacement for the \code{base} R function \code{match.arg}.
 #' Gives more informative errors and requires exact match. Should only be used
-#'as a subroutine of other functions and never directly.
+#' as a subroutine of other functions and never directly.
 #'
 #' @param arg The given argument. Cannot be a list.
 #' @param allowed Allowed arguments. Must be have length at least 2.
@@ -32,14 +32,18 @@ argument_check <- function(arg, allowed) {
   idx <- which(allowed == arg)
   L <- length(idx)
   if (L == 0) {
-    msg <- paste0(msg, "The given argument <", arg_name, "=", arg,
-                  "> is invalid. Allowed values are {")
+    msg <- paste0(
+      msg, "The given argument <", arg_name, "=", arg,
+      "> is invalid. Allowed values are {"
+    )
     opts <- paste0(allowed, collapse = ", ")
     msg <- paste0(msg, opts, "}.")
     stop(msg)
   } else if (L > 1) {
-    msg <- paste0(msg, "The given argument <", arg_name, "=", arg,
-                  "> matches multiple allowed values!")
+    msg <- paste0(
+      msg, "The given argument <", arg_name, "=", arg,
+      "> matches multiple allowed values!"
+    )
     stop(msg)
   }
 

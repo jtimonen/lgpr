@@ -360,7 +360,9 @@ sim_data_to_observed <- function(dat, t_observed) {
 #' @param n number of samples
 #' @return an integer from the interval 1...n
 rtgeom <- function(s, p, n = 1) {
-  r <- sample.int(n = s, size = n, prob = p ^ (0:(s - 1)), replace = TRUE)
+  s_seq <- 0:(s - 1)
+  prob <- p^s_seq
+  r <- sample.int(n = s, size = n, prob = prob, replace = TRUE)
   return(r)
 }
 

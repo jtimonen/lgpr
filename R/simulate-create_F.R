@@ -86,7 +86,8 @@ create_F <- function(X,
   }
 
   FFF <- scaleRelevances(FFF, relevances,
-                         force_zeromean = force_zeromean, i_skip)
+    force_zeromean = force_zeromean, i_skip
+  )
   colnames(FFF) <- labs
   ret <- list(FFF = data.frame(FFF), KKK = KK)
   return(ret)
@@ -184,7 +185,6 @@ simulate_kernels <- function(X,
 #' @return a vector of component names
 nameComponents <- function(types, names) {
   d <- length(types)
-  iAge <- which(types == 1)
   componentNames <- rep("foo", d)
   for (j in 1:d) {
     if (types[j] == 1) {

@@ -50,7 +50,8 @@ plot_simdata <- function(simData,
 
   # Create ggplot object
   h <- ggplot2::ggplot(data = DF, ggplot2::aes_string(
-    x = "age", y = "yval", group = "leg"))
+    x = "age", y = "yval", group = "leg"
+  ))
   subt <- paste(n, " data points, ", N, " individuals", sep = "")
 
   # Faceting
