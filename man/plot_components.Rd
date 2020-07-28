@@ -73,7 +73,7 @@ plot_components(
 \item{viridis_option}{the option argument of \code{ggplot2::scale_colour_viridis_c}
 by colour in the sum plot}
 
-\item{return_list}{should this return a list of ggplot objects 
+\item{return_list}{should this return a list of ggplot objects
 instead of doing ggarrange}
 }
 \value{

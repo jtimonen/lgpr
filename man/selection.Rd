@@ -9,7 +9,7 @@ selection(object, threshold = 0.95)
 \arguments{
 \item{object}{An object of class \code{lgpfit}.}
 
-\item{threshold}{Threshold for relevance sum. 
+\item{threshold}{Threshold for relevance sum.
 Must be a value between 0 and 1.}
 }
 \value{

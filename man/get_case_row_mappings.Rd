@@ -17,7 +17,7 @@ get_case_row_mappings(X_notnan, X_id, only_R2C = FALSE)
 a list
 }
 \description{
-Create mappings 
+Create mappings
 \itemize{
   \item from case ID to data rows (caseID_to_rows, caseID_nrows)
   \item  from row number to case ID (row_to_caseID)

@@ -6,7 +6,7 @@
 \alias{lgpr}
 \title{The 'lgpr' package.}
 \description{
-Longitudinal Gaussian Process regression. 
+Longitudinal Gaussian Process regression.
 The package features
 \itemize{
   \item Additive Gaussian process modeling of longitudinal data
@@ -20,7 +20,7 @@ The package features
 \section{Basic usage}{
 
 \itemize{
-\item See the main function \code{\link{lgp}} for creating and fitting additive 
+\item See the main function \code{\link{lgp}} for creating and fitting additive
  longitudinal GP models.
  \item See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}
 }

@@ -7,7 +7,7 @@
 selection_prob_fixed_threshold(relevances, threshold)
 }
 \arguments{
-\item{relevances}{The \code{relevances$samples} slot of an 
+\item{relevances}{The \code{relevances$samples} slot of an
 \code{lgpfit} object.}
 
 \item{threshold}{value between 0 and 1}

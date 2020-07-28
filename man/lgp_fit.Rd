@@ -19,12 +19,13 @@ lgp_fit(
 
 \item{threshold}{Component selection threshold for relevance sum.}
 
-\item{parallel}{This argument has been deprecated and throws and error if \code{TRUE}. 
-Use the \code{cores} argument of \code{rstan::sampling} instead.}
+\item{parallel}{This argument has been deprecated and throws and error if
+\code{TRUE}. Use the \code{cores} argument of \code{rstan::sampling} instead.}
 
-\item{skip_postproc}{In this mode the postprocessing after running Stan is skipped.}
+\item{skip_postproc}{In this mode the postprocessing after running Stan is
+skipped.}
 
-\item{relevance_method}{Component relevance determination method. 
+\item{relevance_method}{Component relevance determination method.
 Must be either \code{"f_mean"} or \code{"alpha"}.}
 
 \item{verbose}{should some output be printed?}
@@ -35,10 +36,11 @@ Must be either \code{"f_mean"} or \code{"alpha"}.}
 An object of class \code{lgpfit}.
 }
 \description{
-Samples the posterior of an additive Gaussian process regression model
-using \code{\link{rstan}}.
+Samples the posterior of an additive Gaussian process regression
+model using \code{\link{rstan}}.
 }
 \seealso{
-For all possible additional arguments (\code{...}), see \code{?rstan::sampling}.
-For creating the \code{lgpmodel} input, see \code{\link{lgp_model}}.
+For all possible additional arguments (\code{...}), see
+\code{?rstan::sampling}. For creating the \code{lgpmodel} input, see
+\code{\link{lgp_model}}.
 }

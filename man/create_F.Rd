@@ -35,7 +35,7 @@ following covariate types:
 \item{relevances}{Relative relevance of each component. Must have be a vector
 so that \cr
  \code{length(relevances) =  2 + length(covariates)}. \cr
-First two values define the relevance of the infividual-specific age and 
+First two values define the relevance of the infividual-specific age and
 shared age component, respectively.}
 
 \item{lengthscales}{A vector so that \cr \code{length(lengthscales) = }
@@ -48,13 +48,13 @@ is a function, that function is used to generate the effect. If \code{dis_fun}
 is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
 prior (vm is the variance masked version of it).}
 
-\item{bin_kernel}{Should the binary kernel be used for categorical covariates? 
+\item{bin_kernel}{Should the binary kernel be used for categorical covariates?
 If this is \code{TRUE}, the effect will exist only for group 1.}
 
 \item{steepness}{Steepness of the input warping function. This is only used
 if the disease component is in the model.}
 
-\item{vm_params}{Parameters of the variance mask function. This is only 
+\item{vm_params}{Parameters of the variance mask function. This is only
 needed if \code{useMaskedVarianceKernel = TRUE}.}
 
 \item{force_zeromean}{Should each component (excluding the disease age component)

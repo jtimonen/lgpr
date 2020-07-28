@@ -21,6 +21,7 @@ lgp_test(fit, test_data, plot = FALSE, verbose = TRUE, samples = "mean")
 a ggplot object or lppd
 }
 \description{
-This is a convenience function that wraps \code{\link{lgp_predict}},
-\code{\link{compute_lppd}} and \code{\link{plot_posterior_y}}.
+This is a convenience function that wraps
+\code{\link{lgp_predict}}, \code{\link{compute_lppd}} and
+\code{\link{plot_posterior_y}}.
 }

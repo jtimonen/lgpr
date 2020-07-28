@@ -2,7 +2,7 @@
 % Please edit documentation in R/preproc-parse_prior.R
 \name{parse_prior_t_effect}
 \alias{parse_prior_t_effect}
-\title{Turn a list describing an effect time distribution into 
+\title{Turn a list describing an effect time distribution into
 things to be given to Stan}
 \usage{
 parse_prior_t_effect(dist, N_cases, T_observed, T_last, UNCRT)
@@ -23,6 +23,6 @@ parse_prior_t_effect(dist, N_cases, T_observed, T_last, UNCRT)
 a list with things to be given to Stan
 }
 \description{
-Turn a list describing an effect time distribution into 
+Turn a list describing an effect time distribution into
 things to be given to Stan
 }

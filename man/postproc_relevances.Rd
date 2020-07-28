@@ -15,10 +15,10 @@ postproc_relevances(
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
 
-\item{relevance_method}{Component relevance determination method. 
+\item{relevance_method}{Component relevance determination method.
 Must be either \code{"f_mean"} or \code{"alpha"}.}
 
-\item{noise_method}{Noise level determination method. 
+\item{noise_method}{Noise level determination method.
 Currently must be \code{"SSE"}.}
 
 \item{verbose}{Should some output be printed?}

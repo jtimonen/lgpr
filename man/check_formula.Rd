@@ -15,6 +15,6 @@ check_formula(formula, data)
 nothing
 }
 \description{
-Checks if the input `formula` to \code{lgp_model} 
+Checks if the input `formula` to \code{lgp_model}
 are valid with the given data
 }

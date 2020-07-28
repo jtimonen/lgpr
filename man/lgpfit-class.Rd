@@ -21,6 +21,7 @@ An S4 class to represent the output of the \code{lgp_fit} function
 
 \item{\code{pkg_version}}{Package version number.}
 
-\item{\code{diagnostics}}{A data frame with columns \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.}
+\item{\code{diagnostics}}{A data frame with columns
+\code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.}
 }}
 

@@ -97,7 +97,8 @@ setMethod(
     cat("\n ---------- LGPFIT SUMMARY ----------\n\n")
 
     # Runtime info
-    tryCatch({
+    tryCatch(
+      {
         runtime <- get_runtime(object)
         cat("* Average runtime per chain: ",
           runtime$warmup, " s (warmup) and ",
@@ -112,7 +113,8 @@ setMethod(
     )
 
     # Convergence info
-    tryCatch({
+    tryCatch(
+      {
         diag <- object@diagnostics
         Rhat <- diag$Rhat
         imax <- which(Rhat == max(Rhat))
@@ -129,7 +131,8 @@ setMethod(
     )
 
     # Relevance info
-    tryCatch({
+    tryCatch(
+      {
         sel <- object@selection
         rel_method <- object@relevances$method
         r3 <- sel$prob

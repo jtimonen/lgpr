@@ -96,7 +96,7 @@ lgp <- function(formula,
 #' separated by a plus (+) sign. All variables that appear in the formula must
 #' exist as columns of \code{data}. Note that effects of categorical covariates
 #' are by default defined as interactions with \code{time_variable}. If you wish
-#'to change this, see the argument \code{offset_vars}. The subject identifier
+#' to change this, see the argument \code{offset_vars}. The subject identifier
 #' variable cannot currently be included in \code{offset_vars}. If you wish
 #' to model the effect of \code{id_variable} as a constant offset,
 #' you can create another covariate with the same values and
@@ -107,19 +107,19 @@ lgp <- function(formula,
 #' \itemize{
 #'   \item All data columns are in numeric format (especially
 #'   \code{id_variable})
-#'   \item Rows are sorted so that the values of \code{id_variable} are 
+#'   \item Rows are sorted so that the values of \code{id_variable} are
 #'   increasing
-#'   \item The \code{id_variable} values belong in the integer set 
+#'   \item The \code{id_variable} values belong in the integer set
 #'   \code{{1, ..., N}}, where \code{N} is the total number of individuals.
 #' }
 #' Note that you need to indicate missing values of \code{disAge_variable} with
 #' \code{NaN}.
-#' @param likelihood Determines the observation model. Must be either 
-#' \code{"Gaussian"} (default), \code{"Poisson"}, \code{"NB"} (negative 
+#' @param likelihood Determines the observation model. Must be either
+#' \code{"Gaussian"} (default), \code{"Poisson"}, \code{"NB"} (negative
 #' binomial) or \code{"binomial"}. To
-#' use Bernoulli likelihood, use \code{likelihood="binomial"} and set 
+#' use Bernoulli likelihood, use \code{likelihood="binomial"} and set
 #' \code{N_trials} as a vector of ones.
-#' @param prior A named list, defining the prior distribution of model 
+#' @param prior A named list, defining the prior distribution of model
 #' (hyper)parameters. It is recommended to first create this using the function
 #' \code{\link{prior_default}}, and then possibly modify it.
 #' @param uncertain_effect_time Do we wish to model uncertainty in the disease
@@ -133,11 +133,11 @@ lgp <- function(formula,
 #'  \itemize{
 #'    \item \code{C_hat = 0}, if \code{likelihood} is \code{"Gaussian"}, because
 #'    with
-#'    Gaussian likelihood the response variable is by default centered to have 
+#'    Gaussian likelihood the response variable is by default centered to have
 #'    zero mean.
 #'    \item \code{C_hat = } \code{log(mean(y))} if \code{likelihood} is
 #'    \code{"Poisson"} or \code{"NB"},
-#'    \item \code{C_hat = } \code{log(p/(1-p))}, where 
+#'    \item \code{C_hat = } \code{log(p/(1-p))}, where
 #'    \code{p = mean(y/N_trials)} if \code{likelihood} is \code{"binomial"},
 #'  }
 #' where \code{y} denotes the response variable. You can modify this vector to
@@ -150,10 +150,10 @@ lgp <- function(formula,
 #' @param time_variable Name of the time variable (default = \code{"age"}).
 #' @param disAge_variable Name of the disease-related age variable. If
 #' \code{NULL}, this will be chosen to be \code{"diseaseAge"}, if such covariate
-#' is found in the data. You need to indicate missing values of 
+#' is found in the data. You need to indicate missing values of
 #' \code{disAge_variable} with \code{NaN} in \code{data}.
 #' @param continuous_vars Names of other continuous covariates. If \code{NULL},
-#' the remaining covariates that have floating point values are interpreted as 
+#' the remaining covariates that have floating point values are interpreted as
 #' continuous.
 #' @param categorical_vars Names of categorical covariates that interact with
 #' the time ariable.
@@ -268,12 +268,12 @@ lgp_model <- function(formula,
 #' @description Samples the posterior of an additive Gaussian process regression
 #' model using \code{\link{rstan}}.
 #' @param model An object of class \code{lgpmodel}.
-#' @param ... Optional arguments passed to \code{rstan::sampling}, for example 
-#' \code{iter}, \code{chains} or \code{control}. See 
+#' @param ... Optional arguments passed to \code{rstan::sampling}, for example
+#' \code{iter}, \code{chains} or \code{control}. See
 #' \code{\link[rstan]{sampling}} for the possible arguments.
-#' @param parallel This argument has been deprecated and throws and error if 
+#' @param parallel This argument has been deprecated and throws and error if
 #' \code{TRUE}. Use the \code{cores} argument of \code{rstan::sampling} instead.
-#' @param skip_postproc In this mode the postprocessing after running Stan is 
+#' @param skip_postproc In this mode the postprocessing after running Stan is
 #' skipped.
 #' @param threshold Component selection threshold for relevance sum.
 #' @param relevance_method Component relevance determination method.
@@ -281,8 +281,8 @@ lgp_model <- function(formula,
 #' @param verbose should some output be printed?
 #' @param ... Additional arguments that are passed to \code{rstan::sampling}.
 #' @return An object of class \code{lgpfit}.
-#' @seealso For all possible additional arguments (\code{...}), see 
-#' \code{?rstan::sampling}. For creating the \code{lgpmodel} input, see 
+#' @seealso For all possible additional arguments (\code{...}), see
+#' \code{?rstan::sampling}. For creating the \code{lgpmodel} input, see
 #' \code{\link{lgp_model}}.
 lgp_fit <- function(model,
                     threshold = 0.95,
@@ -305,12 +305,15 @@ lgp_fit <- function(model,
 
   # Run stan
   stan_dat <- model@stan_dat
-  stan_fit <- rstan::sampling(object = stanmodels[["lgp"]], 
-                              data = stan_dat, ...)
+  stan_fit <- rstan::sampling(
+    object = stanmodels[["lgp"]],
+    data = stan_dat, ...
+  )
 
   # Initialize the 'lgpfit' object
   ver <- " "
-  tryCatch({
+  tryCatch(
+    {
       ver <- get_pkg_description()$Version
     },
     error = function(e) {
@@ -363,10 +366,10 @@ lgp_fit <- function(model,
 #' with Gaussian likelihood.
 #' @param fit An object of class \code{lgpfit}.
 #' @param X_test The test points where the predictions should be computed.
-#' @param samples The predictions can be computed either by using only the 
+#' @param samples The predictions can be computed either by using only the
 #' posterior mean \cr (\code{samples="mean"}), median (\code{samples="median"}),
-#' or MAP (\code{samples="map"}) parameters, or for all parameter samples 
-#' (\code{samples="all"}). This can also be a set of indices, for example 
+#' or MAP (\code{samples="map"}) parameters, or for all parameter samples
+#' (\code{samples="all"}). This can also be a set of indices, for example
 #' \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.
 #' @param print_progress Should progress be printed (if there is more than one
 #' sample)?
@@ -412,8 +415,10 @@ lgp_predict <- function(fit,
       if (print_params) {
         print(params)
       }
-      LIST[[1]] <- compute_predictions(X_data, y_data, X_test, params, D, info,
-                                       cnames, TSCL)
+      LIST[[1]] <- compute_predictions(
+        X_data, y_data, X_test, params, D, info,
+        cnames, TSCL
+      )
     } else {
       stop("\ninvalid 'samples' input for lgp_predict! (", samples, ")")
     }
@@ -441,8 +446,10 @@ lgp_predict <- function(fit,
       # Predict with current parameter sample
       params <- as.numeric(PAR[i_smp, ])
       names(params) <- pnames
-      LIST[[i_smp]] <- compute_predictions(X_data, y_data, X_test, params, D,
-                                           info, cnames, TSCL)
+      LIST[[i_smp]] <- compute_predictions(
+        X_data, y_data, X_test, params, D,
+        info, cnames, TSCL
+      )
 
       # Print progress
       if (print_progress && (ns > 1)) {
@@ -465,8 +472,8 @@ lgp_predict <- function(fit,
 #' Compute predictions and log-posterior predictive density at test points
 #'
 #' @export
-#' @description This is a convenience function that wraps 
-#' \code{\link{lgp_predict}}, \code{\link{compute_lppd}} and 
+#' @description This is a convenience function that wraps
+#' \code{\link{lgp_predict}}, \code{\link{compute_lppd}} and
 #' \code{\link{plot_posterior_y}}.
 #' @param fit an object of class \code{lgpfit}
 #' @param test_data a test data matrix
@@ -474,7 +481,7 @@ lgp_predict <- function(fit,
 #' @param samples Sample indices or a keyword "mean", "median", "map", or "all".
 #' @param plot should this return also a plot of the data and predictions?
 #' @return a ggplot object or lppd
-lgp_test <- function(fit, test_data, plot = FALSE, verbose = TRUE, 
+lgp_test <- function(fit, test_data, plot = FALSE, verbose = TRUE,
                      samples = "mean") {
 
   # predict only at test points
@@ -492,8 +499,10 @@ lgp_test <- function(fit, test_data, plot = FALSE, verbose = TRUE,
   mlppd <- mean(as.numeric(LPPD))
   ret <- list(lppd = LPPD, mlppd = mlppd)
   if (plot) {
-    p <- plot_posterior_y(fit, PRED, test_data = test_data,
-                          uncertainty = "errorbar")
+    p <- plot_posterior_y(fit, PRED,
+      test_data = test_data,
+      uncertainty = "errorbar"
+    )
     subt <- paste("Mean log-posterior predictive density:", round(mlppd, 5))
     p <- p + ggplot2::ggtitle(
       label = "Predictive distribution of y at test points",

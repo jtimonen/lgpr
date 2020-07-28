@@ -53,7 +53,7 @@ covariates are created. Different integers correspond to the following covariate
 \item{relevances}{Relative relevance of each component. Must have be a vector
 so that \cr
  \code{length(relevances) =  2 + length(covariates)}. \cr
-First two values define the relevance of the infividual-specific age and 
+First two values define the relevance of the infividual-specific age and
 shared age component, respectively.}
 
 \item{n_categs}{An integer vector defining the number of categories
@@ -83,7 +83,7 @@ contains a zero.}
 Alternatively, This can any function that returns the (possibly randomly generated)
 real disease effect time for one individual.}
 
-\item{t_observed}{Determines how the disease effect time is observed. This can be any function 
+\item{t_observed}{Determines how the disease effect time is observed. This can be any function
 that takes the real disease effect time as an argument and returns the (possibly randomly generated)
 observed onset/initiation time. Alternatively, this can be a string of the form \code{"after_n"}
 or \code{"random_p"} or \code{"exact"}.}
@@ -95,13 +95,13 @@ is a function, that function is used to generate the effect. If \code{dis_fun}
 is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
 prior (vm is the variance masked version of it).}
 
-\item{bin_kernel}{Should the binary kernel be used for categorical covariates? 
+\item{bin_kernel}{Should the binary kernel be used for categorical covariates?
 If this is \code{TRUE}, the effect will exist only for group 1.}
 
 \item{steepness}{Steepness of the input warping function. This is only used
 if the disease component is in the model.}
 
-\item{vm_params}{Parameters of the variance mask function. This is only 
+\item{vm_params}{Parameters of the variance mask function. This is only
 needed if \code{useMaskedVarianceKernel = TRUE}.}
 
 \item{continuous_info}{Info for generating continuous covariates. Must be a list
@@ -122,11 +122,11 @@ covariates are generated so that \code{x <- sin(a*t + b) + c}, where
 be forced to have a zero mean?}
 }
 \value{
-A list \code{out}, where 
+A list \code{out}, where
 \itemize{
-  \item \code{out$data} is a data frame containing the actual data and 
-  \item \code{out$components} contains more points for smoother visualizations of the 
-  generating process. 
+  \item \code{out$data} is a data frame containing the actual data and
+  \item \code{out$components} contains more points for smoother visualizations of the
+  generating process.
   \item \code{out$onsets} contains the real disease effect times
   \item \code{out$p_signal} proportion of variance explained by signal
 }
@@ -136,7 +136,7 @@ Generate an artificial longitudinal data set.
 }
 \examples{
 # Generate Gaussian data
-dat <- simulate_data(N = 4, t_data = c(6,12,24,36,48), snr = 3)
+dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 
 # Generate negative binomially distributed count data
 dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB", phi = 2)

@@ -13,7 +13,7 @@ obtained as \code{as.data.frame(stanfit)}}
 \item{model}{An object of class \code{lgpmodel}}
 }
 \value{
-An array of size 
+An array of size
 \code{n_samples} x \code{n_data} x \code{n_components+2}
 }
 \description{

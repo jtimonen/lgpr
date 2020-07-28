@@ -17,26 +17,28 @@ lgp_predict(
 
 \item{X_test}{The test points where the predictions should be computed.}
 
-\item{samples}{The predictions can be computed either by using only the posterior mean
-\cr (\code{samples="mean"}), median (\code{samples="median"}), or MAP (\code{samples="map"}) 
-parameters, or for all parameter samples (\code{samples="all"}). This can also be a set of indices, 
-for example \code{samples=c(1:10)} gives predictions for the parameter samples 1...10.}
+\item{samples}{The predictions can be computed either by using only the
+posterior mean \cr (\code{samples="mean"}), median (\code{samples="median"}),
+or MAP (\code{samples="map"}) parameters, or for all parameter samples
+(\code{samples="all"}). This can also be a set of indices, for example
+\code{samples=c(1:10)} gives predictions for the parameter samples 1...10.}
 
-\item{print_progress}{Should progress be printed (if there is more than one sample)?}
+\item{print_progress}{Should progress be printed (if there is more than one
+sample)?}
 
-\item{print_params}{Should the parameter values be printed? (only works if \code{samples}
-is mean or median.)}
+\item{print_params}{Should the parameter values be printed? (only works if
+\code{samples} is mean or median.)}
 }
 \value{
 A list.
 }
 \description{
-Compute predictions for a fitted model. Only possible for models with
-Gaussian likelihood.
+Compute predictions for a fitted model. Only possible for models
+with Gaussian likelihood.
 }
 \seealso{
 \itemize{
-\item For creating an \code{lgpfit} object, see \code{\link{lgp_fit}}.
-\item For creating an \code{lgpmodel} object, see \code{\link{lgp_model}}.
+  \item For creating an \code{lgpfit} object, see \code{\link{lgp_fit}}.
+  \item For creating an \code{lgpmodel} object, see \code{\link{lgp_model}}.
 }
 }

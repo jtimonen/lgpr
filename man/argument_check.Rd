@@ -12,7 +12,7 @@ argument_check(arg, allowed)
 \item{allowed}{Allowed arguments. Must be have length at least 2.}
 }
 \value{
-Return the index of \code{arg} in \code{allowed} or 
+Return the index of \code{arg} in \code{allowed} or
 throws an error if argument is not valid.
 }
 \description{
