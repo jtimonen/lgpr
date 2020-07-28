@@ -29,8 +29,6 @@ plot_simdata <- function(simData,
   vlinetypes <- c(1, 5)
   dat <- simData$data
   comp <- simData$components
-  ons <- simData$onsets
-  D3 <- ("diseaseAge" %in% colnames(comp))
   g <- comp$g
   y <- y_transform(dat$y)
   yval <- c(g, y)
@@ -51,7 +49,8 @@ plot_simdata <- function(simData,
   DF$is_test <- as.factor(it)
 
   # Create ggplot object
-  h <- ggplot2::ggplot(data = DF, ggplot2::aes_string(x = "age", y = "yval", group = "leg"))
+  h <- ggplot2::ggplot(data = DF, ggplot2::aes_string(
+    x = "age", y = "yval", group = "leg"))
   subt <- paste(n, " data points, ", N, " individuals", sep = "")
 
   # Faceting
@@ -190,6 +189,7 @@ create_simdata_plot_df <- function(simData) {
 #' @return names of model components
 simdata_colnames_pretty <- function(cn) {
   cn <- gsub("\\.", ", ", cn)
-  cn <- paste("f_", 1:length(cn), "(", cn, ")", sep = "")
+  cn_seq <- seq_len(length(cn))
+  cn <- paste("f_", cn_seq, "(", cn, ")", sep = "")
   return(cn)
 }

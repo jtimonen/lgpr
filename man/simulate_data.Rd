@@ -38,7 +38,8 @@ simulate_data(
 
 \item{covariates}{Integer vector that defines the types of covariates
 (other than id and age). If not given, only the id and age
-covariates are created. Different integers correspond to the following covariate types:
+covariates are created. Different integers correspond to the following
+covariate types:
 \itemize{
   \item 0 = disease-related age
   \item 1 = other continuous covariate
@@ -60,7 +61,8 @@ shared age component, respectively.}
 for each categorical covariate, so that \code{length(n_categs)} equals to
 the number of 2's and 3's in the \code{covariates} vector.}
 
-\item{t_jitter}{Standard deviation of the jitter added to the given measurement times.}
+\item{t_jitter}{Standard deviation of the jitter added to the given
+measurement times.}
 
 \item{lengthscales}{A vector so that \cr \code{length(lengthscales) = }
 \code{2 + sum(covariates \%in\% c(0,1,2))}.}
@@ -81,25 +83,25 @@ is g + g^2/phi.}
 disease. This defaults to the number of diseased individuals. This argument
 can only be given if \code{covariates} contains a zero.}
 
-\item{t_effect_range}{Time interval from which the disease effect times are sampled uniformly.
-Alternatively, This can any function that returns the (possibly randomly generated)
-real disease effect time for one individual.}
+\item{t_effect_range}{Time interval from which the disease effect times are
+sampled uniformly. Alternatively, This can any function that returns the
+(possibly randomly generated) real disease effect time for one individual.}
 
 \item{t_observed}{Determines how the disease effect time is observed. This
 can be any function that takes the real disease effect time as an argument
 and returns the (possibly randomly generated) observed onset/initiation time.
-Alternatively, this can be a string of the form \code{"after_n"} or 
+Alternatively, this can be a string of the form \code{"after_n"} or
 \code{"random_p"} or \code{"exact"}.}
 
 \item{C_hat}{A constant added to f}
 
-\item{dis_fun}{A function or a string that defines the disease effect. If this
-is a function, that function is used to generate the effect. If \code{dis_fun}
-is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
-prior (vm is the variance masked version of it).}
+\item{dis_fun}{A function or a string that defines the disease effect. If
+this is a function, that function is used to generate the effect.
+If \code{dis_fun} is "gp_vm" or "gp_ns", the disease component is drawn from
+a nonstationary GP prior ("vm" is the variance masked version of it).}
 
-\item{bin_kernel}{Should the binary kernel be used for categorical covariates?
-If this is \code{TRUE}, the effect will exist only for group 1.}
+\item{bin_kernel}{Should the binary kernel be used for categorical
+covariates? If this is \code{TRUE}, the effect will exist only for group 1.}
 
 \item{steepness}{Steepness of the input warping function. This is only used
 if the disease component is in the model.}
@@ -107,9 +109,10 @@ if the disease component is in the model.}
 \item{vm_params}{Parameters of the variance mask function. This is only
 needed if \code{useMaskedVarianceKernel = TRUE}.}
 
-\item{continuous_info}{Info for generating continuous covariates. Must be a list
-containing fields \code{lambda} and \code{mu}, which have length 3. The continuous
-covariates are generated so that \code{x <- sin(a*t + b) + c}, where
+\item{continuous_info}{Info for generating continuous covariates. Must be a
+list containing fields \code{lambda} and \code{mu}, which have length 3.
+The continuous covariates are generated so that \code{x <- sin(a*t + b) + c},
+where
 \itemize{
   \item \code{t <- seq(0, 2*pi, length.out = k)}
   \item \code{a <- mu[1] + lambda[1]*stats::runif(1)}
@@ -121,8 +124,8 @@ covariates are generated so that \code{x <- sin(a*t + b) + c}, where
 
 \item{verbose}{verbosity mode}
 
-\item{force_zeromean}{Should each component (excluding the disease age component)
-be forced to have a zero mean?}
+\item{force_zeromean}{Should each component (excluding the disease age
+component) be forced to have a zero mean?}
 }
 \value{
 A list \code{out}, where
@@ -142,6 +145,8 @@ Generate an artificial longitudinal data set.
 dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 
 # Generate negative binomially distributed count data
-dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB",
-phi = 2)
+dat <- simulate_data(
+  N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB",
+  phi = 2
+)
 }

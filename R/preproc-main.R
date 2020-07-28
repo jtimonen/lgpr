@@ -6,10 +6,9 @@
 #' @param standardize Should the response variable be standardized?
 #' @param varInfo Variable type info.
 #' @param verbose Should more verbose output be printed?
-#' @return A list containing the data to be given to \code{rstan::sampling}, some info about
-#' preprocessing and all the information about scaling the inputs and response, and updated
-#' variable type info.
-#'
+#' @return A list containing the data to be given to \code{rstan::sampling},
+#' some info about preprocessing and all the information about scaling the
+#' inputs and response, and updated variable type info.
 create_stan_input <- function(formula,
                               data,
                               prior,

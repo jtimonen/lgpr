@@ -11,7 +11,8 @@ split_data_random(data, p_test = 0.1, n_test = NULL)
 
 \item{p_test}{desired proportion of test data}
 
-\item{n_test}{desired number of test data points (if NULL, p_test is used to compute this)}
+\item{n_test}{desired number of test data points (if NULL, p_test is used
+to compute this)}
 }
 \value{
 a \code{list(train, test)}

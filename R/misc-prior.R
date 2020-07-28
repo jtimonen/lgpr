@@ -1,7 +1,9 @@
 #' Create the default prior
 #' @export
-#' @param sigma_alpha Sigma parameter of the student-t distribution for all alpha.
-#' @return A list defining a valid \code{prior} argument for the \code{lgp} function.
+#' @param sigma_alpha Sigma parameter of the student-t distribution for all
+#' alpha.
+#' @return A list defining a valid \code{prior} argument for the \code{lgp}
+#' function.
 prior_default <- function(sigma_alpha = 1) {
 
   # Magnitude parameters
@@ -11,7 +13,6 @@ prior_default <- function(sigma_alpha = 1) {
     sigma = sigma_alpha,
     nu = 20
   )
-
 
   prior_mag <- list(
     idAge = pmag,
@@ -35,10 +36,13 @@ prior_default <- function(sigma_alpha = 1) {
 
   # Other parameters
   prior_st <- list(type = "inv-gamma", shape = 14, scale = 5)
-  # prior_sig <- list(type = "log-normal", mu = 0, sigma = 1, transform = "square")
-  # prior_sig <- list(type = "inv-gamma", shape  = 1/2, scale = 0.01/2, transform = "square")
-  prior_sig <- list(type = "inv-gamma", shape = 2, scale = 1, transform = "square")
-  prior_phi <- list(type = "log-normal", mu = 1, sigma = 1, transform = "square")
+  # prior_sig <-
+  # list(type = "log-normal", mu = 0, sigma = 1, transform = "square")
+  # list(type = "inv-gamma", shape = 1/2, scale = 0.01/2, transform = "square")
+  prior_sig <- list(type = "inv-gamma", shape = 2, scale = 1,
+                    transform = "square")
+  prior_phi <- list(type = "log-normal", mu = 1, sigma = 1,
+                    transform = "square")
   prior_bet <- list(shape1 = 0.2, shape2 = 0.2)
 
   # Uncertain disease onset
@@ -60,10 +64,11 @@ prior_default <- function(sigma_alpha = 1) {
 }
 
 
-#' Create a similar default prior as in \code{LonGP} (Cheng et. al, 2019)
+#' Create a similar default prior as in \code{LonGP} (Cheng et al., 2019)
 #' @export
 #' @description Not recommended, because a lengthscale close to 0 is possible.
-#' @return A list defining a valid \code{prior} argument for the \code{lgp_model} function.
+#' @return A list defining a valid \code{prior} argument for the
+#' \code{lgp_model} function.
 prior_LonGP <- function() {
 
   # Start by creating the default prior
@@ -72,7 +77,8 @@ prior_LonGP <- function() {
   # Edit some parts of the default prior
   ln <- list(type = "log-normal", mu = 0, sigma = (log(1) - log(0.1)) / 2)
   t4 <- list(type = "student-t", mu = 0, sigma = 1, nu = 4)
-  ig <- list(type = "inv-gamma", shape = 1 / 2, scale = 0.01 / 2, transform = "square")
+  ig <- list(type = "inv-gamma", shape = 1 / 2, scale = 0.01 / 2,
+             transform = "square")
 
   prior$lengthscale <- list(
     idAge = t4,
@@ -92,8 +98,10 @@ prior_LonGP <- function() {
 #' Human-readable description of a specified prior
 #'
 #' @export
-#' @description Print human-readable info about the prior specification that was used or will be used
-#' @param object An object of class \code{lgpfit} or a valid prior argument for the `lgp` function.
+#' @description Print human-readable info about the prior specification that was
+#' used or will be used.
+#' @param object An object of class \code{lgpfit} or a valid prior argument for
+#' the `lgp` function.
 #' @return nothing
 print_prior <- function(object) {
   if (class(object) == "lgpmodel") {
@@ -117,7 +125,8 @@ prior_stan_to_readable <- function(stan_dat) {
   info <- " ---------- PRIOR SPECIFICATIONS ----------\n"
 
   D <- stan_dat$D
-  dist <- c("Uniform", "Normal", "Student-t", "Gamma", "Inverse-Gamma", "Log-Normal", "Beta")
+  dist <- c("Uniform", "Normal", "Student-t", "Gamma", "Inverse-Gamma",
+            "Log-Normal", "Beta")
 
   info_mag <- ""
   info_ls <- ""
@@ -317,9 +326,11 @@ prior_statement <- function(parname, TYP, P, dist, row_change = TRUE) {
 
   # Get prior statement
   if (TYP[1] %in% c(2, 4, 5, 6, 7)) {
-    str <- paste(parname, " ~ ", dist[TYP[1]], "(", P[1], ",", P[2], ")", sep = "")
+    str <- paste(parname, " ~ ", dist[TYP[1]], "(", P[1], ",", P[2], ")",
+                 sep = "")
   } else if (TYP[1] == 3) {
-    str <- paste(parname, " ~ ", dist[TYP[1]], "(nu=", P[1], ",", "mu=0", ",", "sigma=", P[2], ")", sep = "")
+    str <- paste(parname, " ~ ", dist[TYP[1]], "(nu=", P[1], ",", "mu=0", ",",
+                 "sigma=", P[2], ")", sep = "")
   } else {
     str <- paste(parname, " ~ ", dist[TYP[1]], sep = "")
   }
@@ -393,7 +404,8 @@ check_warp_prior <- function(prior, L = 24, ...) {
 #' @param chains how many chains are used to sample from the prior
 #' @param iter for how many iterations are the chains run
 #' @param parallel should the chains be run in parallel?
-#' @return An object of class \code{lgpfit} and random samples of both `f` and `y`.
+#' @return An object of class \code{lgpfit} and random samples of
+#' both `f` and `y`.
 #'
 validate_prior <- function(model,
                            chains = 4,
@@ -449,26 +461,6 @@ validate_prior <- function(model,
     mean_y <- mean(Y_mean)
     std_y <- mean(Y_std)
   }
-  # if(noiseType == "Gaussian"){
-  #  y_n <- matrix(0, s, n)
-  #  for(is in 1:s){
-  #    y_n[is,] <- stats::rnorm(n = n, mean = 0, sd = sig[is])
-  #  }
-  #  mu_rng <- f_rng
-  # y_rng <- mu_rng + y_n
-  # }else if(noiseType == "Poisson"){
-  #  mu_rng <- mean(data$y)*exp(f_rng)
-  #  y_rng  <- matrix(0, s, n)
-  ##  for(is in 1:s){
-  #    y_rng[is,] <- stats::rpois(n = n, lambda = mu_rng[is,])
-  #  }
-  # }else if(noiseType == "NB"){
-  #  mu_rng <- mean(data$y)*exp(f_rng)
-  #  y_rng  <- matrix(0, s, n)
-  #  for(is in 1:s){
-  #    y_rng[is,] <- MASS::rnegbin(n = n, mu = mu_rng[is,], theta = phi[is])
-  #  }
-  # }
 
   yname <- strsplit(model@formula, "~")[[1]][1]
   yname <- substr(yname, 1, nchar(yname) - 1)

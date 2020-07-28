@@ -17,7 +17,8 @@ plot_data_hl_cat(
 \arguments{
 \item{data}{A data frame.}
 
-\item{highlight}{Name of a categorical covariate to be highlighted with color.}
+\item{highlight}{Name of a categorical covariate to be highlighted
+with color.}
 
 \item{response}{Name of the response variable.}
 

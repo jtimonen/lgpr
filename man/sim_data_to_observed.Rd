@@ -9,7 +9,7 @@ sim_data_to_observed(dat, t_observed)
 \arguments{
 \item{dat}{data frame}
 
-\item{t_observed}{Determines how the disease onset is observed. See 
+\item{t_observed}{Determines how the disease onset is observed. See
 documentation of \code{\link{simulate_data}}.}
 }
 \value{

@@ -46,8 +46,8 @@ assess_convergence <- function(fit, skip_F_gen = TRUE) {
 #' @param object An object of class \code{lgpfit}.
 #' @param medians.return Should the medians of beta parameters also be returned?
 #' @param threshold A value that the median of beta has to exceed
-#' @return A binary vector indicating the individuals for which the disease effect is inferred
-#' to exist.
+#' @return A binary vector indicating the individuals for which
+#' the disease effect is inferred to exist.
 affected <- function(object, medians.return = FALSE, threshold = 0.5) {
   DF <- as.data.frame(object@stan_fit)
   i_beta <- grep("beta", names(DF))

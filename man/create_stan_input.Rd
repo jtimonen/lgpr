@@ -106,9 +106,9 @@ points. Setting \code{N_trials=1} corresponds to Bernoulli observation model.}
 is skipped.}
 }
 \value{
-A list containing the data to be given to \code{rstan::sampling}, some info about
-preprocessing and all the information about scaling the inputs and response, and updated
-variable type info.
+A list containing the data to be given to \code{rstan::sampling},
+some info about preprocessing and all the information about scaling the
+inputs and response, and updated variable type info.
 }
 \description{
 Parses the \code{formula} and \code{data} input to

@@ -11,7 +11,7 @@
 #' @param t_observed Determines how the disease effect time is observed. This
 #' can be any function that takes the real disease effect time as an argument
 #' and returns the (possibly randomly generated) observed onset/initiation time.
-#' Alternatively, this can be a string of the form \code{"after_n"} or 
+#' Alternatively, this can be a string of the form \code{"after_n"} or
 #' \code{"random_p"} or \code{"exact"}.
 #' @param f_var variance of f
 #' @param C_hat A constant added to f
@@ -28,8 +28,10 @@
 #' dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 #'
 #' # Generate negative binomially distributed count data
-#' dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB",
-#' phi = 2)
+#' dat <- simulate_data(
+#'   N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB",
+#'   phi = 2
+#' )
 simulate_data <- function(N,
                           t_data,
                           covariates = c(),
@@ -37,7 +39,7 @@ simulate_data <- function(N,
                           relevances = c(1, 1, rep(1, length(covariates))),
                           n_categs = rep(2, sum(covariates %in% c(2, 3))),
                           t_jitter = 0,
-                          lengthscales = 
+                          lengthscales =
                             rep(12, 2 + sum(covariates %in% c(0, 1, 2))),
                           f_var = 1,
                           noise_type = "Gaussian",
@@ -62,7 +64,7 @@ simulate_data <- function(N,
   if (length(t_data) < 3) {
     stop("There must be at least 3 time points per individual!")
   }
-  
+
   # Input checks
   names <- sim_check_covariates(covariates, relevances, names, n_categs)
   if (N_affected > round(N / 2)) {
@@ -282,7 +284,7 @@ sim_generate_names <- function(covariates) {
 
 #' Real generated disease ages to observed ones
 #' @param dat data frame
-#' @param t_observed Determines how the disease onset is observed. See 
+#' @param t_observed Determines how the disease onset is observed. See
 #' documentation of \code{\link{simulate_data}}.
 #' @return a new data frame and observed onsets
 sim_data_to_observed <- function(dat, t_observed) {
@@ -358,7 +360,7 @@ sim_data_to_observed <- function(dat, t_observed) {
 #' @param n number of samples
 #' @return an integer from the interval 1...n
 rtgeom <- function(s, p, n = 1) {
-  r <- sample.int(n = s, size = n, prob = p^(0:(s - 1)), replace = TRUE)
+  r <- sample.int(n = s, size = n, prob = p ^ (0:(s - 1)), replace = TRUE)
   return(r)
 }
 

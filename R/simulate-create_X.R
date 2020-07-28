@@ -3,7 +3,8 @@
 #' @param N Number of individuals.
 #' @param covariates Integer vector that defines the types of covariates
 #' (other than id and age). If not given, only the id and age
-#' covariates are created. Different integers correspond to the following covariate types:
+#' covariates are created. Different integers correspond to the following
+#' covariate types:
 #' \itemize{
 #'   \item 0 = disease-related age
 #'   \item 1 = other continuous covariate
@@ -17,13 +18,15 @@
 #' for each categorical covariate, so that \code{length(n_categs)} equals to
 #' the number of 2's and 3's in the \code{covariates} vector.
 #' @param t_data Measurement times.
-#' @param t_jitter Standard deviation of the jitter added to the given measurement times.
-#' @param t_effect_range Time interval from which the disease effect times are sampled uniformly.
-#' Alternatively, This can any function that returns the (possibly randomly generated)
-#' real disease effect time for one individual.
-#' @param continuous_info Info for generating continuous covariates. Must be a list
-#' containing fields \code{lambda} and \code{mu}, which have length 3. The continuous
-#' covariates are generated so that \code{x <- sin(a*t + b) + c}, where
+#' @param t_jitter Standard deviation of the jitter added to the given
+#' measurement times.
+#' @param t_effect_range Time interval from which the disease effect times are
+#' sampled uniformly. Alternatively, This can any function that returns the
+#' (possibly randomly generated) real disease effect time for one individual.
+#' @param continuous_info Info for generating continuous covariates. Must be a
+#' list containing fields \code{lambda} and \code{mu}, which have length 3.
+#' The continuous covariates are generated so that \code{x <- sin(a*t + b) + c},
+#' where
 #' \itemize{
 #'   \item \code{t <- seq(0, 2*pi, length.out = k)}
 #'   \item \code{a <- mu[1] + lambda[1]*stats::runif(1)}
@@ -91,7 +94,8 @@ create_X <- function(N,
         onsets[j] <- onset_range()
       }
     } else {
-      onsets <- stats::runif(N_cases, min = onset_range[1], max = onset_range[2])
+      onsets <- stats::runif(N_cases, min = onset_range[1],
+                             max = onset_range[2])
     }
     onsets <- c(onsets, rep(NaN, N - N_cases))
     disAge <- onsetsToDiseaseAge(onsets, age, k)
@@ -103,7 +107,8 @@ create_X <- function(N,
 
   # Other
   if (D[2] > 0) {
-    CONT <- drawContinuous(N, k, D[2], continuous_info$mu, continuous_info$lambda)
+    CONT <- drawContinuous(N, k, D[2],
+                           continuous_info$mu, continuous_info$lambda)
     cont <- CONT$C
     par_cont <- list(A = CONT$A, B = CONT$B, OFS = CONT$OFS)
   } else {
@@ -142,7 +147,8 @@ create_X <- function(N,
 #'
 #' @param N number of individuals
 #' @param t_data a vector of length \code{k}
-#' @param t_jitter Standard deviation of the jitter added to the given measurement times.
+#' @param t_jitter Standard deviation of the jitter added to the given
+#' measurement times.
 #' @return a vector of length \code{N*k}
 drawMeasurementTimes <- function(N, t_data, t_jitter) {
   k <- length(t_data)
@@ -210,7 +216,7 @@ drawContinuous <- function(N, k, D, mu, lambda) {
 }
 
 
-#' Indepedently draw categorical variables for each individual
+#' Independently draw categorical variables for each individual
 #'
 #' @param N number of individuals
 #' @param k number of timepoints
@@ -222,7 +228,8 @@ drawCategorical <- function(N, k, v) {
   for (i in c(1:D)) {
     C[, i] <- sample.int(v[i], N, replace = T)
   }
-  rows <- rep(1:nrow(C), each = k)
+  C_seq <- seq_len(nrow(C))
+  rows <- rep(C_seq, each = k)
   C <- C[rows, ]
   return(C)
 }

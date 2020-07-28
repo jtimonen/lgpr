@@ -7,14 +7,15 @@
 scaleRelevances(FFF, relevances, force_zeromean, i_skip)
 }
 \arguments{
-\item{FFF}{matrix where one column corresponds to one additive data component}
+\item{FFF}{matrix where one column corresponds to one additive component}
 
 \item{relevances}{the desired variance of each component (column)}
 
-\item{force_zeromean}{Should each component (excluding the disease age component)
-be forced to have a zero mean.}
+\item{force_zeromean}{Should each component (excluding the disease age
+component) be forced to have a zero mean.}
 
-\item{i_skip}{induces of components for which the zero-mean forcing is skipped}
+\item{i_skip}{induces of components for which the zero-mean forcing is
+skipped}
 }
 \value{
 a new matrix \code{FFF}

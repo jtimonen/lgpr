@@ -16,7 +16,8 @@ validate_prior(model, chains = 4, iter = 1000, parallel = FALSE)
 \item{parallel}{should the chains be run in parallel?}
 }
 \value{
-An object of class \code{lgpfit} and random samples of both `f` and `y`.
+An object of class \code{lgpfit} and random samples of
+both `f` and `y`.
 }
 \description{
 Validate prior by sampling the signal and noise from it

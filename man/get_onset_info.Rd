@@ -22,6 +22,7 @@ two vectors of length \code{N_cases}
 This returns
 \itemize{
   \item a vector of observed onsets
-  \item mapping from case ID to average sampling interval before the observed disease onset
+  \item mapping from case ID to average sampling interval before
+  the observed disease onset
 }
 }

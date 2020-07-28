@@ -8,7 +8,8 @@
 #' @param equal_effect Boolean value
 #' @param TSCL time scaling function and its inverse
 #' @return a list
-get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time, equal_effect, TSCL) {
+get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time,
+                              equal_effect, TSCL) {
   X_id <- X[, 1]
   test_id_variable(X_id)
   M_max <- max(table(X_id))
@@ -30,7 +31,8 @@ get_diseased_info <- function(D, X, X_notnan, uncertain_effect_time, equal_effec
   return(ret)
 }
 
-#' Test that the id variable is correctly specified to allow disease effect modeling
+#' Test that the id variable is correctly specified to allow
+#' disease effect modeling
 #'
 #' @param X_id the id covariate in X
 #' @return a list
@@ -50,8 +52,9 @@ test_id_variable <- function(X_id) {
   N <- length(uid)
   if (M != N) {
     stop(
-      "id_variable should take values from the set ",
-      paste0("{1, 2, ..., N}, where N is the number of unique individuals (", N, ")")
+      paste0("id_variable should take values from the set ",
+             "{1, 2, ..., N}, where N is the number of ",
+             "unique individuals (", N, ")")
     )
   }
 }
@@ -63,7 +66,8 @@ test_id_variable <- function(X_id) {
 #'   \item from case ID to data rows (caseID_to_rows, caseID_nrows)
 #'   \item  from row number to case ID (row_to_caseID)
 #' }
-#' @param X_notnan binary vector indicating if diseaseAge is available for that measurement
+#' @param X_notnan binary vector indicating if diseaseAge is available
+#' for that measurement
 #' @param X_id the id covariate in X
 #' @param only_R2C should this return only the rows-to-caseID mapping
 #' @return a list
@@ -71,11 +75,9 @@ get_case_row_mappings <- function(X_notnan, X_id, only_R2C = FALSE) {
   UNI <- unique(cbind(X_id, X_notnan))
   uid <- UNI[, 1]
   is_case <- UNI[, 2]
-  N <- length(uid)
   N_cases <- sum(is_case)
   inn <- which(X_notnan == 1)
   tab <- table(X_id[inn])
-
   nrows <- as.numeric(tab)
   M_max <- max(table(X_id))
 
@@ -117,7 +119,8 @@ get_case_row_mappings <- function(X_notnan, X_id, only_R2C = FALSE) {
 #' @description This returns
 #' \itemize{
 #'   \item a vector of observed onsets
-#'   \item mapping from case ID to average sampling interval before the observed disease onset
+#'   \item mapping from case ID to average sampling interval before
+#'   the observed disease onset
 #' }
 #' @param D an integer vector of length 6
 #' @param X the design matrix

@@ -2,7 +2,8 @@
 % Please edit documentation in R/preproc-disease_info.R
 \name{test_id_variable}
 \alias{test_id_variable}
-\title{Test that the id variable is correctly specified to allow disease effect modeling}
+\title{Test that the id variable is correctly specified to allow
+disease effect modeling}
 \usage{
 test_id_variable(X_id)
 }
@@ -13,5 +14,6 @@ test_id_variable(X_id)
 a list
 }
 \description{
-Test that the id variable is correctly specified to allow disease effect modeling
+Test that the id variable is correctly specified to allow
+disease effect modeling
 }

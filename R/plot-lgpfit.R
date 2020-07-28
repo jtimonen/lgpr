@@ -19,13 +19,13 @@ plot_relevances <- function(object, violin = FALSE, color_scheme = "red", ...) {
   Covariate <- c(info$component_names, "noise")
   Relevance <- as.matrix(object@relevances$samples)
   n_smp <- dim(Relevance)[1]
-  n_cmp <- dim(Relevance)[2]
   rel <- as.numeric(Relevance)
   cname <- as.factor(rep(Covariate, each = n_smp))
 
   df <- data.frame(cname, rel)
   colnames(df) <- c("Component", "Relevance")
-  h <- ggplot2::ggplot(df, ggplot2::aes_string(x = "Component", y = "Relevance"))
+  h <- ggplot2::ggplot(df,
+                       ggplot2::aes_string(x = "Component", y = "Relevance"))
   if (violin) {
     h <- h + ggplot2::geom_violin(color = color, fill = fill, ...)
   } else {
@@ -99,6 +99,8 @@ plot_inputwarp <- function(fit,
     h <- h + ggplot2::ggtitle("Input-warping function", subtitle = subt)
     return(h)
   } else {
-    stop("Cannot visualize the input warping if 'diseaseAge' is not a model component.")
+    msg <- paste0("Cannot visualize the input warping ",
+                  "if 'diseaseAge' is not a model component.")
+    stop(msg)
   }
 }

@@ -153,7 +153,8 @@ test_that("lgp can be run using Poisson observation model", {
   expect_equal(suppressWarnings({
     dim(lgp(
       formula = y ~ id + age,
-      data = simulate_data(N = 4, t_data = 10 * c(1, 2, 3, 4, 5), noise_type = "Poisson")$data,
+      data = simulate_data(N = 4, t_data = 10 * c(1, 2, 3, 4, 5),
+                           noise_type = "Poisson")$data,
       likelihood = "Poisson",
       iter = 60,
       chains = 1,

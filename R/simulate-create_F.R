@@ -20,19 +20,20 @@
 #' @param lengthscales A vector so that \cr \code{length(lengthscales) = }
 #' \code{2 + sum(covariates \%in\% c(0,1,2))}.
 #' @param X_affected which individuals are affected by the disease
-#' @param dis_fun A function or a string that defines the disease effect. If this
-#' is a function, that function is used to generate the effect. If \code{dis_fun}
-#' is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
-#' prior (vm is the variance masked version of it).
-#' @param bin_kernel Should the binary kernel be used for categorical covariates?
-#' If this is \code{TRUE}, the effect will exist only for group 1.
+#' @param dis_fun A function or a string that defines the disease effect. If
+#' this is a function, that function is used to generate the effect.
+#' If \code{dis_fun} is "gp_vm" or "gp_ns", the disease component is drawn from
+#' a nonstationary GP prior ("vm" is the variance masked version of it).
+#' @param bin_kernel Should the binary kernel be used for categorical
+#' covariates? If this is \code{TRUE}, the effect will exist only for group 1.
 #' @param steepness Steepness of the input warping function. This is only used
 #' if the disease component is in the model.
 #' @param vm_params Parameters of the variance mask function. This is only
 #' needed if \code{useMaskedVarianceKernel = TRUE}.
-#' @param force_zeromean Should each component (excluding the disease age component)
-#' be forced to have a zero mean?
-#' @return a data frame FFF where one column corresponds to one additive data component
+#' @param force_zeromean Should each component (excluding the disease age
+#' component) be forced to have a zero mean?
+#' @return a data frame FFF where one column corresponds to one additive
+#' component
 create_F <- function(X,
                      covariates,
                      relevances,
@@ -84,7 +85,8 @@ create_F <- function(X,
     i_skip <- c(i_dis)
   }
 
-  FFF <- scaleRelevances(FFF, relevances, force_zeromean = force_zeromean, i_skip)
+  FFF <- scaleRelevances(FFF, relevances,
+                         force_zeromean = force_zeromean, i_skip)
   colnames(FFF) <- labs
   ret <- list(FFF = data.frame(FFF), KKK = KK)
   return(ret)
@@ -200,18 +202,18 @@ nameComponents <- function(types, names) {
 
 #' Scale the effect sizes
 #'
-#' @param FFF matrix where one column corresponds to one additive data component
+#' @param FFF matrix where one column corresponds to one additive component
 #' @param relevances the desired variance of each component (column)
-#' @param force_zeromean Should each component (excluding the disease age component)
-#' be forced to have a zero mean.
-#' @param i_skip induces of components for which the zero-mean forcing is skipped
+#' @param force_zeromean Should each component (excluding the disease age
+#' component) be forced to have a zero mean.
+#' @param i_skip induces of components for which the zero-mean forcing is
+#' skipped
 #' @return a new matrix \code{FFF}
 scaleRelevances <- function(FFF, relevances,
                             force_zeromean, i_skip) {
 
   # Some input checking
   d <- dim(FFF)[2]
-  R <- sum(relevances)
   if (any(relevances < 0)) {
     stop("negative relevances not allowed!")
   }

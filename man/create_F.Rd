@@ -43,13 +43,13 @@ shared age component, respectively.}
 
 \item{X_affected}{which individuals are affected by the disease}
 
-\item{dis_fun}{A function or a string that defines the disease effect. If this
-is a function, that function is used to generate the effect. If \code{dis_fun}
-is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
-prior (vm is the variance masked version of it).}
+\item{dis_fun}{A function or a string that defines the disease effect. If
+this is a function, that function is used to generate the effect.
+If \code{dis_fun} is "gp_vm" or "gp_ns", the disease component is drawn from
+a nonstationary GP prior ("vm" is the variance masked version of it).}
 
-\item{bin_kernel}{Should the binary kernel be used for categorical covariates?
-If this is \code{TRUE}, the effect will exist only for group 1.}
+\item{bin_kernel}{Should the binary kernel be used for categorical
+covariates? If this is \code{TRUE}, the effect will exist only for group 1.}
 
 \item{steepness}{Steepness of the input warping function. This is only used
 if the disease component is in the model.}
@@ -57,11 +57,12 @@ if the disease component is in the model.}
 \item{vm_params}{Parameters of the variance mask function. This is only
 needed if \code{useMaskedVarianceKernel = TRUE}.}
 
-\item{force_zeromean}{Should each component (excluding the disease age component)
-be forced to have a zero mean?}
+\item{force_zeromean}{Should each component (excluding the disease age
+component) be forced to have a zero mean?}
 }
 \value{
-a data frame FFF where one column corresponds to one additive data component
+a data frame FFF where one column corresponds to one additive
+component
 }
 \description{
 Simulate latent function components for longitudinal data analysis

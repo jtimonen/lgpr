@@ -18,9 +18,9 @@ create_test_points <- function(object, t_test) {
   D <- model@stan_dat$D
   if (D[4] > 0) {
     stop(
-      "There are non-time-related continuous covariates in the data. There is no",
-      " automatic way of generating the covariate matrix at test points based",
-      " on only the test time points!"
+      "There are non-time-related continuous covariates in the data. ",
+      "There is no automatic way of generating the covariate matrix ",
+      "at test points based on only the test time points!"
     )
   }
   SCL <- model@scalings$TSCL
@@ -43,7 +43,6 @@ create_X_star <- function(X, D, t_test, SCL, X_notnan) {
   X_id <- X[, 1]
   uid <- unique(X_id)
   N <- length(uid)
-  n <- length(X_id)
   d <- dim(X)[2]
   X_age <- X[, 2]
   age_raw <- SCL$fun_inv(X_age)
@@ -98,7 +97,9 @@ predict_preproc <- function(fit, X_test, samples) {
   # Check input correctness
   if (class(fit) != "lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
   model <- fit@model
-  if (class(model) != "lgpmodel") stop("Class of 'fit@model' must be 'lgpmodel'!")
+  if (class(model) != "lgpmodel") {
+    stop("Class of 'fit@model' must be 'lgpmodel'!")
+  }
   minfo <- model@info
   cnames <- minfo$component_names
   stan_dat <- model@stan_dat
@@ -269,7 +270,8 @@ compute_predictions <- function(X_data, y_data, X_test,
   uid2 <- unique(X_test[, 1])
   extra <- setdiff(uid2, uid1)
   if (length(extra) > 0) {
-    msg <- "The test data contains individuals that are not in the training data! {"
+    msg <- paste0("The test data contains individuals that are not ",
+                  "in the training data! {")
     msg <- paste(msg, paste(extra, collapse = ", "), "}", sep = "")
     if (handle_extra == "warning") {
       warning(msg)
@@ -365,7 +367,8 @@ compute_predictions <- function(X_data, y_data, X_test,
 #' @param sigma_n Noise standard deviation parameter.
 #' @param DELTA Diagonal jitter that ensures pos. def. kernel.
 #' @return A list containing predicted means and variances.
-compute_predicted_components <- function(KK, KKs, KKss, y_data, sigma_n, DELTA) {
+compute_predicted_components <- function(KK, KKs, KKss,
+                                         y_data, sigma_n, DELTA) {
   n <- length(y_data)
   p <- dim(KKs)[1]
   d <- dim(KK)[3]
@@ -435,7 +438,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info) {
     mag <- alpha[1]
     len <- ell[1]
     N_tot <- NCAT[1]
-    KK[, , r] <- kernel_zerosum(id1, id2, N_tot) * kernel_se(age1, age2, mag, len)
+    KK[, , r] <- kernel_zerosum(id1, id2, N_tot) *
+      kernel_se(age1, age2, mag, len)
   }
   if (D[2] == 1) {
     r <- r + 1
@@ -513,7 +517,8 @@ compute_kernel_matrices <- function(X1, X2, kernel_info) {
       x1 <- X1[, idx]
       x2 <- X2[, idx]
       N_cat <- NCAT[1 + j]
-      KK[, , r] <- kernel_zerosum(x1, x2, N_cat) * kernel_se(age1, age2, mag, len)
+      KK[, , r] <- kernel_zerosum(x1, x2, N_cat) *
+        kernel_se(age1, age2, mag, len)
     }
   }
   if (D[6] > 0) {

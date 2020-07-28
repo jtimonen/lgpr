@@ -10,11 +10,12 @@
 #' @param prob_outer outer interval
 #' @param prob inner interval
 #' @param binwidth width of histogram bins if \code{type = "hist"}
-#' @param color_scheme See different color schemes in the \code{bayesplot} package.
+#' @param color_scheme See different color schemes in the
+#' \code{bayesplot} package.
 #' @param off_diag_args Additional argument list for the pairs plot.
 #' @param type Visualization type. Must be either \code{"dens"}, \code{"areas"},
 #' \code{"intervals"}(default) or \code{"hist"}.
-#' @param facet_args additional facetting arguments
+#' @param facet_args additional faceting arguments
 #' @return a ggplot object
 plot_samples <- function(object,
                          pars = character(),
@@ -130,7 +131,8 @@ plot_effect_times <- function(fit,
 #' parameters
 #'
 #' @export
-#' @description Can only be used if the disease effect was modeled heterogeneously.
+#' @description Can only be used if the disease effect was modeled
+#' heterogeneously.
 #' @param fit An object of class \code{lgpfit}.
 #' @param color_scheme Name of bayesplot color scheme.
 #' @param threshold Threshold for median.
@@ -139,8 +141,8 @@ plot_beta <- function(fit,
                       color_scheme = "red",
                       threshold = 0.5) {
   if (class(fit) != "lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  ptitle <- "Posterior distribution of individual-specific disease effect magnitudes"
-
+  ptitle <- paste0("Posterior distribution of individual-specific ",
+                   "disease effect magnitudes")
   aff <- affected(fit, threshold = threshold)
   df <- as.data.frame(fit@stan_fit)
   ibeta <- grep("beta", names(df))
@@ -151,8 +153,8 @@ plot_beta <- function(fit,
   beta <- "beta" # avoid note from R CMD check
   p <- p + ggplot2::xlab(expression(beta))
 
-  str <- paste("Affected individuals: ", paste(names(which(aff)), collapse = ", "), sep = "")
-  form <- fit@model@info$formula
+  str <- paste("Affected individuals: ",
+               paste(names(which(aff)), collapse = ", "), sep = "")
   p <- p + ggplot2::labs(
     subtitle = str,
     title = ptitle

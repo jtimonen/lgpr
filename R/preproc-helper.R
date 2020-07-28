@@ -10,12 +10,16 @@ check_formula <- function(formula, data) {
   vars <- rownames(attr(trm, "factors"))
   resp <- attr(trm, "response")
   if (!resp) stop("The formula does not contain a response variable")
-  comp <- attr(trm, "term.labels")
   tord <- attr(trm, "order")
-  if (sum(tord > 1) > 0) stop("Only first-order terms are allowed in the model formula!")
+  if (sum(tord > 1) > 0) {
+    stop("Only first-order terms are allowed in the model formula!")
+  }
   yName <- vars[resp]
-  if (!(yName %in% colnames(data))) stop(paste("The data frame does not contain the response variable", yName))
-  for (i in 1:length(vars)) {
+  if (!(yName %in% colnames(data))) {
+    stop(paste("The data frame does not contain the response variable", yName))
+  }
+  vars_seq <- seq_len(length(vars))
+  for (i in vars_seq) {
     if (!(vars[i] %in% colnames(data))) {
       stop(paste(
         "Variable", vars[i], "not found in the data frame!",
@@ -55,11 +59,15 @@ check_data <- function(data, varInfo, verbose) {
   idx0 <- which(cols == respvar)
   types[idx0] <- 0
 
-  # Data must have columns corresponding to'idvar' and 'timevar'
+  # Data must have columns corresponding to 'idvar' and 'timevar'
   idx1 <- which(cols == idvar)
   idx2 <- which(cols == timevar)
-  if (!(idvar %in% cols)) stop("The data frame must contain a column called ", idvar, "!")
-  if (!(timevar %in% cols)) stop("The data frame must contain a column called ", timevar, "!")
+  if (!(idvar %in% cols)) {
+    stop("The data frame must contain a column called ", idvar, "!")
+  }
+  if (!(timevar %in% cols)) {
+    stop("The data frame must contain a column called ", timevar, "!")
+  }
   types[idx1] <- 1
   types[idx2] <- 2
 
@@ -69,7 +77,9 @@ check_data <- function(data, varInfo, verbose) {
       davar <- "diseaseAge"
       idx3 <- which(cols == davar)
       if (verbose) {
-        cat("* Interpreting 'diseaseAge' as the disease-related age variable.\n")
+        msg <- paste0("* Interpreting 'diseaseAge' as the ",
+                      "disease-related age variable.\n")
+        cat(msg)
       }
     } else {
       idx3 <- c()
@@ -77,7 +87,8 @@ check_data <- function(data, varInfo, verbose) {
   } else {
     idx3 <- which(cols == davar)
     if (length(idx3) == 0) {
-      stop("The given disease-related age variable ", davar, " not found in the data!")
+      stop("The given disease-related age variable ", davar,
+           " not found in the data!")
     }
   }
   types[idx3] <- 3
@@ -138,7 +149,6 @@ stan_input_X_and_D <- function(data, varInfo, types, formula, verbose) {
   predictors <- attr(trm, "term.labels")
 
   # Types
-  i0 <- which(types == 0)
   i1 <- which(types == 1)
   i2 <- which(types == 2)
   i3 <- which(types == 3)
@@ -159,7 +169,6 @@ stan_input_X_and_D <- function(data, varInfo, types, formula, verbose) {
 
   # Take only the needed covariates
   i_use <- which(cn %in% used_names)
-  used <- cn[i_use]
   X <- X[, i_use]
   types <- types[i_use]
 
@@ -184,7 +193,8 @@ stan_input_X_and_D <- function(data, varInfo, types, formula, verbose) {
 
   if (D[2] == 0) {
     if (D[1] != 0) {
-      stop("cannot model id effect as time-dependent if the time variable is not in model!")
+      stop("cannot model id effect as time-dependent ",
+           "if the time variable is not in model!")
     }
     if (D[5] != 0) {
       stop(
@@ -253,7 +263,8 @@ standardize_inputs <- function(X, D) {
 #' @description Gets and possibly scales the response variable.
 #' @param data the data frame given as input to \code{lgp}
 #' @param varInfo variable type info
-#' @param standardize should the response be standardized to unit variance and zero mean
+#' @param standardize should the response be standardized to
+#' unit variance and zero mean
 #' @param LH likelihood as integer
 #' @return a list with the (scaled) response variable
 #'
@@ -271,7 +282,8 @@ get_response <- function(data, varInfo, standardize, LH) {
   lh_not_01 <- !(LH %in% c(0, 1))
   if (standardize) {
     if (lh_not_01) {
-      stop("Standardization of response is only possible if likelihood is 'Gaussian' or 'none'!")
+      stop("Standardization of response is only possible if ",
+           "likelihood is 'Gaussian' or 'none'!")
     }
   }
 
@@ -298,18 +310,16 @@ get_response <- function(data, varInfo, standardize, LH) {
   # Check the response for negative values or non-integer values
   if (lh_not_01) {
     if (sum(response < 0) > 0) {
-      msg <- paste("The response variable contains negative values. ",
-        "Only the likelihoods 'Gaussian' and 'none' are allowed in such case!\n",
-        sep = ""
-      )
+      msg <- paste0("The response variable contains negative values. ",
+                    "Only the likelihoods 'Gaussian' and 'none' are allowed ",
+                    "in such case!\n")
       stop(msg)
     }
     notint <- sum(response - round(response))
     if (notint > 0) {
-      msg <- paste("The response variable contains non-integer values. ",
-        " Only the likelihoods 'Gaussian' and 'none' are allowed in such case!\n",
-        sep = ""
-      )
+      msg <- paste0("The response variable contains non-integer values. ",
+                    "Only the likelihoods 'Gaussian' and 'none' are allowed ",
+                    "in such case!\n")
       stop(msg)
     }
   }
@@ -428,7 +438,8 @@ set_C_hat <- function(C_hat, response, LH, N_trials) {
 
 #' Set N_trials (binomial and Bernoulli observation models)
 #'
-#' @param N_trials the \code{N_trials} argument given as input to \code{lgp_model}
+#' @param N_trials the \code{N_trials} argument given as input to
+#' \code{lgp_model}
 #' @param response response variable
 #' @param LH likelihood as int
 #' @return a numeric vector

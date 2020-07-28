@@ -98,13 +98,11 @@ hyperparam_samples <- function(object, samples = NULL) {
   return(OUT)
 }
 
-
 #' Get average runtime of a chain
 #' @param object An object of class \code{lgpfit}.
 #' @return Average runtimes for warmup and sampling
 get_runtime <- function(object) {
   TIM <- rstan::get_elapsed_time(object@stan_fit)
-  n_chains <- dim(TIM)[1]
   t1 <- round(mean(TIM[, 1]), 2)
   t2 <- round(mean(TIM[, 2]), 2)
   return(list(warmup = t1, sampling = t2))

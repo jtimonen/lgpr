@@ -298,8 +298,8 @@ lgp_fit <- function(model,
   # Check if parallelization should be used
   if (parallel) {
     stop(
-      "The 'parallel' argument has been deprecated. Use the 'cores' argument 
-      instead. See ?rstan::sampling for help."
+      "The 'parallel' argument has been deprecated. Use the 'cores' argument ",
+      "instead. See ?rstan::sampling for help."
     )
   }
 
@@ -311,13 +311,13 @@ lgp_fit <- function(model,
   )
 
   # Initialize the 'lgpfit' object
-  ver <- " "
+  ver <- "NA"
   tryCatch(
     {
       ver <- get_pkg_description()$Version
     },
     error = function(e) {
-      ver <- "NA"
+      # Do nothing
     }
   )
   fit <- new("lgpfit",

@@ -94,7 +94,8 @@ kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c, nan_replace = 0) {
 }
 
 
-#' Compute the multiplier matrix K_beta (to eneable heterogeneous disease effect)
+#' Compute the multiplier matrix K_beta (to enable heterogeneous
+#' disease effect)
 #'
 #' @param beta a row vector of length \code{N_cases}
 #' @param row_to_caseID_1 mapping from row index to case ID

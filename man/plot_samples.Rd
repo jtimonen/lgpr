@@ -33,7 +33,8 @@ plot_samples(
 
 \item{prob_outer}{outer interval}
 
-\item{color_scheme}{See different color schemes in the \code{bayesplot} package.}
+\item{color_scheme}{See different color schemes in the
+\code{bayesplot} package.}
 
 \item{point_est}{the point estimate type}
 
@@ -43,7 +44,7 @@ plot_samples(
 
 \item{off_diag_args}{Additional argument list for the pairs plot.}
 
-\item{facet_args}{additional facetting arguments}
+\item{facet_args}{additional faceting arguments}
 }
 \value{
 a ggplot object

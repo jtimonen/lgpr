@@ -42,8 +42,9 @@ plot_component(
 
 \item{sum_highlight}{name of a categorical covariate to be highlighted}
 
-\item{viridis_option}{the option argument of \code{ggplot2::scale_colour_viridis_c}
-by colour in the sum plot}
+\item{viridis_option}{the option argument of
+\code{ggplot2::scale_colour_viridis_c}
+by color in the sum plot}
 }
 \value{
 a ggplot object

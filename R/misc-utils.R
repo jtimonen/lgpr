@@ -80,7 +80,8 @@ likelihood_as_int <- function(likelihood) {
   } else if (likelihood == "binomial") {
     LH <- 4
   } else {
-    stop("likelihood must be either 'none', 'Gaussian', 'Poisson', 'binomial', or 'NB'!")
+    stop("likelihood must be either 'none', 'Gaussian', 'Poisson',
+         'binomial', or 'NB'!")
   }
   return(LH)
 }
@@ -101,13 +102,15 @@ lgp_component_names <- function(stan_dat) {
   idx[1:2] <- c(D[1], D[2])
   types <- c(1, 2, rep(3, D[3]), rep(4, D[4]), rep(5, D[5]), rep(6, D[6]))
   i_inter <- which(types == 5)
-  for (j in 1:length(i_inter)) {
+  j_seq <- seq_len(length(i_inter))
+  for (j in j_seq) {
     ind <- i_inter[j]
     compnam[ind] <- paste(compnam[ind], "*", timevar, sep = "")
   }
   cn <- compnam[which(idx == 1)]
   cn <- gsub("\\*", ", ", cn)
-  cn <- paste("f[(", 1:length(cn), ")](", cn, ")", sep = "")
+  cn_seq <- seq_len(length(cn))
+  cn <- paste("f[(", cn_seq, ")](", cn, ")", sep = "")
   return(cn)
 }
 
@@ -150,7 +153,8 @@ model_info <- function(object, print = TRUE) {
   info <- object@info
 
   # Model formula and likelihood
-  str <- paste("  Model:\n    f = ", paste(info$component_names, collapse = " + "), sep = "")
+  str <- paste("  Model:\n    f = ", paste(info$component_names,
+                                           collapse = " + "), sep = "")
   LH <- object@stan_dat$LH
   LH_str <- likelihood_as_str(LH)
   yvar <- info$varInfo$response_variable
@@ -170,16 +174,20 @@ model_info <- function(object, print = TRUE) {
   str <- paste(str, "    - Identifier variable: ", t1, "\n", sep = "")
   str <- paste(str, "    - Time variable: ", t2, "\n", sep = "")
   if (!is.null(t3)) {
-    str <- paste(str, "    - Disease-related age variable: ", t3, "\n", sep = "")
+    str <- paste(str, "    - Disease-related age variable: ", t3, "\n",
+                 sep = "")
   }
   if (!is.null(t4)) {
-    str <- paste(str, "    - Other continuous variables: ", paste(t4, collapse = ", "), "\n", sep = "")
+    str <- paste(str, "    - Other continuous variables: ",
+                 paste(t4, collapse = ", "), "\n", sep = "")
   }
   if (!is.null(t5)) {
-    str <- paste(str, "    - Other categorical variables: ", paste(t5, collapse = ", "), "\n", sep = "")
+    str <- paste(str, "    - Other categorical variables: ",
+                 paste(t5, collapse = ", "), "\n", sep = "")
   }
   if (!is.null(t6)) {
-    str <- paste(str, "    - Group offset variables: ", paste(t6, collapse = ", "), "\n", sep = "")
+    str <- paste(str, "    - Group offset variables: ",
+                 paste(t6, collapse = ", "), "\n", sep = "")
   }
 
   # Print info
@@ -194,7 +202,8 @@ model_info <- function(object, print = TRUE) {
 #'
 #' @param id the id covariate, vector of length \code{n}
 #' @param age the age covariate, vector of length \code{n}
-#' @param disAge the observed disease-related age covariate, vector of length \code{n}
+#' @param disAge the observed disease-related age covariate,
+#' vector of length \code{n}
 #' @return vector of observed onset times
 get_obs_onset_times <- function(id, age, disAge) {
   uid <- unique(id)
@@ -348,16 +357,16 @@ example_fit <- function(N = 4,
 }
 
 #' Returns a valid example call of the \code{lgp} function
-#' witi valid data input
+#' with valid data input
 #'
 #' @export
 #' @return a string
 example_call <- function() {
   code <- "
-  fit <- lgp(formula = y ~ id + age, 
-  data    = simulate_data(N = 4, t_data=10*c(1,2,3,4,5))$data, 
+  fit <- lgp(formula = y ~ id + age,
+  data    = simulate_data(N = 4, t_data=10*c(1,2,3,4,5))$data,
   iter    = 100,
-  chains  = 1, 
+  chains  = 1,
   refresh = 0,
   verbose = FALSE)
   "

@@ -147,7 +147,6 @@ compute_noise_level <- function(pars, model, noise_method) {
 
   # Get components
   n_data <- model@stan_dat$n
-  n_cmp <- sum(model@stan_dat$D)
   FFF <- get_function_components_from_df(pars, model)
   FFF <- as.data.frame(FFF)
 

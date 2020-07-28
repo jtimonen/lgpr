@@ -36,8 +36,8 @@ plot_posterior_components_sub1 <- function(fit, subsamples,
   } else if (is.numeric(subsamples)) {
     if (length(subsamples) < 2) {
       stop(
-        "Length of 'subsamples' must be at least 2! If you want to plot one sample, use the ",
-        "'sample_idx' argument instead!"
+        "Length of 'subsamples' must be at least 2! If you want to ",
+        "plot one sample, use the 'sample_idx' argument instead!"
       )
     }
     n_smp <- dim(FFF)[1]
@@ -82,31 +82,37 @@ plot_posterior_components_sub2 <- function(fit, PRED, sample_idx,
 #' @param fit An object of class \code{lgpfit}.
 #' @param mode Must be either "posterior" or "predictive".
 #' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param color_scheme Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.
+#' @param color_scheme Name of \code{bayesplot} color scheme or
+#' a list with fields dark' and 'light'.
 #' @param alpha Ribbon fill opacity.
 #' @param alpha_line Line opacity.
 #' @param alpha2 alpha of t_onset density
 #' @param plot_uncertainty Should an uncertainty ribbon be plotted?
 #' @param title optional prefix to plot title
 #' @param ylim y axis limits
-#' @param plot_obs_onset should the observed disease onset/initiation time be plotted
-#' by a vertical line
-#' @param plot_t_effect_samples should a distribution of sampled effect times be plotted
-#' @param color_scheme_t_effect color scheme name for effect time density plotting
+#' @param plot_obs_onset should the observed disease onset/initiation time
+#' be plotted by a vertical line?
+#' @param plot_t_effect_samples should a distribution of sampled effect times
+#' be plotted?
+#' @param color_scheme_t_effect color scheme name for effect time
+#' density plotting
 #' @param ypos_dens y-position of the density plot
 #' @param test_data Test data frame
 #' @param color_test test point color
 #' @param pch_test test point marker
 #' @param size_test test point size
-#' @param error_bar should uncertainty be plotted using error bars instead of a ribbon
+#' @param error_bar should uncertainty be plotted using error bars
+#' instead of a ribbon
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @param reference_times reference onset times
-#' @param post_t_effect_stat statistic computed from effect time samples (mean or median)
+#' @param post_t_effect_stat statistic computed from effect time samples
+#' (mean or median)
 #' @param ons_linetypes onset line types
 #' @param ons_linecolors onset line colors
 #' @param data_marker data marker type
 #' @param data_color data marker color
-#' @param original_y_scale should the predictions be scaled back to original data scale
+#' @param original_y_scale should the predictions be scaled back to
+#' original data scale
 #' @return a ggplot object
 plot_posterior_predictions <- function(fit,
                                        mode,
@@ -134,7 +140,8 @@ plot_posterior_predictions <- function(fit,
                                        data_color = "black",
                                        data_marker = 21,
                                        ons_linetypes = c(1, 2, 3),
-                                       ons_linecolors = c("black", "red", "gray50")) {
+                                       ons_linecolors =
+                                         c("black", "red", "gray50")) {
 
   # Input checks and options
   OPT <- plot_predictions_options(
@@ -179,7 +186,8 @@ plot_posterior_predictions <- function(fit,
   if (error_bar) {
     h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var))
   } else {
-    h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var, group = group_var))
+    h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = timevar, y = y_var,
+                                                group = group_var))
   }
 
   # Edit plot title
@@ -196,12 +204,14 @@ plot_posterior_predictions <- function(fit,
       age_test <- c(DF[[timevar]])
       trange <- range(c(age_test, age_train))
       width <- 0.035 * (trange[2] - trange[1])
-      h <- h + ggplot2::geom_errorbar(ggplot2::aes_string(ymin = "lower", ymax = "upper"),
+      h <- h + ggplot2::geom_errorbar(
+        ggplot2::aes_string(ymin = "lower", ymax = "upper"),
         color = OPT$hlcolor,
         width = width
       )
     } else {
-      h <- h + ggplot2::geom_ribbon(ggplot2::aes_string(ymin = "lower", ymax = "upper"),
+      h <- h + ggplot2::geom_ribbon(
+        ggplot2::aes_string(ymin = "lower", ymax = "upper"),
         fill = OPT$fill,
         alpha = alpha
       )
@@ -307,9 +317,13 @@ plot_predictions_options <- function(fit,
                                      mode,
                                      n_sds) {
   # Check input correctness
-  if (class(fit) != "lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
+  if (class(fit) != "lgpfit") {
+    stop("Class of 'fit' must be 'lgpfit'!")
+  }
   model <- fit@model
-  if (class(model) != "lgpmodel") stop("Class of 'fit@model' must be 'lgpmodel'!")
+  if (class(model) != "lgpmodel") {
+    stop("Class of 'fit@model' must be 'lgpmodel'!")
+  }
   info <- model@info
   idvar <- info$varInfo$id_variable
   timevar <- info$varInfo$time_variable
@@ -387,14 +401,17 @@ plot_predictions_add_onsets <- function(fit, h,
                                         reference_times,
                                         post_t_effect_stat,
                                         linetypes = c(1, 2, 3),
-                                        linecolors = c("black", "red", "gray50"),
+                                        linecolors =
+                                          c("black", "red", "gray50"),
                                         alpha2 = 1) {
   model <- fit@model
   D <- model@stan_dat$D
   if (D[3] == 1 && plot_obs_onset) {
     df <- model@data
     davar <- model@info$varInfo$disAge_variable
-    t_ons <- get_obs_onset_times(id = df[[idvar]], age = df[[timevar]], disAge = df[[davar]])
+    t_ons <- get_obs_onset_times(id = df[[idvar]],
+                                 age = df[[timevar]],
+                                 disAge = df[[davar]])
     vline.data <- data.frame(zzz = t_ons, facet_var = names(t_ons))
 
 
@@ -405,7 +422,8 @@ plot_predictions_add_onsets <- function(fit, h,
       if (l1 != l2) {
         stop("invalid length of reference_times (", l1, "), must be ", l2)
       }
-      refline.data <- data.frame(zzz = reference_times, facet_var = names(t_ons))
+      refline.data <- data.frame(zzz = reference_times,
+                                 facet_var = names(t_ons))
       h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "zzz"),
         na.rm = TRUE,
         data = refline.data,
@@ -488,12 +506,12 @@ plot_predictions_add_onsets <- function(fit, h,
 #' @description A helper function for \code{plot_predictions}.
 #' @param fit An object of class \code{lgpfit}.
 #' @param n_sds number of standard deviations for the uncertainty band width
-#' @param scale_f Should the predictions be scaled back to the original data scale?
+#' @param scale_f Should the predictions be scaled back to the original
+#' data scale?
 #' @return a data frame
 create_predictions_plot_df1 <- function(fit, scale_f = TRUE, n_sds) {
   model <- fit@model
   info <- model@info
-  SCL <- model@scalings
   TSCL <- model@scalings$TSCL
   YSCL <- model@scalings$YSCL
 
@@ -563,7 +581,8 @@ create_predictions_plot_df1 <- function(fit, scale_f = TRUE, n_sds) {
 #' @description A helper function for \code{plot_predictions}.
 #' @param model An object of class \code{lgpmodel}.
 #' @param PRED Predictions computed using \code{lgp_predict}.
-#' @param scale_f Should the predictions be scaled back to the original data scale?
+#' @param scale_f Should the predictions be scaled back to the original
+#' data scale?
 #' @param mode mode
 #' @param n_sds number of standard deviations for the uncertainty band width
 #' @return a data frame
@@ -590,8 +609,6 @@ create_predictions_plot_df2 <- function(model,
   ID <- X_test[, 1]
   AGE <- X_test[, 2]
   AGE <- TSCL$fun_inv(AGE)
-  n <- length(ID)
-  cn <- model@info$component_names
 
   # Create data frame columns
   MU <- pred$mu_f
@@ -638,8 +655,6 @@ get_predicted <- function(fit) {
   model <- fit@model
   info <- model@info
   sf <- fit@stan_fit
-  sdat <- fit@model@stan_dat
-  n <- sdat$n
   if (!info$sample_F) {
     F_mean <- rstan::extract(sf, pars = "F_mean_tot")$F_mean_tot[, 1, ]
     F_var <- rstan::extract(sf, pars = "F_var_tot")$F_var_tot[, 1, ]

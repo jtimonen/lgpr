@@ -16,6 +16,7 @@ Return the index of \code{arg} in \code{allowed} or
 throws an error if argument is not valid.
 }
 \description{
-Replacement for the \code{base} R function \code{match.arg}. Gives more informative errors and requires
-exact match. Should only be used as a subroutine of other functions and never directly.
+Replacement for the \code{base} R function \code{match.arg}.
+Gives more informative errors and requires exact match. Should only be used
+as a subroutine of other functions and never directly.
 }

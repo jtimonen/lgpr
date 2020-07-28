@@ -7,11 +7,13 @@
 print_prior(object)
 }
 \arguments{
-\item{object}{An object of class \code{lgpfit} or a valid prior argument for the `lgp` function.}
+\item{object}{An object of class \code{lgpfit} or a valid prior argument for
+the `lgp` function.}
 }
 \value{
 nothing
 }
 \description{
-Print human-readable info about the prior specification that was used or will be used
+Print human-readable info about the prior specification that was
+used or will be used.
 }

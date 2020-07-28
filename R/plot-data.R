@@ -1,8 +1,9 @@
 #' A spaghetti plot of longitudinal data.
+#'
 #' @export
 #' @param data A data frame.
-#' @param highlight Name of a covariate to be highlighted with color, or id of a subject
-#' to be highlighted.
+#' @param highlight Name of a covariate to be highlighted with color,
+#' or id of a subject to be highlighted.
 #' @param id_variable Name of id variable.
 #' @param time_variable Name of time variable.
 #' @param response Name of the response variable.
@@ -102,8 +103,10 @@ plot_data_plain <- function(data,
 }
 
 #' A spaghetti plot of longitudinal data, highlighting a categorical covariate.
+#'
 #' @param data A data frame.
-#' @param highlight Name of a categorical covariate to be highlighted with color.
+#' @param highlight Name of a categorical covariate to be highlighted
+#' with color.
 #' @param id_variable Name of id variable.
 #' @param time_variable Name of time variable.
 #' @param response Name of the response variable.
@@ -138,7 +141,8 @@ plot_data_hl_cat <- function(data,
   p <- p + ggplot2::scale_color_brewer(palette = "Set1")
   p <- p + ggplot2::geom_line(ggplot2::aes_string(color = "Z1"), size = lwd)
   if (psize > 0) {
-    p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"), size = psize)
+    p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"),
+                                 size = psize)
   }
   return(p)
 }
@@ -179,7 +183,8 @@ plot_data_hl_cont <- function(data,
   p <- p + ggplot2::geom_line(ggplot2::aes_string(color = "Value"), size = lwd)
   p <- p + colgrad + ggplot2::labs(colour = highlight)
   if (psize > 0) {
-    p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"), size = psize)
+    p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"),
+                                 size = psize)
   }
   return(p)
 }

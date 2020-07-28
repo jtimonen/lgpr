@@ -19,5 +19,6 @@ a positive real number
 }
 \description{
 See
-\href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
+\href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
+{here}.
 }

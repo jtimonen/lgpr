@@ -4,8 +4,9 @@
 #' @inheritParams plot_component
 #' @param ncol number of plot columns
 #' @param nrow number of plot rows
-#' @param legend legend argument for ggarrange, use \code{"none"} to remove legends
-#' @param labels labels argument for ggarrange
+#' @param legend legend argument for \code{ggarrange},
+#' use \code{"none"} to remove legends
+#' @param labels labels argument for \code{ggarrange}
 #' @param ylim y axis limits
 #' @param font_size font size for plots
 #' @param theme ggplot theme
@@ -13,7 +14,7 @@
 #' @param xlabel x-axis label
 #' @param ylabel y-axis label
 #' @param return_list should this return a list of ggplot objects
-#' instead of doing ggarrange
+#' instead of doing \code{ggarrange}
 #' @return an object returned by \code{ggpubr::ggarrange} or a list
 plot_components <- function(MMM, SSS, model, time_is_xvar,
                             X_test = NULL,
@@ -67,7 +68,9 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
         legend.direction = legend_dir
       )
     }
-    GG[[d]] <- gg + ggplot2::theme(text = ggplot2::element_text(size = font_size))
+    GG[[d]] <- gg + ggplot2::theme(
+      text = ggplot2::element_text(size = font_size)
+    )
   }
   if (return_list) {
     p <- GG
@@ -93,8 +96,9 @@ plot_components <- function(MMM, SSS, model, time_is_xvar,
 #' @param X_test optional matrix of test points
 #' @param marker point type
 #' @param sum_highlight name of a categorical covariate to be highlighted
-#' @param viridis_option the option argument of \code{ggplot2::scale_colour_viridis_c}
-#' by colour in the sum plot
+#' @param viridis_option the option argument of
+#' \code{ggplot2::scale_colour_viridis_c}
+#' by color in the sum plot
 #' @return a ggplot object
 plot_component <- function(MMM, SSS, model, idx, time_is_xvar,
                            linealpha, linetype, fill_alpha,

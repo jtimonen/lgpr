@@ -145,7 +145,8 @@ selection_fixed_threshold <- function(rel, threshold) {
     i_sel <- i_noise
     return(i_sel)
   } else {
-    for (j in 1:length(rel)) {
+    rel_seq <- seq_len(length(rel))
+    for (j in rel_seq) {
       h <- p_noise + sum(rel[1:j])
       if (h >= threshold) {
         i_sel <- c(i_noise, s$ix[1:j])
@@ -171,7 +172,6 @@ selection_prob_plot <- function(PROB, H, P) {
   pr <- as.numeric(PROB)
   cp <- as.factor(rep(nam, each = n))
   h <- rep(H, d)
-  p <- rep(P, d)
   df <- data.frame(h, pr, cp)
   colnames(df) <- c("Threshold", "Probability", "Component")
   plt <- ggplot2::ggplot(

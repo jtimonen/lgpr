@@ -41,9 +41,11 @@ plot_posterior_predictions(
 
 \item{PRED}{Predictions computed using \code{lgp_predict}.}
 
-\item{color_scheme}{Name of bayesplot color scheme or a list with fieds 'dark' and 'light'.}
+\item{color_scheme}{Name of \code{bayesplot} color scheme or
+a list with fields dark' and 'light'.}
 
-\item{color_scheme_t_effect}{color scheme name for effect time density plotting}
+\item{color_scheme_t_effect}{color scheme name for effect time
+density plotting}
 
 \item{alpha}{Ribbon fill opacity.}
 
@@ -57,10 +59,11 @@ plot_posterior_predictions(
 
 \item{ylim}{y axis limits}
 
-\item{plot_obs_onset}{should the observed disease onset/initiation time be plotted
-by a vertical line}
+\item{plot_obs_onset}{should the observed disease onset/initiation time
+be plotted by a vertical line?}
 
-\item{plot_t_effect_samples}{should a distribution of sampled effect times be plotted}
+\item{plot_t_effect_samples}{should a distribution of sampled effect times
+be plotted?}
 
 \item{ypos_dens}{y-position of the density plot}
 
@@ -72,15 +75,18 @@ by a vertical line}
 
 \item{size_test}{test point size}
 
-\item{error_bar}{should uncertainty be plotted using error bars instead of a ribbon}
+\item{error_bar}{should uncertainty be plotted using error bars
+instead of a ribbon}
 
 \item{n_sds}{number of standard deviations for the uncertainty band width}
 
 \item{reference_times}{reference onset times}
 
-\item{post_t_effect_stat}{statistic computed from effect time samples (mean or median)}
+\item{post_t_effect_stat}{statistic computed from effect time samples
+(mean or median)}
 
-\item{original_y_scale}{should the predictions be scaled back to original data scale}
+\item{original_y_scale}{should the predictions be scaled back to
+original data scale}
 
 \item{data_color}{data marker color}
 

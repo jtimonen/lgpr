@@ -11,7 +11,8 @@ get_response(data, varInfo, standardize, LH)
 
 \item{varInfo}{variable type info}
 
-\item{standardize}{should the response be standardized to unit variance and zero mean}
+\item{standardize}{should the response be standardized to
+unit variance and zero mean}
 
 \item{LH}{likelihood as integer}
 }

@@ -11,7 +11,8 @@ create_predictions_plot_df2(model, PRED, scale_f = TRUE, mode, n_sds)
 
 \item{PRED}{Predictions computed using \code{lgp_predict}.}
 
-\item{scale_f}{Should the predictions be scaled back to the original data scale?}
+\item{scale_f}{Should the predictions be scaled back to the original
+data scale?}
 
 \item{mode}{mode}
 

@@ -20,13 +20,10 @@ split_data_by_id <- function(data, test_ids, id_variable = "id") {
 #' @param data a data frame
 #' @param test_idx indices of test time points
 #' @param id_variable name of id variable
-#' @param time_variable name of time variable
 #' @return a \code{list(train, test)}
-split_data_by_timepoint <- function(data, test_idx, id_variable = "id", time_variable = "age") {
+split_data_by_timepoint <- function(data, test_idx, id_variable = "id") {
   id <- data[[id_variable]]
-  age <- data[[time_variable]]
   uid <- unique(id)
-  N <- length(uid)
   i_test <- c()
   for (i in uid) {
     inds <- which(id == i)
@@ -41,7 +38,8 @@ split_data_by_timepoint <- function(data, test_idx, id_variable = "id", time_var
 #' @export
 #' @param data a data frame
 #' @param p_test desired proportion of test data
-#' @param n_test desired number of test data points (if NULL, p_test is used to compute this)
+#' @param n_test desired number of test data points (if NULL, p_test is used
+#' to compute this)
 #' @return a \code{list(train, test)}
 split_data_random <- function(data, p_test = 0.1, n_test = NULL) {
   n_total <- dim(data)[1]
@@ -54,19 +52,17 @@ split_data_random <- function(data, p_test = 0.1, n_test = NULL) {
 }
 
 
-#' Split data into training and test data by selecting randomly k points from each individual
+#' Split data into training and test data by selecting randomly k points
+#' from each individual
 #'
 #' @export
 #' @param data a data frame
 #' @param n_test desired number of test data points per individual
 #' @param id_variable name of id variable
-#' @param time_variable name of time variable
 #' @return a \code{list(train, test)}
-split_data_random_each <- function(data, n_test = 1, id_variable = "id", time_variable = "age") {
+split_data_random_each <- function(data, n_test = 1, id_variable = "id") {
   id <- data[[id_variable]]
-  age <- data[[time_variable]]
   uid <- unique(id)
-  N <- length(uid)
   i_test <- c()
   for (i in uid) {
     inds <- which(id == i)
@@ -92,6 +88,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
   i_train <- setdiff(1:n_total, i_test)
   data_train <- data[i_train, ]
   data_test <- data[i_test, ]
-  ret <- list(train = data_train, test = data_test, i_train = i_train, i_test = i_test)
+  ret <- list(train = data_train, test = data_test,
+              i_train = i_train, i_test = i_test)
   return(ret)
 }

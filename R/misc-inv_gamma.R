@@ -2,7 +2,8 @@
 #' as in Stan
 #'
 #' @description See
-#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
+#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
+#' {here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param x point where to compute the density
@@ -16,7 +17,7 @@ dinvgamma_stanlike <- function(x, alpha, beta, log = FALSE) {
     stop("beta must be positive")
   }
   t1 <- alpha * log(beta) - lgamma(alpha)
-  t2 <- -(alpha + 1) * log(x)
+  t2 <- -1 * (alpha + 1) * log(x)
   t3 <- -beta / x
   log_p <- t1 + t2 + t3
   if (log) {
@@ -30,7 +31,8 @@ dinvgamma_stanlike <- function(x, alpha, beta, log = FALSE) {
 #' as in Stan
 #'
 #' @description See
-#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
+#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
+#' {here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param p quantile (must be between 0 and 1)
@@ -44,14 +46,15 @@ qinvgamma_stanlike <- function(p, alpha, beta) {
 #' Plot pdf of inverse gamma distribution
 #'
 #' @export
-#' @description Uses the same parametrization as decribed
-#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
+#' @description Uses the same parametrization as described
+#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
+#' {here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param by grid size
 #' @param max maximum warping steepness to be visualized
 #' @param log if prior pdf should be on log scale
-#' @param IQR interquantile range width
+#' @param IQR inter-quantile range width
 #' @param return_quantiles should this return a list
 #' @return a ggplot object or a list
 plot_invgamma <- function(alpha, beta, by = 0.01, max = 1.5,
@@ -99,7 +102,8 @@ plot_invgamma <- function(alpha, beta, by = 0.01, max = 1.5,
     subtitle = msg
   )
   if (return_quantiles) {
-    out <- list(plot = p1, lower = q1, upper = q2, mean = beta / (alpha - 1), IQR = IQR)
+    out <- list(plot = p1, lower = q1, upper = q2,
+                mean = beta / (alpha - 1), IQR = IQR)
   } else {
     out <- p1
   }
