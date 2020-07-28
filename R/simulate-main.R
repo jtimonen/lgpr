@@ -5,20 +5,21 @@
 #' @inheritParams create_X
 #' @inheritParams create_F
 #' @inheritParams create_y
-#' @param N_affected Number of diseased individuals that are affected by the disease. This defaults
-#' to the number of diseased individuals. This argument can only be given if \code{covariates}
-#' contains a zero.
-#' @param t_observed Determines how the disease effect time is observed. This can be any function
-#' that takes the real disease effect time as an argument and returns the (possibly randomly generated)
-#' observed onset/initiation time. Alternatively, this can be a string of the form \code{"after_n"}
-#' or \code{"random_p"} or \code{"exact"}.
+#' @param N_affected Number of diseased individuals that are affected by the
+#' disease. This defaults to the number of diseased individuals. This argument
+#' can only be given if \code{covariates} contains a zero.
+#' @param t_observed Determines how the disease effect time is observed. This
+#' can be any function that takes the real disease effect time as an argument
+#' and returns the (possibly randomly generated) observed onset/initiation time.
+#' Alternatively, this can be a string of the form \code{"after_n"} or 
+#' \code{"random_p"} or \code{"exact"}.
 #' @param f_var variance of f
 #' @param C_hat A constant added to f
 #' @return A list \code{out}, where
 #' \itemize{
 #'   \item \code{out$data} is a data frame containing the actual data and
-#'   \item \code{out$components} contains more points for smoother visualizations of the
-#'   generating process.
+#'   \item \code{out$components} contains more points for smoother
+#'   visualizations of the generating process.
 #'   \item \code{out$onsets} contains the real disease effect times
 #'   \item \code{out$p_signal} proportion of variance explained by signal
 #' }
@@ -27,7 +28,8 @@
 #' dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 #'
 #' # Generate negative binomially distributed count data
-#' dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB", phi = 2)
+#' dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB",
+#' phi = 2)
 simulate_data <- function(N,
                           t_data,
                           covariates = c(),
@@ -35,7 +37,8 @@ simulate_data <- function(N,
                           relevances = c(1, 1, rep(1, length(covariates))),
                           n_categs = rep(2, sum(covariates %in% c(2, 3))),
                           t_jitter = 0,
-                          lengthscales = rep(12, 2 + sum(covariates %in% c(0, 1, 2))),
+                          lengthscales = 
+                            rep(12, 2 + sum(covariates %in% c(0, 1, 2))),
                           f_var = 1,
                           noise_type = "Gaussian",
                           snr = 3,
@@ -56,11 +59,15 @@ simulate_data <- function(N,
                           verbose = FALSE,
                           force_zeromean = TRUE) {
   if (N < 2) stop("There must be at least 2 individuals!")
-  if (length(t_data) < 3) stop("There must be at least 3 time points per individual!")
-
+  if (length(t_data) < 3) {
+    stop("There must be at least 3 time points per individual!")
+  }
+  
   # Input checks
   names <- sim_check_covariates(covariates, relevances, names, n_categs)
-  if (N_affected > round(N / 2)) stop("N_affected cannot be greater than round(N/2)!")
+  if (N_affected > round(N / 2)) {
+    stop("N_affected cannot be greater than round(N/2)!")
+  }
   if (is.unsorted(covariates)) {
     stop("The covariates vector must be increasing!")
   }
@@ -145,11 +152,13 @@ simulate_data <- function(N,
 
 #' Generate noisy observations
 
-#' @param noise_type Either "Gaussian", "Poisson", NB" (negative binomial) or "binomial".
+#' @param noise_type Either "Gaussian", "Poisson", NB" (negative binomial) or
+#' "binomial".
 #' @param snr The desired signal-to-noise ratio. This argument is valid
 #' only with \cr
 #' \code{noise_type = "Gaussian"}.
-#' @param phi The dispersion parameter for negative binomial data. The variance is g + g^2/phi.
+#' @param phi The dispersion parameter for negative binomial data. The variance
+#' is g + g^2/phi.
 #' @param N_trials The number of trials parameter for binomial data.
 #' @param f The underlying signal.
 #' @return A list \code{out}, where
@@ -273,8 +282,8 @@ sim_generate_names <- function(covariates) {
 
 #' Real generated disease ages to observed ones
 #' @param dat data frame
-#' @param t_observed Determines how the disease onset is observed. See documentation
-#' of \code{\link{simulate_data}}.
+#' @param t_observed Determines how the disease onset is observed. See 
+#' documentation of \code{\link{simulate_data}}.
 #' @return a new data frame and observed onsets
 sim_data_to_observed <- function(dat, t_observed) {
   flag <- !("diseaseAge" %in% colnames(dat))
@@ -311,7 +320,7 @@ sim_data_to_observed <- function(dat, t_observed) {
           if (length(inds0) < 1) {
             stop("There are no data points after t = ", t_possible, "!")
           } else {
-            idx0 <- inds0[1] # next measurement point after detection is possible
+            idx0 <- inds0[1] # next meas. point after detection is possible
             t0 <- rem[idx0]
           }
         } else {

@@ -7,7 +7,8 @@
 create_y(noise_type, f, snr, phi, N_trials)
 }
 \arguments{
-\item{noise_type}{Either "Gaussian", "Poisson", NB" (negative binomial) or "binomial".}
+\item{noise_type}{Either "Gaussian", "Poisson", NB" (negative binomial) or
+"binomial".}
 
 \item{f}{The underlying signal.}
 
@@ -15,7 +16,8 @@ create_y(noise_type, f, snr, phi, N_trials)
 only with \cr
 \code{noise_type = "Gaussian"}.}
 
-\item{phi}{The dispersion parameter for negative binomial data. The variance is g + g^2/phi.}
+\item{phi}{The dispersion parameter for negative binomial data. The variance
+is g + g^2/phi.}
 
 \item{N_trials}{The number of trials parameter for binomial data.}
 }

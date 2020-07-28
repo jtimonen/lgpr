@@ -67,26 +67,29 @@ the number of 2's and 3's in the \code{covariates} vector.}
 
 \item{f_var}{variance of f}
 
-\item{noise_type}{Either "Gaussian", "Poisson", NB" (negative binomial) or "binomial".}
+\item{noise_type}{Either "Gaussian", "Poisson", NB" (negative binomial) or
+"binomial".}
 
 \item{snr}{The desired signal-to-noise ratio. This argument is valid
 only with \cr
 \code{noise_type = "Gaussian"}.}
 
-\item{phi}{The dispersion parameter for negative binomial data. The variance is g + g^2/phi.}
+\item{phi}{The dispersion parameter for negative binomial data. The variance
+is g + g^2/phi.}
 
-\item{N_affected}{Number of diseased individuals that are affected by the disease. This defaults
-to the number of diseased individuals. This argument can only be given if \code{covariates}
-contains a zero.}
+\item{N_affected}{Number of diseased individuals that are affected by the
+disease. This defaults to the number of diseased individuals. This argument
+can only be given if \code{covariates} contains a zero.}
 
 \item{t_effect_range}{Time interval from which the disease effect times are sampled uniformly.
 Alternatively, This can any function that returns the (possibly randomly generated)
 real disease effect time for one individual.}
 
-\item{t_observed}{Determines how the disease effect time is observed. This can be any function
-that takes the real disease effect time as an argument and returns the (possibly randomly generated)
-observed onset/initiation time. Alternatively, this can be a string of the form \code{"after_n"}
-or \code{"random_p"} or \code{"exact"}.}
+\item{t_observed}{Determines how the disease effect time is observed. This
+can be any function that takes the real disease effect time as an argument
+and returns the (possibly randomly generated) observed onset/initiation time.
+Alternatively, this can be a string of the form \code{"after_n"} or 
+\code{"random_p"} or \code{"exact"}.}
 
 \item{C_hat}{A constant added to f}
 
@@ -125,8 +128,8 @@ be forced to have a zero mean?}
 A list \code{out}, where
 \itemize{
   \item \code{out$data} is a data frame containing the actual data and
-  \item \code{out$components} contains more points for smoother visualizations of the
-  generating process.
+  \item \code{out$components} contains more points for smoother
+  visualizations of the generating process.
   \item \code{out$onsets} contains the real disease effect times
   \item \code{out$p_signal} proportion of variance explained by signal
 }
@@ -139,5 +142,6 @@ Generate an artificial longitudinal data set.
 dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 
 # Generate negative binomially distributed count data
-dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB", phi = 2)
+dat <- simulate_data(N = 6, t_data = seq(2, 10, by = 2), noise_type = "NB",
+phi = 2)
 }

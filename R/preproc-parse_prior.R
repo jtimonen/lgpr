@@ -2,7 +2,8 @@
 #'
 #' @param D an integer vector of length 6
 #' @param prior The \code{prior} argument supplied to \code{lgp()}.
-#' @param HMGNS Is diseaseAge assumed to have a homogenous effect (1) or not (0)?
+#' @param HMGNS Is diseaseAge assumed to have a homogenous effect (1)
+#' or not (0)?
 #' @param UNCRT Boolean value, is uncertainty of disease onset modeled?
 #' @param N_cases number of case individuals
 #' @param T_observed observed disease onsets
@@ -94,7 +95,8 @@ prior_to_stan <- function(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last) {
   p_BET <- c(prior$beta$shape1, prior$beta$shape2)
 
   # Parse prior of uncertain disease effect time
-  ONSET <- parse_prior_t_effect(prior$t_effect, N_cases, T_observed, T_last, UNCRT)
+  ONSET <- parse_prior_t_effect(prior$t_effect, N_cases, T_observed, T_last,
+                                UNCRT)
 
   # Things returned and given to Stan
   stan_priors <- list(
@@ -211,7 +213,10 @@ parse_prior_distribution <- function(dist, add_correct = NULL) {
     stop("dist cannot be NULL!")
   }
   types <- c(get_prior_type(dist$type), get_transform_type(dist$transform))
-  params <- c(get_prior_params(dist, add_correct), 1) # trailing one because of a deprecated feature
+  
+  # this has trailing one because of a deprecated feature
+  params <- c(get_prior_params(dist, add_correct), 1) 
+  
   if (length(params) != 3) stop("Length of params is not 3!")
   if (length(types) != 2) stop("Length of types is not 2!")
   if (sum(is.null(types)) > 0) stop("types contains NULL values")
@@ -240,10 +245,10 @@ get_prior_type <- function(type) {
   )
   if (is.null(TYPE)) {
     msg <- paste("Invalid prior distribution type '", type, "'.", sep = "")
-    msg <- paste(msg, " Valid types are 'uniform', 'normal', 'student-t', 'gamma',",
-      "'inv-gamma' and 'log-normal'.",
-      sep = ""
-    )
+    msg <- paste(msg, 
+                 " Valid types are 'uniform', 'normal', 'student-t', 'gamma',",
+                 "'inv-gamma' and 'log-normal'.",
+                 sep = "")
     stop(msg)
   } else {
     return(TYPE)
@@ -335,13 +340,14 @@ check_hyperparameter_names <- function(dist, correct) {
     if (type == "uniform") {
       msg <- paste(
         "The uniform distribution does not have a parameter called '",
-        bad[1], "'. There are not any allowed parameters for the uniform distribution."
+        bad[1], 
+        "'. There are not any allowed parameters for the uniform distribution."
       )
     } else {
-      msg <- paste("The ", type, " distribution does not have a parameter called '",
-        bad[1], "'. The allowed parameters are:",
-        sep = ""
-      )
+      msg <- paste("The ", type, 
+                   " distribution does not have a parameter called '",
+                   bad[1], "'. The allowed parameters are:",
+                   sep = "")
       msg <- paste(msg, paste(correct, collapse = ", "))
     }
     stop(msg)
