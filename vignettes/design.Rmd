@@ -13,6 +13,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{css, echo=FALSE}
+a { color: #098ee6; }
+a:hover { color: #56b5f5; }
+body { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif; }
+```
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -25,7 +31,7 @@ require("lgpr")
 set.seed(123)
 ```
 
-```{r plot_opts}
+```{r plot_opts, echo=FALSE}
 # Define plot options
 color1 <- lgpr::color_set('blue')
 LWD <- 2
@@ -44,21 +50,46 @@ Interface: R -> Stan -> R
 
 ## Model
 
-```{r image, fig.width = 7.2, fig.height=2.5, echo=FALSE}
+```{r image, fig.width = 7, fig.height=6, echo=FALSE}
+
+# Create plot
 par(mar=c(1.25,1.25,1.25,1.25))
-plot(0, 0, pch=0, xlim=c(0.7,5.3), ylim=c(-1.3,1.3), bty='n', 
+plot(0, 0, pch=0, xlim=c(-2.5,1.5), ylim=c(-5,0.5), bty='n', 
      yaxt='n', xaxt='n', ann=FALSE, main='Overview of the design')
-x  <- c(1,2,3,4,5)
-y1 <- c(0,1,1,1,1)
-y2 <- c(0,-1)
-lines(x, y1, col=color1, lwd=LWD)
-lines(x[1:2], y2, col=color1, lwd=LWD)
-plotBox(1, 0, 'Model', col=color1)
-plotBox(2, -1, 'Likelihood', col=color1)
-plotBox(2, 1, 'Function', col=color1)
-plotBox(3, 1, 'Component', col=color1)
-plotBox(4, 1, 'Kernel', col=color1)
-plotBox(5, 1, 'Covariate', col=color1)
+
+# Define box locations
+x  <- c(0, 1, -1,
+        -2, -1, 0,
+        -2, -1, 0,
+        -2, -1, 0)
+y  <- c(0, -1, -1,
+        -2, -2, -2,
+        -3, -3, -3,
+        -4, -4, -4)
+
+# Define box labels
+labels <- c("Model", "Obs. model", "Signal", 
+            "Component 1", "Component 2", "Component 3",
+            "Kernel 1", "Kernel 2", "Kernel 3",
+            "Covariate 1", "Covariate 2", "Covariate 3")
+
+# Define which boxes are connected with a line
+line_starts <- c(1,1,3,3,3)
+line_ends <- c(2,3,4,5,6)
+L <- length(line_starts)
+
+# Draw lines
+for(i in seq_len(L)){
+  i1 <- line_starts[i]
+  i2 <- line_ends[i]
+  lines(x[c(i1,i2)], y[c(i1,i2)], col=color1, lwd=LWD)
+}
+
+# Draw boxes
+N <- length(labels)
+for(i in seq_len(N)){
+  plotBox(x[i], y[i], labels[i], col=color1)
+}
 
 ```
 

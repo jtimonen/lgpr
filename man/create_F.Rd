@@ -35,7 +35,7 @@ following covariate types:
 \item{relevances}{Relative relevance of each component. Must have be a vector
 so that \cr
  \code{length(relevances) =  2 + length(covariates)}. \cr
-First two values define the relevance of the infividual-specific age and
+First two values define the relevance of the individual-specific age and
 shared age component, respectively.}
 
 \item{lengthscales}{A vector so that \cr \code{length(lengthscales) = }
