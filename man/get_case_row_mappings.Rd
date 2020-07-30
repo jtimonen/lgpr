@@ -7,7 +7,8 @@
 get_case_row_mappings(X_notnan, X_id, only_R2C = FALSE)
 }
 \arguments{
-\item{X_notnan}{binary vector indicating if diseaseAge is available for that measurement}
+\item{X_notnan}{binary vector indicating if diseaseAge is available
+for that measurement}
 
 \item{X_id}{the id covariate in X}
 
@@ -17,7 +18,7 @@ get_case_row_mappings(X_notnan, X_id, only_R2C = FALSE)
 a list
 }
 \description{
-Create mappings 
+Create mappings
 \itemize{
   \item from case ID to data rows (caseID_to_rows, caseID_nrows)
   \item  from row number to case ID (row_to_caseID)

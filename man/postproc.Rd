@@ -9,10 +9,10 @@ postproc(fit, threshold = 0.95, relevance_method = "f_mean", verbose = FALSE)
 \arguments{
 \item{fit}{An (incomplete) object of class \code{lgpfit}.}
 
-\item{threshold}{Threshold for relevance sum. 
+\item{threshold}{Threshold for relevance sum.
 Must be a value between 0 and 1.}
 
-\item{relevance_method}{Component relevance determination method. 
+\item{relevance_method}{Component relevance determination method.
 Must be either \code{"f_mean"} or \code{"alpha"}.}
 
 \item{verbose}{Should some output be printed?}

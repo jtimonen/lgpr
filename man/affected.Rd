@@ -14,8 +14,8 @@ affected(object, medians.return = FALSE, threshold = 0.5)
 \item{threshold}{A value that the median of beta has to exceed}
 }
 \value{
-A binary vector indicating the individuals for which the disease effect is inferred
-to exist.
+A binary vector indicating the individuals for which
+the disease effect is inferred to exist.
 }
 \description{
 Select the affected individuals

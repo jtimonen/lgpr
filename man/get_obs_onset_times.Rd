@@ -11,7 +11,8 @@ get_obs_onset_times(id, age, disAge)
 
 \item{age}{the age covariate, vector of length \code{n}}
 
-\item{disAge}{the observed disease-related age covariate, vector of length \code{n}}
+\item{disAge}{the observed disease-related age covariate,
+vector of length \code{n}}
 }
 \value{
 vector of observed onset times

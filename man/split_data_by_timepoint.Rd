@@ -4,12 +4,7 @@
 \alias{split_data_by_timepoint}
 \title{Split data into training and test data according to time point indices}
 \usage{
-split_data_by_timepoint(
-  data,
-  test_idx,
-  id_variable = "id",
-  time_variable = "age"
-)
+split_data_by_timepoint(data, test_idx, id_variable = "id")
 }
 \arguments{
 \item{data}{a data frame}
@@ -17,8 +12,6 @@ split_data_by_timepoint(
 \item{test_idx}{indices of test time points}
 
 \item{id_variable}{name of id variable}
-
-\item{time_variable}{name of time variable}
 }
 \value{
 a \code{list(train, test)}

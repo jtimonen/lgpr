@@ -15,24 +15,25 @@
 #' @param relevances Relative relevance of each component. Must have be a vector
 #' so that \cr
 #'  \code{length(relevances) =  2 + length(covariates)}. \cr
-#' First two values define the relevance of the infividual-specific age and 
+#' First two values define the relevance of the individual-specific age and
 #' shared age component, respectively.
 #' @param lengthscales A vector so that \cr \code{length(lengthscales) = }
 #' \code{2 + sum(covariates \%in\% c(0,1,2))}.
 #' @param X_affected which individuals are affected by the disease
-#' @param dis_fun A function or a string that defines the disease effect. If this
-#' is a function, that function is used to generate the effect. If \code{dis_fun}
-#' is "gp_vm" or "gp_ns", the disease component is drawn from a nonstationary GP
-#' prior (vm is the variance masked version of it).
-#' @param bin_kernel Should the binary kernel be used for categorical covariates? 
-#' If this is \code{TRUE}, the effect will exist only for group 1.
+#' @param dis_fun A function or a string that defines the disease effect. If
+#' this is a function, that function is used to generate the effect.
+#' If \code{dis_fun} is "gp_vm" or "gp_ns", the disease component is drawn from
+#' a nonstationary GP prior ("vm" is the variance masked version of it).
+#' @param bin_kernel Should the binary kernel be used for categorical
+#' covariates? If this is \code{TRUE}, the effect will exist only for group 1.
 #' @param steepness Steepness of the input warping function. This is only used
 #' if the disease component is in the model.
-#' @param vm_params Parameters of the variance mask function. This is only 
+#' @param vm_params Parameters of the variance mask function. This is only
 #' needed if \code{useMaskedVarianceKernel = TRUE}.
-#' @param force_zeromean Should each component (excluding the disease age component)
-#' be forced to have a zero mean?
-#' @return a data frame FFF where one column corresponds to one additive data component
+#' @param force_zeromean Should each component (excluding the disease age
+#' component) be forced to have a zero mean?
+#' @return a data frame FFF where one column corresponds to one additive
+#' component
 create_F <- function(X,
                      covariates,
                      relevances,
@@ -42,48 +43,51 @@ create_F <- function(X,
                      bin_kernel,
                      steepness,
                      vm_params,
-                     force_zeromean)
-{
-  i4 <- which(covariates==4)
+                     force_zeromean) {
+  i4 <- which(covariates == 4)
   covariates[i4] <- 3
   D <- c(1, 2, covariates + 3)
   useMaskedVarianceKernel <- TRUE
-  if(is.character(dis_fun)){
-    if(dis_fun=="gp_vm"){
+  if (is.character(dis_fun)) {
+    if (dis_fun == "gp_vm") {
       useMaskedVarianceKernel <- TRUE
-    }else if(dis_fun=="gp_ns"){
+    } else if (dis_fun == "gp_ns") {
       useMaskedVarianceKernel <- FALSE
-    }else{
-      stop("Invalid keyword for input dis_fun (", dis_fun,")")
+    } else {
+      stop("Invalid keyword for input dis_fun (", dis_fun, ")")
     }
   }
-  
-  KK <- simulate_kernels(X, D, lengthscales,
-                            X_affected, bin_kernel, 
-                            useMaskedVarianceKernel, 
-                            steepness, vm_params)
 
-  labs  <- nameComponents(D, colnames(X))
-  FFF   <- drawLatentComponents(KK)
-  if(sum(D==3)==1){
-    i_dis <- which(labs=="diseaseAge") 
-  }else{
+  KK <- simulate_kernels(
+    X, D, lengthscales,
+    X_affected, bin_kernel,
+    useMaskedVarianceKernel,
+    steepness, vm_params
+  )
+
+  labs <- nameComponents(D, colnames(X))
+  FFF <- drawLatentComponents(KK)
+  if (sum(D == 3) == 1) {
+    i_dis <- which(labs == "diseaseAge")
+  } else {
     i_dis <- -1
   }
-  if(i_dis > 0 && is.function(dis_fun)){
-    FFF[,i_dis] <- disease_effect(X[,1],X[,3],dis_fun)
-  }else{
-    #do nothing, keep the component drawn from a GP
+  if (i_dis > 0 && is.function(dis_fun)) {
+    FFF[, i_dis] <- disease_effect(X[, 1], X[, 3], dis_fun)
+  } else {
+    # do nothing, keep the component drawn from a GP
   }
 
-  if(!bin_kernel){
-    i_zm <- c(which(D==1), which(D==5))
+  if (!bin_kernel) {
+    i_zm <- c(which(D == 1), which(D == 5))
     i_skip <- c(i_dis, i_zm)
-  }else{
+  } else {
     i_skip <- c(i_dis)
   }
-  
-  FFF <- scaleRelevances(FFF, relevances, force_zeromean = force_zeromean, i_skip)
+
+  FFF <- scaleRelevances(FFF, relevances,
+    force_zeromean = force_zeromean, i_skip
+  )
   colnames(FFF) <- labs
   ret <- list(FFF = data.frame(FFF), KKK = KK)
   return(ret)
@@ -106,72 +110,70 @@ create_F <- function(X,
 #' @param X_affected which individuals are affected by the disease
 #' @param bin_kernel whether or not binary (mask) kernel should be used for
 #' categorical covariates
-#' @param useMaskedVarianceKernel should the masked variance kernel be used 
+#' @param useMaskedVarianceKernel should the masked variance kernel be used
 #' for drawing the disease component
 #' @param steepness steepness of the input warping function
 #' @param vm_params parameters of the variance mask function
 #' @return a 3D array
 simulate_kernels <- function(X,
-                             types, 
-                             lengthscales, 
-                             X_affected, 
+                             types,
+                             lengthscales,
+                             X_affected,
                              bin_kernel,
                              useMaskedVarianceKernel,
                              steepness,
-                             vm_params
-)
-{
-  n     <- dim(X)[1]
-  d     <- length(types)
-  KK    <- array(0,c(n,n,d))
-  t     <- X[,which(types==2)]
-  id    <- X[,which(types==1)]
-  n_ell <- sum(types!=6)
+                             vm_params) {
+  n <- dim(X)[1]
+  d <- length(types)
+  KK <- array(0, c(n, n, d))
+  t <- X[, which(types == 2)]
+  id <- X[, which(types == 1)]
+  n_ell <- sum(types != 6)
   d_ell <- length(lengthscales)
-  if(d_ell != n_ell){
+  if (d_ell != n_ell) {
     stop("lengthscales has length ", d_ell, ", should be ", n_ell)
   }
   j_ell <- 0
   ell <- lengthscales
-  for(j in 1:d){
-    xj <- X[,j]
-    if(types[j]==1){
+  for (j in 1:d) {
+    xj <- X[, j]
+    if (types[j] == 1) {
       j_ell <- j_ell + 1
       N_tot <- length(unique(xj))
-      Kj <- kernel_zerosum(id,id,N_tot)*kernel_se(t,t,ell=ell[j_ell])
-    }else if(types[j]==2){
+      Kj <- kernel_zerosum(id, id, N_tot) * kernel_se(t, t, ell = ell[j_ell])
+    } else if (types[j] == 2) {
       j_ell <- j_ell + 1
-      Kj <- kernel_se(t,t,ell=ell[j_ell])
-    }else if(types[j]==3){
+      Kj <- kernel_se(t, t, ell = ell[j_ell])
+    } else if (types[j] == 3) {
       j_ell <- j_ell + 1
       Kj <- kernel_bin(X_affected, X_affected) *
-        kernel_ns(xj,xj,ell=ell[j_ell], a = steepness, b = 0, c = 1)
-      if(useMaskedVarianceKernel){
-        M  <- kernel_var_mask(xj,xj, vm_params, stp = steepness)
+        kernel_ns(xj, xj, ell = ell[j_ell], a = steepness, b = 0, c = 1)
+      if (useMaskedVarianceKernel) {
+        M <- kernel_var_mask(xj, xj, vm_params, stp = steepness)
         Kj <- Kj * M
       }
-    }else if(types[j]==4){
+    } else if (types[j] == 4) {
       j_ell <- j_ell + 1
-      Kj <- kernel_se(xj,xj,ell=ell[j_ell])
-    }else if(types[j]==5){
+      Kj <- kernel_se(xj, xj, ell = ell[j_ell])
+    } else if (types[j] == 5) {
       j_ell <- j_ell + 1
-      if(bin_kernel){
-        Kj <- kernel_bin(xj,xj)*kernel_se(t,t,ell=ell[j_ell])
-      }else{
+      if (bin_kernel) {
+        Kj <- kernel_bin(xj, xj) * kernel_se(t, t, ell = ell[j_ell])
+      } else {
         N_cat <- length(unique(xj))
-        Kj <- kernel_zerosum(xj,xj,N_cat)*kernel_se(t,t,ell=ell[j_ell])
+        Kj <- kernel_zerosum(xj, xj, N_cat) * kernel_se(t, t, ell = ell[j_ell])
       }
-    }else if(types[j]==6){
-      if(bin_kernel){
-        Kj <- kernel_bin(xj,xj)
-      }else{
+    } else if (types[j] == 6) {
+      if (bin_kernel) {
+        Kj <- kernel_bin(xj, xj)
+      } else {
         N_cat <- length(unique(xj))
-        Kj <- kernel_zerosum(xj,xj,N_cat)
+        Kj <- kernel_zerosum(xj, xj, N_cat)
       }
-    }else{
-      stop('types contains invalid values')
+    } else {
+      stop("types contains invalid values")
     }
-    KK[,,j] <- Kj
+    KK[, , j] <- Kj
   }
   return(KK)
 }
@@ -181,16 +183,15 @@ simulate_kernels <- function(X,
 #' @param types vector of covariate types
 #' @param names names of the covariates
 #' @return a vector of component names
-nameComponents <- function(types,names){
-  d    <- length(types)
-  iAge <- which(types==1)
-  componentNames <- rep("foo",d)
-  for(j in 1:d){
-    if(types[j]==1){
+nameComponents <- function(types, names) {
+  d <- length(types)
+  componentNames <- rep("foo", d)
+  for (j in 1:d) {
+    if (types[j] == 1) {
       lab <- "id*age"
-    }else if(types[j]==5){
-      lab <- paste(names[j], "*age",sep="")
-    }else{
+    } else if (types[j] == 5) {
+      lab <- paste(names[j], "*age", sep = "")
+    } else {
       lab <- names[j]
     }
     componentNames[j] <- lab
@@ -201,29 +202,29 @@ nameComponents <- function(types,names){
 
 #' Scale the effect sizes
 #'
-#' @param FFF matrix where one column corresponds to one additive data component
+#' @param FFF matrix where one column corresponds to one additive component
 #' @param relevances the desired variance of each component (column)
-#' @param force_zeromean Should each component (excluding the disease age component)
-#' be forced to have a zero mean.
-#' @param i_skip induces of components for which the zero-mean forcing is skipped
+#' @param force_zeromean Should each component (excluding the disease age
+#' component) be forced to have a zero mean.
+#' @param i_skip induces of components for which the zero-mean forcing is
+#' skipped
 #' @return a new matrix \code{FFF}
-scaleRelevances <- function(FFF, relevances, 
-                            force_zeromean, i_skip){
-  
+scaleRelevances <- function(FFF, relevances,
+                            force_zeromean, i_skip) {
+
   # Some input checking
   d <- dim(FFF)[2]
-  R <- sum(relevances)
-  if(any(relevances < 0)){
+  if (any(relevances < 0)) {
     stop("negative relevances not allowed!")
   }
-  
+
   # Scale the columns to correct relevances
-  for(j in 1:d){
-    std <- stats::sd(FFF[,j])
-    if(std > 0){
-      FFF[,j] <- sqrt(relevances[j])/std*FFF[,j]
-      if(force_zeromean && !(j %in% i_skip)){
-        FFF[,j] <- FFF[,j] - mean(FFF[,j])
+  for (j in 1:d) {
+    std <- stats::sd(FFF[, j])
+    if (std > 0) {
+      FFF[, j] <- sqrt(relevances[j]) / std * FFF[, j]
+      if (force_zeromean && !(j %in% i_skip)) {
+        FFF[, j] <- FFF[, j] - mean(FFF[, j])
       }
     }
   }
@@ -235,15 +236,15 @@ scaleRelevances <- function(FFF, relevances,
 #'
 #' @param KK 3D matrix where \code{KK[,,j]} is the \code{j}th kernel matrix
 #' @return a matrix \code{FFF}
-drawLatentComponents <- function(KK){
-  n   <- dim(KK)[1]
-  d   <- dim(KK)[3]
-  mu0 <- rep(0,n)
-  FFF <- matrix(0,n,d)
-  for(j in 1:d){
-    K  <- KK[,,j]
+drawLatentComponents <- function(KK) {
+  n <- dim(KK)[1]
+  d <- dim(KK)[3]
+  mu0 <- rep(0, n)
+  FFF <- matrix(0, n, d)
+  for (j in 1:d) {
+    K <- KK[, , j]
     fj <- MASS::mvrnorm(1, mu0, K)
-    FFF[,j] <- fj
+    FFF[, j] <- fj
   }
   return(FFF)
 }
@@ -254,14 +255,14 @@ drawLatentComponents <- function(KK){
 #' @param X_disAge the diseaseAge covariate
 #' @param dis_fun the disease age effect function
 #' @return a vector
-disease_effect <- function(X_id, X_disAge, dis_fun){
-  n        <- length(X_id)
-  uid      <- unique(X_id)
+disease_effect <- function(X_id, X_disAge, dis_fun) {
+  n <- length(X_id)
+  uid <- unique(X_id)
   F_disAge <- rep(0, n)
-  for(id in uid){
-    inds <- which(X_id==id)
+  for (id in uid) {
+    inds <- which(X_id == id)
     da <- X_disAge[inds]
-    if(!is.nan(da[1])){
+    if (!is.nan(da[1])) {
       F_disAge[inds] <- dis_fun(da)
     }
   }

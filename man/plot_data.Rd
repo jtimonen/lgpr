@@ -18,8 +18,8 @@ plot_data(
 \arguments{
 \item{data}{A data frame.}
 
-\item{highlight}{Name of a covariate to be highlighted with color, or id of a subject
-to be highlighted.}
+\item{highlight}{Name of a covariate to be highlighted with color,
+or id of a subject to be highlighted.}
 
 \item{response}{Name of the response variable.}
 

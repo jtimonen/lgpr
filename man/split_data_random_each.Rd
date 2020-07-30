@@ -2,14 +2,10 @@
 % Please edit documentation in R/misc-split.R
 \name{split_data_random_each}
 \alias{split_data_random_each}
-\title{Split data into training and test data by selecting randomly k points from each individual}
+\title{Split data into training and test data by selecting randomly k points
+from each individual}
 \usage{
-split_data_random_each(
-  data,
-  n_test = 1,
-  id_variable = "id",
-  time_variable = "age"
-)
+split_data_random_each(data, n_test = 1, id_variable = "id")
 }
 \arguments{
 \item{data}{a data frame}
@@ -17,12 +13,11 @@ split_data_random_each(
 \item{n_test}{desired number of test data points per individual}
 
 \item{id_variable}{name of id variable}
-
-\item{time_variable}{name of time variable}
 }
 \value{
 a \code{list(train, test)}
 }
 \description{
-Split data into training and test data by selecting randomly k points from each individual
+Split data into training and test data by selecting randomly k points
+from each individual
 }

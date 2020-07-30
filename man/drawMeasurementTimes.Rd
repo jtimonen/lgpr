@@ -11,7 +11,8 @@ drawMeasurementTimes(N, t_data, t_jitter)
 
 \item{t_data}{a vector of length \code{k}}
 
-\item{t_jitter}{Standard deviation of the jitter added to the given measurement times.}
+\item{t_jitter}{Standard deviation of the jitter added to the given
+measurement times.}
 }
 \value{
 a vector of length \code{N*k}

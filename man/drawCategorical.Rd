@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate-create_X.R
 \name{drawCategorical}
 \alias{drawCategorical}
-\title{Indepedently draw categorical variables for each individual}
+\title{Independently draw categorical variables for each individual}
 \usage{
 drawCategorical(N, k, v)
 }
@@ -17,5 +17,5 @@ drawCategorical(N, k, v)
 a matrix of size \code{N} x \code{D}, where \code{D <- length(v)}
 }
 \description{
-Indepedently draw categorical variables for each individual
+Independently draw categorical variables for each individual
 }

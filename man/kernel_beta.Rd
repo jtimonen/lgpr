@@ -2,7 +2,8 @@
 % Please edit documentation in R/misc-kernels.R
 \name{kernel_beta}
 \alias{kernel_beta}
-\title{Compute the multiplier matrix K_beta (to eneable heterogeneous disease effect)}
+\title{Compute the multiplier matrix K_beta (to enable heterogeneous
+disease effect)}
 \usage{
 kernel_beta(beta, row_to_caseID_1, row_to_caseID_2)
 }
@@ -17,5 +18,6 @@ kernel_beta(beta, row_to_caseID_1, row_to_caseID_2)
 a matrix
 }
 \description{
-Compute the multiplier matrix K_beta (to eneable heterogeneous disease effect)
+Compute the multiplier matrix K_beta (to enable heterogeneous
+disease effect)
 }

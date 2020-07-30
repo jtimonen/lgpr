@@ -35,7 +35,7 @@ simulate_kernels(
 \item{bin_kernel}{whether or not binary (mask) kernel should be used for
 categorical covariates}
 
-\item{useMaskedVarianceKernel}{should the masked variance kernel be used 
+\item{useMaskedVarianceKernel}{should the masked variance kernel be used
 for drawing the disease component}
 
 \item{steepness}{steepness of the input warping function}

@@ -20,6 +20,6 @@ dinvgamma_stanlike(x, alpha, beta, log = FALSE)
 density or log-density at \code{x}
 }
 \description{
-See 
+See
 \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 }

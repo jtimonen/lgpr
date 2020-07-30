@@ -54,9 +54,10 @@ plot_components(
 
 \item{nrow}{number of plot rows}
 
-\item{legend}{legend argument for ggarrange, use \code{"none"} to remove legends}
+\item{legend}{legend argument for \code{ggarrange},
+use \code{"none"} to remove legends}
 
-\item{labels}{labels argument for ggarrange}
+\item{labels}{labels argument for \code{ggarrange}}
 
 \item{ylim}{y axis limits}
 
@@ -70,11 +71,12 @@ plot_components(
 
 \item{ylabel}{y-axis label}
 
-\item{viridis_option}{the option argument of \code{ggplot2::scale_colour_viridis_c}
-by colour in the sum plot}
+\item{viridis_option}{the option argument of
+\code{ggplot2::scale_colour_viridis_c}
+by color in the sum plot}
 
-\item{return_list}{should this return a list of ggplot objects 
-instead of doing ggarrange}
+\item{return_list}{should this return a list of ggplot objects
+instead of doing \code{ggarrange}}
 }
 \value{
 an object returned by \code{ggpubr::ggarrange} or a list

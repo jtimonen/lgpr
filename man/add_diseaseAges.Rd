@@ -11,7 +11,7 @@ add_diseaseAges(data, t_init, id_var = "id", time_var = "age")
 \item{data}{the original data frame}
 
 \item{t_init}{A named vector containing the observed initiation or onset
-time for each individual. The names, i.e. \code{names(t_init)}, should 
+time for each individual. The names, i.e. \code{names(t_init)}, should
 specify the individual id.}
 
 \item{id_var}{name of the id variable in \code{data}}

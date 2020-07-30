@@ -25,7 +25,7 @@ plot_invgamma(
 
 \item{log}{if prior pdf should be on log scale}
 
-\item{IQR}{interquantile range width}
+\item{IQR}{inter-quantile range width}
 
 \item{return_quantiles}{should this return a list}
 }
@@ -33,6 +33,6 @@ plot_invgamma(
 a ggplot object or a list
 }
 \description{
-Uses the same parametrization as decribed 
+Uses the same parametrization as described
 \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 }

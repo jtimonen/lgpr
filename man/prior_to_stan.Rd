@@ -11,7 +11,8 @@ prior_to_stan(D, prior, HMGNS, UNCRT, N_cases, T_observed, T_last)
 
 \item{prior}{The \code{prior} argument supplied to \code{lgp()}.}
 
-\item{HMGNS}{Is diseaseAge assumed to have a homogenous effect (1) or not (0)?}
+\item{HMGNS}{Is diseaseAge assumed to have a homogenous effect (1)
+or not (0)?}
 
 \item{UNCRT}{Boolean value, is uncertainty of disease onset modeled?}
 

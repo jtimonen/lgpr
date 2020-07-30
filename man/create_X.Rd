@@ -21,7 +21,8 @@ create_X(
 
 \item{covariates}{Integer vector that defines the types of covariates
 (other than id and age). If not given, only the id and age
-covariates are created. Different integers correspond to the following covariate types:
+covariates are created. Different integers correspond to the following
+covariate types:
 \itemize{
   \item 0 = disease-related age
   \item 1 = other continuous covariate
@@ -39,15 +40,17 @@ the number of 2's and 3's in the \code{covariates} vector.}
 
 \item{t_data}{Measurement times.}
 
-\item{t_jitter}{Standard deviation of the jitter added to the given measurement times.}
+\item{t_jitter}{Standard deviation of the jitter added to the given
+measurement times.}
 
-\item{t_effect_range}{Time interval from which the disease effect times are sampled uniformly.
-Alternatively, This can any function that returns the (possibly randomly generated)
-real disease effect time for one individual.}
+\item{t_effect_range}{Time interval from which the disease effect times are
+sampled uniformly. Alternatively, This can any function that returns the
+(possibly randomly generated) real disease effect time for one individual.}
 
-\item{continuous_info}{Info for generating continuous covariates. Must be a list
-containing fields \code{lambda} and \code{mu}, which have length 3. The continuous
-covariates are generated so that \code{x <- sin(a*t + b) + c}, where
+\item{continuous_info}{Info for generating continuous covariates. Must be a
+list containing fields \code{lambda} and \code{mu}, which have length 3.
+The continuous covariates are generated so that \code{x <- sin(a*t + b) + c},
+where
 \itemize{
   \item \code{t <- seq(0, 2*pi, length.out = k)}
   \item \code{a <- mu[1] + lambda[1]*stats::runif(1)}

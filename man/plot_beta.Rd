@@ -18,5 +18,6 @@ plot_beta(fit, color_scheme = "red", threshold = 0.5)
 a ggplot object
 }
 \description{
-Can only be used if the disease effect was modeled heterogeneously.
+Can only be used if the disease effect was modeled
+heterogeneously.
 }

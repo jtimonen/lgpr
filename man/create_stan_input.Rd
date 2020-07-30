@@ -25,82 +25,92 @@ create_stan_input(
 \arguments{
 \item{formula}{A formula of the form
 \code{y ~ } \code{x1 + x2 + x3}
-defining the response variable \code{y} and covariates \code{xi}. The formula must
-contain exatly one tilde (~), with response variable on the left-hand side and 
-covariates on the right-hand side. Covariates should be separated by a plus (+)
-sign. All variables that appear in the formula must exist as columns of \code{data}.
-Note that effects of categorical covariates are by default defined
-as interactions with \code{time_variable}. If you wish to change
-this, see the argument \code{offset_vars}. The subject identifier
+defining the response variable \code{y} and covariates \code{xi}.
+The formula must contain exatly one tilde (~), with response variable on the
+left-hand side and covariates on the right-hand side. Covariates should be
+separated by a plus (+) sign. All variables that appear in the formula must
+exist as columns of \code{data}. Note that effects of categorical covariates
+are by default defined as interactions with \code{time_variable}. If you wish
+to change this, see the argument \code{offset_vars}. The subject identifier
 variable cannot currently be included in \code{offset_vars}. If you wish
 to model the effect of \code{id_variable} as a constant offset,
 you can create another covariate with the same values and
 use it in your \code{formula} and \code{offset_vars} instead.}
 
-\item{data}{A data frame containing the variables given in \code{formula} as columns. NOTE:
-disease effect modeling can currently be ensured to work correctly only if 
+\item{data}{A data frame containing the variables given in \code{formula} as
+columns. NOTE: disease effect modeling can currently be ensured to work
+correctly only if
 \itemize{
-  \item All data columns are in numeric format (especially \code{id_variable})
-  \item Rows are sorted so that the values of \code{id_variable} are increasing
-  \item The \code{id_variable} values belong in the integer set \code{{1, ..., N}}, 
-  where \code{N} is the total number of individuals.
+  \item All data columns are in numeric format (especially
+  \code{id_variable})
+  \item Rows are sorted so that the values of \code{id_variable} are
+  increasing
+  \item The \code{id_variable} values belong in the integer set
+  \code{{1, ..., N}}, where \code{N} is the total number of individuals.
 }
-Note that you need to indicate missing values of \code{disAge_variable} with \code{NaN}.}
+Note that you need to indicate missing values of \code{disAge_variable} with
+\code{NaN}.}
 
-\item{prior}{A named list, defining the prior distribution of model (hyper)parameters.
-It is recommended to first create this using the function \code{\link{prior_default}},
-and then possibly modify it.}
+\item{prior}{A named list, defining the prior distribution of model
+(hyper)parameters. It is recommended to first create this using the function
+\code{\link{prior_default}}, and then possibly modify it.}
 
-\item{likelihood}{Determines the observation model. Must be either \code{"Gaussian"} 
-(default), \code{"Poisson"}, \code{"NB"} (negative binomial) or \code{"binomial"}. To
-use Bernoulli likelihood, use \code{likelihood="binomial"} and set \code{N_trials} 
-as a vector of ones.}
+\item{likelihood}{Determines the observation model. Must be either
+\code{"Gaussian"} (default), \code{"Poisson"}, \code{"NB"} (negative
+binomial) or \code{"binomial"}. To
+use Bernoulli likelihood, use \code{likelihood="binomial"} and set
+\code{N_trials} as a vector of ones.}
 
 \item{varInfo}{Variable type info.}
 
 \item{standardize}{Should the response variable be standardized?}
 
-\item{uncertain_effect_time}{Do we wish to model uncertainty in the disease effect time?}
+\item{uncertain_effect_time}{Do we wish to model uncertainty in the disease
+effect time?}
 
-\item{equal_effect}{Is the disease effect assumed to be equally strong for all diseased 
-individuals?}
+\item{equal_effect}{Is the disease effect assumed to be equally strong for
+all diseased individuals?}
 
-\item{C_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or a real
-number defining a constant GP mean. If \code{NULL}, this is set to
+\item{C_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
+a real number defining a constant GP mean. If \code{NULL}, this is set to
  \itemize{
- \item \code{C_hat = 0}, if \code{likelihood} is \code{"Gaussian"}, because with 
- Gaussian likelihood the response variable is by default centered to have zero mean.
-\item \code{C_hat = } \code{log(mean(y))} if \code{likelihood} is \code{"Poisson"}
-or \code{"NB"},
-\item \code{C_hat = } \code{log(p/(1-p))}, where \code{p = mean(y/N_trials)} if 
-\code{likelihood} is \code{"binomial"},
+   \item \code{C_hat = 0}, if \code{likelihood} is \code{"Gaussian"}, because
+   with
+   Gaussian likelihood the response variable is by default centered to have
+   zero mean.
+   \item \code{C_hat = } \code{log(mean(y))} if \code{likelihood} is
+   \code{"Poisson"} or \code{"NB"},
+   \item \code{C_hat = } \code{log(p/(1-p))}, where
+   \code{p = mean(y/N_trials)} if \code{likelihood} is \code{"binomial"},
  }
-where \code{y} denotes the response variable. You can modify this vector to account for
-normalization between data points. With Gaussian likelihood though, do not modify
-this argument, normalize the data beforehand instead.}
+where \code{y} denotes the response variable. You can modify this vector to
+account for normalization between data points. With Gaussian likelihood
+though, do not modify this argument, normalize the data beforehand instead.}
 
-\item{DELTA}{the amount of added jitter to ensure positive definiteness of the kernel}
+\item{DELTA}{the amount of added jitter to ensure positive definiteness of
+the kernel}
 
-\item{sample_F}{Determines if the function values are be sampled (must be \code{TRUE} if
-likelihood is not \code{"Gaussian"}).}
+\item{sample_F}{Determines if the function values are be sampled (must be
+\code{TRUE} if likelihood is not \code{"Gaussian"}).}
 
 \item{verbose}{Should more verbose output be printed?}
 
-\item{variance_mask}{Should a variance mask be used to force disease component
-variance to zero before disease onset?}
+\item{variance_mask}{Should a variance mask be used to force disease
+component variance to zero before disease onset?}
 
-\item{N_trials}{This argument (number of trials) is only needed when likelihood 
-is binomial. Must have length one or equal to number of data points. Setting 
-\code{N_trials=1} corresponds to Bernoulli observation model.}
+\item{N_trials}{This argument (number of trials) is only needed when
+likelihood is binomial. Must have length one or equal to number of data
+points. Setting \code{N_trials=1} corresponds to Bernoulli observation model.}
 
-\item{skip_gen_quant}{If this is true, the generated quantities block of Stan is skipped.}
+\item{skip_gen_quant}{If this is true, the generated quantities block of Stan
+is skipped.}
 }
 \value{
-A list containing the data to be given to \code{rstan::sampling}, some info about
-preprocessing and all the information about scaling the inputs and response, and updated
-variable type info.
+A list containing the data to be given to \code{rstan::sampling},
+some info about preprocessing and all the information about scaling the
+inputs and response, and updated variable type info.
 }
 \description{
-Parses the \code{formula} and \code{data} input to 
+Parses the \code{formula} and \code{data} input to
 \code{\link{lgp_model}}. Also performs many input checks.
 }

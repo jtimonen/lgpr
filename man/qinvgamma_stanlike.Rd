@@ -18,6 +18,6 @@ qinvgamma_stanlike(p, alpha, beta)
 a positive real number
 }
 \description{
-See 
+See
 \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 }

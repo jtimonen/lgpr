@@ -3,34 +3,35 @@
 #'
 #' @export
 #' @param object An object of class \code{lgpfit}.
-#' @param threshold Threshold for relevance sum. 
+#' @param threshold Threshold for relevance sum.
 #' Must be a value between 0 and 1.
 #' @return A named list
-selection <- function(object, threshold = 0.95)
-{
-  if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
-  if(threshold > 1 || threshold < 0) {
+selection <- function(object, threshold = 0.95) {
+  if (class(object) != "lgpfit") stop("Class of 'object' must be 'lgpfit'!")
+  if (threshold > 1 || threshold < 0) {
     stop("'threshold' must be between 0 and 1!")
   }
-  
+
   # Get relevances
-  relevances  <- object@relevances
-  rel_avg     <- relevances$average
-  rel_smp     <- relevances$samples
-  
+  relevances <- object@relevances
+  rel_avg <- relevances$average
+  rel_smp <- relevances$samples
+
   # Strict selection using average relevances
-  info     <- object@model@info
-  rel_avg  <- object@relevances$average
-  i_sel    <- selection_fixed_threshold(rel_avg, threshold)
-  nam      <- c(info$component_names, "noise")
+  info <- object@model@info
+  rel_avg <- object@relevances$average
+  i_sel <- selection_fixed_threshold(rel_avg, threshold)
+  nam <- c(info$component_names, "noise")
   selected <- nam[i_sel]
-  
+
   # Selection probabilities
-  prob     <- selection_prob_fixed_threshold(rel_smp, threshold)
-  
-  res <- list(selected  = selected,
-              prob      = prob,
-              threshold = threshold)
+  prob <- selection_prob_fixed_threshold(rel_smp, threshold)
+
+  res <- list(
+    selected = selected,
+    prob = prob,
+    threshold = threshold
+  )
   return(res)
 }
 
@@ -43,49 +44,56 @@ selection <- function(object, threshold = 0.95)
 #' @param h discretization parameter for computing a quadrature
 #' @param show_progbar Should this show a progress bar?
 #' @return Selection probabilities for each component
-selection_prob <- function(object, 
-                           p = function(x){stats::dbeta(x, 100, 5)},
+selection_prob <- function(object,
+                           p = function(x) {
+                             stats::dbeta(x, 100, 5)
+                           },
                            h = 0.01,
-                           show_progbar = FALSE)
-{
-  if(class(object)!="lgpfit") stop("Class of 'object' must be 'lgpfit'!")
-  if(!is.function(p)){stop('p must be a function')}
-  
+                           show_progbar = FALSE) {
+  if (class(object) != "lgpfit") stop("Class of 'object' must be 'lgpfit'!")
+  if (!is.function(p)) {
+    stop("p must be a function")
+  }
+
   # Get relevances
   rel_smp <- as.matrix(object@relevances$samples)
 
-  # Set variables  
-  info <- object@model@info
-  H    <- seq(0, 1, by = h)
-  L    <- length(H)
-  P    <- rep(0, L)
+  # Set variables
+  H <- seq(0, 1, by = h)
+  L <- length(H)
+  P <- rep(0, L)
   prob <- selection_prob_fixed_threshold(rel_smp, threshold = 0)
-  D    <- length(prob) - 1 
+  D <- length(prob) - 1
   prob <- prob[1:D]
-  nam  <- names(prob)
+  nam <- names(prob)
   PROB <- matrix(0, L, D)
-  
+
   # Setup progress bar
-  if(show_progbar){
-    str    <- paste("|   ", seq(10,100,by=10), "%", sep="")
-    top    <- paste(formatC(str, width = 4), collapse = " ")
-    top    <- paste(top, "|")
+  if (show_progbar) {
+    str <- paste("|   ", seq(10, 100, by = 10), "%", sep = "")
+    top <- paste(formatC(str, width = 4), collapse = " ")
+    top <- paste(top, "|")
     barlen <- nchar(top) - 1
     iprint <- ceiling(seq(1, L, length.out = barlen))
-    if(L >=100){
+    if (L >= 100) {
       cat(top, "\n ")
     }
   }
-  
+
   # Run probability computations
-  for(i in 1:L){
+  for (i in 1:L) {
     P[i] <- p(H[i])
     prob <- selection_prob_fixed_threshold(rel_smp,
-                                           threshold = H[i])
-    PROB[i,] <- prob[1:D]
-    if(show_progbar){
-      if(i %in% iprint){cat('=')}
-      if(i == L){ cat('\n\n')}
+      threshold = H[i]
+    )
+    PROB[i, ] <- prob[1:D]
+    if (show_progbar) {
+      if (i %in% iprint) {
+        cat("=")
+      }
+      if (i == L) {
+        cat("\n\n")
+      }
     }
   }
   colnames(PROB) <- nam
@@ -102,19 +110,18 @@ selection_prob <- function(object,
 
 #' Selection probabilities using a fixed threshold
 #'
-#' @param relevances The \code{relevances$samples} slot of an 
+#' @param relevances The \code{relevances$samples} slot of an
 #' \code{lgpfit} object.
 #' @param threshold value between 0 and 1
 #' @return proportion of times each component was selected
-selection_prob_fixed_threshold <- function(relevances, threshold)
-{
+selection_prob_fixed_threshold <- function(relevances, threshold) {
   n_smp <- dim(relevances)[1]
-  n_cmp <- dim(relevances)[2]-1
+  n_cmp <- dim(relevances)[2] - 1
   names <- colnames(relevances)
-  sel   <- matrix(0, n_smp, n_cmp+1)
-  for(i in 1:n_smp){
-    i_sel <- selection_fixed_threshold(relevances[i,], threshold)
-    sel[i,i_sel] <- 1
+  sel <- matrix(0, n_smp, n_cmp + 1)
+  for (i in 1:n_smp) {
+    i_sel <- selection_fixed_threshold(relevances[i, ], threshold)
+    sel[i, i_sel] <- 1
   }
   colnames(sel) <- names
   return(colMeans(sel))
@@ -126,29 +133,28 @@ selection_prob_fixed_threshold <- function(relevances, threshold)
 #' @param rel a named vector of component relevances
 #' @param threshold value between 0 and 1
 #' @return indices of selected components (including "noise" always)
-selection_fixed_threshold <- function(rel, threshold)
-{
-  n_cmp      <- length(rel) - 1
-  i_noise    <- n_cmp + 1
-  p_noise    <- rel[i_noise]
-  rel        <- as.numeric(rel[1:n_cmp])
-  s          <- sort(rel, decreasing = TRUE, index.return = TRUE)
-  rel        <- s$x
-  if(p_noise >= threshold){
+selection_fixed_threshold <- function(rel, threshold) {
+  n_cmp <- length(rel) - 1
+  i_noise <- n_cmp + 1
+  p_noise <- rel[i_noise]
+  rel <- as.numeric(rel[1:n_cmp])
+  s <- sort(rel, decreasing = TRUE, index.return = TRUE)
+  rel <- s$x
+  if (p_noise >= threshold) {
     i_sel <- i_noise
     return(i_sel)
-  }else{
-    for(j in 1:length(rel)){
+  } else {
+    rel_seq <- seq_len(length(rel))
+    for (j in rel_seq) {
       h <- p_noise + sum(rel[1:j])
-      if(h >= threshold){
+      if (h >= threshold) {
         i_sel <- c(i_noise, s$ix[1:j])
         return(i_sel)
       }
     }
-    i_sel <- c(1:(n_cmp+1))
+    i_sel <- c(1:(n_cmp + 1))
     return(i_sel)
   }
-
 }
 
 
@@ -158,23 +164,25 @@ selection_fixed_threshold <- function(rel, threshold)
 #' @param H a grid on interval [0,1]
 #' @param P threshold probability distribution evaluated at H
 #' @return a ggplot object
-selection_prob_plot <- function(PROB, H, P)
-{
+selection_prob_plot <- function(PROB, H, P) {
   nam <- colnames(PROB)
-  n   <- dim(PROB)[1]
-  d   <- dim(PROB)[2]
-  pr  <- as.numeric(PROB)
-  cp  <- as.factor(rep(nam, each = n))
-  h   <- rep(H, d)
-  p   <- rep(P, d)
-  df  <- data.frame(h, pr, cp)
+  n <- dim(PROB)[1]
+  d <- dim(PROB)[2]
+  pr <- as.numeric(PROB)
+  cp <- as.factor(rep(nam, each = n))
+  h <- rep(H, d)
+  df <- data.frame(h, pr, cp)
   colnames(df) <- c("Threshold", "Probability", "Component")
-  plt <- ggplot2::ggplot(df, 
-        ggplot2::aes_string(x = 'Threshold',
-                            y = 'Probability',
-                            group = 'Component',
-                             color = 'Component'))
+  plt <- ggplot2::ggplot(
+    df,
+    ggplot2::aes_string(
+      x = "Threshold",
+      y = "Probability",
+      group = "Component",
+      color = "Component"
+    )
+  )
   plt <- plt + ggplot2::geom_line() + ggplot2::theme_linedraw()
-  plt <- plt + ggplot2::xlim(c(0,1)) + ggplot2::ylim(c(0,1))
+  plt <- plt + ggplot2::xlim(c(0, 1)) + ggplot2::ylim(c(0, 1))
   return(plt)
 }

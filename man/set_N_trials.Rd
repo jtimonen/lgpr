@@ -7,7 +7,8 @@
 set_N_trials(N_trials, response, LH)
 }
 \arguments{
-\item{N_trials}{the \code{N_trials} argument given as input to \code{lgp_model}}
+\item{N_trials}{the \code{N_trials} argument given as input to
+\code{lgp_model}}
 
 \item{response}{response variable}
 

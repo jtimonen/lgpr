@@ -7,10 +7,12 @@
 prior_default(sigma_alpha = 1)
 }
 \arguments{
-\item{sigma_alpha}{Sigma parameter of the student-t distribution for all alpha.}
+\item{sigma_alpha}{Sigma parameter of the student-t distribution for all
+alpha.}
 }
 \value{
-A list defining a valid \code{prior} argument for the \code{lgp} function.
+A list defining a valid \code{prior} argument for the \code{lgp}
+function.
 }
 \description{
 Create the default prior
