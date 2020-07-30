@@ -458,16 +458,10 @@ compute_kernel_matrices <- function(X1, X2, kernel_info) {
     xnn1 <- as.numeric(!is.nan(disAge1))
     xnn2 <- as.numeric(!is.nan(disAge2))
 
-    # modify diseaseAges if they are uncertain
+    # modify disease ages if they are uncertain
     if (info$UNCRT == 1) {
-      formatter <- function(x) {
-        formatC(x, width = 2, format = "d", flag = "0")
-      }
-      id1_str <- formatter(id1)
-      id2_str <- formatter(id2)
       t_onset1 <- rep(NaN, n1)
       t_onset2 <- rep(NaN, n2)
-      case_ids <- t_ons[1, ]
       for (i_iter in 1:dim(t_ons)[2]) {
         caseid <- t_ons[1, i_iter]
         i1 <- which(id1 == caseid)

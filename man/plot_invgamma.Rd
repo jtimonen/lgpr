@@ -34,6 +34,5 @@ a ggplot object or a list
 }
 \description{
 Uses the same parametrization as described
-\href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
-{here}.
+\href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 }

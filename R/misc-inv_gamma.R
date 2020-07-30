@@ -2,8 +2,7 @@
 #' as in Stan
 #'
 #' @description See
-#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
-#' {here}.
+#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param x point where to compute the density
@@ -31,8 +30,7 @@ dinvgamma_stanlike <- function(x, alpha, beta, log = FALSE) {
 #' as in Stan
 #'
 #' @description See
-#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
-#' {here}.
+#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param p quantile (must be between 0 and 1)
@@ -47,8 +45,7 @@ qinvgamma_stanlike <- function(p, alpha, beta) {
 #'
 #' @export
 #' @description Uses the same parametrization as described
-#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}
-#' {here}.
+#' \href{https://mc-stan.org/docs/2_21/functions-reference/inverse-gamma-distribution.html}{here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param by grid size

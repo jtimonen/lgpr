@@ -381,6 +381,7 @@ lgp_fit <- function(model,
 #'   \item For creating an \code{lgpfit} object, see \code{\link{lgp_fit}}.
 #'   \item For creating an \code{lgpmodel} object, see \code{\link{lgp_model}}.
 #' }
+#'
 lgp_predict <- function(fit,
                         X_test,
                         samples = "map",
