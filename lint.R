@@ -13,8 +13,11 @@ linters <- lintr::with_defaults(
   open_curly_linter = NULL
   )
 
+# Files that are not linted
+exclusions <- list("R/RcppExports.R", "R/stanmodels.R")
+
 # Lint the package
-lout <- lintr::lint_package(linters = linters)
+lout <- lintr::lint_package(linters = linters, exclusions = exclusions)
 show(summary(lout))
 
 # Lint a single file
