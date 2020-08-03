@@ -25,12 +25,11 @@ int<lower=0> num_ell;           // number of ell parameters
 int<lower=0> num_dis;           // number of disease components
 
 // Observation model
-// - 0 = None
 // - 1 = Gaussian
 // - 2 = Poisson
 // - 3 = Negative Binomial
 // - 4 = Binomial
-int<lower=0,upper=4> obs_model;
+int<lower=1,upper=4> obs_model;
 
 // Component types are specified by the first two "rows" of the integer array
 // <components>, so that on each "column"
@@ -104,7 +103,7 @@ real hyper_wrp[num_dis, 3];
 real hyper_sigma[obs_model==1, 3];
 real hyper_phi[obs_model==3, 3];
 real hyper_teff[is_uncrt, 3];
-real hyper_beta[is_heter, 3];
+real hyper_beta[is_heter, 2];
 
 // Observed effect times and uncertainty bounds for each case subject
 vector[num_cases] teff_obs[is_uncrt];

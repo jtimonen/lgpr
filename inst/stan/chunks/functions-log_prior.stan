@@ -1,5 +1,9 @@
 // LOG PRIOR TO BE ADDED TO TARGET
-real STAN_log_prior(real x, int[] types, real[] hp){
+real STAN_log_prior(
+  real x, 
+  data int[] types,
+  data real[] hp)
+{
   real lp;
   real a = hp[1]; // prior hyperparameter 1
   real b = hp[2]; // prior hyperparameter 2

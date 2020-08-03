@@ -1,72 +1,56 @@
-// Kernel hyperparameters for idAge component
-if(D[1]==1){
-  target += STAN_log_prior(alpha_idAge[1], t_ID[1,1:2], p_ID[1,1:3]);
-  target += STAN_log_prior(ell_idAge[1], t_ID[1,3:4], p_ID[1,4:6]);
+// Magnitude parameters
+for(j in 1:num_comps){
+  target += STAN_log_prior(alpha[j], prior_alpha[j], hyper_alpha[j]);
 }
 
-// Kernel hyperparameters for sharedAge component
-if(D[2]==1){
-  target += STAN_log_prior(alpha_sharedAge[1], t_A[1,1:2], p_A[1,1:3]);
-  target += STAN_log_prior(ell_sharedAge[1], t_A[1,3:4], p_A[1,4:6]);
+// Lengthscale parameters
+for(j in 1:num_ell){
+  target += STAN_log_prior(ell[j], prior_ell[j], hyper_ell[j]);
 }
 
-// Kernel hyperparameters for diseaseAge component
-if(D[3]==1){
-  target += STAN_log_prior(alpha_diseaseAge[1], t_D[1,1:2], p_D[1,1:3]);
-  target += STAN_log_prior(ell_diseaseAge[1], t_D[1,3:4], p_D[1,4:6]);
-  target += STAN_log_prior(warp_steepness[1], t_D[1,5:6], p_D[1,7:9]);
-}
-
-// Kernel hyperparameters for other continuous components
-for(j in 1:D[4]){
-  target += STAN_log_prior(alpha_continuous[j], t_CNT[j,1:2], p_CNT[j,1:3]);
-  target += STAN_log_prior(ell_continuous[j], t_CNT[j,3:4], p_CNT[j,4:6]);
-}
-
-// Kernel hyperparameters for categorical * age components
-for(j in 1:D[5]){
-  target += STAN_log_prior(alpha_categAge[j], t_CAT[j,1:2], p_CAT[j,1:3]);
-  target += STAN_log_prior(ell_categAge[j], t_CAT[j,3:4], p_CAT[j,4:6]);
-}
-
-// Kernel hyperparameters for categorical offset components
-for(j in 1:D[6]){
-  target += STAN_log_prior(alpha_categOffset[j], t_OFS[j,1:2], p_OFS[j,1:3]);
+// Input warping parameters
+for(j in 1:num_dis){
+  target += STAN_log_prior(wrp[j], prior_wrp[j], hyper_wrp[j]);
 }
 
 // Noise level parameters
-if(LH==1){
-  target += STAN_log_prior(sigma_n[1], t_SIG[1:2], p_SIG[1:3]);
-}else if(LH==3){
-  target += STAN_log_prior(phi[1], t_PHI[1:2], p_PHI[1:3]);
-}else if(LH==0){
-  target += STAN_log_prior(sigma_n[1], t_SIG[1:2], p_SIG[1:3]);
-  target += STAN_log_prior(phi[1], t_PHI[1:2], p_PHI[1:3]);
+if(obs_model==1){
+  target += STAN_log_prior(sigma[1], prior_sigma[1], hyper_sigma[1]);
+}else if(obs_model==3){
+  target += STAN_log_prior(phi[1], prior_phi[1], hyper_phi[1]);
 }
 
-// DiseaseAge uncertainty prior
-if(UNCRT){
-  real tx;
-  for(k in 1:N_cases){
-    if(RELATIVE==1){
-      tx = - T_observed[k] + T_effect[1,k];
-    }else if(BACKWARDS==1){
-      tx = T_observed[k] - T_effect[1,k];
-    }else{
-      tx = T_effect[1,k];
-    }
-    target += STAN_log_prior(tx, t_ONS[k,1:2], p_ONS[k,1:3]);
+// Heterogeneity parameters
+if(is_heter){
+  real a[2] = hyper_beta[1];
+  target += beta_lpdf(beta[1] | a[1], a[2]);
+}
+
+// Disease-related age uncertainty
+if(is_uncrt){
+  
+  vector[num_cases] tx;
+  int ptype = prior_teff[1][1];
+  int is_backwards = prior_teff[1][2];
+  int is_relative = prior_teff[1][3];
+  
+  if(is_relative){
+    tx = teff[1] - teff_obs[1];
+  }else if(is_backwards){
+    tx = teff_obs[1] - teff[1];
+  }else{
+      tx = teff[1];
   }
-}
+  
+  for(k in 1:num_cases){
+    target += STAN_log_prior(tx[k], {ptype, 0}, hyper_teff[1]);
+  }
 
-// Heterogeneous disease effect parameters
-if(HMGNS==0){
-  target += beta_lpdf(beta[1] | p_BET[1], p_BET[2]);
 }
 
 // Isotropic normals for auxiliary variables when F is sampled
-if(F_IS_SAMPLED){
-  for(j in 1:sum_D){
-    target += normal_lpdf(ETA[1,j] | 0, 1);
+if(is_f_sampled){
+  for(j in 1:num_comps){
+    target += normal_lpdf(eta[1,j] | 0, 1);
   }
 }

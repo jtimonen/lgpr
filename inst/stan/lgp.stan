@@ -43,10 +43,10 @@ transformed parameters {
 }
 
 model {
-// #include chunks/model-priors.stan
+#include chunks/model-priors.stan
   if(is_likelihood_skipped){
   }else{
-// #include chunks/model-likelihood.stan
+#include chunks/model-likelihood.stan
   }
 }
 
