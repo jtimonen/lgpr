@@ -1,4 +1,3 @@
-context("kernel functions")
 library(lgpr)
 
 test_that("base kernels work correctly", {

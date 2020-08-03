@@ -1,4 +1,3 @@
-
 if(F_IS_SAMPLED){
   
   // Compute total signal + offset c_hat

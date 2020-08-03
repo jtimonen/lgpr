@@ -1,4 +1,3 @@
-context("generating artificial data")
 library(lgpr)
 
 test_that("gaussian data can be simulated", {

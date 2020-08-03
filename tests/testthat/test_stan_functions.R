@@ -1,10 +1,8 @@
-
-context("stan helper functions")
-
 library(lgpr)
 library(rstan)
 stanmodel <- lgpr::get_stan_model()
 rstan::expose_stan_functions(stanmodel)
+
 
 test_that("input warping function works similarly in Stan and R", {
   a <- exp(stats::rnorm(1))

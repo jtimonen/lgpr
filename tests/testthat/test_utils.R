@@ -1,4 +1,3 @@
-context("utility functions")
 library(lgpr)
 
 test_that("repvec works correctly", {

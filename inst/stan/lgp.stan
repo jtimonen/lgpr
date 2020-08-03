@@ -17,43 +17,39 @@
     along with lgpr.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 functions{
-#include chunks/functions_kernels_base.stan
-#include chunks/functions_kernels.stan
-#include chunks/functions_log_prior.stan
+#include chunks/functions-utils.stan
+#include chunks/functions-log_prior.stan
+#include chunks/functions-kernels_discrete.stan
+#include chunks/functions-kernels_continuous.stan
+#include chunks/functions-kernels_single.stan
+#include chunks/functions-kernels_many.stan
 }
-
 
 data {
-#include chunks/data.stan
+#include chunks/data-data.stan
 }
-
 
 transformed data{
-#include chunks/transformed_data.stan
+#include chunks/data-transformed.stan
 }
-
 
 parameters {
-#include chunks/parameters.stan
+#include chunks/parameters-parameters.stan
 }
-
 
 transformed parameters {
-#include chunks/transformed_parameters.stan
+#include chunks/parameters-transformed.stan
 }
 
-
 model {
-#include chunks/model_priors.stan
-  if(LH!=0){
-#include chunks/model_likelihood.stan
+// #include chunks/model-priors.stan
+  if(is_likelihood_skipped){
+  }else{
+// #include chunks/model-likelihood.stan
   }
 }
 
-
 generated quantities {
-#include chunks/generated_quantities.stan
+// #include chunks/generated.stan
 }
-

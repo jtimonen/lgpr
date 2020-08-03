@@ -1,4 +1,3 @@
-
 // Kernel hyperparameters for idAge component
 if(D[1]==1){
   target += STAN_log_prior(alpha_idAge[1], t_ID[1,1:2], p_ID[1,1:3]);

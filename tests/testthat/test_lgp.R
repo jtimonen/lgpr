@@ -1,4 +1,3 @@
-context("main function lgp")
 library(lgpr)
 
 # Warnings are suppressed because sampling won't converge in such a short time

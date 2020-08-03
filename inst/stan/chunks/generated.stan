@@ -1,4 +1,3 @@
-
 vector[n] F_mean_cmp[DO_GEN_QUANT, sum_D];
 vector[n] F_var_cmp[DO_GEN_QUANT, sum_D];
 vector[n] F_mean_tot[DO_GEN_QUANT];
