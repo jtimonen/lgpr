@@ -1,71 +1,227 @@
 library(lgpr)
 library(rstan)
 stanmodel <- lgpr::get_stan_model()
-rstan::expose_stan_functions(stanmodel)
+rstan::expose_stan_functions(stanmodel, show_compiler_warnings = FALSE)
 
+# 1. STAN UTILS -----------------------------------------------------------
 
-test_that("input warping function works similarly in Stan and R", {
-  a <- exp(stats::rnorm(1))
-  x <- c(-2, 1, 0, 1, 2)
+context("Stan utils: input warping")
+
+test_that("STAN_warp_input works for scalar input", {
+  w <- STAN_warp_input(-1,1.32)
+  expect_equal(w, -0.5783634)
+})
+
+test_that("STAN_warp_input works for vector input", {
+  w <- STAN_warp_input(c(-1,0,1), 1.32)
+  w_correct <- c(-0.5783634, 0.0, 0.5783634)
+  expect_equal(w, w_correct)
+})
+
+test_that("STAN_warp_input errors with invalid steepness input", {
+  expect_error(STAN_warp_input(1, -1))
+  expect_error(STAN_warp_input(1, 0.0))
+  expect_error(STAN_warp_input(1, NaN))
+  expect_error(STAN_warp_input(1, Inf))
+})
+
+test_that("STAN_warp_input works similarly as lgpr:::warp_input", {
+  a <- exp(stats::rnorm(1)) # random steepness
+  x <- seq(-3, 3, by = 1.33)
   expect_equal(
     STAN_warp_input(x, a),
-    warp_input(x, a, 0, 1)
+    lgpr:::warp_input(x, a, 0, 1)
   )
 })
 
-test_that("variance masking function works similarly in Stan and R", {
+
+context("Stan utils: variance masking")
+
+test_that("STAN_var_mask works for scalar input", {
+  m <- STAN_var_mask(-1,1.32)
+  expect_equal(m, 0.2108183)
+})
+
+test_that("STAN_var_mask works for vector input", {
+  m <- STAN_var_mask(c(-1,0,1), 1.32)
+  m_correct <- c(0.2108183, 0.5, 0.7891817)
+  expect_equal(m, m_correct)
+})
+
+test_that("STAN_var_mask errors with invalid steepness input", {
+  expect_error(STAN_var_mask(1, -1))
+  expect_error(STAN_var_mask(1, 0.0))
+  expect_error(STAN_var_mask(1, NaN))
+  expect_error(STAN_var_mask(1, Inf))
+})
+
+test_that("STAN_var_mask works similarly as lgpr:::var_mask", {
   a <- 0.6
   x <- c(-5, 0, 5)
   expect_equal(
-    STAN_var_mask(x = x, a = a),
-    var_mask(x = x, a = a)
+    STAN_var_mask(x, a),
+    lgpr:::var_mask(x, a)
   )
 })
 
-test_that("STAN_get_x_tilde works properly", {
-  x_disAge <- c(
+
+context("Stan utils: expanding a vector")
+
+test_that("STAN_expand works for valid input", {
+  p <- c(0.1, 0.2)
+  v <- STAN_expand(p, c(2,3,2,3))
+  expect_equal(v, c(0.1, 0.2, 0.1, 0.2))
+})
+
+test_that("STAN_expand errors when idx_expand has out of bounds indices", {
+  p <- c(0.1, 0.2)
+  idx1 <- c(2,3,0,3)
+  idx2 <- c(2,3,4,3)
+  expect_error(STAN_expand(p, idx1))
+  expect_error(STAN_expand(p, idx2))
+})
+
+
+context("Stan utils: editing disease-related age")
+
+test_that("STAN_edit_dis_age works properly", {
+  x_dis_age <- c(
     -24, -12, 0, 12, -24, -12, 0, 12,
     0, 0, 0, 0, 0, -12, 0, 12, 16
   )
-  T_effect <- c(-1, 2, 10)
-  T_observed <- c(0, 6, 12)
-  mapping <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17),
-    ncol = 4, nrow = 3, byrow = TRUE
-  )
-  map <- list(mapping[1, ], mapping[2, ], mapping[3, ])
-  lengths <- c(4, 4, 4)
-  expected <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
-  expect_equal(
-    STAN_get_x_tilde(x_disAge, T_effect, T_observed, map, lengths),
-    expected
-  )
+  teff <- c(-1, 2, 10)
+  teff_obs <- c(0, 6, 12)
+  case_ids <- c(1,1,1,1,2,2,2,2,0,0,0,0,0,3,3,3,3)
+  idx_expand <- case_ids + 1
+  expand_expect <- c(-1,-1,-1,-1,2,2,2,2,0,0,0,0,0,10,10,10,10)
+  expect_equal(STAN_expand(teff, idx_expand), expand_expect)
+  t_edit <- STAN_edit_dis_age(x_dis_age, idx_expand, teff_obs, teff)
+  t_expect <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
+  expect_equal(t_edit, t_expect)
 })
 
-context("stan kernel functions")
+
+# 2. STAN BASE KERNELS ----------------------------------------------------
+
+context("Stan base kernels: zero-sum kernel")
+
+test_that("zero-sum kernel works correctly", {
+  M <- 2
+  x <- c(1, 1, 2)
+  a <- c( 1,  1, -1,
+          1,  1, -1,
+         -1, -1,  1)
+  K_expect <- matrix(a, 3, 3, byrow = TRUE)
+  K <- STAN_kernel_base_zerosum(x, x, M)
+  expect_equal(K, K_expect)
+})
 
 test_that("zero-sum kernel works similarly in R and Stan", {
   M <- 3
   x <- sample.int(M, size = 8, replace = TRUE)
   expect_equal(
-    STAN_K_zerosum(x, x, M),
+    STAN_kernel_base_zerosum(x, x, M),
     kernel_zerosum(x, x, M)
   )
+})
+
+test_that("zero-sum kernel errors if number of categories is one", {
+  M <- 1
+  x <- sample.int(M, size = 8, replace = TRUE)
+  expect_error(STAN_kernel_base_zerosum(x, x, M))
+})
+
+
+context("Stan base kernels: ordinary categorical kernel")
+
+test_that("categorical kernel works correctly", {
+  x <- c(1, 1, 2)
+  a <- c( 1,  1,  0,
+          1,  1,  0,
+          0,  0,  1)
+  K_expect <- matrix(a, 3, 3, byrow = TRUE)
+  K <- STAN_kernel_base_cat(x, x)
+  expect_equal(K, K_expect)
+})
+
+
+context("Stan base kernels: binary mask kernel")
+
+test_that("binary mask kernel works correctly", {
+  x <- c(1, 1, 2)
+  a <- c( 1,  1,  0,
+          1,  1,  0,
+          0,  0,  0)
+  b <- c( 0,  0,  0,
+          0,  0,  0,
+          0,  0,  1)
+  K1_expect <- matrix(a, 3, 3, byrow = TRUE)
+  K2_expect <- matrix(b, 3, 3, byrow = TRUE)
+  K1 <- STAN_kernel_base_bin(x, x, 1)
+  K2 <- STAN_kernel_base_bin(x, x, 2)
+  expect_equal(K1, K1_expect)
+  expect_equal(K2, K2_expect)
 })
 
 test_that("binary mask kernel works similarly in R and Stan", {
   x <- sample.int(2, size = 8, replace = TRUE) - 1
   expect_equal(
-    STAN_K_bin(x, x, 1),
+    STAN_kernel_base_bin(x, x, 1),
     kernel_bin(x, x)
   )
+})
+
+context("Stan base kernels: variance mask kernel")
+
+test_that("variance mask kernel works correctly", {
+  x <- c(12, 0, 12)
+  stp <- 0.2
+  vm_params <- c(0.05, 0.6)
+  v <- c(0.9755191, 0.9382995, 0.9755191,
+         0.9382995, 0.9025000, 0.9382995,
+         0.9755191, 0.9382995, 0.9755191)
+  K_expect <- matrix(v, 3, 3, byrow = TRUE)
+  K <- STAN_kernel_base_var_mask(x, x, stp, vm_params)
+  expect_equal(K, K_expect)
+})
+
+
+context("Stan base kernels: disease mask kernel")
+
+test_that("disease mask kernel works correctly", {
+  x1 <- c(1, 3, 0)
+  x2 <- c(1, 0, 2, 0)
+  a <- c( 1,  0,  1,  0,
+          1,  0,  1,  0,
+          0,  0,  0,  0)
+  K_expect <- matrix(a, 3, 4, byrow = TRUE)
+  K <- STAN_kernel_base_disease_mask(x1, x2)
+  expect_equal(K, K_expect)
 })
 
 test_that("variance mask kernel works similarly in R and Stan", {
   x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
   stp <- 1.0
   vm_params <- c(0.05, 0.6)
-  expect_equal(
-    STAN_K_var_mask(x, stp, vm_params),
-    kernel_var_mask(x, x, vm_params, stp)
-  )
+  K_stan <- STAN_kernel_base_var_mask(x, x, stp, vm_params)
+  K_r <- kernel_var_mask(x, x, vm_params, stp)
+  expect_equal(K_stan, K_r)
+})
+
+test_that("variance mask kernel errors if steepness is not valid", {
+  x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
+  vm_params <- c(0.05, 0.6)
+  expect_error(STAN_kernel_base_var_mask(x, x, 0, vm_params))
+  expect_error(STAN_kernel_base_var_mask(x, x, -1.0, vm_params))
+  expect_error(STAN_kernel_base_var_mask(x, x, NaN, vm_params))
+  expect_error(STAN_kernel_base_var_mask(x, x, Inf, vm_params))
+})
+
+test_that("variance mask kernel errors if <vm_params> is not valid", {
+  x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
+  vm_params <- c(0.05, 0.6)
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(-0.05, 0.6)))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(1.6, 0.6)))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(0.05, NaN)))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6)))
 })

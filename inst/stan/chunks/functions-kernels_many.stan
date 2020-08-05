@@ -1,7 +1,6 @@
-/* Compute all fixed kernel matrices
-
-  These do not depend on parameters and therefore this function
-  never needs to be evaluated during sampling
+/* 
+  Compute all fixed kernel matrices. These do not depend on parameters and
+  therefore this function never needs to be evaluated during sampling.
 */
 matrix[] STAN_kernel_fixed_all(
     data int[,] x1, 
@@ -29,13 +28,12 @@ matrix[] STAN_kernel_fixed_all(
   return(K_fixed);
 }
 
-/* Compute all kernel matrices
-
-  These depend on parameters and therefore this function
-  needs to be evaluated repeatedly during sampling
+/* 
+  Compute all kernel matrices. These depend on parameters and
+  therefore this function needs to be evaluated repeatedly during sampling.
 */
 matrix[] STAN_kernel_all(
-    matrix[] K_fixed,
+    data matrix[] K_fixed,
     data int[,] components,
     data vector[] x1,
     data vector[] x2,

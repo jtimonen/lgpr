@@ -1,4 +1,5 @@
-/* Binary option switches
+/* 
+  Binary option switches
   - is verbose mode used?
   - are function values be sampled?
   - is the possible disease effect modeled heterogeneously?
@@ -25,7 +26,8 @@ int<lower=0> num_comps;         // number of additive components
 int<lower=0> num_ell;           // number of ell parameters
 int<lower=0> num_dis;           // number of disease components
 
-/* Observation model
+/*
+  Observation model
   - 1 = Gaussian
   - 2 = Poisson
   - 3 = Negative Binomial
@@ -33,7 +35,8 @@ int<lower=0> num_dis;           // number of disease components
 */
 int<lower=1,upper=4> obs_model;
 
-/* Types of the additive function components are specified by the first two
+/* 
+  Types of the additive function components are specified by the first two
   "rows" of the integer array <components>, so that on each "column"
     - the first number specifies component type
     - the second number specifies kernel type
@@ -80,7 +83,8 @@ int<lower=0> num_levels[num_cov_disc];
 // Inputs related to expanding beta and t_effect
 int<lower=1, upper=num_cases+1> idx_expand[(is_heter || is_uncrt), num_obs];
 
-/* Prior types and transforms for kernel and noise parameters
+/* 
+  Prior types and transforms for kernel and noise parameters
   - [,1]: prior types
   - [,2]: prior transforms
 */
@@ -90,7 +94,8 @@ int<lower=0> prior_wrp[num_dis, 2];
 int<lower=0> prior_sigma[obs_model==1, 2];
 int<lower=0> prior_phi[obs_model==3, 2];
 
-/* Prior types for effect time uncertainty
+/*
+  Prior types for effect time uncertainty
   - [,1]: prior type
   - [,2]: is prior "backwards"?
   - [,3]: is prior relative to the observed effect time?

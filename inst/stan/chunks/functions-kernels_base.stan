@@ -1,4 +1,4 @@
-// CATEGORICAL ZERO-SUM KERNEL
+// Categorical zero-sum kernel
 matrix STAN_kernel_base_zerosum(
   data int[] x1,
   data int[] x2,
@@ -6,9 +6,9 @@ matrix STAN_kernel_base_zerosum(
 {
   int n1 = size(x1);
   int n2 = size(x2);
-  matrix[n1,n2] K;
+  matrix[n1, n2] K;
   if(num_cat <= 1){
-    reject("num_cat must be at least 2!")
+    reject("STAN_kernel_base_zerosum: <num_cat> must be at least 2!")
   }
   for(i in 1:n1){
     for(j in 1:n2){
@@ -22,7 +22,7 @@ matrix STAN_kernel_base_zerosum(
   return(K);
 }
 
-// CATEGORICAL KERNEL
+// Categorical kernel
 matrix STAN_kernel_base_cat(
   data int[] x1,
   data int[] x2)
@@ -42,7 +42,7 @@ matrix STAN_kernel_base_cat(
 matrix STAN_kernel_base_bin(
   data int[] x1,
   data int[] x2,
-  real c)
+  data int c)
 {
   int n1 = size(x1);
   int n2 = size(x2);
@@ -82,8 +82,11 @@ matrix STAN_kernel_base_var_mask(
   int n2 = num_elements(x2);
   real a = steepness * vm_params[2];
   real r = inv(a)*logit(vm_params[1]);
-  matrix[1, n1] s1 = to_matrix(STAN_var_mask(x1 - r, a));
-  matrix[1, n2] s2 = to_matrix(STAN_var_mask(x2 - r, a));
+  matrix[n1, 1] s1 = to_matrix(STAN_var_mask(x1 - r, a));
+  matrix[n2, 1] s2 = to_matrix(STAN_var_mask(x2 - r, a));
   matrix[n1, n2] K = s1 * transpose(s2);
+  STAN_check_real_positive(steepness);
+  STAN_check_real_positive(vm_params[2]);
+  STAN_check_prob_positive(vm_params[1]);
   return(K);
 }
