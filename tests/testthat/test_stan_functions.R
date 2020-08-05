@@ -225,3 +225,83 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
   expect_error(STAN_kernel_base_var_mask(x, x, 1, c(0.05, NaN)))
   expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6)))
 })
+
+
+# 3. STAN PRIORS ----------------------------------------------------------
+
+require(stats)
+
+context("Stan priors: log-densities")
+
+test_that("normal prior is correct", {
+  x <- 0.333
+  mu <- -0.11
+  sigma <- 0.23
+  log_p <- STAN_log_prior(x, c(2,0), c(mu, sigma, 0))
+  expect_equal(log_p, stats::dnorm(!!x, !!mu, !!sigma, log = TRUE))
+})
+
+test_that("student-t prior is correct", {
+  x <- 0.333
+  nu <- 16
+  sigma <- 1
+  log_p <- STAN_log_prior(x, c(3,0), c(nu, sigma, 0))
+  expect_equal(log_p, stats::dt(!!x, !!nu, log = TRUE))
+})
+
+test_that("gamma prior is correct", {
+  x <- 0.333
+  a <- 5
+  b <- 8
+  log_p <- STAN_log_prior(x, c(4,0), c(a, b, 0))
+  expect_equal(log_p, stats::dgamma(!!x, shape = !!a, rate = !!b, log = TRUE))
+})
+
+test_that("inverse-gamma prior is correct", {
+  x <- 0.333
+  a <- 5
+  b <- 8
+  log_p <- STAN_log_prior(x, c(5,0), c(a, b, 0))
+  expect_equal(
+    log_p,
+    lgpr::dinvgamma_stanlike(!!x, alpha = !!a, beta = !!b, log = TRUE)
+  )
+})
+
+test_that("log-normal prior is correct", {
+  x <- 0.333
+  mu <- -0.11
+  sigma <- 0.23
+  log_p <- STAN_log_prior(x, c(6,0), c(mu, sigma, 0))
+  expect_equal(log_p, stats::dlnorm(!!x, !!mu, !!sigma, log = TRUE))
+})
+
+context("Stan priors: Jacobian of a transformation")
+
+test_that("square transform is taken into account", {
+  x <- 0.333
+  mu <- -0.11
+  sigma <- 0.23
+  log_p <- STAN_log_prior(x, c(6,1), c(mu, sigma, 0)) 
+  expect_lt(
+    log_p, # -38.9
+    stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
+  )
+})
+
+context("Stan priors: errors")
+
+test_that("an error is thrown if <types> is misspecified", {
+  x <- 1
+  expect_error( STAN_log_prior(x, c(6), c(1, 1, 0)) )
+  expect_error( STAN_log_prior(x, c(0,1), c(1, 1, 0)) )
+  expect_error( STAN_log_prior(x, c(7,1), c(1, 1, 0)) )
+  expect_error( STAN_log_prior(x, c(1,3), c(1, 1, 0)) )
+})
+
+test_that("an error is thrown if <hyper> is misspecified", {
+  x <- 1
+  expect_error( STAN_log_prior(x, c(2,0), c(1, 1)) )
+  expect_error( STAN_log_prior(x, c(2,0), c(1, 1, 0, 1)) )
+  expect_error( STAN_log_prior(x, c(2,0), c(1, -1, 0)) )
+})
