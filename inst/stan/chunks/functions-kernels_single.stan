@@ -1,6 +1,7 @@
-// Compute a discrete kernel matrix
-// - Does not depend on parameters and therefore this function
-//   never needs to be evaluated during sampling
+/* Compute a discrete kernel matrix
+  Does not depend on parameters and therefore this function
+  never needs to be evaluated during sampling
+*/
 matrix STAN_kernel_discrete(
   data int[] x1,
   data int[] x2,
@@ -22,9 +23,10 @@ matrix STAN_kernel_discrete(
   return(K);
 }
 
-// Compute one fixed kernel matrix
-// - Does not depend on parameters and therefore this function
-//   never needs to be evaluated during sampling
+/* Compute one fixed kernel matrix
+  Does not depend on parameters and therefore this function
+  never needs to be evaluated during sampling
+*/
 matrix STAN_kernel_fixed(
   data int[] x1,
   data int[] x2,
@@ -45,8 +47,9 @@ matrix STAN_kernel_fixed(
   return(K);
 }
 
-// Compute one stationary kernel matrix
-// - This function needs to be evaluated repeatedly during sampling
+/* Compute one stationary kernel matrix
+  This function needs to be evaluated repeatedly during sampling
+*/
 matrix STAN_kernel_stationary(
   matrix K_fixed,
   data vector x1,
@@ -97,8 +100,9 @@ matrix STAN_kernel_nonstationary(
   return(K);
 }
 
-// Compute the disease kernel matrix
-// - This function needs to be evaluated repeatedly during sampling
+/* Compute the disease kernel matrix
+  This function needs to be evaluated repeatedly during sampling
+*/
 matrix STAN_kernel_disease(
   matrix K_fixed,
   data vector x1,

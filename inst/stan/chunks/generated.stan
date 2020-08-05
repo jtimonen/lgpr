@@ -1,3 +1,10 @@
+/* Component-wise and total posterior means and variances. Let D be the
+  number of components (<num_comps>). Then the elemens of <f_post> are
+    - [1:D] = component means
+    - [D+1] = total mean
+    - [(D+2):(D+2+D)] = component variances
+    - [2*(D+1)] = total variance
+*/
 vector[num_obs] f_post[is_generated_done, 2*(num_comps+1)];
 
 if(is_generated_done){
