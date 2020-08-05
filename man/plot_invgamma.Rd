@@ -8,7 +8,6 @@ plot_invgamma(
   alpha,
   beta,
   by = 0.01,
-  max = 1.5,
   log = FALSE,
   IQR = 0.95,
   return_quantiles = FALSE
@@ -20,8 +19,6 @@ plot_invgamma(
 \item{beta}{positive real number}
 
 \item{by}{grid size}
-
-\item{max}{maximum warping steepness to be visualized}
 
 \item{log}{if prior pdf should be on log scale}
 

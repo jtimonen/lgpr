@@ -7,8 +7,8 @@
 #' @param name Color name.
 #' @return A hex value of the color.
 color_set <- function(name) {
-  allowed <- c("blue", "red")
-  colors <- c("#3399ff", "#b22222")
+  allowed <- c("blue", "red", "red_muted", "blue_muted")
+  colors <- c("#3399ff", "#b22222", "#B97C7C", "#6497b1")
   idx <- argument_check(arg = name, allowed = allowed)
   return(colors[idx])
 }

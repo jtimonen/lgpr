@@ -8,12 +8,12 @@ rstan::expose_stan_functions(stanmodel, show_compiler_warnings = FALSE)
 context("Stan utils: input warping")
 
 test_that("STAN_warp_input works for scalar input", {
-  w <- STAN_warp_input(-1,1.32)
+  w <- STAN_warp_input(-1, 1.32)
   expect_equal(w, -0.5783634)
 })
 
 test_that("STAN_warp_input works for vector input", {
-  w <- STAN_warp_input(c(-1,0,1), 1.32)
+  w <- STAN_warp_input(c(-1, 0, 1), 1.32)
   w_correct <- c(-0.5783634, 0.0, 0.5783634)
   expect_equal(w, w_correct)
 })
@@ -38,12 +38,12 @@ test_that("STAN_warp_input works similarly as lgpr:::warp_input", {
 context("Stan utils: variance masking")
 
 test_that("STAN_var_mask works for scalar input", {
-  m <- STAN_var_mask(-1,1.32)
+  m <- STAN_var_mask(-1, 1.32)
   expect_equal(m, 0.2108183)
 })
 
 test_that("STAN_var_mask works for vector input", {
-  m <- STAN_var_mask(c(-1,0,1), 1.32)
+  m <- STAN_var_mask(c(-1, 0, 1), 1.32)
   m_correct <- c(0.2108183, 0.5, 0.7891817)
   expect_equal(m, m_correct)
 })
@@ -69,14 +69,14 @@ context("Stan utils: expanding a vector")
 
 test_that("STAN_expand works for valid input", {
   p <- c(0.1, 0.2)
-  v <- STAN_expand(p, c(2,3,2,3))
+  v <- STAN_expand(p, c(2, 3, 2, 3))
   expect_equal(v, c(0.1, 0.2, 0.1, 0.2))
 })
 
 test_that("STAN_expand errors when idx_expand has out of bounds indices", {
   p <- c(0.1, 0.2)
-  idx1 <- c(2,3,0,3)
-  idx2 <- c(2,3,4,3)
+  idx1 <- c(2, 3, 0, 3)
+  idx2 <- c(2, 3, 4, 3)
   expect_error(STAN_expand(p, idx1))
   expect_error(STAN_expand(p, idx2))
 })
@@ -91,9 +91,9 @@ test_that("STAN_edit_dis_age works properly", {
   )
   teff <- c(-1, 2, 10)
   teff_obs <- c(0, 6, 12)
-  case_ids <- c(1,1,1,1,2,2,2,2,0,0,0,0,0,3,3,3,3)
+  case_ids <- c(1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 3, 3, 3, 3)
   idx_expand <- case_ids + 1
-  expand_expect <- c(-1,-1,-1,-1,2,2,2,2,0,0,0,0,0,10,10,10,10)
+  expand_expect <- c(-1, -1, -1, -1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 10, 10, 10, 10)
   expect_equal(STAN_expand(teff, idx_expand), expand_expect)
   t_edit <- STAN_edit_dis_age(x_dis_age, idx_expand, teff_obs, teff)
   t_expect <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
@@ -108,9 +108,11 @@ context("Stan base kernels: zero-sum kernel")
 test_that("zero-sum kernel works correctly", {
   M <- 2
   x <- c(1, 1, 2)
-  a <- c( 1,  1, -1,
-          1,  1, -1,
-         -1, -1,  1)
+  a <- c(
+    1, 1, -1,
+    1, 1, -1,
+    -1, -1, 1
+  )
   K_expect <- matrix(a, 3, 3, byrow = TRUE)
   K <- STAN_kernel_base_zerosum(x, x, M)
   expect_equal(K, K_expect)
@@ -136,9 +138,11 @@ context("Stan base kernels: ordinary categorical kernel")
 
 test_that("categorical kernel works correctly", {
   x <- c(1, 1, 2)
-  a <- c( 1,  1,  0,
-          1,  1,  0,
-          0,  0,  1)
+  a <- c(
+    1, 1, 0,
+    1, 1, 0,
+    0, 0, 1
+  )
   K_expect <- matrix(a, 3, 3, byrow = TRUE)
   K <- STAN_kernel_base_cat(x, x)
   expect_equal(K, K_expect)
@@ -149,12 +153,16 @@ context("Stan base kernels: binary mask kernel")
 
 test_that("binary mask kernel works correctly", {
   x <- c(1, 1, 2)
-  a <- c( 1,  1,  0,
-          1,  1,  0,
-          0,  0,  0)
-  b <- c( 0,  0,  0,
-          0,  0,  0,
-          0,  0,  1)
+  a <- c(
+    1, 1, 0,
+    1, 1, 0,
+    0, 0, 0
+  )
+  b <- c(
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 1
+  )
   K1_expect <- matrix(a, 3, 3, byrow = TRUE)
   K2_expect <- matrix(b, 3, 3, byrow = TRUE)
   K1 <- STAN_kernel_base_bin(x, x, 1)
@@ -177,9 +185,11 @@ test_that("variance mask kernel works correctly", {
   x <- c(12, 0, 12)
   stp <- 0.2
   vm_params <- c(0.05, 0.6)
-  v <- c(0.9755191, 0.9382995, 0.9755191,
-         0.9382995, 0.9025000, 0.9382995,
-         0.9755191, 0.9382995, 0.9755191)
+  v <- c(
+    0.9755191, 0.9382995, 0.9755191,
+    0.9382995, 0.9025000, 0.9382995,
+    0.9755191, 0.9382995, 0.9755191
+  )
   K_expect <- matrix(v, 3, 3, byrow = TRUE)
   K <- STAN_kernel_base_var_mask(x, x, stp, vm_params)
   expect_equal(K, K_expect)
@@ -191,9 +201,11 @@ context("Stan base kernels: disease mask kernel")
 test_that("disease mask kernel works correctly", {
   x1 <- c(1, 3, 0)
   x2 <- c(1, 0, 2, 0)
-  a <- c( 1,  0,  1,  0,
-          1,  0,  1,  0,
-          0,  0,  0,  0)
+  a <- c(
+    1, 0, 1, 0,
+    1, 0, 1, 0,
+    0, 0, 0, 0
+  )
   K_expect <- matrix(a, 3, 4, byrow = TRUE)
   K <- STAN_kernel_base_disease_mask(x1, x2)
   expect_equal(K, K_expect)
@@ -237,7 +249,7 @@ test_that("normal prior is correct", {
   x <- 0.333
   mu <- -0.11
   sigma <- 0.23
-  log_p <- STAN_log_prior(x, c(2,0), c(mu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(2, 0), c(mu, sigma, 0))
   expect_equal(log_p, stats::dnorm(!!x, !!mu, !!sigma, log = TRUE))
 })
 
@@ -245,7 +257,7 @@ test_that("student-t prior is correct", {
   x <- 0.333
   nu <- 16
   sigma <- 1
-  log_p <- STAN_log_prior(x, c(3,0), c(nu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(3, 0), c(nu, sigma, 0))
   expect_equal(log_p, stats::dt(!!x, !!nu, log = TRUE))
 })
 
@@ -253,7 +265,7 @@ test_that("gamma prior is correct", {
   x <- 0.333
   a <- 5
   b <- 8
-  log_p <- STAN_log_prior(x, c(4,0), c(a, b, 0))
+  log_p <- STAN_log_prior(x, c(4, 0), c(a, b, 0))
   expect_equal(log_p, stats::dgamma(!!x, shape = !!a, rate = !!b, log = TRUE))
 })
 
@@ -261,10 +273,10 @@ test_that("inverse-gamma prior is correct", {
   x <- 0.333
   a <- 5
   b <- 8
-  log_p <- STAN_log_prior(x, c(5,0), c(a, b, 0))
+  log_p <- STAN_log_prior(x, c(5, 0), c(a, b, 0))
   expect_equal(
     log_p,
-    lgpr::dinvgamma_stanlike(!!x, alpha = !!a, beta = !!b, log = TRUE)
+    lgpr:::dinvgamma_stanlike(!!x, alpha = !!a, beta = !!b, log = TRUE)
   )
 })
 
@@ -272,7 +284,7 @@ test_that("log-normal prior is correct", {
   x <- 0.333
   mu <- -0.11
   sigma <- 0.23
-  log_p <- STAN_log_prior(x, c(6,0), c(mu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(6, 0), c(mu, sigma, 0))
   expect_equal(log_p, stats::dlnorm(!!x, !!mu, !!sigma, log = TRUE))
 })
 
@@ -282,7 +294,7 @@ test_that("square transform is taken into account", {
   x <- 0.333
   mu <- -0.11
   sigma <- 0.23
-  log_p <- STAN_log_prior(x, c(6,1), c(mu, sigma, 0)) 
+  log_p <- STAN_log_prior(x, c(6, 1), c(mu, sigma, 0))
   expect_lt(
     log_p, # -38.9
     stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
@@ -293,15 +305,15 @@ context("Stan priors: errors")
 
 test_that("an error is thrown if <types> is misspecified", {
   x <- 1
-  expect_error( STAN_log_prior(x, c(6), c(1, 1, 0)) )
-  expect_error( STAN_log_prior(x, c(0,1), c(1, 1, 0)) )
-  expect_error( STAN_log_prior(x, c(7,1), c(1, 1, 0)) )
-  expect_error( STAN_log_prior(x, c(1,3), c(1, 1, 0)) )
+  expect_error(STAN_log_prior(x, c(6), c(1, 1, 0)))
+  expect_error(STAN_log_prior(x, c(0, 1), c(1, 1, 0)))
+  expect_error(STAN_log_prior(x, c(7, 1), c(1, 1, 0)))
+  expect_error(STAN_log_prior(x, c(1, 3), c(1, 1, 0)))
 })
 
 test_that("an error is thrown if <hyper> is misspecified", {
   x <- 1
-  expect_error( STAN_log_prior(x, c(2,0), c(1, 1)) )
-  expect_error( STAN_log_prior(x, c(2,0), c(1, 1, 0, 1)) )
-  expect_error( STAN_log_prior(x, c(2,0), c(1, -1, 0)) )
+  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1)))
+  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1, 0, 1)))
+  expect_error(STAN_log_prior(x, c(2, 0), c(1, -1, 0)))
 })
