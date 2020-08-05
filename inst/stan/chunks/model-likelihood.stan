@@ -26,14 +26,13 @@ if(is_f_sampled){
     real LOGIT_P[num_obs] = to_array_1d(f_sum); // p success (logit-scale)
     target += binomial_logit_lpmf(y_disc[1] | y_num_trials[1], LOGIT_P);
   }else{
-    reject("<obs_model> must be 1, 2, 3 or 4!")
+    reject("<obs_model> must be 1, 2, 3 or 4!");
   }
 
 }else{
   // F NOT SAMPLED
-  matrix[num_obs, num_obs] Ky;
-  vector[num_obs] delta_vec = num_comps * rep_vector(delta, num_obs);
-  matrix[num_obs, num_obs] Kx = diag_matrix(delta_vec);
+  vector[num_obs] sigma2_vec = rep_vector(square(sigma[1]), num_obs);
+  matrix[num_obs, num_obs] Ky = diag_matrix(num_comps * delta_vec);
   matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(
       K_fixed, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_obs);
@@ -42,8 +41,8 @@ if(is_f_sampled){
     reject("<obs_model> must be 1 if the latent functions are not sampled!")
   }
   for(j in 1:num_comps){
-    Kx += KX[j];
+    Ky += KX[j];
   }
-  Ky = Kx + diag_matrix(rep_vector(square(sigma[1]), num_obs));
+  Ky = Ky + diag_matrix(sigma2_vec);
   target += multi_normal_lpdf(y_cont[1] | c_hat, Ky);
 }

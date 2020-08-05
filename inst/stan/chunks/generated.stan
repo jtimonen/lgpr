@@ -1,34 +1,12 @@
-vector[n] F_mean_cmp[DO_GEN_QUANT, sum_D];
-vector[n] F_var_cmp[DO_GEN_QUANT, sum_D];
-vector[n] F_mean_tot[DO_GEN_QUANT];
-vector[n] F_var_tot[DO_GEN_QUANT];
+vector[num_obs] f_post[is_generated_done, 2*(num_comps+1)];
 
-if(DO_GEN_QUANT){
-  matrix[n,n] A;
-  vector[n] v;
-  matrix[n,n] Ky;
-  matrix[n,n] Ly;
-  matrix[n,n] Kx = diag_matrix(rep_vector(DELTA, n));
+if(is_generated_done){
   
-  matrix[n,n] KX[sum_D] = STAN_compute_kernel_matrices(X, caseID_to_rows,
-      row_to_caseID, caseID_nrows, KF, T_effect, T_observed, D, UNCRT, HMGNS,
-      USE_VAR_MASK, vm_params, alpha_idAge, alpha_sharedAge,  alpha_diseaseAge,
-      alpha_continuous, alpha_categAge, alpha_categOffset,
-      ell_idAge, ell_sharedAge, ell_diseaseAge, ell_continuous, ell_categAge,
-      warp_steepness, beta);
-     
-  for(j in 1:sum_D){
-    Kx += KX[j];
-  }
-  Ky = Kx + diag_matrix(rep_vector(square(sigma_n[1]), n));
-  Ly = cholesky_decompose(Ky);
-  v = mdivide_left_tri_low(Ly, y);
-  for(j in 1:sum_D){
-    A  = mdivide_left_tri_low(Ly, transpose(KX[j]));
-    F_mean_cmp[1,j] = transpose(A)*v;
-    F_var_cmp[1,j] = diagonal(KX[j] - crossprod(A));
-  }
-  A = mdivide_left_tri_low(Ly, transpose(Kx));
-  F_mean_tot[1] = transpose(A)*v;
-  F_var_tot[1] = diagonal(Kx - crossprod(A));
+  // Compute all kernel matrices
+  matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(
+      K_fixed, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
+      vm_params, idx_expand, idx_expand, teff_obs);
+      
+  // Compute component-wise and total function posteriors
+  f_post[1] = STAN_gp_posterior(KX, y_cont[1], delta, sigma[1]);
 }

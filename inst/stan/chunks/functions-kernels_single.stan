@@ -1,3 +1,27 @@
+// Compute a discrete kernel matrix
+// - Does not depend on parameters and therefore this function
+//   never needs to be evaluated during sampling
+matrix STAN_kernel_discrete(
+  data int[] x1,
+  data int[] x2,
+  data int kernel_type,
+  data int num_cat)
+{
+  int n1 = num_elements(x1);
+  int n2 = num_elements(x2);
+  matrix[n1, n2] K;
+  if(kernel_type==0){
+    K = STAN_kernel_base_zerosum(x1, x2, num_cat);
+  }else if(kernel_type==1){
+    K = STAN_kernel_base_cat(x1, x2);
+  }else if(kernel_type==2){
+    K = STAN_kernel_base_bin(x1, x2, 1);
+  }else{
+    reject("invalid kernel type");
+  }
+  return(K);
+}
+
 // Compute one fixed kernel matrix
 // - Does not depend on parameters and therefore this function
 //   never needs to be evaluated during sampling
@@ -47,8 +71,33 @@ matrix STAN_kernel_stationary(
   return(K);
 }
 
+// Compute a nonstationary kernel matrix
+matrix STAN_kernel_nonstationary(
+  vector x1,
+  vector x2,
+  real alpha,
+  real ell,
+  real steepness,
+  data real[,] vm_params)
+{
 
-// Compute the diseaase kernel matrix
+  // Input warping
+  int n1 = num_elements(x1);
+  int n2 = num_elements(x2);
+  real w1[n1] = to_array_1d(STAN_warp_input(x1, steepness));
+  real w2[n2] = to_array_1d(STAN_warp_input(x2, steepness));
+  matrix[n1, n2] K = cov_exp_quad(w1, w2, alpha, ell);
+  
+  // Variance masking
+  int is_var_masked = size(vm_params);
+  if(is_var_masked){
+    K = K .* STAN_kernel_base_var_mask(x1, x2, steepness, vm_params[1]);
+  }
+  
+  return(K);
+}
+
+// Compute the disease kernel matrix
 // - This function needs to be evaluated repeatedly during sampling
 matrix STAN_kernel_disease(
   matrix K_fixed,
@@ -69,7 +118,7 @@ matrix STAN_kernel_disease(
   int is_heter = size(beta);
   int is_uncrt = size(teff);
   int n1 = num_elements(x1);
-  int n2 = num_elements(x2); 
+  int n2 = num_elements(x2);
   matrix[n1, n2] K = K_fixed;
   
   // Handle uncertainty in disease-related age
@@ -88,8 +137,8 @@ matrix STAN_kernel_disease(
   
   // Heterogeneity
   if(is_heter){
-    vector[n1] b1 = beta[1][idx1_expand[1]];
-    vector[n2] b2 = beta[1][idx2_expand[1]];
+    vector[n1] b1 = STAN_expand(beta[1], idx1_expand[1]);
+    vector[n2] b2 = STAN_expand(beta[1], idx2_expand[1]);
     matrix[n1, n2] K_beta = to_matrix(b1) * transpose(to_matrix(b2));
     K = K .* K_beta;
   }

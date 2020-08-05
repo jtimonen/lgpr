@@ -71,26 +71,19 @@ matrix STAN_kernel_base_disease_mask(
   return(K);
 }
 
-// Compute a discrete kernel matrix
-// - Does not depend on parameters and therefore this function
-//   never needs to be evaluated during sampling
-matrix STAN_kernel_discrete(
-  data int[] x1,
-  data int[] x2,
-  data int kernel_type,
-  data int num_cat)
+// Multiplier matrix to enable variance masking
+matrix STAN_kernel_base_var_mask(
+  data vector x1,
+  data vector x2,
+  real steepness,
+  data real[] vm_params)
 {
   int n1 = num_elements(x1);
   int n2 = num_elements(x2);
-  matrix[n1, n2] K;
-  if(kernel_type==0){
-    K = STAN_kernel_base_zerosum(x1, x2, num_cat);
-  }else if(kernel_type==1){
-    K = STAN_kernel_base_cat(x1, x2);
-  }else if(kernel_type==2){
-    K = STAN_kernel_base_bin(x1, x2, 1);
-  }else{
-    reject("invalid kernel type");
-  }
+  real a = steepness * vm_params[2];
+  real r = inv(a)*logit(vm_params[1]);
+  matrix[1, n1] s1 = to_matrix(STAN_var_mask(x1 - r, a));
+  matrix[1, n2] s2 = to_matrix(STAN_var_mask(x2 - r, a));
+  matrix[n1, n2] K = s1 * transpose(s2);
   return(K);
 }

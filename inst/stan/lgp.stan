@@ -19,15 +19,15 @@
 
 functions{
 #include chunks/functions-utils.stan
-#include chunks/functions-log_prior.stan
-#include chunks/functions-kernels_discrete.stan
-#include chunks/functions-kernels_continuous.stan
+#include chunks/functions-prior.stan
+#include chunks/functions-posterior.stan
+#include chunks/functions-kernels_base.stan
 #include chunks/functions-kernels_single.stan
 #include chunks/functions-kernels_many.stan
 }
 
 data {
-#include chunks/data-data.stan
+#include chunks/data.stan
 }
 
 transformed data{
@@ -35,7 +35,7 @@ transformed data{
 }
 
 parameters {
-#include chunks/parameters-parameters.stan
+#include chunks/parameters.stan
 }
 
 transformed parameters {
@@ -43,7 +43,7 @@ transformed parameters {
 }
 
 model {
-#include chunks/model-priors.stan
+#include chunks/model-prior.stan
   if(is_likelihood_skipped){
   }else{
 #include chunks/model-likelihood.stan
@@ -51,5 +51,5 @@ model {
 }
 
 generated quantities {
-// #include chunks/generated.stan
+#include chunks/generated.stan
 }

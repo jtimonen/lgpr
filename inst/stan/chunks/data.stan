@@ -12,7 +12,7 @@ int<lower=0, upper=1> is_heter;
 int<lower=0, upper=1> is_uncrt;
 int<lower=0, upper=1> is_vm_used;
 int<lower=0, upper=1> is_likelihood_skipped;
-int<lower=0, upper=1> is_gen_quant_skipped;
+int<lower=0, upper=1> is_generated_skipped;
 
 // Dimensions
 int<lower=0> num_subjects;      // total number of subjects
@@ -79,7 +79,7 @@ int<lower=1> y_num_trials[obs_model==4, num_obs];
 int<lower=0> num_levels[num_cov_disc];
 
 // Inputs related to expanding beta and t_effect
-int<lower=0, upper=num_cases> idx_expand[(is_heter || is_uncrt), num_obs];
+int<lower=1, upper=num_cases+1> idx_expand[(is_heter || is_uncrt), num_obs];
 
 // Prior types and transforms for kernel and noise parameters
 //   [,1]: prior types
