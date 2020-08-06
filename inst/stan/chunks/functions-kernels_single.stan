@@ -62,15 +62,13 @@ matrix STAN_kernel_stationary(
   int n1 = num_elements(x1);
   int n2 = num_elements(x2);
   matrix[n1, n2] K;
-  if(ctype == 0){
-    K = square(alpha) * K_fixed;
-  }else if(ctype==1 || ctype==2){
+  if(ctype==1 || ctype==2){
     K = cov_exp_quad(to_array_1d(x1), to_array_1d(x2), alpha, ell);
     if(ctype == 2){
       K = K .* K_fixed;
     }
   }else{
-    reject("STAN_kernel_stationary: <ctype> must be 0, 1, or 2!")
+    reject("STAN_kernel_stationary: <ctype> must be 1 or 2!")
   }
   return(K);
 }
