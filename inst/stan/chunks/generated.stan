@@ -10,7 +10,7 @@ vector[num_obs] f_post[is_generated_done, 2*(num_comps+1)];
 if(is_generated_done){
   
   // Compute all kernel matrices
-  matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(
+  matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
       K_fixed, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_obs);
       

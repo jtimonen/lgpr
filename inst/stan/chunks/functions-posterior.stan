@@ -41,7 +41,7 @@ vector[] STAN_gp_posterior(
   
   // Component-wise means and variances
   for(j in 1:num_comps){
-    inds = {j, 2*j};
+    inds = {j, J + j};
     F_POST[inds] = STAN_gp_posterior_helper(Ly, KX[j], v);
   }
   

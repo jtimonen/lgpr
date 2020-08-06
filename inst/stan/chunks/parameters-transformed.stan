@@ -11,7 +11,7 @@ if(is_uncrt){
 if(is_f_sampled){
   
   matrix[num_obs, num_obs] Delta = diag_matrix(delta_vec);
-  matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(
+  matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
       K_fixed, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_obs);
       

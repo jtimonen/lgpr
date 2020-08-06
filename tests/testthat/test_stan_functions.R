@@ -100,7 +100,6 @@ test_that("STAN_edit_dis_age works properly", {
   expect_equal(t_edit, t_expect)
 })
 
-
 # 2. STAN BASE KERNELS ----------------------------------------------------
 
 context("Stan base kernels: zero-sum kernel")
@@ -179,6 +178,7 @@ test_that("binary mask kernel works similarly in R and Stan", {
   )
 })
 
+
 context("Stan base kernels: variance mask kernel")
 
 test_that("variance mask kernel works correctly", {
@@ -238,147 +238,150 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
   expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6)))
 })
 
-
 # 3. STAN KERNEL ARRAYS ---------------------------------------------------
 
 context("Stan kernels: fixed kernel arrays")
 
-# Create data for testing
-create_test_x <- function(N=3){
-  
-  x1_id <- rep(c(1,2,3), each = N)
-  x1_z <- rep(c(0,1,1), each = N)
-  x1_d <- rep(c(0,1,0), each = N)
-  x1_disc <- list(x1_id, x1_z, x1_d)
-  x1_cont <- list(rep(c(12,24,36), times = N ))
-  
-  x2_id <- c(1,1,2,3)
-  x2_z <- c(0,0,1,1)
-  x2_d <- c(0,0,1,0)
-  x2_disc <- list(x2_id, x2_z, x2_d)
-  x2_cont <- list(c(20,20,20,20))
-  
-  num_levels <- c(N, 2, 2)
-  covtypes <- c(0, 2, 2, 1, 3, 2)
-  kertypes <- c(0, 0, 1, 0, 0, 2)
-  cov_disc <- c(1, 2, 2, 0, 3, 2)
-  cov_cont <- c(0, 1, 1, 1, 1, 1)
-  comps <- list(covtypes, kertypes, cov_disc, cov_cont)
-  
-  dat <- list(x1_disc = x1_disc, 
-              x2_disc = x2_disc,
-              x1_cont = x1_cont,
-              x2_cont = x2_cont,
-              num_levels = num_levels,
-              components = comps)
-  return(dat)
-}
-
 test_that("correct number of matrices is returned", {
-  dat <- create_test_x(3)
-  KF <- STAN_kernel_fixed_all(dat$x1_disc, dat$x2_disc,
+  dat <- lgpr:::test_data_x(3)
+  n1 <- length(dat$x1_disc[[1]])
+  n2 <- length(dat$x2_disc[[1]])
+  KF <- STAN_kernel_fixed_all(n1, n2, dat$x1_disc, dat$x2_disc,
                               dat$num_levels, dat$components)
   expect_equal(length(KF), 6)
 })
 
 test_that("matrices of correct size are returned", {
   N <- 5
-  dat <- create_test_x(N)
-  KF <- STAN_kernel_fixed_all(dat$x1_disc, dat$x2_disc,
+  dat <- lgpr:::test_data_x(N)
+  n1 <- length(dat$x1_disc[[1]])
+  n2 <- length(dat$x2_disc[[1]])
+  KF <- STAN_kernel_fixed_all(n1, n2, dat$x1_disc, dat$x2_disc,
                               dat$num_levels, dat$components)
   J <- length(KF)
-  for(j in seq_len(J)){
+  for(j in seq_len(J)) {
     expect_equal(dim(KF[[!!j]]), c(3*N, 4))
   }
 })
 
 test_that("matrices with correct values are returned", {
-    dat <- create_test_x(3)
-    
-    a1 <- c( 1.0,  1.0, -0.5, -0.5,
-             1.0,  1.0, -0.5, -0.5,
-            -0.5, -0.5,  1.0, -0.5,
-            -0.5, -0.5, -0.5,  1.0)
-    
-    a2 <- c( 1.0,  1.0, -1.0, -1.0,
-             1.0,  1.0, -1.0, -1.0,
-             -1.0, -1.0, 1.0,  1.0,
-             -1.0, -1.0, 1.0,  1.0)
-    
-    a3 <- c( 1.0,  1.0, 0.0,  0.0,
-             1.0,  1.0, 0.0,  0.0,
-             0.0,  0.0, 1.0,  1.0,
-             0.0,  0.0, 1.0,  1.0)
-    
-    a4 <- rep(0, times = 16)
-    a5 <- a4
-    a5[11] <- 1.0
-    a6 <- c( 0.0,  0.0, 0.0,  0.0,
-             0.0,  0.0, 0.0,  0.0,
-             0.0,  0.0, 1.0,  1.0,
-             0.0,  0.0, 1.0,  1.0)
-    
-    A1 <- matrix(a1, 4, 4, byrow=TRUE)
-    A2 <- matrix(a2, 4, 4, byrow=TRUE)
-    A3 <- matrix(a3, 4, 4, byrow=TRUE)
-    A4 <- matrix(a4, 4, 4, byrow=TRUE)
-    A5 <- matrix(a5, 4, 4, byrow=TRUE)
-    A6 <- matrix(a6, 4, 4, byrow=TRUE)
-    
-    KF <- STAN_kernel_fixed_all(dat$x2_disc, dat$x2_disc,
-                                dat$num_levels, dat$components)
-    expect_equal(KF[[1]], A1)
-    expect_equal(KF[[2]], A2)
-    expect_equal(KF[[3]], A3)
-    expect_equal(KF[[4]], A4)
-    expect_equal(KF[[5]], A5)
-    expect_equal(KF[[6]], A6)
+  
+  dat <- lgpr:::test_data_x(3)
+  
+  a1 <- c( 1.0,  1.0, -0.5, -0.5,
+           1.0,  1.0, -0.5, -0.5,
+           -0.5, -0.5,  1.0, -0.5,
+           -0.5, -0.5, -0.5,  1.0)
+  
+  a2 <- c( 1.0,  1.0, -1.0, -1.0,
+           1.0,  1.0, -1.0, -1.0,
+           -1.0, -1.0, 1.0,  1.0,
+           -1.0, -1.0, 1.0,  1.0)
+  
+  a3 <- c( 1.0,  1.0, 0.0,  0.0,
+           1.0,  1.0, 0.0,  0.0,
+           0.0,  0.0, 1.0,  1.0,
+           0.0,  0.0, 1.0,  1.0)
+  
+  a4 <- rep(0, times = 16)
+  a5 <- a4
+  a5[11] <- 1.0
+  a6 <- c( 0.0,  0.0, 0.0,  0.0,
+           0.0,  0.0, 0.0,  0.0,
+           0.0,  0.0, 1.0,  1.0,
+           0.0,  0.0, 1.0,  1.0)
+  
+  A1 <- matrix(a1, 4, 4, byrow = TRUE)
+  A2 <- matrix(a2, 4, 4, byrow = TRUE)
+  A3 <- matrix(a3, 4, 4, byrow = TRUE)
+  A4 <- matrix(a4, 4, 4, byrow = TRUE)
+  A5 <- matrix(a5, 4, 4, byrow = TRUE)
+  A6 <- matrix(a6, 4, 4, byrow = TRUE)
+  
+  KF <- STAN_kernel_fixed_all(4, 4, dat$x2_disc, dat$x2_disc,
+                              dat$num_levels, dat$components)
+  expect_equal(KF[[1]], A1)
+  expect_equal(KF[[2]], A2)
+  expect_equal(KF[[3]], A3)
+  expect_equal(KF[[4]], A4)
+  expect_equal(KF[[5]], A5)
+  expect_equal(KF[[6]], A6)
 })
 
 context("Stan kernels: full kernel array")
 
 test_that("STAN_kernel_all can be used", {
   N <- 5
-  dat <- create_test_x(N)
-  KF <- STAN_kernel_fixed_all(dat$x1_disc, dat$x2_disc,
+  dat <- lgpr:::test_data_x(N)
+  n1 <- length(dat$x1_disc[[1]])
+  n2 <- length(dat$x2_disc[[1]])
+  KF <- STAN_kernel_fixed_all(n1, n2, dat$x1_disc, dat$x2_disc,
                               dat$num_levels, dat$components)
   alpha <- c(1,1,1,1,1,1)
   ell <- c(1,1,1,1,1)
   x1 <- dat$x1_cont
   x2 <- dat$x2_cont
-  K  <- STAN_kernel_all(KF, dat$components, x1, x2,
-                       alpha, ell, 0.1, list(),
-                       list(), list(), list(), list(), list())
+  K  <- STAN_kernel_all(n1, n2, KF, dat$components, x1, x2,
+                        alpha, ell, 0.1, list(),
+                        list(), list(), list(), list(), list())
   J <- 6
   expect_equal(length(K), J)
   n1 <- length(x1[[1]])
   n2 <- length(x2[[1]])
-  for(j in seq_len(J)){
+  for (j in seq_len(J)) {
     expect_equal(dim(K[[!!j]]), c(!!n1, !!n2))
   }
-
+  
 })
 
 test_that("STAN_kernel_all uses cov_exp_quad correctly", {
   N <- 3
-  dat <- create_test_x(N)
-  KF <- STAN_kernel_fixed_all(dat$x1_disc, dat$x1_disc,
+  dat <- lgpr:::test_data_x(N)
+  n1 <- length(dat$x1_disc[[1]])
+  KF <- STAN_kernel_fixed_all(n1, n1, dat$x1_disc, dat$x1_disc,
                               dat$num_levels, dat$components)
   alpha <- 2*c(1,1,1,1,1,1)
   ell <- 12*c(1,1,1,1,1)
   x1 <- dat$x1_cont
-  K  <- STAN_kernel_all(KF, dat$components, x1, x1,
+  K  <- STAN_kernel_all(n1, n1, KF, dat$components, x1, x1,
                         alpha, ell, 0.1, list(),
                         list(), list(), list(), list(), list())
   diff <- abs(K[[4]][2,3] - 2.426123)
   expect_lt(diff, 1e-6)
 })
 
-# 4. STAN PRIORS ----------------------------------------------------------
+# 4. STAN GP POSTERIOR ----------------------------------------------------
+
+context("Stan GP posterior")
+
+test_that("componentwise means sum to total mean", {
+  N <- 3
+  dat <- lgpr:::test_data_x(N)
+  n1 <- length(dat$x1_disc[[1]])
+  KF <- STAN_kernel_fixed_all(n1, n1, dat$x1_disc, dat$x1_disc,
+                              dat$num_levels, dat$components)
+  alpha <- 2*c(1,1,1,1,1,1)
+  ell <- 12*c(1,1,1,1,1)
+  x1 <- dat$x1_cont
+  KX  <- STAN_kernel_all(n1, n1, KF, dat$components, x1, x1,
+                        alpha, ell, 0.1, list(),
+                        list(), list(), list(), list(), list())
+  y <- rep(1, n1)
+  
+  fp <- STAN_gp_posterior(KX, y, 1e-6, 1.0)
+  f_sum <- fp[[1]]
+  for (j in 2:6) {
+    f_sum = f_sum + fp[[j]]
+  }
+  diff <- f_sum - fp[[7]]
+  expect_lt(max(abs(diff)), 1e-6)
+})
+
+# 5. STAN PRIORS ----------------------------------------------------------
 
 require(stats)
 
-context("Stan priors: log-densities")
+context("Stan priors: log density")
 
 test_that("normal prior is correct", {
   x <- 0.333

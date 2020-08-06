@@ -3,13 +3,13 @@
   therefore this function never needs to be evaluated during sampling.
 */
 matrix[] STAN_kernel_fixed_all(
-    data int[,] x1, 
-    data int[,] x2,
-    data int[] num_levels,
-    data int[,] components)
+  data int n1,
+  data int n2,
+  data int[,] x1, 
+  data int[,] x2,
+  data int[] num_levels,
+  data int[,] components)
 {
-  int n1 = size(x1[1]);
-  int n2 = size(x2[1]);
   int L1 = size(x1);
   int L2 = size(x2);
   int L3 = size(num_levels);
@@ -49,23 +49,23 @@ matrix[] STAN_kernel_fixed_all(
   therefore this function needs to be evaluated repeatedly during sampling.
 */
 matrix[] STAN_kernel_all(
-    data matrix[] K_fixed,
-    data int[,] components,
-    data vector[] x1,
-    data vector[] x2,
-    real[] alpha,
-    real[] ell,
-    real[] wrp,
-    vector[] beta,
-    vector[] teff,
-    data real[,] vm_params,
-    data int[,] idx1_expand,
-    data int[,] idx2_expand,
-    data vector[] teff_obs)
+  data int n1,
+  data int n2,
+  data matrix[] K_fixed,
+  data int[,] components,
+  data vector[] x1,
+  data vector[] x2,
+  real[] alpha,
+  real[] ell,
+  real[] wrp,
+  vector[] beta,
+  vector[] teff,
+  data real[,] vm_params,
+  data int[,] idx1_expand,
+  data int[,] idx2_expand,
+  data vector[] teff_obs)
 {
   int ell_idx = 0;
-  int n1 = num_elements(x1[1]);
-  int n2 = num_elements(x2[1]);
   int num_comps = size(components[1]);
   matrix[n1, n2] KX[num_comps];
   int L1 = size(x1);

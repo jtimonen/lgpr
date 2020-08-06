@@ -1,6 +1,7 @@
 // Precompute fixed kernel matrices
 matrix[num_obs, num_obs] K_fixed[num_comps] = 
-  STAN_kernel_fixed_all(x_disc, x_disc, num_levels, components);
+  STAN_kernel_fixed_all(
+    num_obs, num_obs, x_disc, x_disc, num_levels, components);
 
 // Delta vector for diagonal jitter
 vector[num_obs] delta_vec = rep_vector(delta, num_obs);

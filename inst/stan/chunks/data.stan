@@ -22,7 +22,7 @@ int<lower=0> num_cases;         // number of case subjects
 int<lower=0> num_obs;           // number of observations
 int<lower=0> num_cov_cont;      // number of continuous covariates
 int<lower=0> num_cov_disc;      // number of discrete covariates
-int<lower=0> num_comps;         // number of additive components
+int<lower=1> num_comps;         // number of additive components
 int<lower=0> num_ell;           // number of ell parameters
 int<lower=0> num_dis;           // number of disease components
 
