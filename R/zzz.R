@@ -4,7 +4,12 @@
     lib.loc = Lib
   ))
   if (length(pkgdesc) > 1) {
-    msg <- paste0("This is lgpr (version ", pkgdesc$Version, "). ")
+    msg <- paste0(
+      "This is lgpr (version ", pkgdesc$Version, ").\n",
+      " - Please note the new syntax of the lgp() function \n",
+      " - Use the functions ppc_check() etc.\n",
+      " - Old syntax is avalable in version <= 0.33.3."
+    )
     packageStartupMessage(msg)
   }
 }

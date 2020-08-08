@@ -9,8 +9,12 @@
 #' @param log should logarithm of the density be returned?
 #' @return density or log-density at \code{x}
 dinvgamma_stanlike <- function(x, alpha, beta, log = FALSE) {
-  if (alpha <= 0) { stop("alpha must be positive") }
-  if (beta <= 0) { stop("beta must be positive") }
+  if (alpha <= 0) {
+    stop("alpha must be positive")
+  }
+  if (beta <= 0) {
+    stop("beta must be positive")
+  }
   t1 <- alpha * log(beta) - lgamma(alpha)
   t2 <- -1 * (alpha + 1) * log(x)
   t3 <- -beta / x
@@ -32,6 +36,15 @@ dinvgamma_stanlike <- function(x, alpha, beta, log = FALSE) {
 #' @param p quantile (must be between 0 and 1)
 #' @return a positive real number
 qinvgamma_stanlike <- function(p, alpha, beta) {
+  if (alpha <= 0) {
+    stop("alpha must be positive")
+  }
+  if (beta <= 0) {
+    stop("beta must be positive")
+  }
+  if (p < 0 || p > 1) {
+    stop("p must be between 0 and 1")
+  }
   r <- stats::qgamma(1 - p, shape = alpha, rate = beta)
   return(1 / r)
 }
@@ -52,7 +65,7 @@ qinvgamma_stanlike <- function(p, alpha, beta) {
 plot_invgamma <- function(alpha, beta, by = 0.01,
                           log = FALSE, IQR = 0.95,
                           return_quantiles = FALSE) {
-  
+
   # Compute inter-quantile range
   if (IQR <= 0 || IQR >= 1) {
     stop("IQR must be on interval (0,1)")
@@ -80,8 +93,8 @@ plot_invgamma <- function(alpha, beta, by = 0.01,
   t <- seq(q1, q2, length.out = length(t))
   y <- dinvgamma_stanlike(t, alpha = alpha, beta = beta, log = log)
   df_area <- data.frame(t, y)
-  line_color <- color_set('red')
-  fill_color <- color_set('red_muted')
+  line_color <- color_set("red")
+  fill_color <- color_set("red_muted")
   p1 <- p1 + ggplot2::geom_area(
     data = df_area,
     mapping = ggplot2::aes(x = t, y = y),

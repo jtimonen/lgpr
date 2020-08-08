@@ -11,7 +11,7 @@
 #'   model predictions
 #'   \item Gaussian, Poisson, binomial or negative binomial observation models
 #' }
-#' @author Juho Timonen (first.last at aalto.fi)
+#' @author Juho Timonen (first.last at iki.fi)
 #' @keywords Gaussian processes, longitudinal data, Stan, covariate selection,
 #' interpretable models
 #'

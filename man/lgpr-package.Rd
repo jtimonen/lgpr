@@ -53,7 +53,7 @@ Aki Vehtari and Harri Lahdesmaki, 2019.
 }
 }
 \author{
-Juho Timonen (first.last at aalto.fi)
+Juho Timonen (first.last at iki.fi)
 }
 \keyword{Gaussian}
 \keyword{Stan,}

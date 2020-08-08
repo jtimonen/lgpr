@@ -1,3 +1,121 @@
+#' An S4 class to represent an lgp term with a single covariate
+#'
+#' @slot covariate name of a covariate
+#' @slot type covariate type
+#' @slot fun kernel function name
+lgpterm <- setClass("lgpterm",
+  slots = c(
+    covariate = "character",
+    type = "character",
+    fun = "character"
+  )
+)
+
+#' Convert an \code{lgpterm} to character
+#'
+#' @export
+#' @param object an object of class \code{lgpterm}
+#' @rdname as.character_lgpterm
+setMethod(
+  f = "as.character", signature = "lgpterm",
+  definition = function(x) {
+    desc <- paste0(x@fun, "(", x@covariate, ")")
+    return(desc)
+  }
+)
+
+#' An S4 class to represent a product of lgp terms
+#'
+#' @slot factors a list of at most two \code{\link{lgpterm}}s
+lgpproduct <- setClass("lgpproduct", slots = c(factors = "list"))
+
+
+#' Convert an \code{lgpproduct} to character
+#'
+#' @export
+#' @param object an object of class \code{lgpproduct}
+#' @rdname as.character_lgpproduct
+setMethod(
+  f = "as.character", signature = "lgpproduct",
+  definition = function(x) {
+    facs <- x@factors
+    L <- length(facs)
+    c1 <- as.character(facs[[1]])
+    if (L == 1) {
+      desc <- paste0("(1st order):   ", c1)
+    } else {
+      c2 <- as.character(facs[[2]])
+      desc <- paste0("(interaction): ", c1, " * ", c2)
+    }
+    return(desc)
+  }
+)
+
+
+#' An S4 class to represent the right-hand side of an lgp formula
+#'
+#' @slot summands a list of one or more \code{\link{lgpproduct}}s
+lgpsum <- setClass("lgpsum", slots = c(summands = "list"))
+
+#' Convert an \code{lgpsum} to character
+#'
+#' @export
+#' @param object an object of class \code{lgpsum}
+#' @rdname as.character_lgpsum
+setMethod(
+  f = "as.character", signature = "lgpsum",
+  definition = function(x) {
+    s <- x@summands
+    L <- length(s)
+    desc <- ""
+    for (j in seq_len(L)) {
+      desc <- paste0(desc, "Term ", j, " ", as.character(s[[j]]), "\n")
+    }
+    return(desc)
+  }
+)
+
+#' Show a summary of an \code{lgpsum}
+#'
+#' @export
+#' @param object an object of class \code{lgpsum}
+#' @rdname show_lgpsum
+setMethod(
+  f = "show", signature = "lgpsum",
+  definition = function(object) {
+    cat(as.character(object))
+    invisible(object)
+  }
+)
+
+#' An S4 class to represent an lgp formula
+#'
+#' @slot components an object of class \code{\link{lgpsum}}
+#' @slot response name of the response variable
+lgpformula <- setClass("lgpformula",
+  slots = c(
+    call = "character",
+    response = "character",
+    components = "lgpsum"
+  )
+)
+
+#' Show a summary of an \code{lgpformula}
+#'
+#' @export
+#' @param object an object of class \code{lgpformula}
+#' @rdname show_lgpformula
+setMethod(
+  f = "show", signature = "lgpformula",
+  definition = function(object) {
+    desc <- paste0("Formula: ", object@call, "\n")
+    desc <- paste0("Response variable: ", object@response, "\n")
+    desc <- paste0(desc, as.character(object@components))
+    cat(desc)
+    invisible(object)
+  }
+)
+
 
 #' An S4 class to represent an lgp model
 #'
@@ -54,9 +172,9 @@ setMethod(
       prior_info <- prior_stan_to_readable(object@stan_dat)
       cat(prior_info)
     }
+    invisible(object)
   }
 )
-
 
 #' An S4 class to represent the output of the \code{lgp_fit} function
 #'
@@ -67,12 +185,7 @@ setMethod(
 #' @slot pkg_version Package version number.
 #' @slot diagnostics  A data frame with columns
 #' \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
-#'
-lgpfit <- setClass(
-  # Set the name for the class
-  "lgpfit",
-
-  # Define the slots
+lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
     model = "lgpmodel",

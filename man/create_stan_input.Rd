@@ -23,31 +23,25 @@ create_stan_input(
 )
 }
 \arguments{
-\item{formula}{A formula of the form
-\code{y ~ } \code{x1 + x2 + x3}
-defining the response variable \code{y} and covariates \code{xi}.
-The formula must contain exatly one tilde (~), with response variable on the
-left-hand side and covariates on the right-hand side. Covariates should be
-separated by a plus (+) sign. All variables that appear in the formula must
-exist as columns of \code{data}. Note that effects of categorical covariates
-are by default defined as interactions with \code{time_variable}. If you wish
-to change this, see the argument \code{offset_vars}. The subject identifier
-variable cannot currently be included in \code{offset_vars}. If you wish
-to model the effect of \code{id_variable} as a constant offset,
-you can create another covariate with the same values and
-use it in your \code{formula} and \code{offset_vars} instead.}
-
-\item{data}{A data frame containing the variables given in \code{formula} as
-columns. NOTE: disease effect modeling can currently be ensured to work
-correctly only if
+\item{formula}{A formula specified using the common \code{\link{formula}}
+syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
 \itemize{
-  \item All data columns are in numeric format (especially
-  \code{id_variable})
-  \item Rows are sorted so that the values of \code{id_variable} are
-  increasing
-  \item The \code{id_variable} values belong in the integer set
-  \code{{1, ..., N}}, where \code{N} is the total number of individuals.
-}
+  \item The formula must contain exatly one tilde (\code{~}), with response
+  variable on the left-hand side and model terms on the right-hand side.
+  \item Terms are be separated by a plus (\code{+}) sign.
+  \item Terms can consits of a single variable name, such as \code{x}, or
+  an interaction of two variables, such as \code{x:z}.
+  \item In single-variable terms, the variable can be either continuous or
+  categorical, whereas in interaction terms the variable
+  on the left-hand side of the colon (\code{:}) has to be continuous and the
+  one on the right-hand side has to be categorical (a factor).
+  \item All variables appearing in \code{formula} must be
+  found in \code{data}.
+}}
+
+\item{data}{A data frame where each column corresponds to one variable, and
+each row is one observation. Continuous covariates must have type
+\code{"numeric"} and categorical ones must have type \code{"factor"}.
 Note that you need to indicate missing values of \code{disAge_variable} with
 \code{NaN}.}
 
