@@ -2,20 +2,15 @@
 % Please edit documentation in R/preproc-helper.R
 \name{check_data}
 \alias{check_data}
-\title{Validate the `data` input to \code{lgp} and resolve covariate types}
+\title{Check that given data is consistent with the given formula}
 \usage{
-check_data(data, varInfo, verbose)
+check_data(formula, data)
 }
 \arguments{
-\item{data}{the data frame that was passed to \code{lgp}}
+\item{formula}{an object of class \code{\link{lgpformula}}}
 
-\item{varInfo}{variable type info}
-
-\item{verbose}{can this print some info?}
-}
-\value{
-a list
+\item{data}{an object of class \code{data.frame}}
 }
 \description{
-Validate the `data` input to \code{lgp} and resolve covariate types
+Check that given data is consistent with the given formula
 }

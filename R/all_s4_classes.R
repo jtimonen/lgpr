@@ -1,42 +1,61 @@
-#' An S4 class to represent an lgp term with a single covariate
+#' Check validity of an lgpexpr object
+#'
+#' @param object an object of class \code{\link{lgpexpr}}
+#' @return \code{TRUE} if valid, otherwise reasons for invalidity
+check_lgpexpr <- function(object) {
+  errors <- character()
+  v0 <- nchar(object@covariate) > 0
+  valid_funs <- c("gp", "gp_ns", "mask", "categorical", "zerosum")
+  v1 <- object@fun %in% valid_funs
+  if (!v0) {
+    errors <- c(errors, "covariate name cannot be empty")
+  }
+  if (!v1) {
+    str <- paste0(valid_funs, collapse = ", ")
+    errors <- c(errors, paste0("<fun> must be one of {", str, "}"))
+  }
+  if (length(errors) == 0) TRUE else errors
+}
+
+#' An S4 class to represent an lgp expression
 #'
 #' @slot covariate name of a covariate
-#' @slot type covariate type
-#' @slot fun kernel function name
-lgpterm <- setClass("lgpterm",
-  slots = c(
+#' @slot fun function name
+lgpexpr <- setClass("lgpexpr",
+  representation = representation(
     covariate = "character",
-    type = "character",
     fun = "character"
-  )
+  ),
+  prototype(covariate = "", fun = ""),
+  validity = check_lgpexpr
 )
+
+
+#' Convert an \code{lgpexpr} to character
+#'
+#' @export
+#' @param object an object of class \code{\link{lgpexpr}}
+#' @rdname as.character_lgpexpr
+setMethod(
+  f = "as.character", signature = "lgpexpr",
+  definition = function(x) {
+    paste0(x@fun, "(", x@covariate, ")")
+  }
+)
+
+#' An S4 class to represent one formula term
+#'
+#' @slot factors a list of at most two \code{\link{lgpexpr}}s
+lgpterm <- setClass("lgpterm", slots = c(factors = "list"))
+
 
 #' Convert an \code{lgpterm} to character
 #'
 #' @export
-#' @param object an object of class \code{lgpterm}
+#' @param object an object of class \code{\link{lgpterm}}
 #' @rdname as.character_lgpterm
 setMethod(
   f = "as.character", signature = "lgpterm",
-  definition = function(x) {
-    desc <- paste0(x@fun, "(", x@covariate, ")")
-    return(desc)
-  }
-)
-
-#' An S4 class to represent a product of lgp terms
-#'
-#' @slot factors a list of at most two \code{\link{lgpterm}}s
-lgpproduct <- setClass("lgpproduct", slots = c(factors = "list"))
-
-
-#' Convert an \code{lgpproduct} to character
-#'
-#' @export
-#' @param object an object of class \code{lgpproduct}
-#' @rdname as.character_lgpproduct
-setMethod(
-  f = "as.character", signature = "lgpproduct",
   definition = function(x) {
     facs <- x@factors
     L <- length(facs)
@@ -51,19 +70,18 @@ setMethod(
   }
 )
 
-
 #' An S4 class to represent the right-hand side of an lgp formula
 #'
-#' @slot summands a list of one or more \code{\link{lgpproduct}}s
-lgpsum <- setClass("lgpsum", slots = c(summands = "list"))
+#' @slot summands a list of one or more \code{\link{lgpterm}}s
+lgprhs <- setClass("lgprhs", slots = c(summands = "list"))
 
-#' Convert an \code{lgpsum} to character
+#' Convert an \code{lgprhs} to character
 #'
 #' @export
-#' @param object an object of class \code{lgpsum}
-#' @rdname as.character_lgpsum
+#' @param object an object of class \code{\link{lgprhs}}
+#' @rdname as.character_lgprhs
 setMethod(
-  f = "as.character", signature = "lgpsum",
+  f = "as.character", signature = "lgprhs",
   definition = function(x) {
     s <- x@summands
     L <- length(s)
@@ -75,29 +93,49 @@ setMethod(
   }
 )
 
-#' Show a summary of an \code{lgpsum}
+#' Check validity of an lgpformula object
 #'
-#' @export
-#' @param object an object of class \code{lgpsum}
-#' @rdname show_lgpsum
-setMethod(
-  f = "show", signature = "lgpsum",
-  definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
+#' @param object an object of class \code{\link{lgpformula}}
+#' @return \code{TRUE} if valid, otherwise reasons for invalidity
+check_lgpformula <- function(object) {
+  covs <- rhs_variables(object@terms)
+  r <- object@response
+  errors <- character()
+  if (r %in% covs) {
+    msg <- "the response variable cannot be also a covariate"
+    errors <- c(errors, msg)
   }
-)
+  if (length(errors) == 0) TRUE else errors
+}
 
 #' An S4 class to represent an lgp formula
 #'
-#' @slot components an object of class \code{\link{lgpsum}}
+#' @slot terms an object of class \code{\link{lgpsum}}
 #' @slot response name of the response variable
+#' @slot call original formula call
 lgpformula <- setClass("lgpformula",
-  slots = c(
+  representation = representation(
     call = "character",
     response = "character",
-    components = "lgpsum"
-  )
+    terms = "lgprhs"
+  ),
+  validity = check_lgpformula
+)
+
+
+#' Cast \code{lgpformula} to character
+#'
+#' @export
+#' @param object an object of class \code{\link{lgpformula}}
+#' @rdname as.character_lgpformula
+setMethod(
+  f = "as.character", signature = "lgpformula",
+  definition = function(x) {
+    desc <- paste0("Formula: ", x@call, "\n")
+    desc <- paste0("Response variable: ", x@response, "\n")
+    desc <- paste0(desc, as.character(x@terms))
+    return(desc)
+  }
 )
 
 #' Show a summary of an \code{lgpformula}
@@ -108,12 +146,9 @@ lgpformula <- setClass("lgpformula",
 setMethod(
   f = "show", signature = "lgpformula",
   definition = function(object) {
-    desc <- paste0("Formula: ", object@call, "\n")
-    desc <- paste0("Response variable: ", object@response, "\n")
-    desc <- paste0(desc, as.character(object@components))
-    cat(desc)
+    cat(as.character(object))
     invisible(object)
-  }
+    }
 )
 
 

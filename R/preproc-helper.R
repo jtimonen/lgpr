@@ -1,11 +1,8 @@
-#' Validate the formula of \code{lgp}
+#' Check that given data is consistent with the given formula
 #'
-#' @description Checks if the input `formula` to \code{lgp_model}
-#' are valid with the given data
-#' @param formula the formula that was passed to \code{lgp_model}
-#' @param data the data frame that was passed to \code{lgp_model}
-#' @return nothing
-check_formula <- function(formula, data) {
+#' @param formula an object of class \code{\link{lgpformula}}
+#' @param data an object of class \code{data.frame}
+check_data <- function(formula, data) {
   trm <- stats::terms(formula)
   vars <- rownames(attr(trm, "factors"))
   resp <- attr(trm, "response")
@@ -36,7 +33,7 @@ check_formula <- function(formula, data) {
 #' @param varInfo variable type info
 #' @param verbose can this print some info?
 #' @return a list
-check_data <- function(data, varInfo, verbose) {
+check_data_ <- function(data, varInfo, verbose) {
   cols <- colnames(data)
   idvar <- varInfo$id_variable
   timevar <- varInfo$time_variable

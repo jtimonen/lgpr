@@ -4,17 +4,13 @@
 \name{lgpterm-class}
 \alias{lgpterm-class}
 \alias{lgpterm}
-\title{An S4 class to represent an lgp term with a single covariate}
+\title{An S4 class to represent one formula term}
 \description{
-An S4 class to represent an lgp term with a single covariate
+An S4 class to represent one formula term
 }
 \section{Slots}{
 
 \describe{
-\item{\code{covariate}}{name of a covariate}
-
-\item{\code{type}}{covariate type}
-
-\item{\code{fun}}{kernel function name}
+\item{\code{factors}}{a list of at most two \code{\link{lgpexpr}}s}
 }}
 

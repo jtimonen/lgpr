@@ -4,10 +4,10 @@
 \alias{likelihood_as_str}
 \title{Convert the Stan likelihood encoding to a string}
 \usage{
-likelihood_as_str(LH)
+likelihood_as_str(index)
 }
 \arguments{
-\item{LH}{an integer}
+\item{index}{an integer}
 }
 \value{
 a string

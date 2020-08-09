@@ -1,3 +1,93 @@
+# Summing two rhs's
+setMethod(
+  "+", signature(e1 = "lgprhs", e2 = "lgprhs"),
+  function(e1, e2) {
+    new("lgprhs", summands = c(e1@summands, e2@summands))
+  }
+)
+
+# Summing two terms
+setMethod(
+  "+", signature(e1 = "lgpterm", e2 = "lgpterm"),
+  function(e1, e2) {
+    new("lgprhs", summands = list(e1, e2))
+  }
+)
+
+# Summing rhs and term
+setMethod(
+  "+", signature(e1 = "lgprhs", e2 = "lgpterm"),
+  function(e1, e2) {
+    e1 + new("lgprhs", summands = list(e2))
+  }
+)
+
+# Multiplying of two exprs
+setMethod(
+  "*", signature(e1 = "lgpexpr", e2 = "lgpexpr"),
+  function(e1, e2) {
+    new("lgpterm", factors = list(e1, e2))
+  }
+)
+
+#' Parse a string representation of one formula expression
+#'
+#' @param expr the expression as a string, e.g. \code{"gp(x)"}
+#' @return an object of class \code{\link{lgpexpr}}
+parse_expr <- function(expr) {
+  parsed <- strsplit(expr, "[()]")[[1]]
+  L <- length(parsed)
+  if (L > 2) {
+    stop("invalid expression ", expr)
+  }
+  out <- new("lgpexpr", covariate = parsed[2], fun = parsed[1])
+  return(out)
+}
+
+#' Parse a string representation of one formula term
+#'
+#' @param term a term without any plus signs, e.g. \code{b*c}
+#' @return an object of class \code{\link{lgpterm}}
+parse_term <- function(term) {
+  factors <- strsplit(term, split = "*", fixed = TRUE)[[1]] # split to factors
+  D <- length(factors)
+  if (D > 2) {
+    stop("One formula term can have at most two factors! found = ", D)
+  }
+  f1 <- parse_expr(factors[1])
+  if (D == 2) {
+    f2 <- parse_expr(factors[2])
+    return(f1 * f2)
+  } else {
+    out <- new("lgpterm", factors = list(f1))
+    return(out)
+  }
+}
+
+#' Parse a string representation of the right-hand side of a formula
+#'
+#' @param rhs the formula right-hand side, e.g. \code{a + b*c}
+#' @return an object of class \code{\link{lgprhs}}
+parse_rhs <- function(rhs) {
+  x <- gsub("[[:space:]]", "", rhs) # remove whitespace
+  x <- gsub("[\",\']", "", x) # remove quotes
+  terms <- strsplit(x, split = "+", fixed = TRUE)[[1]] # split to terms
+  D <- length(terms)
+  if (D < 1) {
+    stop("<rhs> must have at least one term!")
+  }
+  f <- parse_term(terms[1])
+  if (D == 1) {
+    out <- new("lgprhs", summands = list(f))
+    return(out)
+  } else {
+    for (j in 2:D) {
+      f <- f + parse_term(terms[j])
+    }
+    return(f)
+  }
+}
+
 #' Create a model formula
 #'
 #' @param formula an object of class \code{formula}
@@ -12,155 +102,34 @@ lgp_formula <- function(formula) {
     stop("Invalid formula: as.character(formula) should have length 3!")
   }
   text <- f_str[3]
-  components <- eval(parse(text = text)) # TODO: allow a + a:b syntax
-  components <- ensure_lgpsum(components)
-
+  terms <- parse_rhs(text)
   new("lgpformula",
     response = f_str[2],
-    components = components,
-    call = f_str
+    terms = terms,
+    call = paste(f_str[2], f_str[1], f_str[3])
   )
 }
 
-#' Promote lgpterm or lgpproduct to lgpsum
+#' Get names of all variables appearing in a term
 #'
-#' @param x an object of class \code{\link{lgpterm}}, \code{\link{lgpproduct}}
-#' or \code{\link{lgpsum}}
-#' @return an object of class \code{\link{lgpterm}}
-ensure_lgpsum <- function(x) {
-  if (class(x) == "lgpterm") {
-    x <- new("lgpproduct", factors = list(x))
+#' @param term an object of class \code{lgpterm}
+#' @return a list of variable names
+term_variables <- function(term) {
+  a <- character()
+  for (f in term@factors) {
+    a <- c(a, f@covariate)
   }
-  if (class(x) == "lgpproduct") {
-    x <- new("lgpsum", summands = list(x))
-  }
-  return(x)
+  return(a)
 }
 
-#' Create a stationary GP term
+#' Get names of all variables appearing on formula right-hand side
 #'
-#' @param covariate name of a continuous covariate
-#' @return an object of class \code{\link{lgpterm}}
-gp <- function(covariate) {
-  covariate <- noquote(deparse1(substitute(covariate)))
-  new("lgpterm",
-    covariate = as.character(covariate),
-    type = "continuous",
-    fun = "gp"
-  )
+#' @param rhs an object of class \code{lgprhs}
+#' @return a list of variable names
+rhs_variables <- function(rhs) {
+  a <- character()
+  for (s in rhs@summands) {
+    a <- c(a, term_variables(s))
+  }
+  return(a)
 }
-
-#' Create a nonstationary GP term
-#'
-#' @param covariate name of a continuous covariate
-#' @return an object of class \code{\link{lgpterm}}
-gp_ns <- function(covariate) {
-  covariate <- noquote(deparse1(substitute(covariate)))
-  new("lgpterm",
-    covariate = as.character(covariate),
-    type = "continuous",
-    fun = "gp_ns"
-  )
-}
-
-#' Create a zerosum term
-#'
-#' @param covariate name of a categorical covariate
-#' @return an object of class \code{\link{lgpterm}}
-zerosum <- function(covariate) {
-  covariate <- noquote(deparse1(substitute(covariate)))
-  new("lgpterm",
-    covariate = as.character(covariate),
-    type = "discrete",
-    fun = "zerosum"
-  )
-}
-
-#' Create a categorical term
-#'
-#' @param covariate name of a categorical covariate
-#' @return an object of class \code{\link{lgpterm}}
-categorical <- function(covariate) {
-  covariate <- noquote(deparse1(substitute(covariate)))
-  new("lgpterm",
-    covariate = as.character(covariate),
-    type = "discrete",
-    fun = "categorical"
-  )
-}
-
-#' Create a mask term
-#'
-#' @param covariate name of a categorical covariate
-#' @return an object of class \code{\link{lgpterm}}
-mask <- function(covariate) {
-  covariate <- noquote(deparse1(substitute(covariate)))
-  new("lgpterm",
-    covariate = as.character(covariate),
-    type = "discrete",
-    fun = "mask"
-  )
-}
-
-# Creating a product term
-setMethod(
-  "*", signature(e1 = "lgpterm", e2 = "lgpterm"),
-  function(e1, e2) {
-    new("lgpproduct", factors = list(e1, e2))
-  }
-)
-
-# Summing two products
-setMethod(
-  "+", signature(e1 = "lgpproduct", e2 = "lgpproduct"),
-  function(e1, e2) {
-    new("lgpsum", summands = list(e1, e2))
-  }
-)
-
-# Summing two terms
-setMethod(
-  "+", signature(e1 = "lgpterm", e2 = "lgpterm"),
-  function(e1, e2) {
-    c1 <- new("lgpproduct", factors = list(e1))
-    c2 <- new("lgpproduct", factors = list(e2))
-    new("lgpsum", summands = list(c1, c2))
-  }
-)
-
-# Summing product and term
-setMethod(
-  "+", signature(e1 = "lgpproduct", e2 = "lgpterm"),
-  function(e1, e2) {
-    c <- new("lgpproduct", factors = list(e2))
-    new("lgpsum", summands = list(e1, c))
-  }
-)
-
-# Summing term and product
-setMethod(
-  "+", signature(e1 = "lgpterm", e2 = "lgpproduct"),
-  function(e1, e2) {
-    c <- new("lgpproduct", factors = list(e1))
-    new("lgpsum", summands = list(c, e2))
-  }
-)
-
-# Summing sum and product
-setMethod(
-  "+", signature(e1 = "lgpsum", e2 = "lgpproduct"),
-  function(e1, e2) {
-    a <- e1@summands
-    a[[length(a) + 1]] <- e2
-    new("lgpsum", summands = a)
-  }
-)
-
-# Summing sum and term
-setMethod(
-  "+", signature(e1 = "lgpsum", e2 = "lgpterm"),
-  function(e1, e2) {
-    c <- new("lgpproduct", factors = list(e2))
-    e1 + c
-  }
-)

@@ -28,40 +28,25 @@ adjusted_Chat <- function(y, norm_factors) {
   return(C_hat)
 }
 
-
-#' Repeat a vector as a rows of an array
+#' List of allowed observation models
 #'
-#' @param v a vector of length \code{m}
-#' @param n number of times to repeat
-#' @return returns an array of size \code{n} x \code{m}
-repvec <- function(v, n) {
-  m <- length(v)
-  A <- matrix(rep(v, n), n, m, byrow = TRUE)
-  return(as.array(A))
+#' @return a list of likelihood names
+likelihood_list <- function() {
+  c("gaussian", "poisson", "nb", "binomial")
 }
-
 
 #' Convert the Stan likelihood encoding to a string
 #'
-#' @param LH an integer
+#' @param index an integer
 #' @return a string
-likelihood_as_str <- function(LH) {
-  if (LH == 1 || LH == -1) {
-    str <- "Gaussian"
-  } else if (LH == 0) {
-    str <- "none"
-  } else if (LH == 2) {
-    str <- "Poisson"
-  } else if (LH == 3) {
-    str <- "NB"
-  } else if (LH == 4) {
-    str <- "binomial"
-  } else {
-    str <- "Unknown likelihood"
+likelihood_as_str <- function(index) {
+  names <- likelihood_list()
+  name <- names[index]
+  if (is.na(name)) {
+    stop("invalid likelihood index")
   }
-  return(str)
+  name
 }
-
 
 #' Convert likelihood string to Stan encoding
 #'
@@ -69,21 +54,9 @@ likelihood_as_str <- function(LH) {
 #' @return an integer
 likelihood_as_int <- function(likelihood) {
   likelihood <- tolower(likelihood)
-  if (likelihood == "none") {
-    LH <- 0
-  } else if (likelihood == "gaussian") {
-    LH <- 1
-  } else if (likelihood == "poisson") {
-    LH <- 2
-  } else if (likelihood == "nb") {
-    LH <- 3
-  } else if (likelihood == "binomial") {
-    LH <- 4
-  } else {
-    stop("likelihood must be either 'none', 'Gaussian', 'Poisson',
-         'binomial', or 'NB'!")
-  }
-  return(LH)
+  allowed <- likelihood_list()
+  index <- argument_check(likelihood, allowed)
+  return(index)
 }
 
 

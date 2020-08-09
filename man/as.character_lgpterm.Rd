@@ -7,7 +7,7 @@
 \S4method{as.character}{lgpterm}(x)
 }
 \arguments{
-\item{object}{an object of class \code{lgpterm}}
+\item{object}{an object of class \code{\link{lgpterm}}}
 }
 \description{
 Convert an \code{lgpterm} to character
