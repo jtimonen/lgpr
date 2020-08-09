@@ -7,8 +7,8 @@
 #' @param y response variable, vector of length \code{n}
 #' @param norm_factors normalization factors, vector of length \code{n}
 #' @return a vector of length \code{n}, which can be used as
-#' the \code{C_hat} input to the \code{lgp} function
-adjusted_Chat <- function(y, norm_factors) {
+#' the \code{c_hat} input to the \code{lgp} function
+adjusted_c_hat <- function(y, norm_factors) {
   if (length(norm_factors) != length(y)) {
     stop("inputs must have same length!")
   }
@@ -22,10 +22,10 @@ adjusted_Chat <- function(y, norm_factors) {
     stop("norm_factors must be all positive!")
   }
 
-  C_hat <- log(mean(y))
-  C_hat <- rep(C_hat, length(y))
-  C_hat <- C_hat + log(norm_factors)
-  return(C_hat)
+  c_hat <- log(mean(y))
+  c_hat <- rep(c_hat, length(y))
+  c_hat <- c_hat + log(norm_factors)
+  return(c_hat)
 }
 
 #' List of allowed observation models
@@ -111,71 +111,6 @@ matrix_to_df <- function(M) {
   df <- data.frame(M)
   colnames(df) <- cn
   return(df)
-}
-
-
-#' Get model info
-#'
-#' @param object an object of class \code{lgpmodel} or \code{lgpfit}
-#' @param print should this print the info?
-#' @return the info as a string
-model_info <- function(object, print = TRUE) {
-  if (class(object) == "lgpfit") {
-    object <- object@model
-  }
-  info <- object@info
-
-  # Model formula and likelihood
-  str <- paste("  Model:\n    f = ", paste(info$component_names,
-    collapse = " + "
-  ), sep = "")
-  LH <- object@stan_dat$LH
-  LH_str <- likelihood_as_str(LH)
-  yvar <- info$varInfo$response_variable
-  str <- paste(str, "\n    Response variable: ", yvar, sep = "")
-  str <- paste(str, "\n    Observation model: ", LH_str, sep = "")
-  str <- paste(str, "\n")
-
-  # Covariate types
-  t1 <- info$varInfo$id_variable
-  t2 <- info$varInfo$time_variable
-  t3 <- info$varInfo$disAge_variable
-  t4 <- info$varInfo$continuous_vars
-  t5 <- info$varInfo$categorical_vars
-  t6 <- info$varInfo$offset_vars
-
-  str <- paste(str, "  Variable types:\n", sep = "")
-  str <- paste(str, "    - Identifier variable: ", t1, "\n", sep = "")
-  str <- paste(str, "    - Time variable: ", t2, "\n", sep = "")
-  if (!is.null(t3)) {
-    str <- paste(str, "    - Disease-related age variable: ", t3, "\n",
-      sep = ""
-    )
-  }
-  if (!is.null(t4)) {
-    str <- paste(str, "    - Other continuous variables: ",
-      paste(t4, collapse = ", "), "\n",
-      sep = ""
-    )
-  }
-  if (!is.null(t5)) {
-    str <- paste(str, "    - Other categorical variables: ",
-      paste(t5, collapse = ", "), "\n",
-      sep = ""
-    )
-  }
-  if (!is.null(t6)) {
-    str <- paste(str, "    - Group offset variables: ",
-      paste(t6, collapse = ", "), "\n",
-      sep = ""
-    )
-  }
-
-  # Print info
-  if (print) {
-    cat(str)
-  }
-  return(invisible(str))
 }
 
 
@@ -266,29 +201,6 @@ get_stan_model <- function() {
   return(stanmodels[["lgp"]])
 }
 
-
-#' Get formula of a full model with all covariates included
-#' @export
-#' @param data a data frame, where the response variable is the last column
-#' @return a formula
-full_model_formula <- function(data) {
-  cn <- colnames(data)
-  ddd <- length(cn)
-  rhs <- paste(cn[1:(ddd - 1)], collapse = " + ")
-  form <- stats::formula(paste(cn[ddd], "~", rhs))
-  return(form)
-}
-
-#' Create a full model with all covariates included
-#' @export
-#' @param data a data frame
-#' @param ... additional parameters to \code{\link{lgp_model}}
-#' @return a ggplot object
-full_model <- function(data, ...) {
-  form <- full_model_formula(data)
-  model <- lgp_model(form, data, ...)
-  return(model)
-}
 
 #' PRED object to arrays
 #' @param PRED an object returned by \code{\link{lgp_predict}}

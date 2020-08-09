@@ -12,7 +12,11 @@ check_lgpexpr <- function(object) {
   }
   if (!v1) {
     str <- paste0(valid_funs, collapse = ", ")
-    errors <- c(errors, paste0("<fun> must be one of {", str, "}"))
+    msg <- paste0(
+      "<fun> must be one of {", str,
+      "}, found = '", object@fun, "'"
+    )
+    errors <- c(errors, msg)
   }
   if (length(errors) == 0) TRUE else errors
 }
@@ -122,7 +126,6 @@ lgpformula <- setClass("lgpformula",
   validity = check_lgpformula
 )
 
-
 #' Cast \code{lgpformula} to character
 #'
 #' @export
@@ -148,65 +151,85 @@ setMethod(
   definition = function(object) {
     cat(as.character(object))
     invisible(object)
-    }
+  }
 )
 
+#' Check validitity of an lgpscaling object
+#'
+#' @param object an object of class \code{\link{lgpscaling}}
+#' @return \code{TRUE} if valid, otherwise reasons for invalidity
+check_lgpscaling <- function(object) {
+  a <- 1.2321
+  a_mapped <- object@fun(a)
+  b <- object@fun_inv(a_mapped)
+  diff <- abs(a - b)
+  if (diff > 1e-6) {
+    error <- paste("<f_inv> is not an inverse function of <f>, diff = ", diff)
+    return(error)
+  } else {
+    return(TRUE)
+  }
+}
+
+#' An S4 class to represent variable scaling and its inverse
+#'
+#' @slot fun function that performs normalization
+#' @slot fun_inv inverse function of \code{fun}
+lgpscaling <- setClass("lgpscaling",
+  representation = representation(
+    fun = "function",
+    fun_inv = "function"
+  ),
+  prototype = prototype(
+    fun = function(x) {
+      x
+    },
+    fun_inv = function(x) {
+      x
+    }
+  ),
+  validity = check_lgpscaling
+)
 
 #' An S4 class to represent an lgp model
 #'
-#' @slot data The original unmodified data frame.
-#' @slot stan_dat The data to be given as input to \code{rstan::sampling}.
-#' @slot scalings Preprocessing scaling functions and their inverse operations.
+#' @slot formula An object of class \code{\link{lgpformula}}
+#' @slot stan_dat The data to be given as input to \code{rstan::sampling}
+#' @slot scalings Variable scaling functions and their inverse operations.
+#' Must be a named list with each element is an \code{\link{lgpscaling}}
+#' object.
 #' @slot info Model info.
 lgpmodel <- setClass("lgpmodel",
-  slots = c(
-    data = "data.frame",
-    stan_dat = "list",
+  representation = representation(
+    model_formula = "lgpformula",
+    stan_input = "list",
     scalings = "list",
     info = "list"
   )
 )
 
+#' Cast \code{lgpmodel} to character
+#'
+#' @export
+#' @param object an object of class \code{\link{lgpmodel}}
+#' @rdname as.character_lgpmodel
+setMethod(
+  f = "as.character", signature = "lgpmodel",
+  definition = function(x) {
+    return(as.character(x@model_formula))
+  }
+)
 
 #' Show a summary of an \code{lgpmodel}
 #'
 #' @export
 #' @param object an object of class \code{lgpmodel}
 #' @rdname show_lgpmodel
-#' @return nothing
+#' @return object invisibly
 setMethod(
-  f = "show",
-  signature = "lgpmodel",
+  f = "show", signature = "lgpmodel",
   definition = function(object) {
-    print_prior <- TRUE
-    if (object@stan_dat$UNCRT == 1) {
-      str2 <- "uncertain"
-    } else {
-      str2 <- "fixed"
-    }
-    if (object@stan_dat$HMGNS == 0) {
-      str3 <- "heterogeneous"
-    } else {
-      str3 <- "homogeneous"
-    }
-    D <- object@stan_dat$D
-    cat("\n ---------- LGPMODEL SUMMARY ----------\n\n")
-    str_dis <- paste("  Disease component \n",
-      "    - Effect time: ", str2, "\n",
-      "    - Effect type: ", str3, "\n",
-      sep = ""
-    )
-
-    minfo <- model_info(object, print = FALSE)
-    cat(minfo)
-    if (D[3] == 1) {
-      cat(str_dis)
-    }
-    cat("\n")
-    if (print_prior) {
-      prior_info <- prior_stan_to_readable(object@stan_dat)
-      cat(prior_info)
-    }
+    cat(as.character(object))
     invisible(object)
   }
 )

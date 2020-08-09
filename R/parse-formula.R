@@ -35,6 +35,20 @@ setMethod(
 #' @param expr the expression as a string, e.g. \code{"gp(x)"}
 #' @return an object of class \code{\link{lgpexpr}}
 parse_expr <- function(expr) {
+  num_open <- lengths(regmatches(expr, gregexpr("[(]", expr)))
+  num_close <- lengths(regmatches(expr, gregexpr("[)]", expr)))
+  if (num_open != 1) {
+    stop(
+      "Each expression must contain exactly one opening parenthesis! ",
+      "Found ", num_open, " in <", expr, ">."
+    )
+  }
+  if (num_close != 1) {
+    stop(
+      "Each expression must contain exactly one closing parenthesis! ",
+      "Found ", num_close, " in <", expr, ">."
+    )
+  }
   parsed <- strsplit(expr, "[()]")[[1]]
   L <- length(parsed)
   if (L > 2) {
@@ -90,9 +104,23 @@ parse_rhs <- function(rhs) {
 
 #' Create a model formula
 #'
-#' @param formula an object of class \code{formula}
+#' @param formula A formula specified using the common \code{\link{formula}}
+#' syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
+#' \itemize{
+#'   \item The formula must contain exatly one tilde (\code{~}), with response
+#'   variable on the left-hand side and model terms on the right-hand side.
+#'   \item Terms are be separated by a plus (\code{+}) sign.
+#'   \item Terms can consits of a single variable name, such as \code{x}, or
+#'   an interaction of two variables, such as \code{x:z}.
+#'   \item In single-variable terms, the variable can be either continuous or
+#'   categorical, whereas in interaction terms the variable
+#'   on the left-hand side of the colon (\code{:}) has to be continuous and the
+#'   one on the right-hand side has to be categorical (a factor).
+#'   \item All variables appearing in \code{formula} must be
+#'   found in \code{data}.
+#' }
 #' @return an object of class \code{\link{lgpformula}}
-lgp_formula <- function(formula) {
+parse_formula <- function(formula) {
   c_str <- class(formula)
   if (c_str != "formula") {
     stop("<formula> must have class formula! found = ", c_str)

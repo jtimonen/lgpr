@@ -11,11 +11,13 @@ An S4 class to represent an lgp model
 \section{Slots}{
 
 \describe{
-\item{\code{data}}{The original unmodified data frame.}
+\item{\code{formula}}{An object of class \code{\link{lgpformula}}}
 
-\item{\code{stan_dat}}{The data to be given as input to \code{rstan::sampling}.}
+\item{\code{stan_dat}}{The data to be given as input to \code{rstan::sampling}}
 
-\item{\code{scalings}}{Preprocessing scaling functions and their inverse operations.}
+\item{\code{scalings}}{Variable scaling functions and their inverse operations.
+Must be a named list with each element is an \code{\link{lgpscaling}}
+object.}
 
 \item{\code{info}}{Model info.}
 }}

@@ -10,7 +10,7 @@
 \item{object}{an object of class \code{lgpmodel}}
 }
 \value{
-nothing
+object invisibly
 }
 \description{
 Show a summary of an \code{lgpmodel}

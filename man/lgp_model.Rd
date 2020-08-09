@@ -7,23 +7,13 @@
 lgp_model(
   formula,
   data,
-  likelihood = "Gaussian",
+  likelihood = "gaussian",
   prior = prior_default(),
-  uncertain_effect_time = FALSE,
-  equal_effect = TRUE,
-  C_hat = NULL,
-  DELTA = 1e-08,
-  sample_F = NULL,
+  c_hat = NULL,
+  num_trials = NULL,
   id_variable = "id",
-  time_variable = "age",
-  disAge_variable = NULL,
-  continuous_vars = NULL,
-  categorical_vars = NULL,
-  offset_vars = NULL,
-  variance_mask = TRUE,
-  N_trials = NULL,
-  skip_gen_quant = FALSE,
-  verbose = FALSE
+  options = NULL,
+  disease_options = NULL
 )
 }
 \arguments{
@@ -43,78 +33,66 @@ syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
   found in \code{data}.
 }}
 
-\item{data}{A data frame where each column corresponds to one variable, and
-each row is one observation. Continuous covariates must have type
-\code{"numeric"} and categorical ones must have type \code{"factor"}.
-Note that you need to indicate missing values of \code{disAge_variable} with
-\code{NaN}.}
+\item{data}{A \code{data.frame} where each column corresponds to one
+variable, and each row is one observation. Continuous covariates must have
+type \code{"numeric"} and categorical ones must have type \code{"factor"}.
+Missing values should be indicated with \code{NaN} or \code{NA}.}
 
 \item{likelihood}{Determines the observation model. Must be either
-\code{"Gaussian"} (default), \code{"Poisson"}, \code{"NB"} (negative
-binomial) or \code{"binomial"}. To
-use Bernoulli likelihood, use \code{likelihood="binomial"} and set
-\code{N_trials} as a vector of ones.}
+\code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
+binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
+\code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.}
 
 \item{prior}{A named list, defining the prior distribution of model
 (hyper)parameters. It is recommended to first create this using the function
 \code{\link{prior_default}}, and then possibly modify it.}
 
-\item{uncertain_effect_time}{Do we wish to model uncertainty in the disease
-effect time?}
-
-\item{equal_effect}{Is the disease effect assumed to be equally strong for
-all diseased individuals?}
-
-\item{C_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
+\item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
 a real number defining a constant GP mean. If \code{NULL}, this is set to
  \itemize{
-   \item \code{C_hat = 0}, if \code{likelihood} is \code{"Gaussian"}, because
-   with
-   Gaussian likelihood the response variable is by default centered to have
-   zero mean.
-   \item \code{C_hat = } \code{log(mean(y))} if \code{likelihood} is
-   \code{"Poisson"} or \code{"NB"},
-   \item \code{C_hat = } \code{log(p/(1-p))}, where
-   \code{p = mean(y/N_trials)} if \code{likelihood} is \code{"binomial"},
+   \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"}, because
+   with Gaussian likelihood the response variable is by default centered to
+   have zero mean.
+   \item \code{c_hat = } \code{log(mean(y))} if \code{likelihood} is
+   \code{"poisson"} or \code{"nb"},
+   \item \code{c_hat = } \code{log(p/(1-p))}, where
+   \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"},
  }
 where \code{y} denotes the response variable. You can modify this vector to
 account for normalization between data points. With Gaussian likelihood
 though, do not modify this argument, normalize the data beforehand instead.}
 
-\item{DELTA}{the amount of added jitter to ensure positive definiteness of
-the kernel}
-
-\item{sample_F}{Determines if the function values are be sampled (must be
-\code{TRUE} if likelihood is not \code{"Gaussian"}).}
-
-\item{id_variable}{Name of the unique subject identifier variable (default =
-\code{"id"}).}
-
-\item{time_variable}{Name of the time variable (default = \code{"age"}).}
-
-\item{disAge_variable}{Name of the disease-related age variable. If
-\code{NULL}, this will be chosen to be \code{"diseaseAge"}, if such covariate
-is found in the data. You need to indicate missing values of
-\code{disAge_variable} with \code{NaN} in \code{data}.}
-
-\item{offset_vars}{Names of the categorical covariates that are treated as
-time-independent group offsets. If \code{NULL} (default), no variables are
-interpreted as such covariates.}
-
-\item{variance_mask}{Should a variance mask be used to force disease
-component variance to zero before disease onset?}
-
-\item{N_trials}{This argument (number of trials) is only needed when
+\item{num_trials}{This argument (number of trials) is only needed when
 likelihood is binomial. Must have length one or equal to number of data
-points. Setting \code{N_trials=1} corresponds to Bernoulli observation model.}
+points. Setting \code{num_trials=1} corresponds to Bernoulli observation
+model.}
 
-\item{skip_gen_quant}{If this is true, the generated quantities block of Stan
-is skipped.}
+\item{id_variable}{Name of the unique subject identifier variable
+(default = \code{"id"}).}
 
-\item{verbose}{Should more verbose output be printed?}
+\item{options}{A named list with the following possible fields:
+\itemize{
+  \item \code{sample_f} Determines if the function values are be sampled
+  (must be \code{TRUE} if likelihood is not \code{"gaussian"}).
+  \item \code{skip_generated} If this is true, the generated quantities
+  block of Stan is skipped.
+  \item \code{delta} Amount of added jitter to ensure positive definite
+  covariance matrices.
+  \item \code{verbose} Should more verbose output be printed?
+}}
+
+\item{disease_options}{A named list with the following possible fields:
+\itemize{
+  \item \code{heterogeneous} Is the disease effect magnitude assumed to be
+  heterogeneous over the diseased individuals?
+  \item \code{uncertain} Do we wish to model uncertainty in the disease
+effect time?
+  \item \code{vm_params} Parameters of the variance masking function. Use
+  \code{NA} to avoid using variance masking at all.
+}}
 }
 \value{
-An object of class \code{lgpmodel}.
+An object of class \code{\link{lgpmodel}}.
 }
 \description{
 Creates an object of class \code{lgpmodel}
