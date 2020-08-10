@@ -7,7 +7,7 @@
 set_c_hat(c_hat, response, LH, num_trials)
 }
 \arguments{
-\item{c_hat}{the \code{c_hat} argument given as input to 
+\item{c_hat}{the \code{c_hat} argument given as input to
 \code{\link{lgp_model}}}
 
 \item{response}{response variable}

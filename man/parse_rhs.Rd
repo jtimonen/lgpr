@@ -10,7 +10,7 @@ parse_rhs(rhs)
 \item{rhs}{the formula right-hand side, e.g. \code{a + b*c}}
 }
 \value{
-an object of class \code{\link{lgprhs}}
+an object of class \linkS4class{lgprhs}
 }
 \description{
 Parse a string representation of the right-hand side of a formula

@@ -11,7 +11,7 @@ An S4 class to represent an lgp formula
 \section{Slots}{
 
 \describe{
-\item{\code{terms}}{an object of class \code{\link{lgpsum}}}
+\item{\code{terms}}{an object of class \linkS4class{lgpsum}}
 
 \item{\code{response}}{name of the response variable}
 

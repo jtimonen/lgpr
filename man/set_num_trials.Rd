@@ -4,15 +4,14 @@
 \alias{set_num_trials}
 \title{Set num_trials (binomial and Bernoulli observation models)}
 \usage{
-set_num_trials(num_trials, response, LH)
+set_num_trials(num_trials, num_obs, LH)
 }
 \arguments{
-\item{num_trials}{the \code{num_trials} argument given as input to
-\code{lgp_model}}
+\item{num_trials}{the \code{num_trials} argument}
 
-\item{response}{response variable}
+\item{num_obs}{number of observations}
 
-\item{LH}{likelihood as int}
+\item{LH}{likelihood as integer encoding}
 }
 \value{
 a numeric vector

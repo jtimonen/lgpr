@@ -11,6 +11,6 @@ An S4 class to represent one formula term
 \section{Slots}{
 
 \describe{
-\item{\code{factors}}{a list of at most two \code{\link{lgpexpr}}s}
+\item{\code{factors}}{a list of at most two \linkS4class{lgpexpr}s}
 }}
 

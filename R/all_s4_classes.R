@@ -1,25 +1,5 @@
-#' Check validity of an lgpexpr object
-#'
-#' @param object an object of class \code{\link{lgpexpr}}
-#' @return \code{TRUE} if valid, otherwise reasons for invalidity
-check_lgpexpr <- function(object) {
-  errors <- character()
-  v0 <- nchar(object@covariate) > 0
-  valid_funs <- c("gp", "gp_ns", "mask", "categorical", "zerosum")
-  v1 <- object@fun %in% valid_funs
-  if (!v0) {
-    errors <- c(errors, "covariate name cannot be empty")
-  }
-  if (!v1) {
-    str <- paste0(valid_funs, collapse = ", ")
-    msg <- paste0(
-      "<fun> must be one of {", str,
-      "}, found = '", object@fun, "'"
-    )
-    errors <- c(errors, msg)
-  }
-  if (length(errors) == 0) TRUE else errors
-}
+#' @include validate.R
+NULL
 
 #' An S4 class to represent an lgp expression
 #'
@@ -34,87 +14,19 @@ lgpexpr <- setClass("lgpexpr",
   validity = check_lgpexpr
 )
 
-
-#' Convert an \code{lgpexpr} to character
-#'
-#' @export
-#' @param object an object of class \code{\link{lgpexpr}}
-#' @rdname as.character_lgpexpr
-setMethod(
-  f = "as.character", signature = "lgpexpr",
-  definition = function(x) {
-    paste0(x@fun, "(", x@covariate, ")")
-  }
-)
-
 #' An S4 class to represent one formula term
 #'
-#' @slot factors a list of at most two \code{\link{lgpexpr}}s
+#' @slot factors a list of at most two \linkS4class{lgpexpr}s
 lgpterm <- setClass("lgpterm", slots = c(factors = "list"))
-
-
-#' Convert an \code{lgpterm} to character
-#'
-#' @export
-#' @param object an object of class \code{\link{lgpterm}}
-#' @rdname as.character_lgpterm
-setMethod(
-  f = "as.character", signature = "lgpterm",
-  definition = function(x) {
-    facs <- x@factors
-    L <- length(facs)
-    c1 <- as.character(facs[[1]])
-    if (L == 1) {
-      desc <- paste0("(1st order):   ", c1)
-    } else {
-      c2 <- as.character(facs[[2]])
-      desc <- paste0("(interaction): ", c1, " * ", c2)
-    }
-    return(desc)
-  }
-)
 
 #' An S4 class to represent the right-hand side of an lgp formula
 #'
-#' @slot summands a list of one or more \code{\link{lgpterm}}s
+#' @slot summands a list of one or more \linkS4class{lgpterm}s
 lgprhs <- setClass("lgprhs", slots = c(summands = "list"))
-
-#' Convert an \code{lgprhs} to character
-#'
-#' @export
-#' @param object an object of class \code{\link{lgprhs}}
-#' @rdname as.character_lgprhs
-setMethod(
-  f = "as.character", signature = "lgprhs",
-  definition = function(x) {
-    s <- x@summands
-    L <- length(s)
-    desc <- ""
-    for (j in seq_len(L)) {
-      desc <- paste0(desc, "Term ", j, " ", as.character(s[[j]]), "\n")
-    }
-    return(desc)
-  }
-)
-
-#' Check validity of an lgpformula object
-#'
-#' @param object an object of class \code{\link{lgpformula}}
-#' @return \code{TRUE} if valid, otherwise reasons for invalidity
-check_lgpformula <- function(object) {
-  covs <- rhs_variables(object@terms)
-  r <- object@response
-  errors <- character()
-  if (r %in% covs) {
-    msg <- "the response variable cannot be also a covariate"
-    errors <- c(errors, msg)
-  }
-  if (length(errors) == 0) TRUE else errors
-}
 
 #' An S4 class to represent an lgp formula
 #'
-#' @slot terms an object of class \code{\link{lgpsum}}
+#' @slot terms an object of class \linkS4class{lgpsum}
 #' @slot response name of the response variable
 #' @slot call original formula call
 lgpformula <- setClass("lgpformula",
@@ -125,51 +37,6 @@ lgpformula <- setClass("lgpformula",
   ),
   validity = check_lgpformula
 )
-
-#' Cast \code{lgpformula} to character
-#'
-#' @export
-#' @param object an object of class \code{\link{lgpformula}}
-#' @rdname as.character_lgpformula
-setMethod(
-  f = "as.character", signature = "lgpformula",
-  definition = function(x) {
-    desc <- paste0("Formula: ", x@call, "\n")
-    desc <- paste0("Response variable: ", x@response, "\n")
-    desc <- paste0(desc, as.character(x@terms))
-    return(desc)
-  }
-)
-
-#' Show a summary of an \code{lgpformula}
-#'
-#' @export
-#' @param object an object of class \code{lgpformula}
-#' @rdname show_lgpformula
-setMethod(
-  f = "show", signature = "lgpformula",
-  definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
-  }
-)
-
-#' Check validitity of an lgpscaling object
-#'
-#' @param object an object of class \code{\link{lgpscaling}}
-#' @return \code{TRUE} if valid, otherwise reasons for invalidity
-check_lgpscaling <- function(object) {
-  a <- 1.2321
-  a_mapped <- object@fun(a)
-  b <- object@fun_inv(a_mapped)
-  diff <- abs(a - b)
-  if (diff > 1e-6) {
-    error <- paste("<f_inv> is not an inverse function of <f>, diff = ", diff)
-    return(error)
-  } else {
-    return(TRUE)
-  }
-}
 
 #' An S4 class to represent variable scaling and its inverse
 #'
@@ -193,10 +60,10 @@ lgpscaling <- setClass("lgpscaling",
 
 #' An S4 class to represent an lgp model
 #'
-#' @slot formula An object of class \code{\link{lgpformula}}
+#' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot stan_dat The data to be given as input to \code{rstan::sampling}
 #' @slot scalings Variable scaling functions and their inverse operations.
-#' Must be a named list with each element is an \code{\link{lgpscaling}}
+#' Must be a named list with each element is an \linkS4class{lgpscaling}
 #' object.
 #' @slot info Model info.
 lgpmodel <- setClass("lgpmodel",
@@ -206,32 +73,6 @@ lgpmodel <- setClass("lgpmodel",
     scalings = "list",
     info = "list"
   )
-)
-
-#' Cast \code{lgpmodel} to character
-#'
-#' @export
-#' @param object an object of class \code{\link{lgpmodel}}
-#' @rdname as.character_lgpmodel
-setMethod(
-  f = "as.character", signature = "lgpmodel",
-  definition = function(x) {
-    return(as.character(x@model_formula))
-  }
-)
-
-#' Show a summary of an \code{lgpmodel}
-#'
-#' @export
-#' @param object an object of class \code{lgpmodel}
-#' @rdname show_lgpmodel
-#' @return object invisibly
-setMethod(
-  f = "show", signature = "lgpmodel",
-  definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
-  }
 )
 
 #' An S4 class to represent the output of the \code{lgp_fit} function
@@ -252,98 +93,4 @@ lgpfit <- setClass("lgpfit",
     pkg_version = "character",
     diagnostics = "data.frame"
   )
-)
-
-
-#' Show a summary of results of the \code{lgp} function
-#'
-#' @export
-#' @param object an object of class \code{lgpfit}
-#' @rdname show_lgpfit
-#' @return nothing
-setMethod(
-  f = "show",
-  signature = "lgpfit",
-  definition = function(object) {
-    cat("\n ---------- LGPFIT SUMMARY ----------\n\n")
-
-    # Runtime info
-    tryCatch(
-      {
-        runtime <- get_runtime(object)
-        cat("* Average runtime per chain: ",
-          runtime$warmup, " s (warmup) and ",
-          runtime$sampling, " s (sampling)\n",
-          sep = ""
-        )
-      },
-      error = function(e) {
-        cat("* Unable to show runtime info. Reason:\n")
-        print(e)
-      }
-    )
-
-    # Convergence info
-    tryCatch(
-      {
-        diag <- object@diagnostics
-        Rhat <- diag$Rhat
-        imax <- which(Rhat == max(Rhat))
-        cat("* Largest R-hat value is ", round(max(Rhat), 4),
-          " (", paste(rownames(diag)[imax], collapse = ", "),
-          ")\n",
-          sep = ""
-        )
-      },
-      error = function(e) {
-        cat("* Unable to show convergence info. Reason:\n")
-        print(e)
-      }
-    )
-
-    # Relevance info
-    tryCatch(
-      {
-        sel <- object@selection
-        rel_method <- object@relevances$method
-        r3 <- sel$prob
-        tr <- sel$threshold
-        cat("* Used relevance method = ", rel_method, "\n", sep = "")
-        cat("* Used selection threshold = ", tr, "\n", sep = "")
-
-        rel <- object@relevances$average
-        cn <- names(rel)
-        r1 <- round(rel, 3)
-        r2 <- cn %in% sel$selected
-        DF <- data.frame(r1, r2, r3)
-        cat("\n")
-
-        colnames(DF) <- c("Relevance", "Selected", "Prob.")
-        print(DF)
-        cat("\n")
-      },
-      error = function(e) {
-        cat("* Unable to show component relevance info. Reason:\n")
-        print(e)
-      }
-    )
-  }
-)
-
-#' Visualize a fitted `lgpfit` object
-#'
-#' @export
-#' @param fit an object of class \code{lgpfit}
-#' @param color_scheme bayesplot color scheme
-#' @param x does nothing
-#' @param y does nothing
-#' @rdname plot_lgpfit
-#' @return a ggplot object
-setMethod(
-  f = "plot",
-  signature = "lgpfit",
-  definition = function(fit, x = 1, y = 1, color_scheme = "red") {
-    h <- plot_relevances(fit, color_scheme = color_scheme)
-    return(h)
-  }
 )

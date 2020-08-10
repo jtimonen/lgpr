@@ -7,7 +7,7 @@
 rhs_variables(rhs)
 }
 \arguments{
-\item{rhs}{an object of class \code{lgprhs}}
+\item{rhs}{an object of class \linkS4class{lgprhs}}
 }
 \value{
 a list of variable names

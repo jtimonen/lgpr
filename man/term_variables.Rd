@@ -7,7 +7,7 @@
 term_variables(term)
 }
 \arguments{
-\item{term}{an object of class \code{lgpterm}}
+\item{term}{an object of class \linkS4class{lgpterm}}
 }
 \value{
 a list of variable names

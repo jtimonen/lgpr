@@ -7,7 +7,7 @@
 parse_formula(formula)
 }
 \arguments{
-\item{formula}{A formula specified using the common \code{\link{formula}}
+\item{formula}{A formula specified using the common \code{formula}
 syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
 \itemize{
   \item The formula must contain exatly one tilde (\code{~}), with response
@@ -24,7 +24,7 @@ syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
 }}
 }
 \value{
-an object of class \code{\link{lgpformula}}
+an object of class \linkS4class{lgpformula}
 }
 \description{
 Create a model formula

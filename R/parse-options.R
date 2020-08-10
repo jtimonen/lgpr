@@ -13,7 +13,7 @@
 #' @return a named list of parsed options
 parse_options <- function(options = NULL) {
   input <- options
-  
+
   # Set defaults
   opts <- list(
     verbose = FALSE,
@@ -21,19 +21,19 @@ parse_options <- function(options = NULL) {
     sample_f = FALSE,
     delta = 1e-8
   )
-  
+
   # Replace defaults if found from input
   for (opt_name in names(opts)) {
     if (opt_name %in% names(input)) {
       opts[[opt_name]] <- input[[opt_name]]
     }
   }
-  
+
   # Format for Stan input
   list(
-    verbose = as.numeric(opts$verbose),
-    skip_generated = as.numeric(opts$skip_generated),
-    sample_f = as.numeric(opts$sample_f),
+    is_verbose = as.numeric(opts$verbose),
+    is_generated_skipped = as.numeric(opts$skip_generated),
+    is_f_sampled = as.numeric(opts$sample_f),
     delta = opts$delta
   )
 }
@@ -52,30 +52,32 @@ parse_options <- function(options = NULL) {
 #' @return a named list of parsed options
 parse_disease_options <- function(disease_options = NULL) {
   input <- disease_options
-  
+
   # Set defaults
   opts <- list(
     uncertain = FALSE,
     heterogeneous = FALSE,
     vm_params = c(0.95, 1.0)
   )
-  
+
   # Replece defaults if found from input
   for (opt_name in names(opts)) {
     if (opt_name %in% names(input)) {
       opts[[opt_name]] <- input[[opt_name]]
     }
   }
-  
+
   # Format for Stan input
-  if (is.na(opts$vm_params) || is.null(opts$vm_params)) {
-    vm_params <- array(0, dim = c(0, 2))
+  is_vm_used <- !(is.na(opts$vm_params) || is.null(opts$vm_params))
+  if (is_vm_used) {
+    vm_params <- array(opts$vm_params, dim = c(is_vm_used, 2))
   } else {
-    vm_params <- array(opts$vm_params, dim = c(1, 2))
+    vm_params <- array(0, dim = c(is_vm_used, 2))
   }
   list(
-    uncertain = as.numeric(opts$uncertain),
-    heterogeneous = as.numeric(opts$heterogeneous),
+    is_uncrt = as.numeric(opts$uncertain),
+    is_heter = as.numeric(opts$heterogeneous),
+    is_vm_used = is_vm_used,
     vm_params = vm_params
   )
 }

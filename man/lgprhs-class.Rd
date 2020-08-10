@@ -11,6 +11,6 @@ An S4 class to represent the right-hand side of an lgp formula
 \section{Slots}{
 
 \describe{
-\item{\code{summands}}{a list of one or more \code{\link{lgpterm}}s}
+\item{\code{summands}}{a list of one or more \linkS4class{lgpterm}s}
 }}
 

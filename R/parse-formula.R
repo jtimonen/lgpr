@@ -1,39 +1,31 @@
-# Summing two rhs's
-setMethod(
-  "+", signature(e1 = "lgprhs", e2 = "lgprhs"),
-  function(e1, e2) {
-    new("lgprhs", summands = c(e1@summands, e2@summands))
+#' Get names of all variables appearing in a term
+#'
+#' @param term an object of class \linkS4class{lgpterm}
+#' @return a list of variable names
+term_variables <- function(term) {
+  a <- character()
+  for (f in term@factors) {
+    a <- c(a, f@covariate)
   }
-)
+  return(a)
+}
 
-# Summing two terms
-setMethod(
-  "+", signature(e1 = "lgpterm", e2 = "lgpterm"),
-  function(e1, e2) {
-    new("lgprhs", summands = list(e1, e2))
+#' Get names of all variables appearing on formula right-hand side
+#'
+#' @param rhs an object of class \linkS4class{lgprhs}
+#' @return a list of variable names
+rhs_variables <- function(rhs) {
+  a <- character()
+  for (s in rhs@summands) {
+    a <- c(a, term_variables(s))
   }
-)
-
-# Summing rhs and term
-setMethod(
-  "+", signature(e1 = "lgprhs", e2 = "lgpterm"),
-  function(e1, e2) {
-    e1 + new("lgprhs", summands = list(e2))
-  }
-)
-
-# Multiplying of two exprs
-setMethod(
-  "*", signature(e1 = "lgpexpr", e2 = "lgpexpr"),
-  function(e1, e2) {
-    new("lgpterm", factors = list(e1, e2))
-  }
-)
+  return(a)
+}
 
 #' Parse a string representation of one formula expression
 #'
 #' @param expr the expression as a string, e.g. \code{"gp(x)"}
-#' @return an object of class \code{\link{lgpexpr}}
+#' @return an object of class \linkS4class{lgpexpr}
 parse_expr <- function(expr) {
   num_open <- lengths(regmatches(expr, gregexpr("[(]", expr)))
   num_close <- lengths(regmatches(expr, gregexpr("[)]", expr)))
@@ -61,7 +53,7 @@ parse_expr <- function(expr) {
 #' Parse a string representation of one formula term
 #'
 #' @param term a term without any plus signs, e.g. \code{b*c}
-#' @return an object of class \code{\link{lgpterm}}
+#' @return an object of class \linkS4class{lgpterm}
 parse_term <- function(term) {
   factors <- strsplit(term, split = "*", fixed = TRUE)[[1]] # split to factors
   D <- length(factors)
@@ -81,7 +73,7 @@ parse_term <- function(term) {
 #' Parse a string representation of the right-hand side of a formula
 #'
 #' @param rhs the formula right-hand side, e.g. \code{a + b*c}
-#' @return an object of class \code{\link{lgprhs}}
+#' @return an object of class \linkS4class{lgprhs}
 parse_rhs <- function(rhs) {
   x <- gsub("[[:space:]]", "", rhs) # remove whitespace
   x <- gsub("[\",\']", "", x) # remove quotes
@@ -104,7 +96,7 @@ parse_rhs <- function(rhs) {
 
 #' Create a model formula
 #'
-#' @param formula A formula specified using the common \code{\link{formula}}
+#' @param formula A formula specified using the common \code{formula}
 #' syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
 #' \itemize{
 #'   \item The formula must contain exatly one tilde (\code{~}), with response
@@ -119,7 +111,7 @@ parse_rhs <- function(rhs) {
 #'   \item All variables appearing in \code{formula} must be
 #'   found in \code{data}.
 #' }
-#' @return an object of class \code{\link{lgpformula}}
+#' @return an object of class \linkS4class{lgpformula}
 parse_formula <- function(formula) {
   c_str <- class(formula)
   if (c_str != "formula") {
@@ -136,28 +128,4 @@ parse_formula <- function(formula) {
     terms = terms,
     call = paste(f_str[2], f_str[1], f_str[3])
   )
-}
-
-#' Get names of all variables appearing in a term
-#'
-#' @param term an object of class \code{lgpterm}
-#' @return a list of variable names
-term_variables <- function(term) {
-  a <- character()
-  for (f in term@factors) {
-    a <- c(a, f@covariate)
-  }
-  return(a)
-}
-
-#' Get names of all variables appearing on formula right-hand side
-#'
-#' @param rhs an object of class \code{lgprhs}
-#' @return a list of variable names
-rhs_variables <- function(rhs) {
-  a <- character()
-  for (s in rhs@summands) {
-    a <- c(a, term_variables(s))
-  }
-  return(a)
 }

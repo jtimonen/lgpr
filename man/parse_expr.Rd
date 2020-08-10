@@ -10,7 +10,7 @@ parse_expr(expr)
 \item{expr}{the expression as a string, e.g. \code{"gp(x)"}}
 }
 \value{
-an object of class \code{\link{lgpexpr}}
+an object of class \linkS4class{lgpexpr}
 }
 \description{
 Parse a string representation of one formula expression

@@ -4,7 +4,7 @@
 \alias{parse_likelihood}
 \title{Parse the given observation model}
 \usage{
-parse_likelihood(likelihood, c_hat, num_trials, response)
+parse_likelihood(likelihood, c_hat, num_trials, list_y)
 }
 \arguments{
 \item{likelihood}{Determines the observation model. Must be either
@@ -32,7 +32,7 @@ likelihood is binomial. Must have length one or equal to number of data
 points. Setting \code{num_trials=1} corresponds to Bernoulli observation
 model.}
 
-\item{response}{response variable measurements}
+\item{list_y}{a list field returned by \code{\link{parse_response}}}
 }
 \value{
 a list of parsed options

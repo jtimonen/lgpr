@@ -1,6 +1,6 @@
 #' Set c_hat (non-gaussian observation models)
 #'
-#' @param c_hat the \code{c_hat} argument given as input to 
+#' @param c_hat the \code{c_hat} argument given as input to
 #' \code{\link{lgp_model}}
 #' @param response response variable
 #' @param LH likelihood as int
@@ -31,7 +31,10 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
   n <- length(response)
   L <- length(c_hat)
   if (L != 1 && L != n) {
-    stop("c_hat must have length 1 or equal to the number of data points!")
+    stop(
+      "Invalid length of <c_hat>! Must be 1 or equal to number ",
+      "of observartions (", n, "). Found = ", L
+    )
   }
   if (L == 1) {
     c_hat <- rep(c_hat, n)
@@ -41,23 +44,25 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
 
 #' Set num_trials (binomial and Bernoulli observation models)
 #'
-#' @param num_trials the \code{num_trials} argument given as input to
-#' \code{lgp_model}
-#' @param response response variable
-#' @param LH likelihood as int
+#' @param num_trials the \code{num_trials} argument
+#' @param num_obs number of observations
+#' @param LH likelihood as integer encoding
 #' @return a numeric vector
-set_num_trials <- function(num_trials, response, LH) {
+set_num_trials <- function(num_trials, num_obs, LH) {
   if (is.null(num_trials)) {
-    num_trials <- rep(1, length(response))
+    num_trials <- rep(1, num_obs)
   } else {
     if (LH != 4) {
-      stop("Only give the num_trials argument if likelihood is binomial!")
+      stop("Only give the <num_trials> argument if likelihood is binomial!")
     }
-    if (length(num_trials) == 1) {
-      num_trials <- rep(num_trials, length(response))
-    }
-    if (length(num_trials) != length(response)) {
-      stop("Invalid length of num_trials!")
+    L <- length(num_trials)
+    if (L == 1) {
+      num_trials <- rep(num_trials, num_obs)
+    } else if (L != num_obs) {
+      stop(
+        "Invalid length of <num_trials>! Must be 1 or equal to number ",
+        "of observartions (", num_obs, "). Found = ", L
+      )
     }
   }
   return(num_trials)
@@ -66,10 +71,7 @@ set_num_trials <- function(num_trials, response, LH) {
 
 #' Parse the given observation model
 #'
-#' @param likelihood Determines the observation model. Must be either
-#' \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-#' binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-#' \code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.
+#' @inheritParams parse_response
 #' @param c_hat The GP mean. Must be a vector of length \code{dim(data)[1]}, or
 #' a real number defining a constant GP mean. If \code{NULL}, this is set to
 #'  \itemize{
@@ -88,15 +90,19 @@ set_num_trials <- function(num_trials, response, LH) {
 #' likelihood is binomial. Must have length one or equal to number of data
 #' points. Setting \code{num_trials=1} corresponds to Bernoulli observation
 #' model.
-#' @param response response variable measurements
+#' @param list_y a list field returned by \code{\link{parse_response}}
 #' @return a list of parsed options
-parse_likelihood <- function(likelihood, c_hat, num_trials, response){
+parse_likelihood <- function(likelihood, c_hat, num_trials, list_y) {
   LH <- likelihood_as_int(likelihood)
-  num_trials <- set_num_trials(num_trials, response, LH)
-  c_hat <- set_c_hat(c_hat, response, LH, num_trials)
+  y <- if (LH != 1) list_y$y_disc else list_y$y_cont
+  y <- as.numeric(y)
+  num_obs <- length(y)
+  num_trials <- set_num_trials(num_trials, num_obs, LH)
+  c_hat <- set_c_hat(c_hat, y, LH, num_trials)
   list(
-    likelihood = LH,
-    num_trials = num_trials,
-    c_hat = c_hat
+    obs_model = LH,
+    y_num_trials = num_trials,
+    c_hat = c_hat,
+    is_likelihood_skipped = 0
   )
 }

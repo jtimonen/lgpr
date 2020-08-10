@@ -1,29 +1,43 @@
-#' Check that given data is consistent with the given formula
+#' Create the covariate matrix that is given to stan
 #'
-#' @param formula an object of class \code{\link{lgpformula}}
-#' @param data an object of class \code{data.frame}
-check_data <- function(formula, data) {
-  trm <- stats::terms(formula)
-  vars <- rownames(attr(trm, "factors"))
-  resp <- attr(trm, "response")
-  if (!resp) stop("The formula does not contain a response variable")
-  tord <- attr(trm, "order")
-  if (sum(tord > 1) > 0) {
-    stop("Only first-order terms are allowed in the model formula!")
+#' @param data the data frame that was passed to \code{lgp}
+#' @param varInfo original variable type info
+#' @param verbose can this print some info?
+#' @param formula the model formula
+#' @param types the types returned by \code{\link{check_data}}
+#' @return a list
+create_covariates_stan <- function(data, varInfo, types, formula, verbose) {
+
+  # Create the design matrix X
+  XD <- stan_input_X_and_D(data, varInfo, types, formula, verbose)
+
+  # Do this because as.matrix() sometimes creates character matrices
+  X <- data.matrix(XD$X)
+  D <- XD$D
+
+  # Get location of NaNs because Stan does not accept NaNs
+  if (D[3] > 0) {
+    X_notnan <- 1 - is.nan(X[, 3])
+    X[which(X_notnan == 0), 3] <- 0
+  } else {
+    X_notnan <- rep(0, length(X[, 1]))
   }
-  yName <- vars[resp]
-  if (!(yName %in% colnames(data))) {
-    stop(paste("The data frame does not contain the response variable", yName))
+  X_notnan <- as.vector(X_notnan)
+
+  # If there are still NaNs, throw an error
+  n_nans <- sum(is.nan(X))
+  if (n_nans > 0) {
+    stop("Only the diseaseAge column of the data can contain NaNs!")
   }
-  vars_seq <- seq_len(length(vars))
-  for (i in vars_seq) {
-    if (!(vars[i] %in% colnames(data))) {
-      stop(paste(
-        "Variable", vars[i], "not found in the data frame!",
-        "Type ?lgp for help."
-      ))
-    }
-  }
+
+  # Return
+  covariates <- list(
+    X = X,
+    X_notnan = X_notnan,
+    D = D
+  )
+
+  return(covariates)
 }
 
 
@@ -258,120 +272,4 @@ standardize_inputs <- function(X, D) {
     }
   }
   return(list(X = X, TSCL = TSCL, CSCL = CSCL))
-}
-
-
-#' Get the (scaled) response variable
-#'
-#' @description Gets and possibly scales the response variable.
-#' @param data the data frame given as input to \code{lgp}
-#' @param varInfo variable type info
-#' @param standardize should the response be standardized to
-#' unit variance and zero mean
-#' @param LH likelihood as integer
-#' @return a list with the (scaled) response variable
-#'
-get_response <- function(data, varInfo, standardize, LH) {
-  yName <- varInfo$response_variable
-  response <- data[yName]
-  response <- unlist(response)
-  y_m <- mean(response)
-  y_std <- stats::sd(response)
-  if (y_std == 0) {
-    stop("The response has zero variance!")
-  }
-
-  # Do some checks and update info
-  lh_not_01 <- !(LH %in% c(0, 1))
-  if (standardize) {
-    if (lh_not_01) {
-      stop(
-        "Standardization of response is only possible if ",
-        "likelihood is 'Gaussian' or 'none'!"
-      )
-    }
-  }
-
-  # Create the function that does the transform, also store its inverse map
-  if (standardize) {
-    sclfun <- function(y) {
-      (y - y_m) / y_std
-    }
-    sclfun_inv <- function(y) {
-      y * y_std + y_m
-    }
-  } else {
-    sclfun <- function(y) {
-      y
-    }
-    sclfun_inv <- function(y) {
-      y
-    }
-  }
-
-  # Apply the response scaling
-  response <- sclfun(response)
-
-  # Check the response for negative values or non-integer values
-  if (lh_not_01) {
-    if (sum(response < 0) > 0) {
-      msg <- paste0(
-        "The response variable contains negative values. ",
-        "Only the likelihoods 'Gaussian' and 'none' are allowed ",
-        "in such case!\n"
-      )
-      stop(msg)
-    }
-    notint <- sum(response - round(response))
-    if (notint > 0) {
-      msg <- paste0(
-        "The response variable contains non-integer values. ",
-        "Only the likelihoods 'Gaussian' and 'none' are allowed ",
-        "in such case!\n"
-      )
-      stop(msg)
-    }
-  }
-
-  # Return
-  ret <- list(
-    response = response,
-    SCL = list(fun = sclfun, fun_inv = sclfun_inv)
-  )
-  return(ret)
-}
-
-
-#' Get some dimension variables that the Stan model needs as input
-#'
-#' @param X the design matrix
-#' @param D a vector of length 6
-#' @return a list
-get_model_dims <- function(X, D) {
-  N_tot <- length(unique(X[, 1]))
-  n <- dim(X)[1]
-  d <- dim(X)[2]
-  ret <- list(n = n, d = d, D = D, N_tot = N_tot)
-  return(ret)
-}
-
-
-#' Check that variable types make sense
-#'
-#' @param varInfo a named list
-#' @return nothing
-check_varInfo <- function(varInfo) {
-
-  # Check that id variable is not in offsets
-  if (varInfo$id_variable %in% varInfo$offset_vars) {
-    stop(
-      "The subject identifier variable cannot currently be included in",
-      " 'offset_vars'. If you wish to model the effect of 'id_variable'",
-      " as a constant offset,",
-      " you can create another covariate with the same values and",
-      " use it in your 'formula' and 'offset_vars' instead."
-    )
-  }
-
-  # TODO: more checks
 }

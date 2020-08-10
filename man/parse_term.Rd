@@ -10,7 +10,7 @@ parse_term(term)
 \item{term}{a term without any plus signs, e.g. \code{b*c}}
 }
 \value{
-an object of class \code{\link{lgpterm}}
+an object of class \linkS4class{lgpterm}
 }
 \description{
 Parse a string representation of one formula term
