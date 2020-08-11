@@ -134,12 +134,20 @@ id <- c(1, 1, 1, 2, 2, 2)
 y <- c(9.3, 1.2, 3.2, 2.3, 4.1, 1)
 dat <- data.frame(age, id, y)
 
-test_that("parse_response creates y_scaling", {
+test_that("parse_response creates y_scaling and applies it", {
   f <- parse_formula(y ~ gp(age) + mask(id))
   parsed <- parse_response(dat, "gaussian", f)
+  yts <- parsed$y_to_stan
   expect_equal(names(parsed), c("y_to_stan", "y_scaling"))
-  expect_equal(parsed$y_to_stan$num_obs, 6)
+  expect_equal(yts$num_obs, 6)
   expect_true(class(parsed$y_scaling) == "lgpscaling")
+
+  # Check zero mean and unit variance of y_cont
+  y <- as.numeric(yts$y_cont)
+  d1 <- abs(mean(y) - 0)
+  d2 <- abs(stats::sd(y) - 1)
+  expect_lt(d1, 1e-6)
+  expect_lt(d2, 1e-6)
 })
 
 # -------------------------------------------------------------------------
@@ -154,12 +162,22 @@ test_that("an lgpmodel can be created", {
 test_that("an lgpmodel has correct number of list fields for stan input", {
   m <- lgp_model(y ~ gp(age) + mask(id), dat, options = list(delta = 1e-5))
   L <- length(names(m@stan_input))
-  expect_equal(L, 15)
+  expect_equal(L, 22)
   expect_equal(m@stan_input$delta, 1e-5)
 })
 
 test_that("createing lgpmodel errors correctly", {
   expect_error(lgp_model(notvar ~ gp(age) + mask(id), dat))
+  expect_error(lgp_model(y ~ gp(notvar) + mask(id), dat))
   expect_error(lgp_model(y ~ gp(age) + mask(id), "notdata"))
   expect_error(lgp_model(y ~ gp(age) + mask(id), dat, likelihood = "binomial"))
+})
+
+
+test_that("covariates are parsed correctly", {
+  new_dat <- dat
+  new_dat$id <- as.factor(new_dat$id)
+  m <- lgp_model(y ~ gp(age) + mask(id), new_dat)
+  expect_equal(m@stan_input$num_cov_disc, 1)
+  expect_equal(m@stan_input$num_cov_cont, 1)
 })

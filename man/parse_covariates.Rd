@@ -20,7 +20,7 @@ values.}
 (default = \code{"id"}).}
 }
 \value{
-a named list of parsed options
+parsed input to stan and covariate scaling
 }
 \description{
 Parse the covariates and model components from given data and formula

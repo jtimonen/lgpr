@@ -1,7 +1,47 @@
 library(lgpr)
 library(rstan)
-stanmodel <- lgpr::get_stan_model()
-rstan::expose_stan_functions(stanmodel, show_compiler_warnings = FALSE)
+
+
+# Create stan model containing only the functions block
+HOME <- file.path("..", "..", "inst", "stan", "chunks")
+FILES <- c(
+  "functions-utils.stan",
+  "functions-kernels_base.stan",
+  "functions-kernels_single.stan",
+  "functions-kernels_many.stan",
+  "functions-posterior.stan",
+  "functions-prior.stan"
+)
+
+f_list <- lapply(file.path(HOME, FILES), FUN = readLines)
+functions <- paste(unlist(f_list), collapse = "\n")
+model_code <- paste(c("functions {", functions, "}"), collapse = "\n")
+
+# Build the stan model and expose the functions
+stanc_ret <- rstan::stanc(
+  model_code = model_code,
+  model_name = "only_functions",
+  allow_undefined = TRUE
+)
+
+sf <- rstan::expose_stan_functions(stanc_ret,
+  rebuild = TRUE,
+  verbose = TRUE,
+  show_compiler_warnings = FALSE
+)
+
+# 0. SETUP ----------------------------------------------------------------
+
+context("Stan functions: setup")
+
+test_that("Stan files are found", {
+  expect_true(file.exists(HOME))
+})
+
+test_that("there is a correct number of exposed Stan functions", {
+  expect_equal(length(sf), 21)
+})
+
 
 # 1. STAN UTILS -----------------------------------------------------------
 

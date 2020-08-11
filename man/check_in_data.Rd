@@ -12,7 +12,7 @@ check_in_data(var_name, data)
 \item{data}{an object of class \code{data.frame}}
 }
 \value{
-\code{TRUE} if the varible is found
+\code{TRUE} if the variable is found
 }
 \description{
 Check that data contains a variable with a certain name

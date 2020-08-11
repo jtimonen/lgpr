@@ -27,7 +27,7 @@ set_num_levels <- function(X, D) {
 #'
 #' @param var_name the variable to be searched for
 #' @param data an object of class \code{data.frame}
-#' @return \code{TRUE} if the varible is found
+#' @return \code{TRUE} if the variable is found
 check_in_data <- function(var_name, data) {
   d_names <- colnames(data)
   ok <- (var_name %in% d_names)
@@ -121,7 +121,7 @@ parse_response <- function(data, likelihood, model_formula) {
   check_in_data(y_name, data)
   y <- data[[y_name]]
 
-  # Check that the response is numeric and compatibile with observation model
+  # Check that the response is numeric and compatible with observation model
   check_response(y, obs_model)
 
   # Create y_cont and y_disc inputs for Stan
@@ -131,9 +131,10 @@ parse_response <- function(data, likelihood, model_formula) {
     y_cont <- array(y, dim = c(0, num_obs))
     y_scaling <- NA
   } else {
+    y_scaling <- create_scaling(y) # create scaling and inverse
+    y <- y_scaling@fun(y) # standardize the response
     y_disc <- array(y, dim = c(0, num_obs))
     y_cont <- array(y, dim = c(1, num_obs))
-    y_scaling <- create_scaling(y)
   }
   to_stan <- list(num_obs = num_obs, y_disc = y_disc, y_cont = y_cont)
 
@@ -150,16 +151,39 @@ parse_response <- function(data, likelihood, model_formula) {
 #' @inheritParams parse_response
 #' @param id_variable Name of the unique subject identifier variable
 #' (default = \code{"id"}).
-#' @return a named list of parsed options
+#' @return parsed input to stan and covariate scaling
 parse_covariates <- function(data, model_formula, id_variable) {
-  list(
-    num_obs = 1,
+
+  # Check that all covariates exist in data
+  x_names <- rhs_variables(model_formula@terms)
+  for (name in x_names) {
+    check_in_data(name, data)
+  }
+
+  # Check that the id variable is in data
+  check_in_data(id_variable, data)
+
+  # TODO: get covariate types, mask NaNs, check NaNs,
+  types <- c()
+  for (name in x_names) {
+    x <- data[[name]]
+    c_x <- class(x)
+    c_type <- if (c_x == "factor") "discrete" else "continuous"
+    types <- c(types, c_type)
+  }
+
+  # Create the list that will go as input to stan
+  to_stan <- list(
     num_subjects = 1,
     num_cases = 0,
-    num_cov_cont = 1,
-    num_cov_disc = 1,
+    num_cov_cont = sum(types == "continuous"),
+    num_cov_disc = sum(types == "discrete"),
     num_levels = 1,
     x_disc = 1,
     x_cont = 1
   )
+
+  # Return
+  x_scaling <- NA
+  list(x_to_stan = to_stan, x_scaling = x_scaling)
 }
