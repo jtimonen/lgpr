@@ -19,8 +19,7 @@ Biarch: true
 Depends: 
     R (>= 3.4.0),
     methods
-Imports: 
-    methods,
+Imports:
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
     rstantools (>= 2.0.0),
@@ -45,6 +44,7 @@ Suggests:
     covr
 VignetteBuilder: knitr
 Collate: 
+    'RcppExports.R'
     'aa-preproc-old.R'
     'validate.R'
     'all_s4_classes.R'

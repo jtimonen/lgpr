@@ -29,23 +29,14 @@ cat(model_code, file = fn)
 cpp_code <- rstan::expose_stan_functions(fn, verbose = TRUE, dryRun = TRUE)
 file.remove(fn)
 
+# Remove an include to prevent linker error
+cpp_lines <- scan(text = cpp_code, what = character(), sep = "\n", quiet = TRUE)
+line_idx <- which(cpp_lines == "#include <exporter.h>")
+cpp_lines[line_idx] <- "// REMOVED #include <exporter.h> by dev-cpp.R "
+cpp_code <- paste0(cpp_lines, collapse = "\n")
+
 # Write the C++ code to src/stanFunctions.cpp
 cat(cpp_code, file = file.path('src', 'stanFunctions.cpp'))
 
 # Update R/RcppExports.R and src/RcppExports.cpp
 Rcpp::compileAttributes(pkgdir = '.', verbose = TRUE)
-
-# Add things
-add1 <- paste0('RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod(); \n',
-               'RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_lc_mod(); \n')
-
-# at the the start of static const R_CallMethodDef CallEntries[] function
-add2 <- paste0('{"_rcpp_module_boot_stan_fit4lgp_mod", ', 
-               '(DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_mod, 3} \n',
-               '{"_rcpp_module_boot_stan_fit4lgp_lc_mod", ',
-               '(DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_lc_mod, 3}\n')
-
-cat("\n === Add following to RcppExports.cpp, ")
-cat("at the start of R_CallMethodDef CallEntries[] == \n")
-cat(paste0(add1, add2))
-

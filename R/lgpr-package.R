@@ -36,7 +36,7 @@
 #' @import methods
 #' @import Rcpp
 #' @import rstantools
-#' @importFrom rstan sampling
+#' @importFrom rstan sampling get_rng get_stream
 #'
 #' @references
 #' \enumerate{
