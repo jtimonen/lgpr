@@ -1,9 +1,8 @@
 library(lgpr)
 library(rstan)
 
-
-# Create stan model containing only the functions block
-HOME <- file.path("..", "..", "inst", "stan", "chunks")
+# stan_files is a symlink to <pkgdir>/inst/stan/
+HOME <- file.path("stan_files", "chunks")
 FILES <- c(
   "functions-utils.stan",
   "functions-kernels_base.stan",
@@ -13,17 +12,19 @@ FILES <- c(
   "functions-prior.stan"
 )
 
+# Create stan model containing only the functions block
 f_list <- lapply(file.path(HOME, FILES), FUN = readLines)
 functions <- paste(unlist(f_list), collapse = "\n")
 model_code <- paste(c("functions {", functions, "}"), collapse = "\n")
 
-# Build the stan model and expose the functions
+# Build the stan model
 stanc_ret <- rstan::stanc(
   model_code = model_code,
   model_name = "only_functions",
   allow_undefined = TRUE
 )
 
+# Expose the functions
 sf <- rstan::expose_stan_functions(stanc_ret,
   rebuild = TRUE,
   verbose = TRUE,

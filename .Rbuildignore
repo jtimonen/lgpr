@@ -3,3 +3,6 @@
 ^\.travis\.yml$
 ^\_config\.yml$
 ^lint\.R$
+tests/testthat/stan_files/.*\.o$
+tests/testthat/stan_files/.*\.cc$
+tests/testthat/stan_files/.*\.hpp$
