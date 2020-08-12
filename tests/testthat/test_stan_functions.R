@@ -1,46 +1,40 @@
 library(lgpr)
 library(rstan)
 
-# 0. SETUP ----------------------------------------------------------------
+context("Stan stream")
+STREAM <- get_stream()
 
-context("Stan functions: setup")
-
-test_that("Stan files are found", {
-  expect_true(file.exists(HOME))
+test_that("rstan::get_stream is in namespace", {
+  expect_true(class(STREAM) == "externalptr")
 })
-
-test_that("there is a correct number of exposed Stan functions", {
-  expect_equal(length(sf), 21)
-})
-
 
 # 1. STAN UTILS -----------------------------------------------------------
 
 context("Stan utils: input warping")
 
 test_that("STAN_warp_input works for scalar input", {
-  w <- STAN_warp_input(-1, 1.32)
+  w <- STAN_warp_input(-1, 1.32, STREAM)
   expect_equal(w, -0.5783634)
 })
 
 test_that("STAN_warp_input works for vector input", {
-  w <- STAN_warp_input(c(-1, 0, 1), 1.32)
+  w <- STAN_warp_input(c(-1, 0, 1), 1.32, STREAM)
   w_correct <- c(-0.5783634, 0.0, 0.5783634)
   expect_equal(w, w_correct)
 })
 
 test_that("STAN_warp_input errors with invalid steepness input", {
-  expect_error(STAN_warp_input(1, -1))
-  expect_error(STAN_warp_input(1, 0.0))
-  expect_error(STAN_warp_input(1, NaN))
-  expect_error(STAN_warp_input(1, Inf))
+  expect_error(STAN_warp_input(1, -1, STREAM))
+  expect_error(STAN_warp_input(1, 0.0, STREAM))
+  expect_error(STAN_warp_input(1, NaN, STREAM))
+  expect_error(STAN_warp_input(1, Inf, STREAM))
 })
 
 test_that("STAN_warp_input works similarly as lgpr:::warp_input", {
   a <- exp(stats::rnorm(1)) # random steepness
   x <- seq(-3, 3, by = 1.33)
   expect_equal(
-    STAN_warp_input(x, a),
+    STAN_warp_input(x, a, STREAM),
     lgpr:::warp_input(x, a, 0, 1)
   )
 })
@@ -49,28 +43,28 @@ test_that("STAN_warp_input works similarly as lgpr:::warp_input", {
 context("Stan utils: variance masking")
 
 test_that("STAN_var_mask works for scalar input", {
-  m <- STAN_var_mask(-1, 1.32)
+  m <- STAN_var_mask(-1, 1.32, STREAM)
   expect_equal(m, 0.2108183)
 })
 
 test_that("STAN_var_mask works for vector input", {
-  m <- STAN_var_mask(c(-1, 0, 1), 1.32)
+  m <- STAN_var_mask(c(-1, 0, 1), 1.32, STREAM)
   m_correct <- c(0.2108183, 0.5, 0.7891817)
   expect_equal(m, m_correct)
 })
 
 test_that("STAN_var_mask errors with invalid steepness input", {
-  expect_error(STAN_var_mask(1, -1))
-  expect_error(STAN_var_mask(1, 0.0))
-  expect_error(STAN_var_mask(1, NaN))
-  expect_error(STAN_var_mask(1, Inf))
+  expect_error(STAN_var_mask(1, -1, STREAM))
+  expect_error(STAN_var_mask(1, 0.0, STREAM))
+  expect_error(STAN_var_mask(1, NaN, STREAM))
+  expect_error(STAN_var_mask(1, Inf, STREAM))
 })
 
 test_that("STAN_var_mask works similarly as lgpr:::var_mask", {
   a <- 0.6
   x <- c(-5, 0, 5)
   expect_equal(
-    STAN_var_mask(x, a),
+    STAN_var_mask(x, a, STREAM),
     lgpr:::var_mask(x, a)
   )
 })
@@ -80,7 +74,7 @@ context("Stan utils: expanding a vector")
 
 test_that("STAN_expand works for valid input", {
   p <- c(0.1, 0.2)
-  v <- STAN_expand(p, c(2, 3, 2, 3))
+  v <- STAN_expand(p, c(2, 3, 2, 3), STREAM)
   expect_equal(v, c(0.1, 0.2, 0.1, 0.2))
 })
 
@@ -88,8 +82,8 @@ test_that("STAN_expand errors when idx_expand has out of bounds indices", {
   p <- c(0.1, 0.2)
   idx1 <- c(2, 3, 0, 3)
   idx2 <- c(2, 3, 4, 3)
-  expect_error(STAN_expand(p, idx1))
-  expect_error(STAN_expand(p, idx2))
+  expect_error(STAN_expand(p, idx1, STREAM))
+  expect_error(STAN_expand(p, idx2, STREAM))
 })
 
 
@@ -105,8 +99,8 @@ test_that("STAN_edit_dis_age works properly", {
   case_ids <- c(1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 3, 3, 3, 3)
   idx_expand <- case_ids + 1
   expand_expect <- c(-1, -1, -1, -1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 10, 10, 10, 10)
-  expect_equal(STAN_expand(teff, idx_expand), expand_expect)
-  t_edit <- STAN_edit_dis_age(x_dis_age, idx_expand, teff_obs, teff)
+  expect_equal(STAN_expand(teff, idx_expand, STREAM), expand_expect)
+  t_edit <- STAN_edit_dis_age(x_dis_age, idx_expand, teff_obs, teff, STREAM)
   t_expect <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
   expect_equal(t_edit, t_expect)
 })
@@ -124,7 +118,7 @@ test_that("zero-sum kernel works correctly", {
     -1, -1, 1
   )
   K_expect <- matrix(a, 3, 3, byrow = TRUE)
-  K <- STAN_kernel_base_zerosum(x, x, M)
+  K <- STAN_kernel_base_zerosum(x, x, M, STREAM)
   expect_equal(K, K_expect)
 })
 
@@ -132,7 +126,7 @@ test_that("zero-sum kernel works similarly in R and Stan", {
   M <- 3
   x <- sample.int(M, size = 8, replace = TRUE)
   expect_equal(
-    STAN_kernel_base_zerosum(x, x, M),
+    STAN_kernel_base_zerosum(x, x, M, STREAM),
     kernel_zerosum(x, x, M)
   )
 })
@@ -140,7 +134,7 @@ test_that("zero-sum kernel works similarly in R and Stan", {
 test_that("zero-sum kernel errors if number of categories is one", {
   M <- 1
   x <- sample.int(M, size = 8, replace = TRUE)
-  expect_error(STAN_kernel_base_zerosum(x, x, M))
+  expect_error(STAN_kernel_base_zerosum(x, x, M, STREAM))
 })
 
 
@@ -154,7 +148,7 @@ test_that("categorical kernel works correctly", {
     0, 0, 1
   )
   K_expect <- matrix(a, 3, 3, byrow = TRUE)
-  K <- STAN_kernel_base_cat(x, x)
+  K <- STAN_kernel_base_cat(x, x, STREAM)
   expect_equal(K, K_expect)
 })
 
@@ -175,8 +169,8 @@ test_that("binary mask kernel works correctly", {
   )
   K1_expect <- matrix(a, 3, 3, byrow = TRUE)
   K2_expect <- matrix(b, 3, 3, byrow = TRUE)
-  K1 <- STAN_kernel_base_bin(x, x, 1)
-  K2 <- STAN_kernel_base_bin(x, x, 2)
+  K1 <- STAN_kernel_base_bin(x, x, 1, STREAM)
+  K2 <- STAN_kernel_base_bin(x, x, 2, STREAM)
   expect_equal(K1, K1_expect)
   expect_equal(K2, K2_expect)
 })
@@ -184,7 +178,7 @@ test_that("binary mask kernel works correctly", {
 test_that("binary mask kernel works similarly in R and Stan", {
   x <- sample.int(2, size = 8, replace = TRUE) - 1
   expect_equal(
-    STAN_kernel_base_bin(x, x, 1),
+    STAN_kernel_base_bin(x, x, 1, STREAM),
     kernel_bin(x, x)
   )
 })
@@ -202,7 +196,7 @@ test_that("variance mask kernel works correctly", {
     0.9755191, 0.9382995, 0.9755191
   )
   K_expect <- matrix(v, 3, 3, byrow = TRUE)
-  K <- STAN_kernel_base_var_mask(x, x, stp, vm_params)
+  K <- STAN_kernel_base_var_mask(x, x, stp, vm_params, STREAM)
   expect_equal(K, K_expect)
 })
 
@@ -218,7 +212,7 @@ test_that("disease mask kernel works correctly", {
     0, 0, 0, 0
   )
   K_expect <- matrix(a, 3, 4, byrow = TRUE)
-  K <- STAN_kernel_base_disease_mask(x1, x2)
+  K <- STAN_kernel_base_disease_mask(x1, x2, STREAM)
   expect_equal(K, K_expect)
 })
 
@@ -226,7 +220,7 @@ test_that("variance mask kernel works similarly in R and Stan", {
   x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
   stp <- 1.0
   vm_params <- c(0.05, 0.6)
-  K_stan <- STAN_kernel_base_var_mask(x, x, stp, vm_params)
+  K_stan <- STAN_kernel_base_var_mask(x, x, stp, vm_params, STREAM)
   K_r <- kernel_var_mask(x, x, vm_params, stp)
   expect_equal(K_stan, K_r)
 })
@@ -234,19 +228,19 @@ test_that("variance mask kernel works similarly in R and Stan", {
 test_that("variance mask kernel errors if steepness is not valid", {
   x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
   vm_params <- c(0.05, 0.6)
-  expect_error(STAN_kernel_base_var_mask(x, x, 0, vm_params))
-  expect_error(STAN_kernel_base_var_mask(x, x, -1.0, vm_params))
-  expect_error(STAN_kernel_base_var_mask(x, x, NaN, vm_params))
-  expect_error(STAN_kernel_base_var_mask(x, x, Inf, vm_params))
+  expect_error(STAN_kernel_base_var_mask(x, x, 0, vm_params, STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, -1.0, vm_params, STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, NaN, vm_params, STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, Inf, vm_params, STREAM))
 })
 
 test_that("variance mask kernel errors if <vm_params> is not valid", {
   x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
   vm_params <- c(0.05, 0.6)
-  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(-0.05, 0.6)))
-  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(1.6, 0.6)))
-  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(0.05, NaN)))
-  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6)))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(-0.05, 0.6), STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(1.6, 0.6), STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(0.05, NaN), STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6), STREAM))
 })
 
 # 3. STAN KERNEL ARRAYS ---------------------------------------------------
@@ -259,7 +253,7 @@ test_that("correct number of matrices is returned", {
   n2 <- length(dat$x2_disc[[1]])
   KF <- STAN_kernel_fixed_all(
     n1, n2, dat$x1_disc, dat$x2_disc,
-    dat$num_levels, dat$components
+    dat$num_levels, dat$components, STREAM
   )
   expect_equal(length(KF), 6)
 })
@@ -271,7 +265,7 @@ test_that("matrices of correct size are returned", {
   n2 <- length(dat$x2_disc[[1]])
   KF <- STAN_kernel_fixed_all(
     n1, n2, dat$x1_disc, dat$x2_disc,
-    dat$num_levels, dat$components
+    dat$num_levels, dat$components, STREAM
   )
   J <- length(KF)
   for (j in seq_len(J)) {
@@ -322,7 +316,7 @@ test_that("matrices with correct values are returned", {
 
   KF <- STAN_kernel_fixed_all(
     4, 4, dat$x2_disc, dat$x2_disc,
-    dat$num_levels, dat$components
+    dat$num_levels, dat$components, STREAM
   )
   expect_equal(KF[[1]], A1)
   expect_equal(KF[[2]], A2)
@@ -341,7 +335,7 @@ test_that("STAN_kernel_all can be used", {
   n2 <- length(dat$x2_disc[[1]])
   KF <- STAN_kernel_fixed_all(
     n1, n2, dat$x1_disc, dat$x2_disc,
-    dat$num_levels, dat$components
+    dat$num_levels, dat$components, STREAM
   )
   alpha <- c(1, 1, 1, 1, 1, 1)
   ell <- c(1, 1, 1, 1, 1)
@@ -350,7 +344,7 @@ test_that("STAN_kernel_all can be used", {
   K <- STAN_kernel_all(
     n1, n2, KF, dat$components, x1, x2,
     alpha, ell, 0.1, list(),
-    list(), list(), list(), list(), list()
+    list(), list(), list(), list(), list(), STREAM
   )
   J <- 6
   expect_equal(length(K), J)
@@ -367,7 +361,7 @@ test_that("STAN_kernel_all uses cov_exp_quad correctly", {
   n1 <- length(dat$x1_disc[[1]])
   KF <- STAN_kernel_fixed_all(
     n1, n1, dat$x1_disc, dat$x1_disc,
-    dat$num_levels, dat$components
+    dat$num_levels, dat$components, STREAM
   )
   alpha <- 2 * c(1, 1, 1, 1, 1, 1)
   ell <- 12 * c(1, 1, 1, 1, 1)
@@ -375,7 +369,7 @@ test_that("STAN_kernel_all uses cov_exp_quad correctly", {
   K <- STAN_kernel_all(
     n1, n1, KF, dat$components, x1, x1,
     alpha, ell, 0.1, list(),
-    list(), list(), list(), list(), list()
+    list(), list(), list(), list(), list(), STREAM
   )
   diff <- abs(K[[4]][2, 3] - 2.426123)
   expect_lt(diff, 1e-6)
@@ -391,7 +385,7 @@ test_that("componentwise means sum to total mean", {
   n1 <- length(dat$x1_disc[[1]])
   KF <- STAN_kernel_fixed_all(
     n1, n1, dat$x1_disc, dat$x1_disc,
-    dat$num_levels, dat$components
+    dat$num_levels, dat$components, STREAM
   )
   alpha <- 2 * c(1, 1, 1, 1, 1, 1)
   ell <- 12 * c(1, 1, 1, 1, 1)
@@ -399,11 +393,11 @@ test_that("componentwise means sum to total mean", {
   KX <- STAN_kernel_all(
     n1, n1, KF, dat$components, x1, x1,
     alpha, ell, 0.1, list(),
-    list(), list(), list(), list(), list()
+    list(), list(), list(), list(), list(), STREAM
   )
   y <- rep(1, n1)
 
-  fp <- STAN_gp_posterior(KX, y, 1e-6, 1.0)
+  fp <- STAN_gp_posterior(KX, y, 1e-6, 1.0, STREAM)
   f_sum <- fp[[1]]
   for (j in 2:6) {
     f_sum <- f_sum + fp[[j]]
@@ -422,7 +416,7 @@ test_that("normal prior is correct", {
   x <- 0.333
   mu <- -0.11
   sigma <- 0.23
-  log_p <- STAN_log_prior(x, c(2, 0), c(mu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(2, 0), c(mu, sigma, 0), STREAM)
   expect_equal(log_p, stats::dnorm(!!x, !!mu, !!sigma, log = TRUE))
 })
 
@@ -430,7 +424,7 @@ test_that("student-t prior is correct", {
   x <- 0.333
   nu <- 16
   sigma <- 1
-  log_p <- STAN_log_prior(x, c(3, 0), c(nu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(3, 0), c(nu, sigma, 0), STREAM)
   expect_equal(log_p, stats::dt(!!x, !!nu, log = TRUE))
 })
 
@@ -438,7 +432,7 @@ test_that("gamma prior is correct", {
   x <- 0.333
   a <- 5
   b <- 8
-  log_p <- STAN_log_prior(x, c(4, 0), c(a, b, 0))
+  log_p <- STAN_log_prior(x, c(4, 0), c(a, b, 0), STREAM)
   expect_equal(log_p, stats::dgamma(!!x, shape = !!a, rate = !!b, log = TRUE))
 })
 
@@ -446,7 +440,7 @@ test_that("inverse-gamma prior is correct", {
   x <- 0.333
   a <- 5
   b <- 8
-  log_p <- STAN_log_prior(x, c(5, 0), c(a, b, 0))
+  log_p <- STAN_log_prior(x, c(5, 0), c(a, b, 0), STREAM)
   expect_equal(
     log_p,
     lgpr:::dinvgamma_stanlike(!!x, alpha = !!a, beta = !!b, log = TRUE)
@@ -457,7 +451,7 @@ test_that("log-normal prior is correct", {
   x <- 0.333
   mu <- -0.11
   sigma <- 0.23
-  log_p <- STAN_log_prior(x, c(6, 0), c(mu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(6, 0), c(mu, sigma, 0), STREAM)
   expect_equal(log_p, stats::dlnorm(!!x, !!mu, !!sigma, log = TRUE))
 })
 
@@ -467,7 +461,7 @@ test_that("square transform is taken into account", {
   x <- 0.333
   mu <- -0.11
   sigma <- 0.23
-  log_p <- STAN_log_prior(x, c(6, 1), c(mu, sigma, 0))
+  log_p <- STAN_log_prior(x, c(6, 1), c(mu, sigma, 0), STREAM)
   expect_lt(
     log_p, # -38.9
     stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
@@ -478,15 +472,15 @@ context("Stan priors: error handling")
 
 test_that("an error is thrown if <types> is misspecified", {
   x <- 1
-  expect_error(STAN_log_prior(x, c(6), c(1, 1, 0)))
-  expect_error(STAN_log_prior(x, c(0, 1), c(1, 1, 0)))
-  expect_error(STAN_log_prior(x, c(7, 1), c(1, 1, 0)))
-  expect_error(STAN_log_prior(x, c(1, 3), c(1, 1, 0)))
+  expect_error(STAN_log_prior(x, c(6), c(1, 1, 0), STREAM))
+  expect_error(STAN_log_prior(x, c(0, 1), c(1, 1, 0), STREAM))
+  expect_error(STAN_log_prior(x, c(7, 1), c(1, 1, 0), STREAM))
+  expect_error(STAN_log_prior(x, c(1, 3), c(1, 1, 0), STREAM))
 })
 
 test_that("an error is thrown if <hyper> is misspecified", {
   x <- 1
-  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1)))
-  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1, 0, 1)))
-  expect_error(STAN_log_prior(x, c(2, 0), c(1, -1, 0)))
+  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1), STREAM))
+  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1, 0, 1), STREAM))
+  expect_error(STAN_log_prior(x, c(2, 0), c(1, -1, 0), STREAM))
 })
