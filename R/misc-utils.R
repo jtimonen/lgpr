@@ -1,3 +1,17 @@
+#' List elements to matrix rows
+#'
+#' @param x a listof length \code{m} where each element is a vector of
+#' length code \code{n}
+#' @param n length of each vector
+#' @return a matrix with shape \code{m} x \code{n}
+list_to_matrix <- function(x, n) {
+  m <- length(x)
+  A <- array(0, dim = c(m, n))
+  for (i in seq_len(m)) {
+    A[i, ] <- x[[i]]
+  }
+  as.matrix(A)
+}
 
 #' Create the GP mean input for \code{lgp}, so that it accounts
 #' for normalization between data points in the Poisson or NB

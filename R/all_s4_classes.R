@@ -42,10 +42,12 @@ lgpformula <- setClass("lgpformula",
 #'
 #' @slot fun function that performs normalization
 #' @slot fun_inv inverse function of \code{fun}
+#' @slot var_name variable name
 lgpscaling <- setClass("lgpscaling",
   representation = representation(
     fun = "function",
-    fun_inv = "function"
+    fun_inv = "function",
+    var_name = "character"
   ),
   prototype = prototype(
     fun = function(x) {
@@ -53,7 +55,8 @@ lgpscaling <- setClass("lgpscaling",
     },
     fun_inv = function(x) {
       x
-    }
+    },
+    var_name = "unknown"
   ),
   validity = check_lgpscaling
 )
@@ -62,15 +65,18 @@ lgpscaling <- setClass("lgpscaling",
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot stan_dat The data to be given as input to \code{rstan::sampling}
-#' @slot scalings Variable scaling functions and their inverse operations.
-#' Must be a named list with each element is an \linkS4class{lgpscaling}
-#' object.
+#' @slot x_scaling Continous covariate normalization functions and their
+#' inverse operations. Must be a named list with each element is an
+#' \linkS4class{lgpscaling} object.
+#' @slot y_scaling Response variable normalization function and its
+#' inverse operation. Must be an \linkS4class{lgpscaling} object.
 #' @slot info Model info.
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
     stan_input = "list",
-    scalings = "list",
+    y_scaling = "lgpscaling",
+    x_scaling = "list",
     info = "list"
   )
 )

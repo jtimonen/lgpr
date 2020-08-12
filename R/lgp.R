@@ -51,7 +51,7 @@ lgp <- function(formula,
 #' @inheritParams parse_response
 #' @inheritParams parse_likelihood
 #' @inheritParams parse_prior
-#' @inheritParams parse_covariates
+#' @inheritParams parse_data
 #' @inheritParams parse_options
 #' @inheritParams parse_disease_options
 #' @return An object of class \code{\link{lgpmodel}}.
@@ -71,15 +71,20 @@ lgp_model <- function(formula,
   list_opts <- parse_options(options)
   list_dopts <- parse_disease_options(disease_options)
 
-  # Parse response and likelihood
+  # Parse response
   parsed <- parse_response(data, likelihood, model_formula)
-  list_y <- parsed$y_to_stan
-  y_scl <- parsed$y_scaling
+  list_y <- parsed$to_stan
+  y_scaling <- parsed$scaling
+
+  # Parse likelihood
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y)
 
-  # Parse covariates and components
-  parsed <- parse_covariates(data, model_formula, id_variable)
-  list_x <- parsed$x_to_stan
+  # Parse covariates
+  parsed <- parse_data(data, model_formula, id_variable)
+  list_x <- parsed$to_stan
+  x_scaling <- parsed$scaling
+
+  # Parse components
 
   # Parse the prior
   # stan_prior <- parse_prior(prior)
@@ -92,13 +97,13 @@ lgp_model <- function(formula,
     list_lh,
     list_x
   )
-  scalings <- list(response = y_scl)
 
   info <- list(created = date(), pkg_desc = get_pkg_description())
   out <- new("lgpmodel",
     model_formula = model_formula,
     stan_input = stan_input,
-    scalings = scalings,
+    x_scaling = x_scaling,
+    y_scaling = y_scaling,
     info = info
   )
   return(out)

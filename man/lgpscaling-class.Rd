@@ -14,5 +14,7 @@ An S4 class to represent variable scaling and its inverse
 \item{\code{fun}}{function that performs normalization}
 
 \item{\code{fun_inv}}{inverse function of \code{fun}}
+
+\item{\code{var_name}}{variable name}
 }}
 

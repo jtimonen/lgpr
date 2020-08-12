@@ -1,161 +1,14 @@
-#' Count numbers of different categories for each categorical variable
-#'
-#' @param X the design matrix
-#' @param D a vector of length 6
-#' @return a numeric vector
-set_num_levels <- function(X, D) {
-  N_cat <- rep(0, 1 + D[5] + D[6])
-  j0 <- 2 + D[3] + D[4]
-  x1 <- X[, 1]
-  N_cat[1] <- length(unique(x1)) # should equal to number of individuals
-  if (D[5] > 0) {
-    for (j in 1:D[5]) {
-      xj <- X[, j0 + j]
-      N_cat[1 + j] <- length(unique(xj))
-    }
-  }
-  if (D[6] > 0) {
-    for (j in 1:D[6]) {
-      xj <- X[, j0 + D[5] + j]
-      N_cat[1 + D[5] + j] <- length(unique(xj))
-    }
-  }
-  return(as.array(N_cat))
-}
-
-#' Check that data contains a variable with a certain name
-#'
-#' @param var_name the variable to be searched for
-#' @param data an object of class \code{data.frame}
-#' @return \code{TRUE} if the variable is found
-check_in_data <- function(var_name, data) {
-  d_names <- colnames(data)
-  ok <- (var_name %in% d_names)
-  if (!ok) {
-    str <- paste(d_names, collapse = ", ")
-    msg <- paste0(
-      "The variable '", var_name, "' not found in <data>! ",
-      " Found data columns = {", str, "}."
-    )
-    stop(msg)
-  }
-  return(TRUE)
-}
-
-#' Create the function that does a standardizing transform and its inverse
-#'
-#' @param y response variable measurements
-#' @return an object of class \linkS4class{lgpscaling}
-create_scaling <- function(y) {
-  if (length(y) < 2) {
-    stop("length of <y> must be at least 2!")
-  }
-  y_m <- mean(y)
-  y_std <- stats::sd(y)
-  if (y_std == 0) {
-    stop("<y> has zero variance!")
-  }
-  fun <- function(y) {
-    (y - y_m) / y_std
-  }
-  fun_inv <- function(y) {
-    y * y_std + y_m
-  }
-  new("lgpscaling", fun = fun, fun_inv = fun_inv)
-}
-
-#' Check that the response is numeric and compatibile with observation model
-#'
-#' @param y the response variable measurements
-#' @param obs_model observation model (integer encoding)
-check_response <- function(y, obs_model) {
-
-  # Check that y is numeric
-  c_y <- class(y)
-  if (c_y != "numeric") {
-    stop("the response variable must be numeric! found = ", c_y)
-  }
-
-  # Check compatibility with observation model
-  if (obs_model != 1) {
-    diff <- max(abs(y - round(y)))
-    if (diff > 0) {
-      stop(
-        "the response variable should contain only integers ",
-        "with this observation model"
-      )
-    }
-    if (any(y < 0)) {
-      stop(
-        "the response variable measurements cannot be negative ",
-        "with this observation model!"
-      )
-    }
-  }
-  return(TRUE)
-}
-
-#' Parse the response variable from given data and formula
-#'
-#' @param data A \code{data.frame} where each column corresponds to one
-#' variable, and each row is one observation. Continuous covariates and the
-#' response variable must have type \code{"numeric"} and categorical covariates
-#' must have type \code{"factor"}. Missing values should be indicated with
-#' \code{NaN} or \code{NA}. The response variable cannot contain missing
-#' values.
-#' @param likelihood Determines the observation model. Must be either
-#' \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-#' binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-#' \code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.
-#' @param model_formula An object of class \code{lgpformula}.
-#' @return a named list of parsed options
-parse_response <- function(data, likelihood, model_formula) {
-  obs_model <- likelihood_as_int(likelihood)
-
-  # Check that data is a data.frame and contains the response variable
-  y_name <- model_formula@response
-  c_data <- class(data)
-  if (c_data != "data.frame") {
-    stop("<data> must be a data.frame! found = ", c_data)
-  }
-  check_in_data(y_name, data)
-  y <- data[[y_name]]
-
-  # Check that the response is numeric and compatible with observation model
-  check_response(y, obs_model)
-
-  # Create y_cont and y_disc inputs for Stan
-  num_obs <- length(y)
-  if (obs_model != 1) {
-    y_disc <- array(y, dim = c(1, num_obs))
-    y_cont <- array(y, dim = c(0, num_obs))
-    y_scaling <- NA
-  } else {
-    y_scaling <- create_scaling(y) # create scaling and inverse
-    y <- y_scaling@fun(y) # standardize the response
-    y_disc <- array(y, dim = c(0, num_obs))
-    y_cont <- array(y, dim = c(1, num_obs))
-  }
-  to_stan <- list(num_obs = num_obs, y_disc = y_disc, y_cont = y_cont)
-
-  # Return also the scaling and its inverse
-  list(
-    y_to_stan = to_stan,
-    y_scaling = y_scaling
-  )
-}
-
-
 #' Parse the covariates and model components from given data and formula
 #'
 #' @inheritParams parse_response
 #' @param id_variable Name of the unique subject identifier variable
 #' (default = \code{"id"}).
 #' @return parsed input to stan and covariate scaling
-parse_covariates <- function(data, model_formula, id_variable) {
+parse_data <- function(data, model_formula, id_variable) {
 
   # Check that all covariates exist in data
   x_names <- rhs_variables(model_formula@terms)
+  x_names <- unique(x_names)
   for (name in x_names) {
     check_in_data(name, data)
   }
@@ -163,27 +16,112 @@ parse_covariates <- function(data, model_formula, id_variable) {
   # Check that the id variable is in data
   check_in_data(id_variable, data)
 
-  # TODO: get covariate types, mask NaNs, check NaNs,
-  types <- c()
-  for (name in x_names) {
-    x <- data[[name]]
-    c_x <- class(x)
-    c_type <- if (c_x == "factor") "discrete" else "continuous"
-    types <- c(types, c_type)
-  }
+  # Create x_cat, x_cont, and x_mask
+  parsed <- stan_data_covariates(data, x_names)
+  scaling <- parsed$x_cont_scaling
 
   # Create the list that will go as input to stan
-  to_stan <- list(
-    num_subjects = 1,
-    num_cases = 0,
-    num_cov_cont = sum(types == "continuous"),
-    num_cov_disc = sum(types == "discrete"),
-    num_levels = 1,
-    x_disc = 1,
-    x_cont = 1
-  )
+  to_stan <- list()
+  to_stan <- c(to_stan, parsed$to_stan)
 
   # Return
-  x_scaling <- NA
-  list(x_to_stan = to_stan, x_scaling = x_scaling)
+  list(to_stan = to_stan, scaling = scaling)
+}
+
+
+#' Create covariate data for Stan input
+#'
+#' @description Creates the following Stan data input list fields:
+#' \itemize{
+#'   \item \code{num_cov_cat}
+#'   \item \code{num_cov_cont}
+#'   \item \code{x_cat}
+#'   \item \code{x_cat_num_levels}
+#'   \item \code{x_cont}
+#'   \item \code{x_cont_mask}
+#'   \item \code{x_cont_normalized}
+#' }
+#' @param data a data frame
+#' @param x_names unique covariate names
+#' @return a named list with fields
+#' \itemize{
+#'   \item \code{to_stan}: a list of stan data
+#'   \item \code{x_cont_scaling}: normalization function and inverse for each
+#'   continuous covariate
+#'   \item \code{x_cat_levels}: names of the levels of each categorical
+#'   covariate before conversion from factor to numeric
+#' }
+stan_data_covariates <- function(data, x_names) {
+  num_obs <- dim(data)[1]
+
+  x_cont <- list()
+  x_cont_mask <- list()
+  x_cont_scaling <- list()
+  x_cont_normalized <- list()
+
+  x_cat <- list()
+  x_cat_levels <- list()
+  x_cat_num_levels <- 0
+
+  num_cat <- 0
+  num_cont <- 0
+
+  for (name in x_names) {
+    X_RAW <- data[[name]]
+    c_x <- class(X_RAW)
+    if (c_x == "factor") {
+
+      # A categorical covariate
+      num_cat <- num_cat + 1
+      n_na <- sum(is.na(X_RAW))
+      if (n_na > 0) {
+        msg <- paste0(n_na, " missing values for factor '", name, "'!")
+        stop(msg)
+      }
+      x_cat[[num_cat]] <- as.numeric(X_RAW)
+      x_cat_num_levels[num_cat] <- length(levels(X_RAW))
+      x_cat_levels[[num_cat]] <- levels(X_RAW)
+    } else if (c_x == "numeric") {
+
+      # A continuous covariate
+      num_cont <- num_cont + 1
+      is_na <- is.na(X_RAW)
+      x_cont_mask[[num_cont]] <- as.numeric(is_na)
+      X_NONAN <- X_RAW
+      X_NONAN[is_na] <- 0
+      x_cont[[num_cont]] <- X_NONAN
+      normalizer <- create_scaling(X_NONAN, name)
+      x_cont_scaling[[num_cont]] <- normalizer
+      x_cont_normalized[[num_cont]] <- normalizer@fun(X_NONAN)
+    } else {
+      msg <- paste0(
+        "Covariate '", name, "' has invalid type '", c_x,
+        "'! Must be one of {'factor', 'numeric'}"
+      )
+      stop(msg)
+    }
+  }
+
+  # Convert lists to matrices
+  x_cat <- list_to_matrix(x_cat, num_obs)
+  x_cont <- list_to_matrix(x_cont, num_obs)
+  x_cont_mask <- list_to_matrix(x_cont_mask, num_obs)
+  x_cont_normalized <- list_to_matrix(x_cont_normalized, num_obs)
+
+  # Return
+  to_stan <- list(
+    num_cov_cont = num_cont,
+    num_cov_cat = num_cat,
+    x_cat = x_cat,
+    x_cat_num_levels = x_cat_num_levels,
+    x_cont = x_cont,
+    x_cont_mask = x_cont_mask,
+    x_cont_normalized = x_cont_normalized
+  )
+
+  list(
+    to_stan = to_stan,
+    x_cont_scaling = x_cont_scaling,
+    x_cat_levels = x_cat_levels
+  )
 }

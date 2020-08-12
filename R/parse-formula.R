@@ -58,7 +58,7 @@ parse_term <- function(term) {
   factors <- strsplit(term, split = "*", fixed = TRUE)[[1]] # split to factors
   D <- length(factors)
   if (D > 2) {
-    stop("One formula term can have at most two factors! found = ", D)
+    stop("One formula term can have at most two expressions! found = ", D)
   }
   f1 <- parse_expr(factors[1])
   if (D == 2) {

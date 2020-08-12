@@ -9,7 +9,7 @@ NULL
 check_lgpexpr <- function(object) {
   errors <- character()
   v0 <- nchar(object@covariate) > 0
-  valid_funs <- c("gp", "gp_ns", "mask", "categorical", "zerosum")
+  valid_funs <- c("gp", "gp_ns", "mask", "categ", "zerosum")
   v1 <- object@fun %in% valid_funs
   if (!v0) {
     errors <- c(errors, "covariate name cannot be empty")
@@ -43,10 +43,15 @@ check_lgpscaling <- function(object) {
   a_mapped <- object@fun(a)
   b <- object@fun_inv(a_mapped)
   diff <- abs(a - b)
+  errors <- character()
   if (diff > 1e-6) {
-    error <- paste("<f_inv> is not an inverse function of <f>, diff = ", diff)
-    return(error)
-  } else {
-    return(TRUE)
+    err <- paste("<f_inv> is not an inverse function of <f>, diff = ", diff)
+    errors <- c(errors, err)
   }
+  if (nchar(object@var_name) < 1) {
+    err <- "variable name length must be at least 1 character"
+    errors <- c(errors, err)
+  }
+  out <- if (length(errors) > 0) errors else TRUE
+  return(out)
 }
