@@ -70,13 +70,22 @@ parse_term <- function(term) {
   }
 }
 
-#' Parse a string representation of the right-hand side of a formula
+#' Remove quotes and whitespace from a formula
 #'
 #' @param rhs the formula right-hand side, e.g. \code{a + b*c}
+#' @return a character string
+parse_whitespace <- function(rhs) {
+  x <- gsub("[[:space:]]", "", rhs) # remove whitespace
+  x <- gsub("[\",\']", "", x)       # remove quotes
+  return(x)
+}
+  
+#' Parse a string representation of the right-hand side of a formula
+#'
+#' @inheritParams parse_whitespace
 #' @return an object of class \linkS4class{lgprhs}
 parse_rhs <- function(rhs) {
-  x <- gsub("[[:space:]]", "", rhs) # remove whitespace
-  x <- gsub("[\",\']", "", x) # remove quotes
+  x <- parse_whitespace(rhs)
   terms <- strsplit(x, split = "+", fixed = TRUE)[[1]] # split to terms
   D <- length(terms)
   if (D < 1) {
@@ -123,9 +132,10 @@ parse_formula <- function(formula) {
   }
   text <- f_str[3]
   terms <- parse_rhs(text)
+  call_str <- paste(f_str[2], f_str[1], f_str[3])
   new("lgpformula",
-    response = f_str[2],
+    y_name = f_str[2],
     terms = terms,
-    call = paste(f_str[2], f_str[1], f_str[3])
+    call = parse_whitespace(call_str)
   )
 }

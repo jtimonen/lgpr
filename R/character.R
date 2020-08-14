@@ -24,7 +24,7 @@ setMethod(
       desc <- paste0("(1st order):   ", c1)
     } else {
       c2 <- as.character(facs[[2]])
-      desc <- paste0("(interaction): ", c1, " * ", c2)
+      desc <- paste0("(interaction): ", c1, "*", c2)
     }
     return(desc)
   }
@@ -48,8 +48,8 @@ setMethod(
 setMethod(
   f = "as.character", signature = "lgpformula",
   definition = function(x) {
-    desc <- paste0("Formula: ", x@call, "\n")
-    desc <- paste0(desc, "Response variable: ", x@response, "\n")
+    desc <- paste0("Formula:              ", x@call, "\n")
+    desc <- paste0(desc, "Response variable:    ", x@y_name, "\n")
     desc <- paste0(desc, as.character(x@terms))
     return(desc)
   }
@@ -59,6 +59,12 @@ setMethod(
 setMethod(
   f = "as.character", signature = "lgpmodel",
   definition = function(x) {
-    return(as.character(x@model_formula))
+    str1 <- covariate_names(x, type = "continuous")
+    str2 <- covariate_names(x, type = "categorical")
+    desc <- "An object of class lgpmodel.\n"
+    desc <- paste0(desc, "\nFormula: ", x@model_formula@call)
+    desc <- paste0(desc, "\nContinuous: {", str1, "}")
+    desc <- paste0(desc, "\nCategorical: {", str2, "}")
+    return(desc)
   }
 )

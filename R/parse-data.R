@@ -18,14 +18,17 @@ parse_data <- function(data, model_formula, id_variable) {
 
   # Create x_cat, x_cont, and x_mask
   parsed <- stan_data_covariates(data, x_names)
-  scaling <- parsed$x_cont_scaling
 
   # Create the list that will go as input to stan
   to_stan <- list()
   to_stan <- c(to_stan, parsed$to_stan)
 
   # Return
-  list(to_stan = to_stan, scaling = scaling)
+  list(
+    to_stan = to_stan,
+    x_cont_scalings = parsed$x_cont_scalings,
+    x_cat_levels = parsed$x_cat_levels
+  )
 }
 
 
@@ -56,12 +59,14 @@ stan_data_covariates <- function(data, x_names) {
 
   x_cont <- list()
   x_cont_mask <- list()
-  x_cont_scaling <- list()
+  x_cont_scalings <- list()
   x_cont_normalized <- list()
+  x_cont_names <- c()
 
   x_cat <- list()
   x_cat_levels <- list()
   x_cat_num_levels <- 0
+  x_cat_names <- c()
 
   num_cat <- 0
   num_cont <- 0
@@ -81,6 +86,7 @@ stan_data_covariates <- function(data, x_names) {
       x_cat[[num_cat]] <- as.numeric(X_RAW)
       x_cat_num_levels[num_cat] <- length(levels(X_RAW))
       x_cat_levels[[num_cat]] <- levels(X_RAW)
+      x_cat_names[num_cat] <- name
     } else if (c_x == "numeric") {
 
       # A continuous covariate
@@ -91,8 +97,9 @@ stan_data_covariates <- function(data, x_names) {
       X_NONAN[is_na] <- 0
       x_cont[[num_cont]] <- X_NONAN
       normalizer <- create_scaling(X_NONAN, name)
-      x_cont_scaling[[num_cont]] <- normalizer
+      x_cont_scalings[[num_cont]] <- normalizer
       x_cont_normalized[[num_cont]] <- normalizer@fun(X_NONAN)
+      x_cont_names[num_cont] <- name
     } else {
       msg <- paste0(
         "Covariate '", name, "' has invalid type '", c_x,
@@ -108,7 +115,11 @@ stan_data_covariates <- function(data, x_names) {
   x_cont_mask <- list_to_matrix(x_cont_mask, num_obs)
   x_cont_normalized <- list_to_matrix(x_cont_normalized, num_obs)
 
-  # Return
+  # Name lists
+  names(x_cont_scalings) <- x_cont_names
+  names(x_cat_levels) <- x_cat_names
+
+  # Create Stan data
   to_stan <- list(
     num_cov_cont = num_cont,
     num_cov_cat = num_cat,
@@ -119,9 +130,10 @@ stan_data_covariates <- function(data, x_names) {
     x_cont_normalized = x_cont_normalized
   )
 
+  # Return
   list(
     to_stan = to_stan,
-    x_cont_scaling = x_cont_scaling,
+    x_cont_scalings = x_cont_scalings,
     x_cat_levels = x_cat_levels
   )
 }

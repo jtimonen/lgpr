@@ -126,7 +126,7 @@ test_that("parse_likelihood works correctly with binomial likelihood", {
 
 # -------------------------------------------------------------------------
 
-context("Input parsing: parsing data")
+context("Input parsing: parsing response")
 
 # Create test data
 age <- c(10, 20, 30, 10, 20, 30)
@@ -134,7 +134,7 @@ id <- c(1, 1, 1, 2, 2, 2)
 y <- c(9.3, 1.2, 3.2, 2.3, 4.1, 1)
 dat <- data.frame(age, id, y)
 
-test_that("parse_response creates y_scaling and applies it", {
+test_that("y_scaling is created and and applied", {
   f <- parse_formula(y ~ gp(age) + zerosum(id))
   parsed <- parse_response(dat, "gaussian", f)
   yts <- parsed$to_stan
@@ -149,6 +149,22 @@ test_that("parse_response creates y_scaling and applies it", {
   expect_lt(d1, 1e-6)
   expect_lt(d2, 1e-6)
 })
+
+y_old <- dat$y
+dat$y <- c(-1, -9, 3, 2, 4, 1)
+test_that("cannot have negative response with NB observation model", {
+  f <- parse_formula(y ~ gp(age) + zerosum(id))
+  reason <- "cannot be negative with this observation model"
+  expect_error(parse_response(dat, "nb", f), reason)
+})
+
+dat$y <- c(1, 1, 1, 1, 1, 1)
+test_that("cannot have a response with zero variance (gaussian obs model)", {
+  f <- parse_formula(y ~ gp(age) + zerosum(id))
+  reason <- "have zero variance"
+  expect_error(parse_response(dat, "gaussian", f), reason)
+})
+dat$y <- y_old
 
 # -------------------------------------------------------------------------
 
@@ -197,4 +213,18 @@ test_that("covariate types are correctly parsed", {
   expect_equal(to_stan$num_cov_cont, 2)
   expect_equal(dim(to_stan$x_cont_normalized), c(2, 6))
   expect_equal(sum(to_stan$x_cont_mask), 3)
+})
+
+test_that("lgpmodel has a character representation", {
+  m <- lgp_model(y ~ gp(age) +
+    gp_ns(dis_age), dat)
+  str <- as.character(m)
+  expect_gt(nchar(str), 100)
+})
+
+test_that("cannot have a continuous covariate with zero variance", {
+  newdat <- dat
+  newdat$age <- -1
+  reason <- "have zero variance"
+  expect_error(lgp_model(y ~ gp(age) + zerosum(id), newdat), reason)
 })

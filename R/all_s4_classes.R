@@ -27,12 +27,12 @@ lgprhs <- setClass("lgprhs", slots = c(summands = "list"))
 #' An S4 class to represent an lgp formula
 #'
 #' @slot terms an object of class \linkS4class{lgpsum}
-#' @slot response name of the response variable
+#' @slot y_name name of the response variable
 #' @slot call original formula call
 lgpformula <- setClass("lgpformula",
   representation = representation(
     call = "character",
-    response = "character",
+    y_name = "character",
     terms = "lgprhs"
   ),
   validity = check_lgpformula
@@ -65,18 +65,28 @@ lgpscaling <- setClass("lgpscaling",
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot stan_dat The data to be given as input to \code{rstan::sampling}
-#' @slot x_scaling Continous covariate normalization functions and their
-#' inverse operations. Must be a named list with each element is an
-#' \linkS4class{lgpscaling} object.
-#' @slot y_scaling Response variable normalization function and its
-#' inverse operation. Must be an \linkS4class{lgpscaling} object.
-#' @slot info Model info.
+#' @slot var_names List of variable names grouped by type.
+#' @slot var_scalings A named list with fields
+#' \itemize{
+#'   \item \code{y} - Response variable normalization function and its
+#'   inverse operation. Must be an \linkS4class{lgpscaling} object.
+#'   \item \code{x_cont} - Continous covariate normalization functions and their
+#'   inverse operations. Must be a named list with each element is an
+#'   \linkS4class{lgpscaling} object.
+#' }
+#' @slot var_info A named list with fields
+#' \itemize{
+#'   \item \code{x_cat_levels} - Names of the levels of categorical covariates
+#'   before converting from factor to numeric.
+#' }
+#' @slot info Other info in text format.
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
     stan_input = "list",
-    y_scaling = "lgpscaling",
-    x_scaling = "list",
+    var_names = "list",
+    var_scalings = "list",
+    var_info = "list",
     info = "list"
   )
 )

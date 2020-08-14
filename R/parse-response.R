@@ -16,7 +16,7 @@ parse_response <- function(data, likelihood, model_formula) {
   obs_model <- likelihood_as_int(likelihood)
 
   # Check that data is a data.frame and contains the response variable
-  y_name <- model_formula@response
+  y_name <- model_formula@y_name
   c_data <- class(data)
   if (c_data != "data.frame") {
     stop("<data> must be a data.frame! found = ", c_data)

@@ -13,7 +13,7 @@ An S4 class to represent an lgp formula
 \describe{
 \item{\code{terms}}{an object of class \linkS4class{lgpsum}}
 
-\item{\code{response}}{name of the response variable}
+\item{\code{y_name}}{name of the response variable}
 
 \item{\code{call}}{original formula call}
 }}

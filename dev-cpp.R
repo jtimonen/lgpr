@@ -35,6 +35,7 @@ cpp_lines <- scan(text = cpp_code, what = character(), sep = "\n", quiet = TRUE)
 line_idx <- which(cpp_lines == "#include <exporter.h>")
 cpp_lines[line_idx] <- "// REMOVED #include <exporter.h> by dev-cpp.R "
 cpp_code <- paste0(cpp_lines, collapse = "\n")
+cpp_code <- paste0(cpp_code, "\n")
 
 # Write the C++ code to src/stanFunctions.cpp
 cat(cpp_code, file = file.path('src', 'stanFunctions.cpp'))

@@ -15,13 +15,23 @@ An S4 class to represent an lgp model
 
 \item{\code{stan_dat}}{The data to be given as input to \code{rstan::sampling}}
 
-\item{\code{x_scaling}}{Continous covariate normalization functions and their
-inverse operations. Must be a named list with each element is an
-\linkS4class{lgpscaling} object.}
+\item{\code{var_names}}{List of variable names grouped by type.}
 
-\item{\code{y_scaling}}{Response variable normalization function and its
-inverse operation. Must be an \linkS4class{lgpscaling} object.}
+\item{\code{var_scalings}}{A named list with fields
+\itemize{
+  \item \code{y} - Response variable normalization function and its
+  inverse operation. Must be an \linkS4class{lgpscaling} object.
+  \item \code{x_cont} - Continous covariate normalization functions and their
+  inverse operations. Must be a named list with each element is an
+  \linkS4class{lgpscaling} object.
+}}
 
-\item{\code{info}}{Model info.}
+\item{\code{var_info}}{A named list with fields
+\itemize{
+  \item \code{x_cat_levels} - Names of the levels of categorical covariates
+  before converting from factor to numeric.
+}}
+
+\item{\code{info}}{Other info in text format.}
 }}
 

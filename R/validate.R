@@ -28,7 +28,7 @@ check_lgpexpr <- function(object) {
 #' @rdname validate
 check_lgpformula <- function(object) {
   covs <- rhs_variables(object@terms)
-  r <- object@response
+  r <- object@y_name
   errors <- character()
   if (r %in% covs) {
     msg <- "the response variable cannot be also a covariate"
