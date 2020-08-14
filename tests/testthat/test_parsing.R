@@ -182,11 +182,28 @@ test_that("an lgpmodel can be created", {
 #  expect_equal(m@stan_input$delta, 1e-5)
 # })
 
-test_that("createing lgpmodel errors correctly", {
+test_that("creating an lgpmodel errors correctly", {
   expect_error(lgp_model(notvar ~ gp(age) + categ(id), dat))
   expect_error(lgp_model(y ~ gp(notvar) + categ(id), dat))
   expect_error(lgp_model(y ~ gp(age) + categ(id), "notdata"))
   expect_error(lgp_model(y ~ gp(age) + categ(id), dat, likelihood = "binomial"))
+})
+
+dat$y <- c(1, 3, 2, 7, 3, 1)
+test_that("the num_trials argument works correctly", {
+  m <- lgp_model(y ~ gp(age) + zerosum(id), dat,
+    likelihood = "binomial",
+    num_trials = 10
+  )
+  expect_equal(m@stan_input$y_num_trials, rep(10, times = 6))
+  reason <- "Invalid length of <num_trials>"
+  expect_error(
+    lgp_model(y ~ gp(age) + zerosum(id), dat,
+      likelihood = "binomial",
+      num_trials = c(10, 4, 6)
+    ),
+    reason
+  )
 })
 
 # Create larger test data

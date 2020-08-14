@@ -76,10 +76,10 @@ parse_term <- function(term) {
 #' @return a character string
 parse_whitespace <- function(rhs) {
   x <- gsub("[[:space:]]", "", rhs) # remove whitespace
-  x <- gsub("[\",\']", "", x)       # remove quotes
+  x <- gsub("[\",\']", "", x) # remove quotes
   return(x)
 }
-  
+
 #' Parse a string representation of the right-hand side of a formula
 #'
 #' @inheritParams parse_whitespace
