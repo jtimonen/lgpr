@@ -2,29 +2,24 @@
   Binary option switches
   - is verbose mode used?
   - are function values be sampled?
-  - is the possible disease effect modeled heterogeneously?
-  - is the possible disease effect time uncertain?
-  - is variance masking used for the possible disease component?
   - should likelihood evaluation be skipped?
   - should the generated quantities block be skipped? 
 */
 int<lower=0, upper=1> is_verbose;
 int<lower=0, upper=1> is_f_sampled;
-int<lower=0, upper=1> is_heter;
-int<lower=0, upper=1> is_uncrt;
-int<lower=0, upper=1> is_vm_used;
 int<lower=0, upper=1> is_likelihood_skipped;
 int<lower=0, upper=1> is_generated_skipped;
 
 // Dimensions
-int<lower=0> num_subjects;      // total number of subjects
-int<lower=0> num_cases;         // number of case subjects
-int<lower=0> num_obs;           // number of observations
-int<lower=0> num_cov_cont;      // number of continuous covariates
-int<lower=0> num_cov_disc;      // number of discrete covariates
-int<lower=1> num_comps;         // number of additive components
-int<lower=0> num_ell;           // number of ell parameters
-int<lower=0> num_dis;           // number of disease components
+int<lower=0> num_obs;            // number of observations
+int<lower=0> num_cov_cont;       // number of continuous covariates
+int<lower=0> num_cov_cat;        // number of categorical covariates
+int<lower=1> num_comps;          // number of additive components
+int<lower=0> num_ell;            // number of ell parameters
+int<lower=0> num_ns;             // number of nonstationary components
+int<lower=0> num_heter;          // number of heterogeneous components
+int<lower=0> num_uncrt;          // number of uncertain continuous covariates
+int<lower=0> num_cases;          // number of case individuals
 
 /*
   Observation model
@@ -36,33 +31,32 @@ int<lower=0> num_dis;           // number of disease components
 int<lower=1,upper=4> obs_model;
 
 /* 
-  Types of the additive function components are specified by the first two
-  "rows" of the integer array <components>, so that on each "column"
-    - the first number specifies component type
-    - the second number specifies kernel type
-
-  Possible types are
+  Each additive function component can be related to at most one continuous and
+  one categorical covariate. Properties of the components are specified by the 
+  "columns" of the integer array <components>. The "rows" are
+    - [,1]: component type
+    - [,2]: kernel type
+    - [,3]: (currently unused row)
+    - [,4]: is the effect magnitude heterogeneous?
+    - [,5]: should input warping be applied to the continuous covariate first?
+    - [,6]: should a variance mask be applied?
+    - [,7]: is there uncertainty in the continuous covariate?
+    - [,8]: index of the categorical covariate in <x_cat>, <x_cat_num_levels>
+    - [,9]: index of the continuous covariate in <x_cont>, <x_cont_mask>
+    
+  NOTES: Options [,6] and [,7] only have an effect if option [,5] is 1.
+  Possible types for option [,1] are
     - type 0 = component with a single categorical covariate
       * kernel 0 = zero-sum kernel
       * kernel 1 = categorical kernel
-      * kernel 2 = binary mask kernel (for category 1)
     - type 1 = continuous covariate modeled with a stationary kernel
       * kernel 0 = [exp. quadratic] kernel
     - type 2 = interaction of categorical and continuous covariate
       * kernel 0 = zero-sum kernel * [exp. quadratic]
       * kernel 1 = categorical kernel * [exp. quadratic]
-      * kernel 2 = binary mask kernel (for category 1) * [exp. quadratic] 
-    - type 3 = disease component (nonstationary)
-      * kernel 0 = input warping
-
- Covariates of each component are specified by the last two "rows" of the
- integer array <components>. The third row specifies an index of a discrete
- covariate in <x_disc> the fourth row specifies an index of a continuous
- covariate in <x_cont>. For a disease component (type 3), the discrete
- covariate is "case id" and the continuous covariate is "disease-related age".
 */
 
-int<lower=0> components[4, num_comps];
+int<lower=0> components[num_comps, 9];
 
 // Response variable (vector of reals)
 vector[num_obs] y_cont[obs_model==1];
@@ -71,17 +65,18 @@ vector[num_obs] y_cont[obs_model==1];
 int<lower=0> y_disc[obs_model>1, num_obs];
 
 // Covariates
-vector[num_obs] x_cont[num_cov_cont]; // continuous covariates
-int x_disc[num_cov_disc, num_obs]; // discrete covariates
+vector[num_obs] x_cont[num_cov_cont];
+int x_cont_mask[num_cov_cont, num_obs];
+int x_cat[num_cov_cat, num_obs];
 
 // Number of trials (binomial or bernoulli model)
 int<lower=1> y_num_trials[obs_model==4, num_obs];
 
-// Number of levels for each discrete covariate
-int<lower=0> num_levels[num_cov_disc];
+// Number of levels for each categorical covariate
+int<lower=0> x_cat_num_levels[num_cov_cat];
 
 // Inputs related to expanding beta and t_effect
-int<lower=1, upper=num_cases+1> idx_expand[(is_heter || is_uncrt), num_obs];
+int<lower=1, upper=num_cases+1> idx_expand[num_obs];
 
 /* 
   Prior types and transforms for kernel and noise parameters
@@ -90,7 +85,7 @@ int<lower=1, upper=num_cases+1> idx_expand[(is_heter || is_uncrt), num_obs];
 */
 int<lower=0> prior_alpha[num_comps, 2];
 int<lower=0> prior_ell[num_ell, 2];
-int<lower=0> prior_wrp[num_dis, 2];
+int<lower=0> prior_wrp[num_ns, 2];
 int<lower=0> prior_sigma[obs_model==1, 2];
 int<lower=0> prior_phi[obs_model==3, 2];
 
@@ -100,23 +95,23 @@ int<lower=0> prior_phi[obs_model==3, 2];
   - [,2]: is prior "backwards"?
   - [,3]: is prior relative to the observed effect time?
 */
-int<lower=0> prior_teff[is_uncrt, 3];
+int<lower=0> prior_teff[num_uncrt>0, 3];
 
 // Hyperparameters of the priors
 real hyper_alpha[num_comps, 3];
 real hyper_ell[num_ell, 3];
-real hyper_wrp[num_dis, 3];
+real hyper_wrp[num_ns, 3];
 real hyper_sigma[obs_model==1, 3];
 real hyper_phi[obs_model==3, 3];
-real hyper_teff[is_uncrt, 3];
-real hyper_beta[is_heter, 2];
+real hyper_teff[num_uncrt>0, 3];
+real hyper_beta[num_heter>0, 2];
 
 // Observed effect times and uncertainty bounds for each case subject
-vector[num_cases] teff_obs[is_uncrt];
-vector[num_cases] teff_lb[is_uncrt];
-vector[num_cases] teff_ub[is_uncrt];
+vector[num_cases] teff_obs[num_uncrt>0];
+vector[num_cases] teff_lb[num_uncrt>0];
+vector[num_cases] teff_ub[num_uncrt>0];
 
 // Misc
 vector[num_obs] c_hat; // GP mean vector 
 real delta; // jitter to ensure pos. def. kernel matrices
-real vm_params[is_vm_used, 2]; // variance mask parameters
+real vm_params[num_ns, 2]; // variance mask parameters

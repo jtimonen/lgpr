@@ -11,7 +11,6 @@ lgp_model(
   prior = prior_default(),
   c_hat = NULL,
   num_trials = NULL,
-  id_variable = "id",
   options = NULL,
   disease_options = NULL
 )
@@ -69,9 +68,6 @@ likelihood is binomial. Must have length one or equal to number of data
 points. Setting \code{num_trials=1} corresponds to Bernoulli observation
 model.}
 
-\item{id_variable}{Name of the unique subject identifier variable
-(default = \code{"id"}).}
-
 \item{options}{A named list with the following possible fields:
 \itemize{
   \item \code{sample_f} Determines if the function values are be sampled
@@ -94,7 +90,7 @@ effect time?
 }}
 }
 \value{
-An object of class \code{\link{lgpmodel}}.
+An object of class \linkS4class{lgpmodel}.
 }
 \description{
 Create an lgpmodel

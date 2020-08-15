@@ -8,7 +8,7 @@
 #' @inheritParams parse_data
 #' @inheritParams parse_options
 #' @inheritParams parse_disease_options
-#' @return An object of class \code{\link{lgpmodel}}.
+#' @return An object of class \linkS4class{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
                       data,
@@ -16,7 +16,6 @@ lgp_model <- function(formula,
                       prior = prior_default(),
                       c_hat = NULL,
                       num_trials = NULL,
-                      id_variable = "id",
                       options = NULL,
                       disease_options = NULL) {
 
@@ -33,8 +32,8 @@ lgp_model <- function(formula,
   # Parse likelihood
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y)
 
-  # Parse covariates
-  parsed <- parse_data(data, model_formula, id_variable)
+  # Parse covariates and components
+  parsed <- parse_data(data, model_formula)
   list_x <- parsed$to_stan
   x_cont_scalings <- parsed$x_cont_scalings
   x_cat_levels <- parsed$x_cat_levels
@@ -46,12 +45,8 @@ lgp_model <- function(formula,
     x_cat = names(x_cat_levels)
   )
 
-  # Parse components
-  # parsed <- parse_components(model_formula, x_names)
-
   # Parse the prior
   # stan_prior <- parse_prior(prior)
-
 
   # Create slots of the 'lgpmodel' object
   stan_input <- c(
@@ -79,10 +74,9 @@ lgp_model <- function(formula,
 
 #' Get covariate names for a model
 #'
-#' @export
-#' @param model bject of class \code{\link{lgpmodel}}.
-#' @param type what types of covariates to include. Must be one of
-#' {"all", "categorical", "continuous"}.
+#' @param model an object of class \linkS4class{lgpmodel}
+#' @param type what types of covariates to include. Must be either
+#' "all", "categorical" or "continuous".
 #' @return A string where names are separated by a comma.
 covariate_names <- function(model, type = "all") {
   allowed <- c("continuous", "categorical", "all")

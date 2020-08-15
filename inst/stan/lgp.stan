@@ -20,9 +20,8 @@ functions{
 #include chunks/functions-utils.stan
 #include chunks/functions-prior.stan
 #include chunks/functions-posterior.stan
-#include chunks/functions-kernels_base.stan
-#include chunks/functions-kernels_single.stan
-#include chunks/functions-kernels_many.stan
+#include chunks/functions-kernels_const.stan
+#include chunks/functions-kernels.stan
 }
 
 data {

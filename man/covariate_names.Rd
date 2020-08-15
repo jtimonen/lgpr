@@ -7,10 +7,10 @@
 covariate_names(model, type = "all")
 }
 \arguments{
-\item{model}{bject of class \code{\link{lgpmodel}}.}
+\item{model}{an object of class \linkS4class{lgpmodel}}
 
-\item{type}{what types of covariates to include. Must be one of
-{"all", "categorical", "continuous"}.}
+\item{type}{what types of covariates to include. Must be either
+"all", "categorical" or "continuous".}
 }
 \value{
 A string where names are separated by a comma.

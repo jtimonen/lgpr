@@ -32,20 +32,17 @@ parse_response <- function(data, likelihood, model_formula) {
   if (obs_model != 1) {
     y_disc <- array(Y_RAW, dim = c(1, num_obs))
     y_cont <- array(Y_RAW, dim = c(0, num_obs))
-    y_cont_norm <- array(Y_RAW, dim = c(0, num_obs))
     normalizer <- new("lgpscaling", var_name = y_name)
   } else {
     normalizer <- create_scaling(Y_RAW, y_name) # create scaling and inverse
     y_disc <- array(Y_RAW, dim = c(0, num_obs))
-    y_cont <- array(Y_RAW, dim = c(1, num_obs))
     Y_NORM <- normalizer@fun(Y_RAW) # standardize the response
-    y_cont_norm <- array(Y_NORM, dim = c(1, num_obs))
+    y_cont <- array(Y_NORM, dim = c(1, num_obs))
   }
   to_stan <- list(
     num_obs = num_obs,
     y_disc = y_disc,
-    y_cont = y_cont,
-    y_cont_norm = y_cont_norm
+    y_cont = y_cont
   )
 
   # Return also the scaling and its inverse

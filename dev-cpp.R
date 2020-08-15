@@ -6,9 +6,8 @@
 STAN_HOME <- file.path("inst", "stan")
 FILES <- c(
   "chunks/functions-utils.stan",
-  "chunks/functions-kernels_base.stan",
-  "chunks/functions-kernels_single.stan",
-  "chunks/functions-kernels_many.stan",
+  "chunks/functions-kernels_const.stan",
+  "chunks/functions-kernels.stan",
   "chunks/functions-posterior.stan",
   "chunks/functions-prior.stan"
 )

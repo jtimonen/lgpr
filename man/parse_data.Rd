@@ -4,7 +4,7 @@
 \alias{parse_data}
 \title{Parse the covariates and model components from given data and formula}
 \usage{
-parse_data(data, model_formula, id_variable)
+parse_data(data, model_formula)
 }
 \arguments{
 \item{data}{A \code{data.frame} where each column corresponds to one
@@ -15,9 +15,6 @@ must have type \code{"factor"}. Missing values should be indicated with
 values.}
 
 \item{model_formula}{An object of class \code{lgpformula}.}
-
-\item{id_variable}{Name of the unique subject identifier variable
-(default = \code{"id"}).}
 }
 \value{
 parsed input to stan and covariate scaling

@@ -73,9 +73,6 @@ likelihood is binomial. Must have length one or equal to number of data
 points. Setting \code{num_trials=1} corresponds to Bernoulli observation
 model.}
 
-\item{id_variable}{Name of the unique subject identifier variable
-(default = \code{"id"}).}
-
 \item{options}{A named list with the following possible fields:
 \itemize{
   \item \code{sample_f} Determines if the function values are be sampled

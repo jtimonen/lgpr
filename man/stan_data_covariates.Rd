@@ -30,6 +30,5 @@ Creates the following Stan data input list fields:
   \item \code{x_cat_num_levels}
   \item \code{x_cont}
   \item \code{x_cont_mask}
-  \item \code{x_cont_normalized}
 }
 }

@@ -87,9 +87,9 @@ test_that("STAN_expand errors when idx_expand has out of bounds indices", {
 })
 
 
-context("Stan utils: editing disease-related age")
+context("Stan utils: editing a covariate according to uncertainty")
 
-test_that("STAN_edit_dis_age works properly", {
+test_that("STAN_edit_x_cont works properly", {
   x_dis_age <- c(
     -24, -12, 0, 12, -24, -12, 0, 12,
     0, 0, 0, 0, 0, -12, 0, 12, 16
@@ -100,7 +100,7 @@ test_that("STAN_edit_dis_age works properly", {
   idx_expand <- case_ids + 1
   expand_expect <- c(-1, -1, -1, -1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 10, 10, 10, 10)
   expect_equal(STAN_expand(teff, idx_expand, STREAM), expand_expect)
-  t_edit <- STAN_edit_dis_age(x_dis_age, idx_expand, teff_obs, teff, STREAM)
+  t_edit <- STAN_edit_x_cont(x_dis_age, idx_expand, teff_obs, teff, STREAM)
   t_expect <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
   expect_equal(t_edit, t_expect)
 })
@@ -156,31 +156,15 @@ test_that("categorical kernel works correctly", {
 context("Stan base kernels: binary mask kernel")
 
 test_that("binary mask kernel works correctly", {
-  x <- c(1, 1, 2)
+  x <- c(0, 0, 1)
   a <- c(
     1, 1, 0,
     1, 1, 0,
     0, 0, 0
   )
-  b <- c(
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 1
-  )
-  K1_expect <- matrix(a, 3, 3, byrow = TRUE)
-  K2_expect <- matrix(b, 3, 3, byrow = TRUE)
-  K1 <- STAN_kernel_base_bin(x, x, 1, STREAM)
-  K2 <- STAN_kernel_base_bin(x, x, 2, STREAM)
-  expect_equal(K1, K1_expect)
-  expect_equal(K2, K2_expect)
-})
-
-test_that("binary mask kernel works similarly in R and Stan", {
-  x <- sample.int(2, size = 8, replace = TRUE) - 1
-  expect_equal(
-    STAN_kernel_base_bin(x, x, 1, STREAM),
-    kernel_bin(x, x)
-  )
+  K_expect <- matrix(a, 3, 3, byrow = TRUE)
+  K <- STAN_kernel_base_bin_mask(x, x, STREAM)
+  expect_equal(K, K_expect)
 })
 
 
@@ -201,20 +185,7 @@ test_that("variance mask kernel works correctly", {
 })
 
 
-context("Stan base kernels: disease mask kernel")
-
-test_that("disease mask kernel works correctly", {
-  x1 <- c(1, 3, 0)
-  x2 <- c(1, 0, 2, 0)
-  a <- c(
-    1, 0, 1, 0,
-    1, 0, 1, 0,
-    0, 0, 0, 0
-  )
-  K_expect <- matrix(a, 3, 4, byrow = TRUE)
-  K <- STAN_kernel_base_disease_mask(x1, x2, STREAM)
-  expect_equal(K, K_expect)
-})
+context("Stan base kernels: variance mask kernel")
 
 test_that("variance mask kernel works similarly in R and Stan", {
   x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
@@ -249,11 +220,11 @@ context("Stan kernels: fixed kernel arrays")
 
 test_that("correct number of matrices is returned", {
   dat <- lgpr:::test_data_x(3)
-  n1 <- length(dat$x1_disc[[1]])
-  n2 <- length(dat$x2_disc[[1]])
+  n1 <- length(dat$x1_cat[[1]])
+  n2 <- length(dat$x2_cat[[1]])
   KF <- STAN_kernel_fixed_all(
-    n1, n2, dat$x1_disc, dat$x2_disc,
-    dat$num_levels, dat$components, STREAM
+    n1, n2, dat$x1_cat, dat$x2_cat, dat$x1_cont_mask, dat$x2_cont_mask,
+    dat$x_cat_num_levels, dat$components, STREAM
   )
   expect_equal(length(KF), 6)
 })

@@ -11,7 +11,7 @@ if(is_generated_done){
   
   // Compute all kernel matrices
   matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
-      K_fixed, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
+      K_const, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_obs);
       
   // Compute component-wise and total function posteriors

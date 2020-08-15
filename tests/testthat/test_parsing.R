@@ -143,7 +143,7 @@ test_that("y_scaling is created and and applied", {
   expect_true(class(parsed$scaling) == "lgpscaling")
 
   # Check zero mean and unit variance of y_cont
-  y <- as.numeric(yts$y_cont_norm)
+  y <- as.numeric(yts$y_cont)
   d1 <- abs(mean(y) - 0)
   d2 <- abs(stats::sd(y) - 1)
   expect_lt(d1, 1e-6)
@@ -226,9 +226,8 @@ test_that("covariate types are correctly parsed", {
     gp_ns(dis_age), dat)
   to_stan <- m@stan_input
   expect_equal(to_stan$num_cov_cat, 2)
-  expect_equal(to_stan$x_cat_num_levels, c(2, 2))
   expect_equal(to_stan$num_cov_cont, 2)
-  expect_equal(dim(to_stan$x_cont_normalized), c(2, 6))
+  expect_equal(to_stan$x_cat_num_levels, c(2, 2))
   expect_equal(sum(to_stan$x_cont_mask), 3)
 })
 

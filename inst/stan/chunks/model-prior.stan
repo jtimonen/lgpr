@@ -9,7 +9,7 @@ for(j in 1:num_ell){
 }
 
 // Input warping parameters
-for(j in 1:num_dis){
+for(j in 1:num_ns){
   target += STAN_log_prior(wrp[j], prior_wrp[j], hyper_wrp[j]);
 }
 
@@ -21,13 +21,13 @@ if(obs_model==1){
 }
 
 // Heterogeneity parameters
-if(is_heter){
-  real a[2] = hyper_beta[1];
-  target += beta_lpdf(beta[1] | a[1], a[2]);
+for(j in 1:num_heter){
+  real a[2] = hyper_beta[j];
+  target += beta_lpdf(beta[j] | a[1], a[2]);
 }
 
 // Disease-related age uncertainty
-if(is_uncrt){
+for(j in 1:num_uncrt){
   
   vector[num_cases] tx;
   int ptype = prior_teff[1][1];

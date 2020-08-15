@@ -6,28 +6,34 @@ test_data_x <- function(N = 3) {
   x1_id <- rep(c(1, 2, 3), each = N)
   x1_z <- rep(c(0, 1, 1), each = N)
   x1_d <- rep(c(0, 1, 0), each = N)
-  x1_disc <- list(x1_id, x1_z, x1_d)
+  x1_cat <- list(x1_id, x1_z, x1_d)
   x1_cont <- list(rep(c(12, 24, 36), times = N))
 
   x2_id <- c(1, 1, 2, 3)
   x2_z <- c(0, 0, 1, 1)
   x2_d <- c(0, 0, 1, 0)
-  x2_disc <- list(x2_id, x2_z, x2_d)
+  x2_cat <- list(x2_id, x2_z, x2_d)
   x2_cont <- list(c(20, 20, 20, 20))
+  
+  x1_cont_mask <- rep(0, length(x1_cont))
+  x2_cont_mask <- rep(0, length(x2_cont))
 
   num_levels <- c(N, 2, 2)
   covtypes <- c(0, 2, 2, 1, 3, 2)
   kertypes <- c(0, 0, 1, 0, 0, 2)
   cov_disc <- c(1, 2, 2, 0, 3, 2)
   cov_cont <- c(0, 1, 1, 1, 1, 1)
-  comps <- list(covtypes, kertypes, cov_disc, cov_cont)
+  a0 <- rep(0, 6)
+  comps <- list(covtypes, kertypes, a0, a0, a0, a0, cov_disc, cov_cont)
 
   dat <- list(
-    x1_disc = x1_disc,
-    x2_disc = x2_disc,
+    x1_cat = x1_cat,
+    x2_cat = x2_cat,
     x1_cont = x1_cont,
     x2_cont = x2_cont,
-    num_levels = num_levels,
+    x1_cont = x1_cont_mask,
+    x2_cont = x2_cont_mask,
+    x_cat_num_levels = num_levels,
     components = comps
   )
   return(dat)
@@ -46,27 +52,27 @@ minimal_stan_data <- function() {
   stan_data <- list(
     is_verbose = 0,
     is_f_sampled = 0,
-    is_heter = 0,
-    is_uncrt = 0,
     is_likelihood_skipped = 0,
-    is_vm_used = 0,
     is_generated_skipped = 0,
     num_obs = n,
-    num_subjects = 1,
     num_cases = 0,
     num_cov_cont = 1,
-    num_cov_disc = 0,
+    num_cov_cat = 0,
     num_comps = 1,
     num_ell = 1,
-    num_dis = 0,
+    num_ns = 0,
+    num_heter = 0,
+    num_uncrt = 0,
+    num_vm = 0,
     obs_model = 1,
-    components = matrix(c(1, 0, 0, 1), 4, 1, byrow = TRUE),
-    y_cont = matrix(sin(0.5 * seq_len(n)), 1, n, byrow = TRUE),
+    components = matrix(c(1, 0, 0, 0, 0, 0, 0, 1), 8, 1, byrow = TRUE),
+    x_cat = array_dim0(n),
     x_cont = matrix(seq_len(n), 1, n, byrow = TRUE),
+    x_cont_mask = array(0, dim = c(1, n)),
+    y_cont = matrix(sin(0.5 * seq_len(n)), 1, n, byrow = TRUE),
     y_disc = array_dim0(n),
-    x_disc = array_dim0(n),
     y_num_trials = array_dim0(n),
-    num_levels = numeric_dim0,
+    x_cat_num_levels = numeric_dim0,
     idx_expand = array_dim0(n),
 
     prior_alpha = matrix(c(1, 0), 1, 2, byrow = TRUE),

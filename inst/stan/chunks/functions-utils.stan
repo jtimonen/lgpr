@@ -31,15 +31,15 @@ vector STAN_expand(vector v, data int[] idx_expand){
   return(v_add0[idx_expand]);
 }
 
-// Edit disease-related age according to sampled uncertainty
-vector STAN_edit_dis_age(
-  data vector x_dis_age,
+// Edit a continuous covariate according to sampled uncertainty
+vector STAN_edit_x_cont(
+  vector x_cont,
   data int[] idx_expand,
   data vector teff_obs,
   vector teff)
 {
-  int n = num_elements(x_dis_age);
+  int n = num_elements(x_cont);
   vector[n] x_teff_obs = STAN_expand(teff_obs, idx_expand);
   vector[n] x_teff = STAN_expand(teff, idx_expand);
-  return(x_dis_age + x_teff_obs - x_teff);
+  return(x_cont + x_teff_obs - x_teff);
 }
