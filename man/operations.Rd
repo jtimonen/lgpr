@@ -6,6 +6,7 @@
 \alias{+,lgpterm,lgpterm-method}
 \alias{+,lgprhs,lgpterm-method}
 \alias{*,lgpexpr,lgpexpr-method}
+\alias{*,lgpterm,lgpexpr-method}
 \title{Operations on formula terms and expressions}
 \usage{
 \S4method{+}{lgprhs,lgprhs}(e1, e2)
@@ -15,6 +16,8 @@
 \S4method{+}{lgprhs,lgpterm}(e1, e2)
 
 \S4method{*}{lgpexpr,lgpexpr}(e1, e2)
+
+\S4method{*}{lgpterm,lgpexpr}(e1, e2)
 }
 \arguments{
 \item{e1}{The first sum, term or expression}
@@ -23,9 +26,13 @@
 }
 \description{
 \itemize{
-  \item Sum two \linkS4class{lgprhs}'s
-  \item Sum two \linkS4class{lgpterm}'s
+  \item Sum two \linkS4class{lgprhs}'s to yield an \linkS4class{lgprhs}
+  \item Sum two \linkS4class{lgpterm}'s to yield an \linkS4class{lgprhs}
   \item Sum an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
-  \item Multiply two \linkS4class{lgpexpr}'s
+  to yield an \linkS4class{lgprhs}
+  \item Multiply two \linkS4class{lgpexpr}'s to yield
+  an \linkS4class{lgpterm}
+  \item Multiply an \linkS4class{lgpterm} and \linkS4class{lgpexpr} to
+  yield an \linkS4class{lgpterm}
 }
 }

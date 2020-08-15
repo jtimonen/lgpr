@@ -14,7 +14,7 @@ setMethod(
 )
 
 #' Character format of an lgpterm
-#' 
+#'
 #' @param x an object of class \linkS4class{lgpterm}
 #' @param verbose should the format be more verbose
 #' @return a string
@@ -25,10 +25,12 @@ term_as_character <- function(x, verbose = TRUE) {
   if (L == 1) {
     str <- c1
     desc <- if (verbose) paste0("(1st order):   ", str) else str
-  } else {
+  } else if (L == 2) {
     c2 <- as.character(facs[[2]])
     str <- paste0(c1, "*", c2)
-    desc <- if (verbose) paste0("(interaction): ", str) else  str
+    desc <- if (verbose) paste0("(interaction): ", str) else str
+  } else {
+    desc <- "TODO: 3"
   }
   return(desc)
 }
@@ -36,7 +38,9 @@ term_as_character <- function(x, verbose = TRUE) {
 #' @rdname as_character
 setMethod(
   f = "as.character", signature = "lgpterm",
-  definition = function(x) { term_as_character(x, verbose = TRUE)}
+  definition = function(x) {
+    term_as_character(x, verbose = TRUE)
+  }
 )
 
 #' @rdname as_character

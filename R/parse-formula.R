@@ -57,16 +57,22 @@ parse_expr <- function(expr) {
 parse_term <- function(term) {
   factors <- strsplit(term, split = "*", fixed = TRUE)[[1]] # split to factors
   D <- length(factors)
-  if (D > 2) {
-    stop("One formula term can have at most two expressions! found = ", D)
+  if (D > 3) {
+    stop("One formula term can have at most three expressions! found = ", D)
   }
   f1 <- parse_expr(factors[1])
-  if (D == 2) {
-    f2 <- parse_expr(factors[2])
-    return(f1 * f2)
-  } else {
+  if (D == 1) {
     out <- new("lgpterm", factors = list(f1))
     return(out)
+  } else {
+    f2 <- parse_expr(factors[2])
+    f12 <- f1 * f2
+    if (D == 2) {
+      return(f12)
+    } else {
+      f3 <- parse_expr(factors[3])
+      return(f12 * f3)
+    }
   }
 }
 

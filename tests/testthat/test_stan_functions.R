@@ -216,13 +216,13 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
 
 # 3. STAN KERNEL ARRAYS ---------------------------------------------------
 
-context("Stan kernels: fixed kernel arrays")
+context("Stan kernels: const kernel arrays")
 
 test_that("correct number of matrices is returned", {
   dat <- lgpr:::test_data_x(3)
   n1 <- length(dat$x1_cat[[1]])
   n2 <- length(dat$x2_cat[[1]])
-  KF <- STAN_kernel_fixed_all(
+  KF <- STAN_kernel_const_all(
     n1, n2, dat$x1_cat, dat$x2_cat, dat$x1_cont_mask, dat$x2_cont_mask,
     dat$x_cat_num_levels, dat$components, STREAM
   )
@@ -234,7 +234,7 @@ test_that("matrices of correct size are returned", {
   dat <- lgpr:::test_data_x(N)
   n1 <- length(dat$x1_disc[[1]])
   n2 <- length(dat$x2_disc[[1]])
-  KF <- STAN_kernel_fixed_all(
+  KF <- STAN_kernel_const_all(
     n1, n2, dat$x1_disc, dat$x2_disc,
     dat$num_levels, dat$components, STREAM
   )
@@ -285,8 +285,8 @@ test_that("matrices with correct values are returned", {
   A5 <- matrix(a5, 4, 4, byrow = TRUE)
   A6 <- matrix(a6, 4, 4, byrow = TRUE)
 
-  KF <- STAN_kernel_fixed_all(
-    4, 4, dat$x2_disc, dat$x2_disc,
+  KF <- STAN_kernel_const_all(
+    4, 4, dat$x2_cat, dat$x2_cat,
     dat$num_levels, dat$components, STREAM
   )
   expect_equal(KF[[1]], A1)
@@ -302,10 +302,10 @@ context("Stan kernels: full kernel array")
 test_that("STAN_kernel_all can be used", {
   N <- 5
   dat <- lgpr:::test_data_x(N)
-  n1 <- length(dat$x1_disc[[1]])
-  n2 <- length(dat$x2_disc[[1]])
-  KF <- STAN_kernel_fixed_all(
-    n1, n2, dat$x1_disc, dat$x2_disc,
+  n1 <- length(dat$x1_cat[[1]])
+  n2 <- length(dat$x2_cat[[1]])
+  KF <- STAN_kernel_const_all(
+    n1, n2, dat$x1_cat, dat$x2_cat, dat$x1_cont_mask, dat$x2_cont_mask,
     dat$num_levels, dat$components, STREAM
   )
   alpha <- c(1, 1, 1, 1, 1, 1)
@@ -330,8 +330,8 @@ test_that("STAN_kernel_all uses cov_exp_quad correctly", {
   N <- 3
   dat <- lgpr:::test_data_x(N)
   n1 <- length(dat$x1_disc[[1]])
-  KF <- STAN_kernel_fixed_all(
-    n1, n1, dat$x1_disc, dat$x1_disc,
+  KF <- STAN_kernel_const_all(
+    n1, n1, dat$x1_cat, dat$x1_cat, dat$x1_cont_mask, dat$x1_cont_mask,
     dat$num_levels, dat$components, STREAM
   )
   alpha <- 2 * c(1, 1, 1, 1, 1, 1)
@@ -354,8 +354,8 @@ test_that("componentwise means sum to total mean", {
   N <- 3
   dat <- lgpr:::test_data_x(N)
   n1 <- length(dat$x1_disc[[1]])
-  KF <- STAN_kernel_fixed_all(
-    n1, n1, dat$x1_disc, dat$x1_disc,
+  KF <- STAN_kernel_const_all(
+    n1, n1, dat$x1_cat, dat$x1_cat, dat$x1_cont_mask, dat$x1_cont_mask,
     dat$num_levels, dat$components, STREAM
   )
   alpha <- 2 * c(1, 1, 1, 1, 1, 1)

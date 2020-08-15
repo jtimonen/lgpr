@@ -9,7 +9,11 @@ NULL
 check_lgpexpr <- function(object) {
   errors <- character()
   v0 <- nchar(object@covariate) > 0
-  valid_funs <- c("gp", "gp_ns", "mask", "categ", "zerosum")
+  valid_funs <- c(
+    "gp", "gp_warp", "gp_warp_vm",
+    "gp_warp_uncrt", "gp_warp_vm_uncrt",
+    "heter", "categ", "zerosum"
+  )
   v1 <- object@fun %in% valid_funs
   if (!v0) {
     errors <- c(errors, "covariate name cannot be empty")

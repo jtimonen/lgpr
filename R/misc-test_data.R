@@ -14,7 +14,7 @@ test_data_x <- function(N = 3) {
   x2_d <- c(0, 0, 1, 0)
   x2_cat <- list(x2_id, x2_z, x2_d)
   x2_cont <- list(c(20, 20, 20, 20))
-  
+
   x1_cont_mask <- rep(0, length(x1_cont))
   x2_cont_mask <- rep(0, length(x2_cont))
 

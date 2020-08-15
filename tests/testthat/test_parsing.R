@@ -175,12 +175,13 @@ test_that("an lgpmodel can be created", {
   expect_true(class(m) == "lgpmodel")
 })
 
-# test_that("an lgpmodel has correct number of list fields for stan input", {
-#  m <- lgp_model(y ~ gp(age) + mask(id), dat, options = list(delta = 1e-5))
-#  L <- length(names(m@stan_input))
-#  expect_equal(L, 22)
-#  expect_equal(m@stan_input$delta, 1e-5)
-# })
+test_that("an lgpmodel has correct list fields for stan input", {
+  m <- lgp_model(y ~ gp(age) + mask(id), dat, options = list(delta = 1e-5))
+  names1 <- sort(names(m@stan_input))
+  names2 <- sort(stan_list_names())
+  expect_equal(names1, names2)
+  expect_equal(m@stan_input$delta, 1e-5)
+})
 
 test_that("creating an lgpmodel errors correctly", {
   expect_error(lgp_model(notvar ~ gp(age) + categ(id), dat))

@@ -7,7 +7,6 @@
 #' @inheritParams parse_prior
 #' @inheritParams parse_data
 #' @inheritParams parse_options
-#' @inheritParams parse_disease_options
 #' @return An object of class \linkS4class{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
@@ -22,7 +21,7 @@ lgp_model <- function(formula,
   # Parse the formula and options
   model_formula <- parse_formula(formula)
   list_opts <- parse_options(options)
-  list_dopts <- parse_disease_options(disease_options)
+  list_dopts <- list()
 
   # Parse response
   parsed <- parse_response(data, likelihood, model_formula)
@@ -47,6 +46,7 @@ lgp_model <- function(formula,
 
   # Parse the prior
   # stan_prior <- parse_prior(prior)
+  list_prior <- list()
 
   # Create slots of the 'lgpmodel' object
   stan_input <- c(
@@ -54,7 +54,8 @@ lgp_model <- function(formula,
     list_dopts,
     list_y,
     list_lh,
-    list_x
+    list_x,
+    list_prior
   )
   info <- list(created = date(), pkg_desc = get_pkg_description())
   var_scalings <- list(y = y_scaling, x_cont = x_cont_scalings)

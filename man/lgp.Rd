@@ -84,16 +84,6 @@ model.}
   \item \code{verbose} Should more verbose output be printed?
 }}
 
-\item{disease_options}{A named list with the following possible fields:
-\itemize{
-  \item \code{heterogeneous} Is the disease effect magnitude assumed to be
-  heterogeneous over the diseased individuals?
-  \item \code{uncertain} Do we wish to model uncertainty in the disease
-effect time?
-  \item \code{vm_params} Parameters of the variance masking function. Use
-  \code{NA} to avoid using variance masking at all.
-}}
-
 \item{parallel}{This argument has been deprecated and throws and error if
 \code{TRUE}. Use the \code{cores} argument of \code{rstan::sampling} instead.}
 

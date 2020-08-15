@@ -13,6 +13,62 @@ list_to_matrix <- function(x, n) {
   as.matrix(A)
 }
 
+#' Names that the list given as data to Stan should contain
+#'
+#' @return a character vector
+stan_list_names <- function() {
+  c(
+    "is_verbose",
+    "is_generated_skipped",
+    "is_f_sampled",
+    "is_likelihood_skipped",
+
+    "num_obs",
+    "num_cov_cont",
+    "num_cov_cat",
+    "num_comps",
+    "num_ell",
+    "num_ns",
+    "num_heter",
+    "num_uncrt",
+    "num_cases",
+
+    "obs_model",
+    "components",
+    "y_cont",
+    "y_disc",
+    "y_num_trials",
+    "x_cat",
+    "x_cat_num_levels",
+    "x_cont",
+    "x_cont_mask",
+
+    "c_hat",
+    "delta",
+    "vm_params",
+    "idx_expand",
+
+    "prior_alpha",
+    "prior_ell",
+    "prior_wrp",
+    "prior_sigma",
+    "prior_phi",
+    "prior_teff",
+
+    "hyper_alpha",
+    "hyper_ell",
+    "hyper_wrp",
+    "hyper_phi",
+    "hyper_sigma",
+    "hyper_beta",
+    "hyper_teff",
+
+    "teff_obs",
+    "teff_lb",
+    "teff_ub"
+  )
+}
+
 #' Create the GP mean input for \code{lgp}, so that it accounts
 #' for normalization between data points in the Poisson or NB
 #' observation model
