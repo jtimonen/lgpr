@@ -49,9 +49,9 @@ int<lower=1,upper=4> obs_model;
     - type 0 = component with a single categorical covariate
       * kernel 0 = zero-sum kernel
       * kernel 1 = categorical kernel
-    - type 1 = continuous covariate modeled with a stationary kernel
+    - type 1 = component with a single continuous covariate
       * kernel 0 = [exp. quadratic] kernel
-    - type 2 = interaction of categorical and continuous covariate
+    - type 2 = interaction of a categorical and a continuous covariate
       * kernel 0 = zero-sum kernel * [exp. quadratic]
       * kernel 1 = categorical kernel * [exp. quadratic]
 */

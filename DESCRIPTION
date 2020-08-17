@@ -65,6 +65,7 @@ Collate:
     'parse-common.R'
     'parse-data.R'
     'parse-formula.R'
+    'parse-misc.R'
     'parse-prior.R'
     'parse-response.R'
     'plot-colors.R'

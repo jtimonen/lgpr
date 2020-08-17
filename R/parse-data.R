@@ -1,43 +1,3 @@
-#' Parse the given modeling options
-#'
-#' @param options A named list with the following possible fields:
-#' \itemize{
-#'   \item \code{sample_f} Determines if the function values are be sampled
-#'   (must be \code{TRUE} if likelihood is not \code{"gaussian"}).
-#'   \item \code{skip_generated} If this is true, the generated quantities
-#'   block of Stan is skipped.
-#'   \item \code{delta} Amount of added jitter to ensure positive definite
-#'   covariance matrices.
-#'   \item \code{verbose} Should more verbose output be printed?
-#' }
-#' @return a named list of parsed options
-parse_options <- function(options = NULL) {
-  input <- options
-
-  # Set defaults
-  opts <- list(
-    verbose = FALSE,
-    skip_generated = FALSE,
-    sample_f = FALSE,
-    delta = 1e-8
-  )
-
-  # Replace defaults if found from input
-  for (opt_name in names(opts)) {
-    if (opt_name %in% names(input)) {
-      opts[[opt_name]] <- input[[opt_name]]
-    }
-  }
-
-  # Format for Stan input
-  list(
-    is_verbose = as.numeric(opts$verbose),
-    is_generated_skipped = as.numeric(opts$skip_generated),
-    is_f_sampled = as.numeric(opts$sample_f),
-    delta = opts$delta
-  )
-}
-
 #' Parse the covariates and model components from given data and formula
 #'
 #' @inheritParams parse_response
@@ -63,7 +23,6 @@ parse_data <- function(data, model_formula) {
     x_cat_levels = covariates$x_cat_levels
   )
 }
-
 
 #' Create covariate data for Stan input
 #'
@@ -169,36 +128,6 @@ stan_data_covariates <- function(data, x_names) {
   )
 }
 
-#' An lgpterm to numeric representation for Stan
-#'
-#' @param term an object of class \linkS4class{lgpterm}
-#' @param covariates a list returned by \code{\link{stan_data_covariates}}
-#' @return a vector of 5 integers
-term_to_numeric <- function(term, covariates) {
-  facs <- term@factors
-  if (length(facs) == 1) {
-    out <- rep(1, 9)
-  } else {
-    out <- rep(2, 9)
-  }
-  return(out)
-}
-
-#' Map a list of terms to their "names"
-#'
-#' @param rhs an object of class \linkS4class{lgprhs}
-#' @return a character vector
-term_names <- function(rhs) {
-  terms <- rhs@summands
-  J <- length(terms)
-  names <- c()
-  for (j in seq_len(J)) {
-    term <- terms[[j]]
-    names <- c(names, term_as_character(term, verbose = FALSE))
-  }
-  return(names)
-}
-
 #' Create model component data for Stan input
 #'
 #' @param model_formula an object of class \linkS4class{lgpformula}
@@ -210,7 +139,6 @@ term_names <- function(rhs) {
 #' }
 stan_data_components <- function(model_formula, covariates) {
   terms <- model_formula@terms@summands
-  print(covariates) # PTRIN
   J <- length(terms)
   comps <- array(0, dim = c(J, 9))
   for (j in seq_len(J)) {
@@ -228,4 +156,247 @@ stan_data_components <- function(model_formula, covariates) {
   list(
     to_stan = to_stan
   )
+}
+
+#' Map a list of terms to their "names"
+#'
+#' @param rhs an object of class \linkS4class{lgprhs}
+#' @return a character vector
+term_names <- function(rhs) {
+  terms <- rhs@summands
+  J <- length(terms)
+  names <- c()
+  for (j in seq_len(J)) {
+    term <- terms[[j]]
+    names <- c(names, term_as_character(term, verbose = FALSE))
+  }
+  return(names)
+}
+
+#' An lgpterm to numeric representation for Stan
+#'
+#' @param term an object of class \linkS4class{lgpterm}
+#' @param covariates a list returned by \code{\link{stan_data_covariates}}
+#' @return a vector of 9 integers
+term_to_numeric <- function(term, covariates) {
+  out <- rep(0, 9)
+
+  # Check formula validity
+  parsed <- check_term_factors(term)
+
+  # Check component type
+  is_gp <- !is.null(parsed$gp_kernel)
+  is_cat <- !is.null(parsed$cat_kernel)
+  if (!is_gp) {
+    ctype <- 0
+  } else {
+    ctype <- if (is_cat) 2 else 1
+  }
+  out[1] <- ctype
+
+  # Check kernel type
+  if (is_cat) {
+    kernels <- c("zerosum", "categ")
+    idx <- argument_check(parsed$cat_kernel, allowed = kernels)
+    ktype <- idx - 1
+  } else {
+    ktype <- 0
+  }
+  out[2] <- ktype
+
+  # Check nonstationary options
+  gpk = parsed$gp_kernel
+  if (!is.null(gpk)) {
+    is_warped <- parsed$gp_kernel %in% c("gp_warp_vm", "gp_warp_vm")
+    is_vm <- parsed$gp_kernel == "gp_warp_vm"
+  } else {
+    is_warped <- FALSE
+    is_vm <- FALSE
+  }
+
+  out[5] <- as.numeric(is_warped)
+  out[6] <- as.numeric(is_vm)
+
+  # Check covariate types
+  cidx <- check_term_covariates(covariates, parsed)
+  out[3] <- cidx[1]
+  out[7] <- cidx[2]
+  out[8] <- cidx[3]
+  out[9] <- cidx[4]
+
+  return(out)
+}
+
+#' Helper for converting an lgpterm to numeric representation for Stan
+#'
+#' @param covariates a list returned by \code{\link{stan_data_covariates}}
+#' @param pf a list returned by \code{\link{check_term_factors}}
+#' @return two integers
+check_term_covariates <- function(covariates, pf) {
+  cat_names <- rownames(covariates$to_stan$x_cat)
+  cont_names <- rownames(covariates$to_stan$x_cont)
+  nams <- list(categorical_names = cat_names, continuous_names = cont_names)
+
+  check_type <- function(cov_name, allowed, type, fun) {
+    idx <- which(allowed == cov_name)
+    if (length(idx) < 1) {
+      msg <- paste0(
+        "The argument for <", fun, "> must be a name of a ",
+        type, " covariate. Found = ", cov_name, "."
+      )
+      stop(msg)
+    }
+    return(idx)
+  }
+
+  out <- c(0, 0, 0, 0)
+  funs <- c("heter", "uncrt", "cat", "gp")
+  types <- c("categorical", "categorical", "categorical", "continuous")
+  fields <- c("", "", "cat_kernel", "gp_kernel")
+  for (j in 1:4) {
+    fun_covariate <- paste0(funs[j], "_covariate")
+    names_type <- paste0(types[j], "_names")
+    type_names <- nams[[names_type]]
+    is_type <- !is.null(pf[[fun_covariate]])
+    if (is_type) {
+      cov_name <- pf[[fun_covariate]]
+      fie <- fields[j]
+      if (nchar(fie) == 0) {
+        field <- funs[[j]]
+      }else{
+        field <- pf[[fie]]
+      }
+      idx <- check_type(cov_name, type_names, types[j], field)
+    } else {
+      idx <- 0
+    }
+    out[j] <- idx
+  }
+
+  # Return
+  out
+}
+
+#' Helper for converting an lgpterm to numeric representation for Stan
+#'
+#' @param term an object of class \linkS4class{lgpterm}
+#' @return a named list
+check_term_factors <- function(term) {
+
+  # Check for heter() expressions
+  facs <- term@factors
+  reduced <- reduce_factors_expr(facs, "heter")
+  facs <- reduced$factors
+  heter_covariate <- reduced$covariate
+
+  # Check for uncrt() expressions
+  reduced <- reduce_factors_expr(facs, "uncrt")
+  facs <- reduced$factors
+  uncrt_covariate <- reduced$covariate
+
+  # Check compatibility
+  if (!is.null(uncrt_covariate) && !is.null(heter_covariate)) {
+    is_compatible <- (uncrt_covariate == heter_covariate)
+    if (!is_compatible) {
+      msg <- paste0(
+        "Names of the covariates in uncrt() and heter() ",
+        "expressions must match! Found = {",
+        uncrt_covariate, ", ", heter_covariate, "}."
+      )
+      stop(msg)
+    }
+  }
+
+  # Check for gp, gp_warp and gp_warp_vm expressions
+  reduced <- reduce_factors_gp(facs)
+  facs <- reduced$factors
+  gp_covariate <- reduced$covariate
+  gp_kernel <- reduced$kernel
+
+  # Check for categorical kernel expression
+  D <- length(facs)
+  if (D == 0) {
+    cat_covariate <- NULL
+    cat_kernel <- NULL
+  } else if (D == 1) {
+    cat_covariate <- facs[[1]]@covariate
+    cat_kernel <- facs[[1]]@fun
+  } else {
+    stop(paste0("Invalid term: \n", as.character(term)))
+  }
+
+  # Return a named list
+  list(
+    gp_covariate = gp_covariate,
+    gp_kernel = gp_kernel,
+    cat_covariate = cat_covariate,
+    cat_kernel = cat_kernel,
+    uncrt_covariate = uncrt_covariate,
+    heter_covariate = heter_covariate
+  )
+}
+
+#' Check for certain expressions in a term
+#'
+#' @param factors list of \linkS4class{lgpexpression} objects
+#' @param expr the expression name to check
+#' @return an updated list with no \code{expr} expressions, and name of
+#' the covariate in the original \code{expr} expression
+reduce_factors_expr <- function(factors, expr) {
+  fun <- function(x) {
+    x@fun == expr
+  }
+  idx <- which(sapply(factors, fun))
+  H <- length(idx)
+  if (H > 1) {
+    msg <- paste0(
+      "cannot have more than one '", expr, "' expression ",
+      "in one term! found = ", H
+    )
+    stop(msg)
+  }
+  if (H == 1) {
+    covariate <- factors[[idx]]@covariate
+    factors[[idx]] <- NULL
+  } else {
+    covariate <- NULL
+  }
+  if (length(factors) < 1) {
+    msg <- paste0(
+      "there must be one <gp>, <gp_warp> or <gp_warp_vm> expression",
+      " in each term involving the '", expr, "' expression!"
+    )
+    stop(msg)
+  }
+  list(factors = factors, covariate = covariate)
+}
+
+#' Check for gp expressions in a term
+#'
+#' @param factors list of \linkS4class{lgpexpression} objects
+#' @return an updated list with no \code{gp*} expressions, and name of
+#' the covariate in the original \code{gp*} expression
+reduce_factors_gp <- function(factors) {
+  fun <- function(x) {
+    gp_names <- c("gp", "gp_warp", "gp_warp_vm")
+    x@fun %in% gp_names
+  }
+  idx <- which(sapply(factors, fun))
+  H <- length(idx)
+  if (H > 1) {
+    msg <- paste0(
+      "cannot have more than one gp* expression ",
+      "in one term! found = ", H
+    )
+    stop(msg)
+  }
+  if (H == 1) {
+    covariate <- factors[[idx]]@covariate
+    kernel <- factors[[idx]]@fun
+    factors[[idx]] <- NULL
+  } else {
+    covariate <- NULL
+    kernel <- NULL
+  }
+  list(factors = factors, covariate = covariate, kernel = kernel)
 }

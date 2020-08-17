@@ -20,18 +20,8 @@ setMethod(
 #' @return a string
 term_as_character <- function(x, verbose = TRUE) {
   facs <- x@factors
-  L <- length(facs)
-  c1 <- as.character(facs[[1]])
-  if (L == 1) {
-    str <- c1
-    desc <- if (verbose) paste0("(1st order):   ", str) else str
-  } else if (L == 2) {
-    c2 <- as.character(facs[[2]])
-    str <- paste0(c1, "*", c2)
-    desc <- if (verbose) paste0("(interaction): ", str) else str
-  } else {
-    desc <- "TODO: 3"
-  }
+  desc <- sapply(facs, as.character)
+  desc <- paste(desc, collapse = ", ")
   return(desc)
 }
 
@@ -51,7 +41,10 @@ setMethod(
     L <- length(s)
     desc <- ""
     for (j in seq_len(L)) {
-      desc <- paste0(desc, "Term ", j, " ", as.character(s[[j]]), "\n")
+      desc <- paste0(
+        desc, "Term ", j, " expressions:   ",
+        as.character(s[[j]]), "\n"
+      )
     }
     return(desc)
   }
@@ -62,7 +55,8 @@ setMethod(
 setMethod(
   f = "as.character", signature = "lgpformula",
   definition = function(x) {
-    desc <- paste0("Formula:              ", x@call, "\n")
+    desc <- "An object of class 'lgpformula'.\n\n"
+    desc <- paste0(desc, "Call:                 ", x@call, "\n")
     desc <- paste0(desc, "Response variable:    ", x@y_name, "\n")
     desc <- paste0(desc, as.character(x@terms))
     return(desc)

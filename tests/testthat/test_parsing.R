@@ -1,24 +1,40 @@
 library(lgpr)
 
+# Create test data
+age <- c(10, 20, 30, 10, 20, 30)
+id <- as.factor(c(1, 1, 1, 2, 2, 2))
+sex <- as.factor(c("Male", "Male", "Male", "Female", "Female", "Female"))
+dis_age <- c(12 - age[1:3], NA, NA, NA)
+y <- c(1, 2, 4, 10, 0, 4)
+dat <- data.frame(id, age, dis_age, sex, y)
 
 # -------------------------------------------------------------------------
 
-context("Input parsing: parsing formulas")
+context("Input parsing")
 
-test_that("parse_formula returns correct object", {
-  f <- y ~ gp(x) + categ(u) + categ(z) * gp(x) + gp_ns(age) + zerosum(q)
-  a <- parse_formula(f)
+test_that("lgp_model can be used", {
+  f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
+  m <- lgp_model(f, dat)
+  a <- m@model_formula
   expect_equal(.class2(a), "lgpformula")
-  expect_equal(length(a@terms@summands), 5)
-  expect_equal(length(rhs_variables(a@terms)), 6)
+  expect_equal(length(a@terms@summands), 3)
+  expect_equal(length(rhs_variables(a@terms)), 4)
   expect_true(validObject(a))
+})
+
+test_that("lgpmodel and lgpformula have character representations", {
+  f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
+  m <- lgp_model(f, dat)
+  a <- m@model_formula
+  expect_gt(nchar(as.character(m)), 10)
   expect_gt(nchar(as.character(a)), 10)
 })
 
-test_that("quotes can be used in gp(), gp_ns() etc", {
-  f <- y ~ gp("x") + categ("u") + categ("z") * gp("x") +
-    gp_ns("age") + zerosum("q")
-  c <- .class2(parse_formula(f))
+test_that("quotes can be used in gp(), gp_warp() etc", {
+  f <- y ~ gp("age") + categ("id") + categ(id) * gp_warp("age")
+  m <- lgp_model(f, dat)
+  a <- m@model_formula
+  c <- .class2(a)
   expect_equal(c, "lgpformula")
 })
 
@@ -53,49 +69,38 @@ test_that("lgpterm and lgpexpr can be summed", {
 })
 
 test_that("lgpexpr and lgpterm can be summed", {
-  f <- y ~ gp(x) + categ("z") * gp_ns(aa)
+  f <- y ~ gp(x) + categ("z") * gp_warp(aa)
   c <- .class2(parse_formula(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("parse_formula throws error when input is not a formula", {
-  expect_error(parse_formula("a + b "))
+  reason <- "must have class formula"
+  expect_error(parse_formula("a + b "), reason)
 })
 
 test_that("parse_formula throws error if invalid function or covariate", {
-  expect_error(parse_formula(y ~ notafunction(x)))
-  expect_error(parse_formula(y ~ gp("")))
-  expect_error(parse_formula(y ~ gp(x) * gp(y) * gp(z)))
-  expect_error(parse_formula(y ~ x + a))
-  expect_error(parse_formula(y ~ gp(x)(y)))
+  expect_error(parse_formula(y ~ notafunction(x)), "<fun> must be one of")
+  expect_error(parse_formula(y ~ gp("")), "covariate name cannot be empty")
+  expect_error(
+    parse_formula(y ~ gp(x) * gp(y) * gp(z)),
+    "the response variable cannot be also a covariate"
+  )
+  expect_error(
+    parse_formula(y ~ x + a),
+    "expression must contain exactly one opening parenthesis"
+  )
+  expect_error(
+    parse_formula(y ~ gp(x)(y)),
+    "expression must contain exactly one opening parenthesis"
+  )
 })
-
-# -------------------------------------------------------------------------
-
-context("Input parsing: parsing options")
 
 test_that("parse_options does not need arguments", {
   a <- parse_options()
   e <- c("is_verbose", "is_generated_skipped", "is_f_sampled", "delta")
   expect_equal(names(a), e)
 })
-
-test_that("parse_disease_options does not need arguments", {
-  a <- parse_disease_options()
-  e <- c("is_uncrt", "is_heter", "is_vm_used", "vm_params")
-  expect_equal(names(a), e)
-})
-
-test_that("vm_params gets correct dimensions", {
-  a <- parse_disease_options()
-  b <- parse_disease_options(list(uncertain = TRUE, vm_params = NA))
-  expect_equal(dim(a$vm_params), c(1, 2))
-  expect_equal(dim(b$vm_params), c(0, 2))
-})
-
-# -------------------------------------------------------------------------
-
-context("Input parsing: parsing likelihood")
 
 test_that("parse_likelihood can be used", {
   list_y <- list(y_cont = c(1, 2))
@@ -124,16 +129,6 @@ test_that("parse_likelihood works correctly with binomial likelihood", {
   expect_error(parse_likelihood("binomial", c(1, 1, 1), NULL, c(1, 2)))
 })
 
-# -------------------------------------------------------------------------
-
-context("Input parsing: parsing response")
-
-# Create test data
-age <- c(10, 20, 30, 10, 20, 30)
-id <- c(1, 1, 1, 2, 2, 2)
-y <- c(9.3, 1.2, 3.2, 2.3, 4.1, 1)
-dat <- data.frame(age, id, y)
-
 test_that("y_scaling is created and and applied", {
   f <- parse_formula(y ~ gp(age) + zerosum(id))
   parsed <- parse_response(dat, "gaussian", f)
@@ -150,48 +145,62 @@ test_that("y_scaling is created and and applied", {
   expect_lt(d2, 1e-6)
 })
 
-y_old <- dat$y
-dat$y <- c(-1, -9, 3, 2, 4, 1)
 test_that("cannot have negative response with NB observation model", {
+  newdat <- dat
+  newdat$y <- c(-1, -9, 3, 2, 4, 1)
   f <- parse_formula(y ~ gp(age) + zerosum(id))
   reason <- "cannot be negative with this observation model"
-  expect_error(parse_response(dat, "nb", f), reason)
+  expect_error(parse_response(newdat, "nb", f), reason)
 })
 
-dat$y <- c(1, 1, 1, 1, 1, 1)
 test_that("cannot have a response with zero variance (gaussian obs model)", {
+  newdat <- dat
+  newdat$y <- c(1, 1, 1, 1, 1, 1)
   f <- parse_formula(y ~ gp(age) + zerosum(id))
   reason <- "have zero variance"
-  expect_error(parse_response(dat, "gaussian", f), reason)
+  expect_error(parse_response(newdat, "gaussian", f), reason)
 })
-dat$y <- y_old
 
-# -------------------------------------------------------------------------
+test_that("a heterogeneous component can be added", {
+  m <- lgp_model(y ~ heter(id) * zerosum(sex) * gp(age) + categ(id), dat)
+  si <- m@stan_input
+  print(names(si))
+})
 
-context("Input parsing: creating an lgpmodel")
-
-test_that("an lgpmodel can be created", {
-  m <- lgp_model(y ~ gp(age) + zerosum(id), dat)
-  expect_true(class(m) == "lgpmodel")
+test_that("a heterogeneous component must take a categorical covariate", {
+  expect_error(
+    lgp_model(y ~ heter(age) * zerosum(sex) + categ(id), dat),
+    "must be categorical"
+  )
 })
 
 test_that("an lgpmodel has correct list fields for stan input", {
-  m <- lgp_model(y ~ gp(age) + mask(id), dat, options = list(delta = 1e-5))
-  names1 <- sort(names(m@stan_input))
-  names2 <- sort(stan_list_names())
-  expect_equal(names1, names2)
+  m <- lgp_model(y ~ gp(age) + zerosum(id), dat, options = list(delta = 1e-5))
+  found_fields <- sort(names(m@stan_input))
+  expected_fields <- sort(stan_list_names())
+  for (field in expected_fields) {
+    expect_true(!!field %in% found_fields)
+  }
   expect_equal(m@stan_input$delta, 1e-5)
 })
 
-test_that("creating an lgpmodel errors correctly", {
-  expect_error(lgp_model(notvar ~ gp(age) + categ(id), dat))
-  expect_error(lgp_model(y ~ gp(notvar) + categ(id), dat))
-  expect_error(lgp_model(y ~ gp(age) + categ(id), "notdata"))
-  expect_error(lgp_model(y ~ gp(age) + categ(id), dat, likelihood = "binomial"))
+test_that("creating an lgpmodel errors with invalid data", {
+  expect_error(
+    lgp_model(notvar ~ gp(age) + categ(id), dat),
+    "variable 'notvar' not found in <data>"
+  )
+  expect_error(
+    lgp_model(y ~ gp(notvar) + categ(id), dat),
+    "variable 'notvar' not found in <data>"
+  )
+  expect_error(
+    lgp_model(y ~ gp(age) + categ(id), "notdata"),
+    "<data> must be a data.frame"
+  )
 })
 
-dat$y <- c(1, 3, 2, 7, 3, 1)
 test_that("the num_trials argument works correctly", {
+  dat$y <- c(1, 3, 2, 7, 3, 1)
   m <- lgp_model(y ~ gp(age) + zerosum(id), dat,
     likelihood = "binomial",
     num_trials = 10
@@ -207,14 +216,6 @@ test_that("the num_trials argument works correctly", {
   )
 })
 
-# Create larger test data
-age <- c(10, 20, 30, 10, 20, 30)
-id <- as.factor(c(1, 1, 1, 2, 2, 2))
-sex <- as.factor(c("Male", "Male", "Male", "Female", "Female", "Female"))
-dis_age <- c(12 - age[1:3], NA, NA, NA)
-y <- c(1, 2, 4, 10, 0, 4)
-dat <- data.frame(id, age, dis_age, sex, y)
-
 test_that("only the covariates required by the model go to stan data", {
   m <- lgp_model(y ~ gp(sex) + zerosum(id), dat)
   to_stan <- m@stan_input
@@ -224,7 +225,7 @@ test_that("only the covariates required by the model go to stan data", {
 
 test_that("covariate types are correctly parsed", {
   m <- lgp_model(y ~ gp(age) + categ(id) * gp(age) + zerosum(sex) +
-    gp_ns(dis_age), dat)
+    gp_warp(dis_age), dat)
   to_stan <- m@stan_input
   expect_equal(to_stan$num_cov_cat, 2)
   expect_equal(to_stan$num_cov_cont, 2)
@@ -232,12 +233,6 @@ test_that("covariate types are correctly parsed", {
   expect_equal(sum(to_stan$x_cont_mask), 3)
 })
 
-test_that("lgpmodel has a character representation", {
-  m <- lgp_model(y ~ gp(age) +
-    gp_ns(dis_age), dat)
-  str <- as.character(m)
-  expect_gt(nchar(str), 100)
-})
 
 test_that("cannot have a continuous covariate with zero variance", {
   newdat <- dat

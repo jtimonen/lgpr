@@ -6,10 +6,8 @@
 #'   \item Sum two \linkS4class{lgpterm}'s to yield an \linkS4class{lgprhs}
 #'   \item Sum an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
 #'   to yield an \linkS4class{lgprhs}
-#'   \item Multiply two \linkS4class{lgpexpr}'s to yield
+#'   \item Multiply two \linkS4class{lgpterms}'s to yield
 #'   an \linkS4class{lgpterm}
-#'   \item Multiply an \linkS4class{lgpterm} and \linkS4class{lgpexpr} to
-#'   yield an \linkS4class{lgpterm}
 #' }
 #' @param e1 The first sum, term or expression
 #' @param e2 The second sum, term or expression
@@ -42,16 +40,8 @@ setMethod(
 
 #' @rdname operations
 setMethod(
-  "*", signature(e1 = "lgpexpr", e2 = "lgpexpr"),
+  "*", signature(e1 = "lgpterm", e2 = "lgpterm"),
   function(e1, e2) {
-    new("lgpterm", factors = list(e1, e2))
-  }
-)
-
-#' @rdname operations
-setMethod(
-  "*", signature(e1 = "lgpterm", e2 = "lgpexpr"),
-  function(e1, e2) {
-    new("lgpterm", factors = c(e1@factors, list(e2)))
+    new("lgpterm", factors = c(e1@factors, e2@factors))
   }
 )

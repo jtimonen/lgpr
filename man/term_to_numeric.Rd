@@ -12,7 +12,7 @@ term_to_numeric(term, covariates)
 \item{covariates}{a list returned by \code{\link{stan_data_covariates}}}
 }
 \value{
-a vector of 5 integers
+a vector of 9 integers
 }
 \description{
 An lgpterm to numeric representation for Stan
