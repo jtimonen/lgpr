@@ -88,17 +88,14 @@ parse_term <- function(term) {
 parse_expr <- function(expr) {
   num_open <- lengths(regmatches(expr, gregexpr("[(]", expr)))
   num_close <- lengths(regmatches(expr, gregexpr("[)]", expr)))
-  if (num_open != 1) {
-    stop(
-      "Each expression must contain exactly one opening parenthesis! ",
-      "Found ", num_open, " in <", expr, ">."
+  ok_paren <- (num_open == 1) && (num_close == 1)
+  if (!ok_paren) {
+    msg <- paste0(
+      "Each expression must contain exactly one opening and ",
+      "closing parenthesis! Found {", num_open, ", ",
+      num_close, "} in <", expr, ">."
     )
-  }
-  if (num_close != 1) {
-    stop(
-      "Each expression must contain exactly one closing parenthesis! ",
-      "Found ", num_close, " in <", expr, ">."
-    )
+    stop(msg)
   }
   parsed <- strsplit(expr, "[()]")[[1]]
   L <- length(parsed)

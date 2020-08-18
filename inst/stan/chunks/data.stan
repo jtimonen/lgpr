@@ -66,6 +66,7 @@ int<lower=0> y_disc[obs_model>1, num_obs];
 
 // Covariates
 vector[num_obs] x_cont[num_cov_cont];
+vector[num_obs] x_cont_unnorm[num_cov_cont];
 int x_cont_mask[num_cov_cont, num_obs];
 int x_cat[num_cov_cat, num_obs];
 

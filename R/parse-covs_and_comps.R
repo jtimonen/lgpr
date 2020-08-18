@@ -2,7 +2,7 @@
 #'
 #' @inheritParams parse_response
 #' @return parsed input to stan and covariate scaling
-parse_data <- function(data, model_formula) {
+parse_covs_and_comps <- function(data, model_formula) {
 
   # Check that all covariates exist in data
   x_names <- rhs_variables(model_formula@terms)
@@ -33,6 +33,7 @@ parse_data <- function(data, model_formula) {
 #'   \item \code{x_cat}
 #'   \item \code{x_cat_num_levels}
 #'   \item \code{x_cont}
+#'   \item \code{x_cont_unnorm}
 #'   \item \code{x_cont_mask}
 #' }
 #' @param data a data frame
@@ -50,12 +51,13 @@ stan_data_covariates <- function(data, x_names) {
 
   x_cont <- list()
   x_cont_mask <- list()
+  x_cont_unnorm <- list()
   x_cont_scalings <- list()
   x_cont_names <- c()
 
   x_cat <- list()
   x_cat_levels <- list()
-  x_cat_num_levels <- 0
+  x_cat_num_levels <- c()
   x_cat_names <- c()
 
   num_cat <- 0
@@ -88,6 +90,7 @@ stan_data_covariates <- function(data, x_names) {
       normalizer <- create_scaling(X_NONAN, name)
       x_cont_scalings[[num_cont]] <- normalizer
       x_cont[[num_cont]] <- normalizer@fun(X_NONAN)
+      x_cont_unnorm[[num_cont]] <- X_NONAN
       x_cont_names[num_cont] <- name
     } else {
       msg <- paste0(
@@ -101,6 +104,7 @@ stan_data_covariates <- function(data, x_names) {
   # Convert lists to matrices
   x_cat <- list_to_matrix(x_cat, num_obs)
   x_cont <- list_to_matrix(x_cont, num_obs)
+  x_cont_unnorm <- list_to_matrix(x_cont_unnorm, num_obs)
   x_cont_mask <- list_to_matrix(x_cont_mask, num_obs)
 
   # Name lists and matrix rows
@@ -108,7 +112,15 @@ stan_data_covariates <- function(data, x_names) {
   names(x_cat_levels) <- x_cat_names
   rownames(x_cat) <- x_cat_names
   rownames(x_cont) <- x_cont_names
+  rownames(x_cont_unnorm) <- x_cont_names
   rownames(x_cont_mask) <- x_cont_names
+  
+  if(!is.null(x_cat_num_levels)){
+    x_cat_num_levels <- array(x_cat_num_levels, dim = c(num_cat))
+  }else{
+    x_cat_num_levels <- array(0, dim=c(0))
+  }
+  
 
   # Create Stan data
   to_stan <- list(
@@ -117,6 +129,7 @@ stan_data_covariates <- function(data, x_names) {
     x_cat = x_cat,
     x_cat_num_levels = x_cat_num_levels,
     x_cont = x_cont,
+    x_cont_unnorm = x_cont_unnorm,
     x_cont_mask = x_cont_mask
   )
 
@@ -128,35 +141,60 @@ stan_data_covariates <- function(data, x_names) {
   )
 }
 
-#' Create model component data for Stan input
+#' Create model components data for Stan input
 #'
 #' @param model_formula an object of class \linkS4class{lgpformula}
 #' @param covariates a list returned by \code{\link{stan_data_covariates}}
 #' @return a named list with fields
 #' \itemize{
 #'   \item \code{to_stan}: a list of stan data
-#'   \item TODO: something?
 #' }
 stan_data_components <- function(model_formula, covariates) {
   terms <- model_formula@terms@summands
   J <- length(terms)
+
+  # Create the components integer array
   comps <- array(0, dim = c(J, 9))
   for (j in seq_len(J)) {
     comps[j, ] <- term_to_numeric(terms[[j]], covariates)
   }
   colnames(comps) <- c(
-    "comp", "ker", " ",
+    "comp", "ker", "unused",
     "heter", "ns", "vm",
     "uncrt", "i_cat", "i_cont"
   )
   rownames(comps) <- term_names(model_formula@terms)
-  to_stan <- list(components = as.matrix(comps))
+  components <- as.matrix(comps)
+
+  # Create idx_expand, num_cases and vm_params
+  x_cat <- covariates$to_stan$x_cat
+  x_cont_mask <- covariates$to_stan$x_cont_mask
+  idx_expand <- create_idx_expand(components, x_cat, x_cont_mask)
+  num_cases <- length(unique(idx_expand[idx_expand != 0]))
+  num_ns <- sum(components[,5] != 0)
+  num_vm <- sum(components[,6] != 0)
+  VM <- c(0.95, 1)
+  vm_params <- matrix(rep(VM, num_ns), num_ns, 2, byrow = TRUE)
+
+  to_stan <- list(
+    components = components,
+    idx_expand = idx_expand,
+    num_cases = num_cases,
+    num_ell = sum(components[,1] != 0),
+    num_heter = sum(components[,4] != 0),
+    num_ns = num_ns,
+    num_vm = num_vm,
+    num_uncrt = sum(components[,7] != 0),
+    num_comps = dim(components)[1],
+    vm_params = vm_params
+  )
 
   # Return
   list(
     to_stan = to_stan
   )
 }
+
 
 #' Map a list of terms to their "names"
 #'
@@ -172,6 +210,7 @@ term_names <- function(rhs) {
   }
   return(names)
 }
+
 
 #' An lgpterm to numeric representation for Stan
 #'
@@ -205,7 +244,7 @@ term_to_numeric <- function(term, covariates) {
   out[2] <- ktype
 
   # Check nonstationary options
-  gpk = parsed$gp_kernel
+  gpk <- parsed$gp_kernel
   if (!is.null(gpk)) {
     is_warped <- parsed$gp_kernel %in% c("gp_warp_vm", "gp_warp_vm")
     is_vm <- parsed$gp_kernel == "gp_warp_vm"
@@ -219,7 +258,7 @@ term_to_numeric <- function(term, covariates) {
 
   # Check covariate types
   cidx <- check_term_covariates(covariates, parsed)
-  out[3] <- cidx[1]
+  out[4] <- cidx[1]
   out[7] <- cidx[2]
   out[8] <- cidx[3]
   out[9] <- cidx[4]
@@ -263,7 +302,7 @@ check_term_covariates <- function(covariates, pf) {
       fie <- fields[j]
       if (nchar(fie) == 0) {
         field <- funs[[j]]
-      }else{
+      } else {
         field <- pf[[fie]]
       }
       idx <- check_type(cov_name, type_names, types[j], field)
@@ -322,7 +361,12 @@ check_term_factors <- function(term) {
     cat_covariate <- facs[[1]]@covariate
     cat_kernel <- facs[[1]]@fun
   } else {
-    stop(paste0("Invalid term: \n", as.character(term)))
+    msg <- paste0(
+      "Invalid term with expressions: ", as.character(term),
+      ". Note that each term can contain at most one categ()",
+      " or zerosum() expression."
+    )
+    stop(msg)
   }
 
   # Return a named list

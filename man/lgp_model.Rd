@@ -8,11 +8,10 @@ lgp_model(
   formula,
   data,
   likelihood = "gaussian",
-  prior = prior_default(),
+  prior = NULL,
   c_hat = NULL,
   num_trials = NULL,
-  options = NULL,
-  disease_options = NULL
+  options = NULL
 )
 }
 \arguments{

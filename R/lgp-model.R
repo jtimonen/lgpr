@@ -5,18 +5,17 @@
 #' @inheritParams parse_response
 #' @inheritParams parse_likelihood
 #' @inheritParams parse_prior
-#' @inheritParams parse_data
+#' @inheritParams parse_covs_and_comps
 #' @inheritParams parse_options
 #' @return An object of class \linkS4class{lgpmodel}.
 #' @seealso For fitting the model, see \code{\link{lgp_fit}}.
 lgp_model <- function(formula,
                       data,
                       likelihood = "gaussian",
-                      prior = prior_default(),
+                      prior = NULL,
                       c_hat = NULL,
                       num_trials = NULL,
-                      options = NULL,
-                      disease_options = NULL) {
+                      options = NULL) {
 
   # Parse the formula and options
   model_formula <- parse_formula(formula)
@@ -32,7 +31,7 @@ lgp_model <- function(formula,
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y)
 
   # Parse covariates and components
-  parsed <- parse_data(data, model_formula)
+  parsed <- parse_covs_and_comps(data, model_formula)
   list_x <- parsed$to_stan
   x_cont_scalings <- parsed$x_cont_scalings
   x_cat_levels <- parsed$x_cat_levels
@@ -45,8 +44,7 @@ lgp_model <- function(formula,
   )
 
   # Parse the prior
-  # stan_prior <- parse_prior(prior)
-  list_prior <- list()
+  list_prior <- parse_prior(prior, list_x, list_lh$obs_model)
 
   # Create slots of the 'lgpmodel' object
   stan_input <- c(

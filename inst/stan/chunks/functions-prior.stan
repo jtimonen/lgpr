@@ -29,15 +29,15 @@ real STAN_log_prior(
   if (types[1]==1){
     // do nothing
   }else if (types[1]==2){
-    lp += normal_lpdf(theta|a,b);
+    lp += normal_lpdf(theta|a,b); // 2 = normal
   }else if (types[1]==3){
-    lp += student_t_lpdf(theta|a,0,b);
+    lp += student_t_lpdf(theta|a,0,b); // 3 = student-t
   }else if (types[1]==4){
-    lp += gamma_lpdf(theta|a,b);
+    lp += gamma_lpdf(theta|a,b); // 4 = gamma
   }else if (types[1]==5){
-    lp += inv_gamma_lpdf(theta|a,b);
+    lp += inv_gamma_lpdf(theta|a,b); // 5 = inv-gamma
   }else if (types[1]==6){
-    lp += lognormal_lpdf(theta|a,b);
+    lp += lognormal_lpdf(theta|a,b); // 6 = log-normal
   }else{
     reject("types[1] must be an integer between 1 and 6, found = ", types[1]);
   }

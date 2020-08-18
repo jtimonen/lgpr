@@ -11,13 +11,10 @@
 lgp <- function(formula,
                 data,
                 likelihood = "gaussian",
-                prior = prior_default(),
+                prior = NULL,
                 c_hat = NULL,
                 num_trials = NULL,
-                id_variable = "id",
                 options = NULL,
-                disease_options = NULL,
-
                 parallel = FALSE,
                 threshold = 0.95,
                 relevance_method = "f_mean",
@@ -25,9 +22,7 @@ lgp <- function(formula,
 
   # Create the model
   model <- lgp_model(
-    formula, data, likelihood, prior, c_hat, num_trials,
-    id_variable, options, disease_options
-  )
+    formula, data, likelihood, prior, c_hat, num_trials, options)
 
   # Fit the model
   # fit <- lgp_fit(

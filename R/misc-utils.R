@@ -1,3 +1,14 @@
+#' Repeat a vector as a rows of an array
+#'
+#' @param v a vector of length \code{m}
+#' @param n number of times to repeat
+#' @return returns an array of size \code{n} x \code{m}
+repvec <- function(v, n) {
+  m <- length(v)
+  A <- matrix(rep(v, n), n, m, byrow = TRUE)
+  return(as.array(A))
+}
+
 #' List elements to matrix rows
 #'
 #' @param x a listof length \code{m} where each element is a vector of
@@ -41,6 +52,7 @@ stan_list_names <- function() {
     "x_cat",
     "x_cat_num_levels",
     "x_cont",
+    "x_cont_unnorm",
     "x_cont_mask",
 
     "c_hat",

@@ -158,6 +158,8 @@ set_num_trials <- function(num_trials, num_obs, LH) {
       )
     }
   }
+  is_binomial <- as.numeric(LH == 4)
+  num_trials <- array(num_trials, dim = c(is_binomial, num_obs))
   return(num_trials)
 }
 

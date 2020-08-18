@@ -49,8 +49,8 @@ STAN_kernel_base_var_mask <- function(x1, x2, steepness, vm_params, pstream__ = 
     .Call(`_lgpr_STAN_kernel_base_var_mask`, x1, x2, steepness, vm_params, pstream__)
 }
 
-STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_obs, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_obs, pstream__)
+STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_obs, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_obs, pstream__)
 }
 
 STAN_gp_posterior_helper <- function(Ly, K, v, pstream__ = 0L) {

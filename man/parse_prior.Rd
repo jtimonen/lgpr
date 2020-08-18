@@ -4,12 +4,16 @@
 \alias{parse_prior}
 \title{Parse the given prior}
 \usage{
-parse_prior(prior)
+parse_prior(prior, stan_input, obs_model)
 }
 \arguments{
 \item{prior}{A named list, defining the prior distribution of model
 (hyper)parameters. It is recommended to first create this using the function
 \code{\link{prior_default}}, and then possibly modify it.}
+
+\item{stan_input}{a list of stan input fields}
+
+\item{obs_model}{observation model as integer}
 }
 \value{
 a named list of parsed options

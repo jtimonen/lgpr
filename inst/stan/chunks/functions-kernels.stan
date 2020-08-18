@@ -29,6 +29,8 @@ matrix[] STAN_kernel_all(
   data int[,] components,
   data vector[] x1,
   data vector[] x2,
+  data vector[] x1_unnorm,
+  data vector[] x2_unnorm,
   real[] alpha,
   real[] ell,
   real[] wrp,
@@ -81,8 +83,13 @@ matrix[] STAN_kernel_all(
     
     // 3. Pick the possible continuous covariate of this component
     if(ctype != 0){
-      X1 = x1[idx_cont];
-      X2 = x2[idx_cont];
+      if(is_warped){
+        X1 = x1_unnorm[idx_cont];
+        X2 = x2_unnorm[idx_cont];
+      }else{
+        X1 = x1[idx_cont];
+        X2 = x2[idx_cont];
+      }
     }
     
     // 4. Handle possible nonstationarity

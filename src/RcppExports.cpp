@@ -173,8 +173,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // STAN_kernel_all
-std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > STAN_kernel_all(const int& n1, const int& n2, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K_const, const std::vector<std::vector<int> >& components, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x1, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x2, const std::vector<double>& alpha, const std::vector<double>& ell, const std::vector<double>& wrp, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& beta, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& teff, const std::vector<std::vector<double> >& vm_params, const std::vector<int>& idx1_expand, const std::vector<int>& idx2_expand, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& teff_obs, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_kernel_all(SEXP n1SEXP, SEXP n2SEXP, SEXP K_constSEXP, SEXP componentsSEXP, SEXP x1SEXP, SEXP x2SEXP, SEXP alphaSEXP, SEXP ellSEXP, SEXP wrpSEXP, SEXP betaSEXP, SEXP teffSEXP, SEXP vm_paramsSEXP, SEXP idx1_expandSEXP, SEXP idx2_expandSEXP, SEXP teff_obsSEXP, SEXP pstream__SEXP) {
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > STAN_kernel_all(const int& n1, const int& n2, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K_const, const std::vector<std::vector<int> >& components, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x1, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x2, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x1_unnorm, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x2_unnorm, const std::vector<double>& alpha, const std::vector<double>& ell, const std::vector<double>& wrp, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& beta, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& teff, const std::vector<std::vector<double> >& vm_params, const std::vector<int>& idx1_expand, const std::vector<int>& idx2_expand, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& teff_obs, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_all(SEXP n1SEXP, SEXP n2SEXP, SEXP K_constSEXP, SEXP componentsSEXP, SEXP x1SEXP, SEXP x2SEXP, SEXP x1_unnormSEXP, SEXP x2_unnormSEXP, SEXP alphaSEXP, SEXP ellSEXP, SEXP wrpSEXP, SEXP betaSEXP, SEXP teffSEXP, SEXP vm_paramsSEXP, SEXP idx1_expandSEXP, SEXP idx2_expandSEXP, SEXP teff_obsSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -184,6 +184,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<std::vector<int> >& >::type components(componentsSEXP);
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type x1(x1SEXP);
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type x2(x2SEXP);
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type x1_unnorm(x1_unnormSEXP);
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type x2_unnorm(x2_unnormSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type ell(ellSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type wrp(wrpSEXP);
@@ -194,7 +196,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<int>& >::type idx2_expand(idx2_expandSEXP);
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type teff_obs(teff_obsSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_kernel_all(n1, n2, K_const, components, x1, x2, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_obs, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_all(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_obs, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -257,7 +259,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_kernel_const", (DL_FUNC) &_lgpr_STAN_kernel_const, 5},
     {"_lgpr_STAN_kernel_const_all", (DL_FUNC) &_lgpr_STAN_kernel_const_all, 9},
     {"_lgpr_STAN_kernel_base_var_mask", (DL_FUNC) &_lgpr_STAN_kernel_base_var_mask, 5},
-    {"_lgpr_STAN_kernel_all", (DL_FUNC) &_lgpr_STAN_kernel_all, 16},
+    {"_lgpr_STAN_kernel_all", (DL_FUNC) &_lgpr_STAN_kernel_all, 18},
     {"_lgpr_STAN_gp_posterior_helper", (DL_FUNC) &_lgpr_STAN_gp_posterior_helper, 4},
     {"_lgpr_STAN_gp_posterior", (DL_FUNC) &_lgpr_STAN_gp_posterior, 5},
     {"_lgpr_STAN_log_prior", (DL_FUNC) &_lgpr_STAN_log_prior, 4},

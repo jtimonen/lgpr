@@ -34,7 +34,8 @@ if(is_f_sampled){
   vector[num_obs] sigma2_vec = rep_vector(square(sigma[1]), num_obs);
   matrix[num_obs, num_obs] Ky = diag_matrix(num_comps * delta_vec);
   matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
-      K_const, components, x_cont, x_cont, alpha, ell, wrp, beta, teff,
+      K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
+      alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_obs);
 
   if(obs_model!=1){
