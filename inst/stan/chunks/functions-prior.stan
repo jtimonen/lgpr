@@ -6,7 +6,7 @@ real STAN_log_prior(
 {
   real lp;
   real a = hyper[1]; // prior hyperparameter 1
-  real b = hyper[2]; // prior hyperparameter 2
+  real b = hyper[2]; // prior hyperparameter 2 (not used in student-t)
   real c = hyper[3]; // prior hyperparameter 3 (currently not used)
   real theta;
   int L1 = size(types);
@@ -31,7 +31,7 @@ real STAN_log_prior(
   }else if (types[1]==2){
     lp += normal_lpdf(theta|a,b); // 2 = normal
   }else if (types[1]==3){
-    lp += student_t_lpdf(theta|a,0,b); // 3 = student-t
+    lp += student_t_lpdf(theta|a,0.0,1.0); // 3 = student-t
   }else if (types[1]==4){
     lp += gamma_lpdf(theta|a,b); // 4 = gamma
   }else if (types[1]==5){

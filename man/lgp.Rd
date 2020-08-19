@@ -2,7 +2,10 @@
 % Please edit documentation in R/lgp.R
 \name{lgp}
 \alias{lgp}
-\title{The main function of the `lgpr` package}
+\alias{lgp_model,}
+\alias{lgp_fit}
+\alias{lgp_model}
+\title{Main functions of the `lgpr` package}
 \usage{
 lgp(
   formula,
@@ -12,11 +15,22 @@ lgp(
   c_hat = NULL,
   num_trials = NULL,
   options = NULL,
-  parallel = FALSE,
   threshold = 0.95,
   relevance_method = "f_mean",
   ...
 )
+
+lgp_model(
+  formula,
+  data,
+  likelihood = "gaussian",
+  prior = NULL,
+  c_hat = NULL,
+  num_trials = NULL,
+  options = NULL
+)
+
+lgp_fit(model, ...)
 }
 \arguments{
 \item{formula}{A formula specified using the common \code{formula}
@@ -82,22 +96,17 @@ model.}
   \item \code{verbose} Should more verbose output be printed?
 }}
 
-\item{parallel}{This argument has been deprecated and throws and error if
-\code{TRUE}. Use the \code{cores} argument of \code{rstan::sampling} instead.}
-
-\item{threshold}{Component selection threshold for relevance sum.}
-
-\item{relevance_method}{Component relevance determination method.
-Must be either \code{"f_mean"} or \code{"alpha"}.}
-
 \item{...}{Additional arguments that are passed to \code{rstan::sampling}.}
-}
-\value{
-An object of class \code{lgpfit}.
+
+\item{model}{An object of class \linkS4class{lgpmodel}.}
 }
 \description{
-This is a wrapper for both \code{\link{lgp_model}}
- and \code{\link{lgp_fit}}. It first creates an
- \linkS4class{lgpmodel} object and then fits the model,
- finally returning an \linkS4class{lgpfit} object.
+\itemize{
+  \item The \code{lgp_model} function creates an object of class
+  \linkS4class{lgpmodel}.
+  \item The \code{lgp_fit} function takes an \linkS4class{lgpmodel} object
+  and fits the model using \code{rstan::sampling}.
+  \item The \code{lgp} function is a wrapper for both \code{lgp_model}
+  and \code{lgp_fit}. 
+}
 }

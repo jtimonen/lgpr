@@ -17,8 +17,7 @@
 #'
 #' @section Basic usage:
 #' \itemize{
-#' \item See the main function \code{\link{lgp}} for creating and fitting
-#' additive longitudinal GP models.
+#' \item See the main function documentation: \code{\link{lgp}}.
 #'  \item See tutorials at
 #'  \url{https://jtimonen.github.io/lgpr-usage/index.html}
 #' }

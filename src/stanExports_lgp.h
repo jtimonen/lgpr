@@ -403,7 +403,7 @@ STAN_log_prior(const T0__& x,
             stan::math::assign(lp, (lp + normal_log(theta, a, b)));
         } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 3))) {
             current_statement_begin__ = 98;
-            stan::math::assign(lp, (lp + student_t_log(theta, a, 0, b)));
+            stan::math::assign(lp, (lp + student_t_log(theta, a, 0.0, 1.0)));
         } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 4))) {
             current_statement_begin__ = 100;
             stan::math::assign(lp, (lp + gamma_log(theta, a, b)));
@@ -2273,7 +2273,7 @@ public:
         size_t teff_raw_i_0_max__ = logical_gt(num_uncrt, 0);
         for (size_t i_0__ = 0; i_0__ < teff_raw_i_0_max__; ++i_0__) {
             try {
-                writer__.vector_lb_unconstrain(0, teff_raw[i_0__]);
+                writer__.vector_lub_unconstrain(0, 1, teff_raw[i_0__]);
             } catch (const std::exception& e) {
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable teff_raw: ") + e.what()), current_statement_begin__, prog_reader__());
             }
@@ -2297,7 +2297,7 @@ public:
         size_t beta_i_0_max__ = logical_gt(num_heter, 0);
         for (size_t i_0__ = 0; i_0__ < beta_i_0_max__; ++i_0__) {
             try {
-                writer__.vector_lb_unconstrain(0, beta[i_0__]);
+                writer__.vector_lub_unconstrain(0, 1, beta[i_0__]);
             } catch (const std::exception& e) {
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable beta: ") + e.what()), current_statement_begin__, prog_reader__());
             }
@@ -2414,9 +2414,9 @@ public:
             teff_raw.reserve(teff_raw_d_0_max__);
             for (size_t d_0__ = 0; d_0__ < teff_raw_d_0_max__; ++d_0__) {
                 if (jacobian__)
-                    teff_raw.push_back(in__.vector_lb_constrain(0, num_cases, lp__));
+                    teff_raw.push_back(in__.vector_lub_constrain(0, 1, num_cases, lp__));
                 else
-                    teff_raw.push_back(in__.vector_lb_constrain(0, num_cases));
+                    teff_raw.push_back(in__.vector_lub_constrain(0, 1, num_cases));
             }
             current_statement_begin__ = 602;
             std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > beta;
@@ -2424,9 +2424,9 @@ public:
             beta.reserve(beta_d_0_max__);
             for (size_t d_0__ = 0; d_0__ < beta_d_0_max__; ++d_0__) {
                 if (jacobian__)
-                    beta.push_back(in__.vector_lb_constrain(0, num_cases, lp__));
+                    beta.push_back(in__.vector_lub_constrain(0, 1, num_cases, lp__));
                 else
-                    beta.push_back(in__.vector_lb_constrain(0, num_cases));
+                    beta.push_back(in__.vector_lub_constrain(0, 1, num_cases));
             }
             current_statement_begin__ = 605;
             std::vector<std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > > eta;
@@ -2878,7 +2878,7 @@ public:
         size_t teff_raw_d_0_max__ = logical_gt(num_uncrt, 0);
         teff_raw.reserve(teff_raw_d_0_max__);
         for (size_t d_0__ = 0; d_0__ < teff_raw_d_0_max__; ++d_0__) {
-            teff_raw.push_back(in__.vector_lb_constrain(0, num_cases));
+            teff_raw.push_back(in__.vector_lub_constrain(0, 1, num_cases));
         }
         size_t teff_raw_j_1_max__ = num_cases;
         size_t teff_raw_k_0_max__ = logical_gt(num_uncrt, 0);
@@ -2891,7 +2891,7 @@ public:
         size_t beta_d_0_max__ = logical_gt(num_heter, 0);
         beta.reserve(beta_d_0_max__);
         for (size_t d_0__ = 0; d_0__ < beta_d_0_max__; ++d_0__) {
-            beta.push_back(in__.vector_lb_constrain(0, num_cases));
+            beta.push_back(in__.vector_lub_constrain(0, 1, num_cases));
         }
         size_t beta_j_1_max__ = num_cases;
         size_t beta_k_0_max__ = logical_gt(num_heter, 0);

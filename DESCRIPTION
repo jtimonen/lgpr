@@ -26,7 +26,6 @@ Imports:
     bayesplot (>= 1.7.0),
     MASS (>= 7.3-50),
     stats (>= 3.4),
-    checkmate (>= 2.0.0),
     ggplot2 (>= 3.1.0),
     ggpubr (>= 0.2)
 LinkingTo: 
@@ -45,25 +44,22 @@ Suggests:
 VignetteBuilder: knitr
 Collate: 
     'RcppExports.R'
-    'aa-preproc-old.R'
     'validate.R'
     'all_s4_classes.R'
+    'all_s4_generics.R'
     'character.R'
-    'lgp-fit.R'
-    'lgp-model.R'
+    'lgp-assist.R'
     'lgp-ppc.R'
     'lgp.R'
     'lgpr-package.R'
-    'misc-argument_check.R'
-    'misc-inv_gamma.R'
-    'misc-kernels.R'
+    'misc-argcheck.R'
+    'misc-invgamma.R'
     'misc-split.R'
-    'misc-test_data.R'
     'misc-utils.R'
     'operations.R'
-    'parse-covs_and_comps.R'
+    'parse-components.R'
+    'parse-expand.R'
     'parse-formula.R'
-    'parse-idx_expand.R'
     'parse-misc.R'
     'parse-prior.R'
     'parse-response.R'
@@ -82,8 +78,10 @@ Collate:
     'postproc-relevances.R'
     'postproc-selection.R'
     'show.R'
-    'simulate-create_F.R'
-    'simulate-create_X.R'
-    'simulate-main.R'
+    'sim-f.R'
+    'sim-k.R'
+    'sim-x.R'
+    'sim.R'
     'stanmodels.R'
+    'summaries.R'
     'zzz.R'

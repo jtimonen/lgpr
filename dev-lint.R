@@ -1,6 +1,9 @@
 # This file is only for development purposes and not a part of the package
 # itself. Run this in the package root directory to (style and) lint the
 # package.
+#
+# Author: Juho Timonen
+#
 require(lintr)
 require(styler)
 

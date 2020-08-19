@@ -61,12 +61,6 @@ test_that("get_stan_model returns a stanmodel", {
   expect_equal(as.character(class(sm)), "stanmodel")
 })
 
-test_that("example_call returns text", {
-  call_str <- example_call()
-  expect_equal(as.character(class(call_str)), "character")
-  expect_gt(nchar(call_str), 100)
-})
-
 test_that("color_set works", {
   col1 <- color_set("blue")
   col2 <- color_set("red")
