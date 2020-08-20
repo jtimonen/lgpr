@@ -77,6 +77,8 @@ Collate:
     'postproc-predict.R'
     'postproc-relevances.R'
     'postproc-selection.R'
+    'priors-helper.R'
+    'priors.R'
     'show.R'
     'sim-f.R'
     'sim-k.R'

@@ -62,8 +62,7 @@ binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
 \code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.}
 
 \item{prior}{A named list, defining the prior distribution of model
-(hyper)parameters. It is recommended to first create this using the function
-\code{\link{prior_default}}, and then possibly modify it.}
+(hyper)parameters.}
 
 \item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
 a real number defining a constant GP mean. If \code{NULL}, this is set to
@@ -107,6 +106,6 @@ model.}
   \item The \code{lgp_fit} function takes an \linkS4class{lgpmodel} object
   and fits the model using \code{rstan::sampling}.
   \item The \code{lgp} function is a wrapper for both \code{lgp_model}
-  and \code{lgp_fit}. 
+  and \code{lgp_fit}.
 }
 }

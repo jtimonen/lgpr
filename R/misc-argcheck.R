@@ -48,3 +48,24 @@ argument_check <- function(arg, allowed) {
 
   return(idx)
 }
+
+#' Check if a value is numeric and throw error if not
+#'
+#' @param arg A single number
+#' @param arg_name Argument name
+#' @param require_positive Should this also check that \code{arg} is positive?
+check_numeric <- function(arg, arg_name = NULL, require_positive = FALSE) {
+  if (is.null(arg_name)) {
+    arg_name <- deparse(substitute(arg))
+  }
+  if (!is.numeric(arg)) {
+    msg <- paste0("<", arg_name, "> must be numeric! found = ", arg)
+    stop(msg)
+  } else if (arg <= 0) {
+    if (require_positive) {
+      msg <- paste0("<", arg_name, "> must be positive! found = ", arg)
+      stop(msg)
+    }
+  }
+  return(TRUE)
+}
