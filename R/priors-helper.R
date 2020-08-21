@@ -55,7 +55,6 @@ prior_to_df_oneparam <- function(stan_input, parname, digits) {
   return(df)
 }
 
-
 #' Human-readable prior statement
 #'
 #' @param parname parameter name

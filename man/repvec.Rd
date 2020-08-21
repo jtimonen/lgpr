@@ -15,5 +15,5 @@ repvec(v, n)
 returns an array of size \code{n} x \code{m}
 }
 \description{
-Repeat a vector as a rows of an array
+Throws an error if \code{v} is \code{NULL}.
 }

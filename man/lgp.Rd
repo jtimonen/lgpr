@@ -17,6 +17,7 @@ lgp(
   options = NULL,
   threshold = 0.95,
   relevance_method = "f_mean",
+  verbose = FALSE,
   ...
 )
 
@@ -27,7 +28,8 @@ lgp_model(
   prior = NULL,
   c_hat = NULL,
   num_trials = NULL,
-  options = NULL
+  options = NULL,
+  verbose = FALSE
 )
 
 lgp_fit(model, ...)
@@ -94,6 +96,8 @@ model.}
   covariance matrices.
   \item \code{verbose} Should more verbose output be printed?
 }}
+
+\item{verbose}{Should more verbose output be printed?}
 
 \item{...}{Additional arguments that are passed to \code{rstan::sampling}.}
 

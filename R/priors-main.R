@@ -1,6 +1,6 @@
 #' Prior definitions
 #'
-#' @param square is the prior for a square-transformed parameter?
+#' @param square is prior for a square-transformed parameter?
 #' @name priors
 #' @aliases normal, log_normal, gamma, inv_gamma, uniform, student_t
 #' @return a named list
@@ -100,5 +100,21 @@ log_normal <- function(mu, sigma, square = FALSE) {
     square = square,
     mu = mu,
     sigma = sigma
+  )
+}
+
+
+#' @export
+#' @rdname priors
+#' @param a shape parameter
+#' @param b shape parameter
+beta <- function(a, b) {
+  check_numeric(a, require_positive = TRUE)
+  check_numeric(b, require_positive = TRUE)
+  list(
+    dist = "beta",
+    square = FALSE,
+    alpha = a,
+    beta = b
   )
 }

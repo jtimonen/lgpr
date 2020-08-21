@@ -6,8 +6,17 @@
 #' @param obs_model observation model as integer
 #' @return a named list of parsed options
 parse_prior <- function(prior, stan_input, obs_model) {
-  prior <- fill_prior(prior)
-  parse_prior_full(prior, stan_input, obs_model)
+  filled <- fill_prior(prior)
+  str1 <- paste(filled$specified, collapse = ", ")
+  str2 <- paste(filled$defaulted, collapse = ", ")
+  msg1 <- paste0("User-specified priors found for: {", str1, "}")
+  msg2 <- paste0("Default priors used for: {", str2, "}")
+  info <- paste0(msg1, "\n", msg2, "\n")
+  to_stan <- parse_prior_full(filled$prior, stan_input, obs_model)
+  list(
+    to_stan = to_stan,
+    info = info
+  )
 }
 
 #' Fill a partially defined prior
@@ -15,66 +24,99 @@ parse_prior <- function(prior, stan_input, obs_model) {
 #' @inheritParams parse_prior
 #' @return a named list
 fill_prior <- function(prior) {
-  if (!is.null(prior)) {
-    stop("Prior was not NULL")
+  names <- c("alpha", "ell", "wrp", "sigma", "phi", 
+             "beta", "effect_time")
+  defaulted <- c()
+  specified <- c()
+  for (name in names) {
+    if (name %in% names(prior)) {
+      # User-specified prior
+      specified <- c(specified, name)
+      pr <- prior[[name]]
+      is_named <- !is.null(names(pr))
+      if (is_named) {
+        pr <- list(pr)
+      }
+      prior[[name]] <- pr
+    } else {
+      # Default prior
+      defaulted <- c(defaulted, name)
+      prior[[name]] <- list(prior_default(name))
+    }
   }
-  st20 <- student_t(nu = 20)
-  ln11 <- log_normal(mu = 1, sigma = 1)
-  changeThis <- normal(mu = 1, sigma = 0.5)
   list(
-    alpha = list(st20),
-    ell = list(ln11),
-    wrp = list(changeThis),
-    phi = list(ln11),
-    sigma = list(ln11)
+    prior = prior,
+    defaulted = defaulted,
+    specified = specified
   )
 }
+
 
 #' Parse given fully defined prior
 #'
 #' @inheritParams parse_prior
 #' @return a named list of parsed options
 parse_prior_full <- function(prior, stan_input, obs_model) {
+  
+  # Count number of different parameters
   nums <- stan_input[c("num_comps", "num_ell", "num_ns")]
   num_sigma <- as.numeric(obs_model == 1)
   num_phi <- as.numeric(obs_model == 3)
-  num_heter <- stan_input$num_heter
   num_uncrt <- stan_input$num_uncrt
+  num_heter <- stan_input$num_heter
   num_cases <- stan_input$num_cases
-
   pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
   nums <- c(unlist(nums), num_sigma, num_phi)
   names(nums)[4:5] <- c("num_sigma", "num_phi")
-
+  
+  # Common parameters
   common <- c()
   K <- length(pnames)
   for (k in seq_len(K)) {
-    name <- pnames[k]
-    desc <- prior[[name]]
-    if (is.null(desc)) {
-      stop("<prior> must contain a field named ", name)
-    }
+    
+    # Ensure that prior definition exists for this parameter
+    desc <- field_must_exist(prior, pnames[k])
+    
+    # Prior type and hyper params to stan input format
     pp <- parse_prior_single(desc, nums[k])
-    f1 <- paste0("prior_", name)
-    f2 <- paste0("hyper_", name)
+    f1 <- paste0("prior_", pnames[k])
+    f2 <- paste0("hyper_", pnames[k])
     common[[f1]] <- pp$prior
     common[[f2]] <- pp$hyper
   }
   
+  # Beta parameters
+  common[["hyper_beta"]] <- create_hyper_beta(prior, num_heter)
+
   # TODO: Change these
   other <- list(
     prior_teff = repvec(c(2, 0, 1), num_uncrt > 0),
-
-    hyper_beta = repvec(c(0.2, 0.2), num_heter > 0),
     hyper_teff = repvec(c(0, 1, 0), num_uncrt > 0),
-
+    
     teff_obs = repvec(rep(0, num_cases), num_uncrt > 0),
     teff_lb = repvec(rep(0, num_cases), num_uncrt > 0),
     teff_ub = repvec(rep(0, num_cases), num_uncrt > 0)
   )
-
+  
   # Return
   c(common, other)
+}
+
+#' Create the hyper_beta input to Stan
+#'
+#' @inheritParams parse_prior_full
+#' @param num_heter the \code{num_heter} input created for Stan
+#' @return an array of size (0, 2) or (1, 2)
+create_hyper_beta <- function(prior, num_heter){
+  desc <- field_must_exist(prior, "beta")
+  L <- length(desc)
+  if (L != 1) {
+    stop("length of prior$beta must be 1!")
+  }
+  bet <- c(desc[[1]]$alpha, desc[[1]]$beta)
+  n_rows <- as.numeric(num_heter > 0)
+  out <- repvec(bet, n_rows)
+  return(out)
 }
 
 #' Parse the given prior for a single parameter type
@@ -91,7 +133,7 @@ parse_prior_single <- function(desc, num) {
   L <- length(desc)
   if (L != num) {
     if (L == 1) {
-
+      
       # The parameter type has the same prior in all components
       out <- prior_to_num(desc[[1]])
       prior <- repvec(out$prior, num)
@@ -104,7 +146,7 @@ parse_prior_single <- function(desc, num) {
       stop(msg)
     }
   } else {
-
+    
     # The parameter type has possibly different prior in different components
     prior <- repvec(c(0, 0), L)
     hyper <- repvec(c(0, 0, 0), L)

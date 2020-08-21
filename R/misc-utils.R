@@ -1,12 +1,33 @@
 #' Repeat a vector as a rows of an array
 #'
+#' @description Throws an error if \code{v} is \code{NULL}.
 #' @param v a vector of length \code{m}
 #' @param n number of times to repeat
 #' @return returns an array of size \code{n} x \code{m}
 repvec <- function(v, n) {
+  if (is.null(v)) {
+    stop("Error in repvec, input <v> is NULL.")
+  }
   m <- length(v)
   A <- matrix(rep(v, n), n, m, byrow = TRUE)
   return(as.array(A))
+}
+
+#' Access list field and throw error if it is NULL
+#' 
+#' @param fields list
+#' @param name field name
+#' @return Returns \code{fields[[name]]} unless it is \code{NULL}
+field_must_exist <- function(fields, name){
+  desc <- fields[[name]]
+  arg_name <- deparse(substitute(fields))
+  if (is.null(desc)) {
+    str <- paste(names(fields), collapse = ", ")
+    msg <- paste0("The list <", arg_name, "> must contain a field named ",
+                  name, "! Found = {", str, "}")
+    stop(msg)
+  }
+  return(desc)
 }
 
 #' Wrapper for rstan::get_stream

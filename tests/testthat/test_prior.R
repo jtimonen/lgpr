@@ -66,6 +66,13 @@ test_that("log-normal prior is parsed correctly", {
   expect_equal(num$hyper_names, c("mu", "sigma"))
 })
 
+test_that("beta prior is parsed correctly", {
+  p <- beta(0.1, 0.5)
+  expect_equal(p$alpha, 0.1)
+  expect_equal(p$beta, 0.5)
+})
+
+
 test_that("invalid prior name or hyperparams cannot be given", {
   p <- list(dist = "stupid", square = TRUE)
   reason <- "given value 'stupid' for argument <distribution_name> is invalid"

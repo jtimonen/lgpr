@@ -24,11 +24,13 @@ lgp <- function(formula,
                 options = NULL,
                 threshold = 0.95,
                 relevance_method = "f_mean",
+                verbose = FALSE,
                 ...) {
 
   # Create and fit the model
   model <- lgp_model(
-    formula, data, likelihood, prior, c_hat, num_trials, options
+    formula, data, likelihood, prior, c_hat, num_trials, options,
+    verbose
   )
   fit <- lgp_fit(model = model, ...)
   list(model = model, fit = fit)
@@ -42,25 +44,25 @@ lgp <- function(formula,
 #' @inheritParams parse_prior
 #' @inheritParams parse_covs_and_comps
 #' @inheritParams parse_options
+#' @param verbose Should more verbose output be printed?
 lgp_model <- function(formula,
                       data,
                       likelihood = "gaussian",
                       prior = NULL,
                       c_hat = NULL,
                       num_trials = NULL,
-                      options = NULL) {
+                      options = NULL,
+                      verbose = FALSE) {
 
   # Parse the formula and options
   model_formula <- parse_formula(formula)
   list_opts <- parse_options(options)
   list_dopts <- list()
 
-  # Parse response
+  # Parse response and likelihood
   parsed <- parse_response(data, likelihood, model_formula)
   list_y <- parsed$to_stan
   y_scaling <- parsed$scaling
-
-  # Parse likelihood
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y)
 
   # Parse covariates and components
@@ -77,7 +79,11 @@ lgp_model <- function(formula,
   )
 
   # Parse the prior
-  list_prior <- parse_prior(prior, list_x, list_lh$obs_model)
+  parsed <- parse_prior(prior, list_x, list_lh$obs_model)
+  list_prior <- parsed$to_stan
+  if (verbose) {
+    cat(parsed$info)
+  }
 
   # Create slots of the 'lgpmodel' object
   stan_input <- c(

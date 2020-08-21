@@ -14,7 +14,7 @@ context("Input parsing")
 
 test_that("lgp_model can be used", {
   f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
-  m <- lgp_model(f, dat)
+  m <- lgp_model(f, dat, verbose = FALSE)
   a <- m@model_formula
   expect_equal(.class2(a), "lgpformula")
   expect_equal(length(a@terms@summands), 3)
