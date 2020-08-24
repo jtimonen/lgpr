@@ -8,7 +8,7 @@
 #'     \item \code{\link{sim_plot}} for objects with signature
 #'       \linkS4class{lgpsim}
 #' }
-#' @param x unused
+#' @param x object to be plotted
 #' @param y unused
 #' @param ... keyword arguments to be passed to the signature-specific plotting
 #' function

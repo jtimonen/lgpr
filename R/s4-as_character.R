@@ -1,6 +1,6 @@
 #' Character representations of different S4 objects
 #'
-#' @param object an object of some S4 class
+#' @param x an object of some S4 class
 #' @return a character representation of the object
 #' @name as_character
 NULL
@@ -76,6 +76,72 @@ setMethod(
   }
 )
 
+#' @rdname as_character
+setMethod(
+  f = "as.character", signature = "lgpfit",
+  definition = function(x) {
+    desc <- "\n ---------- LGPFIT SUMMARY ----------\n\n"
+    
+    # Runtime info
+    tryCatch(
+      {
+        runtime <- get_runtime(x)
+        desc <- paste0(desc, "* Average runtime per chain: ",
+                       runtime$warmup, " s (warmup) and ",
+                       runtime$sampling, " s (sampling)\n")
+      },
+      error = function(e) {
+        cat("* Unable to show runtime info. Reason:\n")
+        print(e)
+      }
+    )
+    
+    # Convergence info
+    tryCatch(
+      {
+        diag <- x@diagnostics
+        Rhat <- diag$Rhat
+        imax <- which(Rhat == max(Rhat))
+        rhat_str <- round(max(Rhat), 4)
+        desc <- paste0(desc, "* Largest R-hat value is ", rhat_str, " (", 
+                       paste(rownames(diag)[imax], collapse = ", "), ")\n")
+      },
+      error = function(e) {
+        cat("* Unable to show convergence info. Reason:\n")
+        print(e)
+      }
+    )
+    
+    # Relevance info
+    tryCatch(
+      {
+        sel <- x@selection
+        rel_method <- x@relevances$method
+        r3 <- sel$prob
+        tr <- sel$threshold
+        cat("* Used relevance method = ", rel_method, "\n", sep = "")
+        cat("* Used selection threshold = ", tr, "\n", sep = "")
+        
+        rel <- x@relevances$average
+        cn <- names(rel)
+        r1 <- round(rel, 3)
+        r2 <- cn %in% sel$selected
+        DF <- data.frame(r1, r2, r3)
+        cat("\n")
+        
+        colnames(DF) <- c("Relevance", "Selected", "Prob.")
+        print(DF)
+        cat("\n")
+      },
+      error = function(e) {
+        cat("* Unable to show component relevance info. Reason:\n")
+        print(e)
+      }
+    )
+    return(desc)
+  }
+)
+
 #' Character format of an lgpterm
 #'
 #' @param x an object of class \linkS4class{lgpterm}
@@ -86,52 +152,4 @@ term_as_character <- function(x, verbose = TRUE) {
   desc <- sapply(facs, as.character)
   desc <- paste(desc, collapse = ", ")
   return(desc)
-}
-
-
-#' Is an object printable
-#'
-#' @param object an object
-is_printable <- function(object) {
-  d <- dim(object)
-  if (is.null(d)) {
-    return(TRUE)
-  } else if (prod(d) == 0) {
-    return(FALSE)
-  }
-  TRUE
-}
-
-#' Print a list in a more compact format
-#'
-#' @param input a named list
-print_list <- function(input) {
-  nam <- names(input)
-  printed <- c()
-  skipped <- c()
-  for (name in nam) {
-    f <- input[[name]]
-    if (is_printable(f)) {
-      printed <- c(printed, name)
-    } else {
-      skipped <- c(skipped, name)
-    }
-  }
-
-  print(input[printed])
-  str <- paste(skipped, collapse = ", ")
-  msg <- paste0(
-    "Did not print fields with at least one zero dimension:\n    ",
-    str, "\n"
-  )
-  cat(msg)
-  invisible(input)
-}
-
-#' Print the Stan input of an lgpmodel
-#'
-#' @param model an object of class \linkS4class{lgpmodel}
-print_stan_input <- function(model) {
-  print_list(model@stan_input)
-  invisible(model)
 }

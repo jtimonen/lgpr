@@ -1,4 +1,4 @@
-#' @include validate.R
+#' @include s4-validate.R
 NULL
 
 #' An S4 class to represent an lgp expression

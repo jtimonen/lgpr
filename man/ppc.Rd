@@ -13,6 +13,8 @@ prior_predict(object, ...)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel}}
+
+\item{...}{other arguments}
 }
 \description{
 Prior and posterior predictive checks

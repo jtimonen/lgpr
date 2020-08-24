@@ -12,8 +12,8 @@ vignette: >
 ---
 
 ```{css, echo=FALSE}
-a { color: #098ee6; }
-a:hover { color: #56b5f5; }
+a:hover { color: #4ca5ff; }
+a { color: #0065cc; }
 body { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif; }
 ```
 

@@ -153,7 +153,7 @@ test_that("simulated data can be plotted", {
     covariates = c(0, 2),
     t_observed = "after_1"
   )
-  p <- plot(dat,
+  p <- sim_plot(dat,
     i_test = c(1, 2, 3), dotcolor = colorset("green", "dark"),
     linecolor = "gray30", ncol = 4
   )
