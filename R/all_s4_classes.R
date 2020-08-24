@@ -26,7 +26,7 @@ lgprhs <- setClass("lgprhs", slots = c(summands = "list"))
 
 #' An S4 class to represent an lgp formula
 #'
-#' @slot terms an object of class \linkS4class{lgpsum}
+#' @slot terms an object of class \linkS4class{lgprhs}
 #' @slot y_name name of the response variable
 #' @slot call original formula call
 lgpformula <- setClass("lgpformula",
@@ -70,8 +70,8 @@ lgpscaling <- setClass("lgpscaling",
 #' \itemize{
 #'   \item \code{y} - Response variable normalization function and its
 #'   inverse operation. Must be an \linkS4class{lgpscaling} object.
-#'   \item \code{x_cont} - Continous covariate normalization functions and their
-#'   inverse operations. Must be a named list with each element is an
+#'   \item \code{x_cont} - Continous covariate normalization functions and
+#'   theirvinverse operations. Must be a named list with each element is an
 #'   \linkS4class{lgpscaling} object.
 #' }
 #' @slot var_info A named list with fields
@@ -108,5 +108,37 @@ lgpfit <- setClass("lgpfit",
     selection = "list",
     pkg_version = "character",
     diagnostics = "data.frame"
+  )
+)
+
+
+#' An S4 class to represent a data set simulated using the additive GP
+#' formalism
+#'
+#' @slot data the actual data
+#' @slot response name of the response variable in the data
+#' @slot components the drawn function components
+#' @slot kernel_matrices the covariance matrices for each gp
+#' @slot info A list with fields
+#' \itemize{
+#'   \item \code{par_ell} the used lengthscale parameters
+#'   \item \code{par_cont} the parameters used to generate the continuous
+#'   covariates
+#'   \item \code{p_signal} signal proportion
+#' }
+#' @slot effect_times A list with fields
+#' \itemize{
+#'   \item \code{true} possible true effect times that generate the disease
+#'   effect
+#'   \item \code{observed} possible observed effect times
+#' }
+lgpsim <- setClass("lgpsim",
+  representation = representation(
+    data = "data.frame",
+    response = "character",
+    components = "data.frame",
+    kernel_matrices = "array",
+    effect_times = "list",
+    info = "list"
   )
 )

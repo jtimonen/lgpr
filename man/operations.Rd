@@ -27,7 +27,7 @@
   \item Sum two \linkS4class{lgpterm}'s to yield an \linkS4class{lgprhs}
   \item Sum an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
   to yield an \linkS4class{lgprhs}
-  \item Multiply two \linkS4class{lgpterms}'s to yield
+  \item Multiply two \linkS4class{lgpterm}'s to yield
   an \linkS4class{lgpterm}
 }
 }

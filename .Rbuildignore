@@ -7,3 +7,5 @@
 tests/testthat/stan_files/.*\.o$
 tests/testthat/stan_files/.*\.cc$
 tests/testthat/stan_files/.*\.hpp$
+^\.github$
+^CONTRIBUTING\.md$

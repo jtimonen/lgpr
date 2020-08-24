@@ -13,6 +13,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{css, echo=FALSE}
+a { color: #098ee6; }
+a:hover { color: #56b5f5; }
+body { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif; }
+```
+
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -20,24 +27,21 @@ knitr::opts_chunk$set(
 )
 ```
   
-```{r require}
+```{r require, message=FALSE}
 require(lgpr)
 ```
 
 ## Default priors
   
-All parameters that are sampled have default priors which can be replaced by user-supplied priors. In the simplest case, the `prior` argument for the `lgp` function can be ignored, in which case default priors are used (`prior = prior_default()`). The prior argument has to be a list with the following fields
+All parameters that are sampled have default priors which can be replaced by user-supplied priors. In the simplest case, the `prior` argument for the `lgp` function can be ignored, in which case default priors are used. The prior argument has to be a list with the following fields
 
 ```{r fields}
-my_prior <- prior_default()
-print(names(my_prior))
+#TODO
 ```
 
-These fields themselves contain lists specifying prior distributions for different types of model parameters. If a custom prior is to be supplied, it is recommended that it is done by first creating the list using `prior_default`, and then editing its fields. For example, the prior for the magnitude parameter of the disease-related age component can be accessed and edited in the following way:
-```{r access}
-print(my_prior$alpha$diseaseAge)
-my_prior$alpha$diseaseAge <- list(type = "normal", mu = 0, sigma = 1)
-print(my_prior$alpha$diseaseAge)
+For example, a custom prior for the magnitude parameter of the disease-related age component can be specified in the following way:
+```{r custom}
+#TODO
 ```
 
 

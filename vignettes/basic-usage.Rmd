@@ -5,70 +5,74 @@ date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
     toc: true
-#  pdf_document:
-#    toc: true     
 vignette: >
   %\VignetteIndexEntry{Basic usage of the lgpr package}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
+```{css, echo=FALSE}
+a { color: #098ee6; }
+a:hover { color: #56b5f5; }
+body { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif; }
+```
+
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#"
-)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
 ```
 
 This vignette demonstrates how to model a longitudinal data set and perform covariate selection using the `lgp` function of the `lgpr` package. In the example cases, the number of data points is small enough so that the experiments can be run in just a few seconds.
 
-```{r load}
+```{r load, message=FALSE}
 require("lgpr")
 set.seed(123)
 ```
 
 ## Simulating data
-Here we simulate data with 8 individuals. We simulate individual-specific and shared age effects, as well as a sex-specific age effect. Also a categorial 'location' covariate is simulated, but it has no effect.
+Here we simulate data with 6 individuals. We simulate individual-specific and shared age effects, as well as a sex-specific age effect. Also a categorial 'location' covariate is simulated, but it has no effect.
 
-```{r simulate, fig.width=6.6, fig.height=6}
-# generate artificial data -----------------------------------------------
-simData <- simulate_data(N           = 8,
-                        t_data       = seq(6, 30, by = 6),
-                        covariates   = c(    2,2), # covariate types (2 = categorical)
-                        lengthscales = c(6,6,6,6), # true effect lengthscales
-                        relevances   = c(1,1,1,0), # true covariate relevances
-                        names        = c("sex", "location"),
-                        t_jitter     = 0.5,  # jitter in time points
-                        snr          = 5)    # signal-to-noise ratio
+```{r simulate}
+sim <- simulate_data(N            = 6,
+                     t_data       = seq(6, 30, by = 6),
+                     covariates   = c(    2,2), # covariate types (2 = categorical)
+                     lengthscales = c(6,6,6,6), # true effect lengthscales
+                     relevances   = c(1,1,1,0), # true covariate relevances
+                     names        = c("sex", "location"),
+                     t_jitter     = 0.5,  # jitter in time points
+                     snr          = 5)    # signal-to-noise ratio
 
-data <- simData$data # data frame
-plot_simdata(simData)
+show(sim)
+```
+
+```{r plot_sim, fig.width=6.6, fig.height=5}
+sim_plot(sim)
 ```
 
 ```{r components, fig.width=6.6, fig.height=5}
-plot_components_simdata(simData)
+#plot(simdata, componentwise = TRUE)
 ```
 
 ## Creating and fitting a model
-``````{r fit, fig.width=6.6, fig.height=6}
-# create and fit a model --------------------------------------------------
-fit <- lgp(formula  = y ~ id + age + sex + location, # model formula
-           data     = data,
+``````{r fit}
+formula <- y ~ zerosum(id)*gp(age) + gp(age) + zerosum(sex)*gp(age) + zerosum(location)*gp(age)
+fit <- lgp(formula  = formula,
+           data     = sim@data,
            iter     = 1000, 
            chains   = 1,
-           refresh  = 500)
+           refresh  = 0)
+
+show(fit$model)
 ```
 
 ## Visualizing inferred components and predictions
 ```{r vis, fig.width=6.6, fig.height=5}
-# visualization -----------------------------------------------------------
-plot(fit)
-plot_posterior_components(fit)
+#plot(fit)
+#plot_posterior_components(fit)
 
-# prediction --------------------------------------------------------------
-t_test <- seq(0, 40, length.out = 60)
-X_test <- create_test_points(fit, t_test)
-PRED   <- lgp_predict(fit, X_test, samples = "mean")
-plot_posterior_y(fit, PRED, uncertainty = "ribbon")
+# prediction
+#t_test <- seq(0, 40, length.out = 60)
+#X_test <- create_test_points(fit, t_test)
+#PRED   <- lgp_predict(fit, X_test, samples = "mean")
+#plot_posterior_y(fit, PRED, uncertainty = "ribbon")
 ```
 

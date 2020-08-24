@@ -14,17 +14,19 @@ repvec <- function(v, n) {
 }
 
 #' Access list field and throw error if it is NULL
-#' 
+#'
 #' @param fields list
 #' @param name field name
 #' @return Returns \code{fields[[name]]} unless it is \code{NULL}
-field_must_exist <- function(fields, name){
+field_must_exist <- function(fields, name) {
   desc <- fields[[name]]
   arg_name <- deparse(substitute(fields))
   if (is.null(desc)) {
     str <- paste(names(fields), collapse = ", ")
-    msg <- paste0("The list <", arg_name, "> must contain a field named ",
-                  name, "! Found = {", str, "}")
+    msg <- paste0(
+      "The list <", arg_name, "> must contain a field named ",
+      name, "! Found = {", str, "}"
+    )
     stop(msg)
   }
   return(desc)

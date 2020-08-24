@@ -1,17 +1,23 @@
 ---
-title: "Easy way to create and modify your input data frame for lgpr"
+title: "Creating and modifying your input data frame for lgpr"
 author: "Juho Timonen"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
     toc: true
-#  pdf_document:
-#    toc: true     
 vignette: >
-  %\VignetteIndexEntry{Easy way to create and modify your input data frame for lgpr}
+  %\VignetteIndexEntry{Creating and modifying your input data frame for lgpr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+  
+```{css, echo=FALSE}
+a { color: #098ee6; }
+a:hover { color: #56b5f5; }
+body { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif; }
+```
+  
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -20,13 +26,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r load}
+```{r load, message=FALSE}
 set.seed(123)
 require("lgpr")
 ```
 
 ## ID and time variables
-The main function of the `lgpr` package is called `lgp`, and it takes a model formula and data frame as input. The data is passed in the so called wide format, meaning that one row corresponds to one data point and there will be one column for each covariate. The data frame always needs at least two columns, one specifying a subject identifier variable and one specifying the measurement time. An example of a valid data frame could be created as below. 
+The main function of the `lgpr` package is called `lgp`, and it takes a model formula and data frame as input. The data is passed in the so called wide format, meaning that one row corresponds to one data point and there will be one column for each covariate. An example of a valid data frame could be created as below. 
 
 ```{r ex1}
 id   <- rep(1:4, each = 5)
@@ -75,7 +81,7 @@ The `add_diseaseAges` function computes the disease-related ages from the initia
 ```{r add2, fig.width=6.6, fig.height=4}
 t_init <- c(12, 36, 24)
 names(t_init) <- c(1, 2, 4) # name the vector elements to indicate individual IDs
-data <- add_diseaseAges(data, t_init)
+data <- add_disease_ages(data, t_init)
 ```
 
 ```{r table5, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}

@@ -91,3 +91,12 @@ setMethod(
     invisible(object)
   }
 )
+
+#' @rdname show
+setMethod(
+  f = "show", signature = "lgpsim",
+  definition = function(object) {
+    cat(as.character(object))
+    invisible(object)
+  }
+)

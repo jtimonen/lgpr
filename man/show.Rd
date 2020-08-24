@@ -4,6 +4,7 @@
 \alias{show}
 \alias{show,lgpfit-method}
 \alias{show,lgpmodel-method}
+\alias{show,lgpsim-method}
 \title{Printing S4 object info using the show generic}
 \usage{
 \S4method{show}{lgpformula}(object)
@@ -11,6 +12,8 @@
 \S4method{show}{lgpfit}(object)
 
 \S4method{show}{lgpmodel}(object)
+
+\S4method{show}{lgpsim}(object)
 }
 \arguments{
 \item{object}{an object of some S4 class}

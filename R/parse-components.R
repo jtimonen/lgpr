@@ -382,7 +382,7 @@ check_term_factors <- function(term) {
 
 #' Check for certain expressions in a term
 #'
-#' @param factors list of \linkS4class{lgpexpression} objects
+#' @param factors list of \linkS4class{lgpexpr} objects
 #' @param expr the expression name to check
 #' @return an updated list with no \code{expr} expressions, and name of
 #' the covariate in the original \code{expr} expression
@@ -417,7 +417,7 @@ reduce_factors_expr <- function(factors, expr) {
 
 #' Check for gp expressions in a term
 #'
-#' @param factors list of \linkS4class{lgpexpression} objects
+#' @param factors list of \linkS4class{lgpexpr} objects
 #' @return an updated list with no \code{gp*} expressions, and name of
 #' the covariate in the original \code{gp*} expression
 reduce_factors_gp <- function(factors) {

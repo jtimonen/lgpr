@@ -15,14 +15,8 @@
 #' \code{"random_p"} or \code{"exact"}.
 #' @param f_var variance of f
 #' @param c_hat A constant added to f
-#' @return A list \code{out}, where
-#' \itemize{
-#'   \item \code{out$data} is a data frame containing the actual data and
-#'   \item \code{out$components} contains more points for smoother
-#'   visualizations of the generating process.
-#'   \item \code{out$onsets} contains the real disease effect times
-#'   \item \code{out$p_signal} proportion of variance explained by signal
-#' }
+#' @param verbose Verbosity mode.
+#' @return An object of class \linkS4class{lgpsim}.
 #' @examples
 #' # Generate Gaussian data
 #' dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
@@ -60,13 +54,13 @@ simulate_data <- function(N,
                           N_trials = 1,
                           verbose = FALSE,
                           force_zeromean = TRUE) {
+
+  # Input checks
   noise_type <- tolower(noise_type)
   if (N < 2) stop("There must be at least 2 individuals!")
   if (length(t_data) < 3) {
     stop("There must be at least 3 time points per individual!")
   }
-
-  # Input checks
   names <- sim_check_covariates(covariates, relevances, names, n_categs)
   if (N_affected > round(N / 2)) {
     stop("N_affected cannot be greater than round(N/2)!")
@@ -84,10 +78,11 @@ simulate_data <- function(N,
     t_data = t_data,
     t_jitter = t_jitter,
     t_effect_range = t_effect_range,
-    continuous_info = continuous_info,
-    verbose = verbose
+    continuous_info = continuous_info
   )
-  X <- IN$X
+  if (verbose) {
+    cat(IN$info)
+  }
 
   # Compute X_affected
   k <- length(t_data)
@@ -95,7 +90,7 @@ simulate_data <- function(N,
 
   # Simulate the components F
   COMP <- sim_create_f(
-    X,
+    IN$X,
     covariates,
     relevances,
     lengthscales,
@@ -129,7 +124,7 @@ simulate_data <- function(N,
   noise <- y - g
 
   # Create the output objects
-  dat <- cbind(X, y)
+  dat <- cbind(IN$X, y)
   rownames(dat) <- 1:(N * k)
   comp <- cbind(FFF, f, g, noise, y)
 
@@ -140,19 +135,21 @@ simulate_data <- function(N,
   SSR <- sum((g - mean(g))^2)
   SSE <- sum(noise^2)
 
-  # Return
-  out <- list(
-    data = OBSERVED$dat,
-    components = comp,
-    kernel_matrices = COMP$KKK,
-    onsets = IN$onsets,
-    onsets_observed = OBSERVED$onsets_observed,
-    par_ABO = IN$par_cont,
+  # Return S4 class object
+  teff <- list(true = IN$onsets, observed = OBSERVED$onsets_observed)
+  info <- list(
     par_ell = lengthscales,
+    par_cont = IN$par_cont,
     p_signal = SSR / (SSR + SSE)
   )
-
-  return(out)
+  new("lgpsim",
+    data = OBSERVED$dat,
+    response = "y",
+    components = comp,
+    kernel_matrices = COMP$KKK,
+    effect_times = teff,
+    info = info
+  )
 }
 
 
@@ -249,36 +246,32 @@ sim_generate_names <- function(covariates) {
   # Get default names
   names <- c("id", "age")
   def <- c("x", "z", "offset", "group")
-  d0 <- sum(covariates == 0)
-  d1 <- sum(covariates == 1)
-  d2 <- sum(covariates == 2)
-  d3 <- sum(covariates == 3)
-  d4 <- sum(covariates == 4)
-  if (d0 == 1) {
+  D <- sim_create_x_D(covariates)
+  if (D[1] == 1) {
     names <- c(names, "diseaseAge")
   }
-  if (d1 > 0) {
-    if (d1 > 1) {
-      names <- c(names, paste(def[1], 1:d1, sep = ""))
+  if (D[2] > 0) {
+    if (D[2] > 1) {
+      names <- c(names, paste(def[1], 1:D[2], sep = ""))
     } else {
       names <- c(names, def[1])
     }
   }
-  if (d2 > 0) {
-    if (d2 > 1) {
-      names <- c(names, paste(def[2], 1:d2, sep = ""))
+  if (D[3] > 0) {
+    if (D[3] > 1) {
+      names <- c(names, paste(def[2], 1:D[3], sep = ""))
     } else {
       names <- c(names, def[2])
     }
   }
-  if (d3 > 0) {
-    if (d3 > 1) {
-      names <- c(names, paste(def[3], 1:d3, sep = ""))
+  if (D[4] > 0) {
+    if (D[4] > 1) {
+      names <- c(names, paste(def[3], 1:D[4], sep = ""))
     } else {
       names <- c(names, def[3])
     }
   }
-  if (d4 > 0) {
+  if (D[5] > 0) {
     names <- c(names, "group")
   }
 
@@ -303,13 +296,13 @@ sim_data_to_observed <- function(dat, t_observed) {
     return(ret)
   } else {
     age <- dat$age
-    disAge <- dat$diseaseAge
+    dis_age <- dat$diseaseAge
     j <- 0
     for (ID in uid) {
       j <- j + 1
       inds <- which(id == ID)
       age_i <- age[inds]
-      dag_i <- disAge[inds]
+      dag_i <- dis_age[inds]
       if (is.nan(dag_i[1])) {
         # not a diseased individual
       } else {

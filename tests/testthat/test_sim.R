@@ -4,46 +4,161 @@ library(lgpr)
 
 context("sim: simulating data")
 
-
 test_that("gaussian data can be simulated", {
-  expect_equal(
-    length(names(simulate_data(
-      N = 16,
-      t_data = seq(6, 36, by = 6),
-      covariates = c(2, 2),
-      lengthscales = c(6, 6, 6, 6),
-      relevances = c(1, 1, 1, 0),
-      names = c("sex", "location"),
-      t_jitter = 0.5
-    ))),
-    8
+  dat <- simulate_data(
+    N = 16,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(2, 2),
+    lengthscales = c(6, 6, 6, 6),
+    relevances = c(1, 1, 1, 0),
+    names = c("sex", "location"),
+    t_jitter = 0.5
   )
+  data <- dat@data
+  data_names <- c("id", "age", "sex", "location", "y")
+  expect_equal(names(data), !!data_names)
+  teff_names <- c("true", "observed")
+  expect_equal(names(dat@effect_times), !!teff_names)
+  info_names <- c("par_ell", "par_cont", "p_signal")
+  expect_equal(names(dat@info), !!info_names)
 })
+
+test_that("as.character method works for class lgpsim", {
+  dat <- simulate_data(
+    N = 16,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(2, 2),
+    lengthscales = c(6, 6, 6, 6),
+    relevances = c(1, 1, 0, 1),
+    names = c("sex", "location")
+  )
+  a <- as.character(dat)
+  expect_gt(nchar(a), 10)
+})
+
 
 test_that("poisson data can be simulated", {
-  expect_equal(
-    length(names(simulate_data(
-      N = 10,
-      t_data = seq(6, 36, by = 6),
-      covariates = c(2, 2),
-      noise_type = "poisson"
-    ))),
-    8
+  dat <- simulate_data(
+    N = 10,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(2, 2),
+    noise_type = "poisson"
   )
+  y <- dat@data$y
+  diff <- round(y) - y
+  expect_lt(max(diff), 1e-6)
 })
 
-test_that("neg binomial data can be simulated", {
-  expect_equal(
-    length(names(simulate_data(
-      N = 4,
-      t_data = c(1, 2, 3),
-      covariates = c(2, 2),
-      noise_type = "nb"
-    ))),
-    8
+
+test_that("negative binomial data can be simulated", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2, 2),
+    noise_type = "nb"
   )
+  y <- dat@data$y
+  diff <- round(y) - y
+  expect_lt(max(diff), 1e-6)
 })
 
+test_that("binomial data can be simulated", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2, 2),
+    noise_type = "binomial",
+    N_trials = 100
+  )
+  y <- dat@data$y
+  diff <- round(y) - y
+  expect_lt(max(diff), 1e-6)
+})
+
+test_that("different types of components can be simulated", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 1, 3, 4)
+  )
+  cnames <- c(
+    "id.age", "age", "diseaseAge", "x", "offset", "group",
+    "f", "g", "noise", "y"
+  )
+  expect_equal(names(dat@components), cnames)
+})
+
+test_that("disease component can be simulated only for selected individuals", {
+  dat <- simulate_data(
+    N = 8,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    N_affected = 2
+  )
+  n <- dim(dat@data)[1]
+  s <- sum(abs(dat@components$diseaseAge[13:n]))
+  expect_lt(s, 1e-6)
+})
+
+
+test_that("simulated effect time can be observed exactly", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "exact"
+  )
+  t <- c(21, 21, NaN, NaN)
+  et <- dat@effect_times
+  expect_equal(et$true, t)
+  expect_equal(et$observed, t)
+})
+
+
+test_that("simulated effect time can be observed late", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "after_1"
+  )
+  t1 <- c(21, 21, NaN, NaN)
+  t2 <- c(30, 30, NaN, NaN)
+  et <- dat@effect_times
+  expect_equal(et$true, t1)
+  expect_equal(et$observed, t2)
+})
+
+test_that("simulated effect time can be observed late randomly", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "random_0.5"
+  )
+  et <- dat@effect_times
+  expect_equal(length(et$true), 4)
+  expect_equal(length(et$observed), 4)
+})
+
+
+# -------------------------------------------------------------------------
+
+context("sim: plotting simulated data")
+
+test_that("simulated data can be plotted", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "after_1"
+  )
+  p <- plot(dat,
+    i_test = c(1, 2, 3), dotcolor = colorset("green", "dark"),
+    linecolor = "gray30", ncol = 4
+  )
+  expect_s3_class(p, "ggplot")
+})
 
 
 # -------------------------------------------------------------------------
@@ -70,6 +185,14 @@ test_that("base kernels work correctly", {
     dim(sim_kernel_ns(c(1, 1, 2), c(0, 1), ell = 1, a = 1, b = -10, c = 1)),
     c(3, 2)
   )
+})
+
+test_that("sim_kernel_beta works correctly", {
+  K <- sim_kernel_beta(c(0.1, 0.5, 1.0), c(1, 2, 3), c(1, 1, 2, 2, 3, 3))
+  expect_equal(dim(K), c(3, 6))
+  expect_equal(K[1, 1], 0.1)
+  expect_equal(K[2, 4], 0.5)
+  expect_equal(K[3, 6], 1.0)
 })
 
 test_that("base kernels give errors when supposed to", {

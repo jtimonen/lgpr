@@ -62,11 +62,12 @@ test_that("get_stan_model returns a stanmodel", {
 })
 
 test_that("color_set works", {
-  col1 <- color_set("blue")
-  col2 <- color_set("red")
+  col1 <- colorset("blue")
+  col2 <- colorset("red", "dark")
   expect_equal(nchar(col1), 7)
   expect_equal(nchar(col2), 7)
-  expect_error(color_set("definitely_not_a_color_name"))
+  expect_error(colorset("definitely_not_a_color_name"))
+  expect_error(colorset("green", "asdf"), "Invalid color")
 })
 
 # -------------------------------------------------------------------------

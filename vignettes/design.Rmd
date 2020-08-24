@@ -26,13 +26,13 @@ comment = "#"
 )
 ```
 
-```{r load}
+```{r load, message=FALSE}
 require("lgpr")
 ```
 
 ```{r plot_opts, echo=FALSE}
 # Define plot options
-color1 <- lgpr::color_set('blue')
+color1 <- lgpr::colorset('blue')
 LWD <- 2
 
 plotBox <- function(x, y, s, col){

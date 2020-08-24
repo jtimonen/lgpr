@@ -30,6 +30,13 @@ test_that("lgpmodel and lgpformula have character representations", {
   expect_gt(nchar(as.character(a)), 10)
 })
 
+test_that("prior can be parsed from stan_input", {
+  f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
+  m <- lgp_model(f, dat)
+  df <- prior_to_df(m@stan_input)
+  expect_equal(class(df), "data.frame")
+})
+
 test_that("quotes can be used in gp(), gp_warp() etc", {
   f <- y ~ gp("age") + categ("id") + categ(id) * gp_warp("age")
   m <- lgp_model(f, dat)

@@ -65,6 +65,17 @@ setMethod(
   }
 )
 
+#' @rdname as_character
+setMethod(
+  f = "as.character", signature = "lgpsim",
+  definition = function(x) {
+    desc <- "An object of class lgpsim with slots "
+    str <- paste(slotNames(x), collapse = ", ")
+    desc <- paste0(desc, "{", str, "}")
+    return(desc)
+  }
+)
+
 #' Character format of an lgpterm
 #'
 #' @param x an object of class \linkS4class{lgpterm}

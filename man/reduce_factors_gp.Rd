@@ -7,7 +7,7 @@
 reduce_factors_gp(factors)
 }
 \arguments{
-\item{factors}{list of \linkS4class{lgpexpression} objects}
+\item{factors}{list of \linkS4class{lgpexpr} objects}
 }
 \value{
 an updated list with no \code{gp*} expressions, and name of

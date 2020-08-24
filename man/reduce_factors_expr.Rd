@@ -7,7 +7,7 @@
 reduce_factors_expr(factors, expr)
 }
 \arguments{
-\item{factors}{list of \linkS4class{lgpexpression} objects}
+\item{factors}{list of \linkS4class{lgpexpr} objects}
 
 \item{expr}{the expression name to check}
 }

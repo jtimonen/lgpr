@@ -2,22 +2,31 @@
 % Please edit documentation in R/plot.R
 \name{plot}
 \alias{plot}
+\alias{plot,lgpsim,missing-method}
 \title{Visualize S4 class objects using the plot generic}
 \usage{
-\S4method{plot}{lgpfit,ANY}(fit, x = 1, y = 1, color_scheme = "red")
+\S4method{plot}{lgpfit,missing}(x, y, ...)
+
+\S4method{plot}{lgpsim,missing}(x, y, ...)
 }
 \arguments{
-\item{fit}{an object of class \linkS4class{lgpfit}}
+\item{x}{unused}
 
-\item{x}{does nothing}
+\item{y}{unused}
 
-\item{y}{does nothing}
-
-\item{color_scheme}{bayesplot color scheme}
+\item{...}{keyword arguments to be passed to the signature-specific plotting
+function}
 }
 \value{
-a ggplot object
+All methods return a \code{ggplot} object.
 }
 \description{
-Visualize S4 class objects using the plot generic
+Depending on the signature of the first argument, one
+of the following signature-specific plotting functions is called
+\itemize{
+    \item \code{\link{plot_relevances}} for objects with signature
+      \linkS4class{lgpfit}
+    \item \code{\link{sim_plot}} for objects with signature
+      \linkS4class{lgpsim}
+}
 }

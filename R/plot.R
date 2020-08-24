@@ -1,18 +1,34 @@
 #' Visualize S4 class objects using the plot generic
 #'
-#' @param x does nothing
-#' @param y does nothing
-#' @param color_scheme bayesplot color scheme
-#' @return a ggplot object
+#' @description Depending on the signature of the first argument, one
+#' of the following signature-specific plotting functions is called
+#' \itemize{
+#'     \item \code{\link{plot_relevances}} for objects with signature
+#'       \linkS4class{lgpfit}
+#'     \item \code{\link{sim_plot}} for objects with signature
+#'       \linkS4class{lgpsim}
+#' }
+#' @param x unused
+#' @param y unused
+#' @param ... keyword arguments to be passed to the signature-specific plotting
+#' function
+#' @return All methods return a \code{ggplot} object.
 #' @name plot
 
 #' @rdname plot
-#' @param fit an object of class \linkS4class{lgpfit}
 setMethod(
   f = "plot",
-  signature = "lgpfit",
-  definition = function(fit, x = 1, y = 1, color_scheme = "red") {
-    h <- plot_relevances(fit, color_scheme = color_scheme)
-    return(h)
+  signature = signature(x = "lgpfit", y = "missing"),
+  definition = function(x, ...) {
+    plot_relevances(x, ...)
+  }
+)
+
+#' @rdname plot
+setMethod(
+  f = "plot",
+  signature = signature(x = "lgpsim", y = "missing"),
+  definition = function(x, ...) {
+    sim_plot(x, ...)
   }
 )

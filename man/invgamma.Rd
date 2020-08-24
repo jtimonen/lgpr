@@ -19,7 +19,9 @@ plot_invgamma(
   by = 0.01,
   log = FALSE,
   IQR = 0.95,
-  return_quantiles = FALSE
+  return_quantiles = FALSE,
+  linecolor = colorset("red", "dark"),
+  fillcolor = colorset("red", "mid")
 )
 }
 \arguments{
@@ -35,15 +37,18 @@ plot_invgamma(
 
 \item{by}{grid size}
 
-\item{IQR}{inter-quantile range width for \code{plot_invgamma}}
+\item{IQR}{inter-quantile range width for \code{\link{plot_invgamma}}}
 
-\item{return_quantiles}{should \code{plot_invgamma} return a list}
+\item{return_quantiles}{\code{\link{plot_invgamma}} return a list}
+
+\item{linecolor}{line color}
+
+\item{fillcolor}{fill color}
 }
 \value{
 density/quantile value or ggplot object
 }
 \description{
 Using the same parametrization as Stan. More info
-\href{https://mc-stan.org/docs/2_24/functions-reference/
-inverse-gamma-distribution.html}{here}.
+\href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{here}.
 }

@@ -1,8 +1,7 @@
 #' Functions related to the inverse gamma distribution
 #'
 #' @description Using the same parametrization as Stan. More info
-#' \href{https://mc-stan.org/docs/2_24/functions-reference/
-#' inverse-gamma-distribution.html}{here}.
+#' \href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param x point where to compute the density
@@ -47,12 +46,16 @@ qinvgamma_stanlike <- function(p, alpha, beta) {
 }
 
 #' @param by grid size
-#' @param IQR inter-quantile range width for \code{plot_invgamma}
-#' @param return_quantiles should \code{plot_invgamma} return a list
+#' @param IQR inter-quantile range width for \code{\link{plot_invgamma}}
+#' @param return_quantiles \code{\link{plot_invgamma}} return a list
+#' @param linecolor line color
+#' @param fillcolor fill color
 #' @rdname invgamma
 plot_invgamma <- function(alpha, beta, by = 0.01,
                           log = FALSE, IQR = 0.95,
-                          return_quantiles = FALSE) {
+                          return_quantiles = FALSE,
+                          linecolor = colorset("red", "dark"),
+                          fillcolor = colorset("red", "mid")) {
 
   # Compute inter-quantile range
   if (IQR <= 0 || IQR >= 1) {
@@ -81,15 +84,13 @@ plot_invgamma <- function(alpha, beta, by = 0.01,
   t <- seq(q1, q2, length.out = length(t))
   y <- dinvgamma_stanlike(t, alpha = alpha, beta = beta, log = log)
   df_area <- data.frame(t, y)
-  line_color <- color_set("red")
-  fill_color <- color_set("red_muted")
   p1 <- p1 + ggplot2::geom_area(
     data = df_area,
     mapping = ggplot2::aes(x = t, y = y),
-    fill = fill_color
+    fill = fillcolor
   )
-  p1 <- p1 + ggplot2::geom_vline(xintercept = q1, color = line_color)
-  p1 <- p1 + ggplot2::geom_vline(xintercept = q2, color = line_color)
+  p1 <- p1 + ggplot2::geom_vline(xintercept = q1, color = linecolor)
+  p1 <- p1 + ggplot2::geom_vline(xintercept = q2, color = linecolor)
   p1 <- p1 + ggplot2::geom_line()
   q1r <- round(q1, 3)
   q2r <- round(q2, 3)

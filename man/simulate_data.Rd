@@ -122,20 +122,13 @@ where
 
 \item{N_trials}{The number of trials parameter for binomial data.}
 
-\item{verbose}{verbosity mode}
+\item{verbose}{Verbosity mode.}
 
 \item{force_zeromean}{Should each component (excluding the disease age
 component) be forced to have a zero mean?}
 }
 \value{
-A list \code{out}, where
-\itemize{
-  \item \code{out$data} is a data frame containing the actual data and
-  \item \code{out$components} contains more points for smoother
-  visualizations of the generating process.
-  \item \code{out$onsets} contains the real disease effect times
-  \item \code{out$p_signal} proportion of variance explained by signal
-}
+An object of class \linkS4class{lgpsim}.
 }
 \description{
 Generate an artificial longitudinal data set.
