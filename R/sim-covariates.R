@@ -84,7 +84,7 @@ sim_create_x_D <- function(covariates) {
 #' @param t_effect_range Time interval from which the disease effect times are
 #' sampled uniformly. Alternatively, This can any function that returns the
 #' (possibly randomly generated) real disease effect time for one individual.
-#' @returns a list
+#' @return a list
 sim_create_x_check <- function(n_categs, D, t_data, t_effect_range) {
 
   # Check length of n_categs
@@ -138,7 +138,7 @@ sim_create_x_check <- function(n_categs, D, t_data, t_effect_range) {
 #' @param D covariate type array
 #' @param age the age covariate
 #' @param t_effect_range Parsed version of \code{t_effect_range}
-#' @param return list
+#' @return list
 sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
   if (D[1] > 0) {
     N_cases <- round(N / 2)
@@ -188,7 +188,7 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
 #'   \item \code{c <- mu[3] + lambda[3]*stats::runif(1)}
 #' }
 #' @param dis_age a disease-age vector
-#' @returns a list
+#' @return a list
 sim_create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
   if (D[2] > 0) {
     mu <- continuous_info$mu

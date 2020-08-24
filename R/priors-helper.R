@@ -1,7 +1,7 @@
 #' Names of allowed  prior types
 #'
 #' @param idx an integer or NULL
-#' @param return a character vector
+#' @return a character vector
 prior_type_names <- function(idx = NULL) {
   names <- c(
     "Uniform", "Normal", "Student-t",

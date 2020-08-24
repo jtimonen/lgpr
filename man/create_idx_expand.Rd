@@ -12,8 +12,9 @@ create_idx_expand(components, x_cat, x_cont_mask)
 \item{x_cat}{the \code{x_cat} input for Stan}
 
 \item{x_cont_mask}{the \code{x_cont_mask} input for Stan}
-
-\item{return}{the \code{idx_expand} input for Stan}
+}
+\value{
+the \code{idx_expand} input for Stan
 }
 \description{
 Create idx_expand input for Stan

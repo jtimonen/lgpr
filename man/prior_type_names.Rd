@@ -8,8 +8,9 @@ prior_type_names(idx = NULL)
 }
 \arguments{
 \item{idx}{an integer or NULL}
-
-\item{return}{a character vector}
+}
+\value{
+a character vector
 }
 \description{
 Names of allowed  prior types

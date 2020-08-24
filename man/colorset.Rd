@@ -4,7 +4,7 @@
 \alias{colorset}
 \title{Plot colors to use}
 \usage{
-colorset(main, sub = "mid")
+colorset(main, variant = "mid")
 }
 \arguments{
 \item{main}{Color name. Must be a valid \code{bayesplot} color name.}
@@ -16,6 +16,6 @@ colorset(main, sub = "mid")
 A hex value of the color.
 }
 \description{
-Plot commands which specify the \code{col} argument should use a
-color that is specified here.
+Plot commands which specify the \code{col} argument should use
+colors that are obtained using this function.
 }

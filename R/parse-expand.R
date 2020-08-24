@@ -3,7 +3,7 @@
 #' @param components the \code{components} input for Stan
 #' @param x_cat the \code{x_cat} input for Stan
 #' @param x_cont_mask the \code{x_cont_mask} input for Stan
-#' @param return the \code{idx_expand} input for Stan
+#' @return the \code{idx_expand} input for Stan
 create_idx_expand <- function(components, x_cat, x_cont_mask) {
   x_fac <- create_idx_expand_picker(components, x_cat)
   inds <- as.numeric(which(components[, 4] + components[, 7] > 0))
@@ -26,7 +26,7 @@ create_idx_expand <- function(components, x_cat, x_cont_mask) {
 #' Helper function for creating the idx_expand input for Stan
 #'
 #' @inheritParams create_idx_expand
-#' @param return a vector of length \code{n_obs}
+#' @return a vector of length \code{n_obs}
 create_idx_expand_picker <- function(components, x_cat) {
   n_obs <- dim(x_cat)[2]
   inds <- c(components[, 4], components[, 7])
@@ -81,7 +81,7 @@ reduce_rows <- function(rows) {
 #' Helper function for creating the idx_expand input for Stan
 #'
 #' @inheritParams create_idx_expand
-#' @param return a vector of length \code{n_obs}
+#' @return a vector of length \code{n_obs}
 create_idx_expand_helper <- function(x_cat, x_cont_mask) {
   x_cat[x_cont_mask == 1] <- -1
   out <- as.numeric(as.factor(x_cat)) + 1

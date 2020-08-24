@@ -10,8 +10,9 @@ create_idx_expand_helper(x_cat, x_cont_mask)
 \item{x_cat}{the \code{x_cat} input for Stan}
 
 \item{x_cont_mask}{the \code{x_cont_mask} input for Stan}
-
-\item{return}{a vector of length \code{n_obs}}
+}
+\value{
+a vector of length \code{n_obs}
 }
 \description{
 Helper function for creating the idx_expand input for Stan

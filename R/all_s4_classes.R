@@ -71,7 +71,7 @@ lgpscaling <- setClass("lgpscaling",
 #'   \item \code{y} - Response variable normalization function and its
 #'   inverse operation. Must be an \linkS4class{lgpscaling} object.
 #'   \item \code{x_cont} - Continous covariate normalization functions and
-#'   theirvinverse operations. Must be a named list with each element is an
+#'   their inverse operations. Must be a named list with each element is an
 #'   \linkS4class{lgpscaling} object.
 #' }
 #' @slot var_info A named list with fields

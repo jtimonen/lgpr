@@ -18,8 +18,9 @@ sim_create_x_dis_age(X, k, N, D, age, t_effect_range)
 \item{age}{the age covariate}
 
 \item{t_effect_range}{Parsed version of \code{t_effect_range}}
-
-\item{return}{list}
+}
+\value{
+list
 }
 \description{
 Helper function for sim_create_x
