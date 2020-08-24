@@ -42,8 +42,8 @@ get_stream <- function() {
 
 #' List elements to matrix rows
 #'
-#' @param x a listof length \code{m} where each element is a vector of
-#' length code \code{n}
+#' @param x a list of length \code{m} where each element is a vector of
+#' length \code{n}
 #' @param n length of each vector
 #' @return a matrix with shape \code{m} x \code{n}
 list_to_matrix <- function(x, n) {
@@ -53,6 +53,20 @@ list_to_matrix <- function(x, n) {
     A[i, ] <- x[[i]]
   }
   as.matrix(A)
+}
+
+#' Matrix rows to a list
+#'
+#' @param x a matrix or array with \code{m} rows and \code{n} columns
+#' @return an unnamed list of length \code{m} where each element is a
+#' vector of length \code{n}
+matrix_to_list <- function(x) {
+  m <- dim(x)[1]
+  L <- list()
+  for (i in seq_len(m)) {
+    L[[i]] <- x[i, ]
+  }
+  return(L)
 }
 
 #' Names that the list given as data to Stan should contain
@@ -161,21 +175,4 @@ get_pkg_description <- function() {
 #' @return an object of class stanmodel
 get_stan_model <- function() {
   return(stanmodels[["lgp"]])
-}
-
-#' Get covariate names for a model
-#'
-#' @param model an object of class \linkS4class{lgpmodel}
-#' @param type what types of covariates to include. Must be either
-#' "all", "categorical" or "continuous".
-#' @return A string where names are separated by a comma.
-covariate_names <- function(model, type = "all") {
-  allowed <- c("continuous", "categorical", "all")
-  nam1 <- model@var_names$x_cont
-  nam2 <- model@var_names$x_cat
-  nam3 <- c(nam1, nam2)
-  names <- list(nam1, nam2, nam3)
-  idx <- argument_check(arg = type, allowed = allowed)
-  out <- names[[idx]]
-  paste(out, collapse = ", ")
 }

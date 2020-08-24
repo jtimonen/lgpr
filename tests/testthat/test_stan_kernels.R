@@ -111,3 +111,78 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
   expect_error(STAN_kernel_base_var_mask(x, x, 1, c(0.05, NaN), STREAM))
   expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6), STREAM))
 })
+
+
+
+# -------------------------------------------------------------------------
+
+context("Stan kernels: kernel arrays")
+
+# Create test input
+sim <- simulate_data(
+  N = 4,
+  t_data = seq(6, 36, by = 6),
+  covariates = c(0, 1, 2, 3),
+  lengthscales = rep(12, 5),
+  relevances = rep(1, 6),
+  t_jitter = 0.5
+)
+
+# Model
+m <- lgp_model(y ~ zerosum(id) * gp(age) + gp_warp_vm(diseaseAge) +
+                 categ(z) + gp(age) + gp(x),
+               data = sim@data
+)
+
+# Input
+input <- m@stan_input
+x_cat <- input$x_cat
+x_mask <- input$x_cont_mask
+num_levels <- input$x_cat_num_levels
+comp <- input$components
+K_const <- kernel_const_all(x_cat, x_cat, x_mask, x_mask, num_levels, comp)
+
+# Params
+alpha <- c(1, 1, 1, 1, 1)
+ell <- c(1, 1, 1, 1)
+x <- input$x_cont
+x_unnorm <- input$x_cont_unnorm
+vm_params <- input$vm_params
+ix <- input$idx_expand
+
+# All kernels
+K <- kernel_all(
+  K_const, comp, x, x, x_unnorm, x_unnorm,
+  alpha, ell, 0.5, list(), list(),
+  vm_params, ix, ix, input$teff_obs
+)
+
+test_that("kernel_const_all works correctly", {
+  expect_equal(length(K_const), 5)
+  expect_equal(dim(K_const[[1]]), c(24, 24))
+  S1 <- sum(K_const[[1]])
+  expect_lt(abs(S1), 1e-6)
+  expect_equal(sum(K_const[[4]]), 24 * 24)
+  expect_equal(sum(K_const[[5]]), 24 * 24)
+})
+
+test_that("kernel_all works correctly", {
+  expect_equal(length(K), 5)
+  expect_equal(dim(K[[1]]), c(24, 24))
+})
+
+context("Stan GP posterior")
+
+test_that("gp_posterior works correctly", {
+  y <- sim@data$y
+  fp <- gp_posterior(K, y, 1e-6, 1.0)
+  expect_equal(length(fp), 12)
+  
+  # test that componentwise means sum to total mean
+  f_sum <- fp[[1]]
+  for (j in 2:5) {
+    f_sum <- f_sum + fp[[j]]
+  }
+  diff <- f_sum - fp[[6]]
+  expect_lt(max(abs(diff)), 1e-6)
+})

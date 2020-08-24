@@ -1,12 +1,24 @@
 library(lgpr)
-library(rstan)
-
-context("Stan stream")
-STREAM <- get_stream()
 
 # -------------------------------------------------------------------------
 
-context("Stan GP posterior")
+
+
+# Create test input
+sim <- simulate_data(
+  N = 4,
+  t_data = seq(6, 36, by = 6),
+  covariates = c(0, 1, 2, 3),
+  lengthscales = rep(12, 5),
+  relevances = rep(1, 6),
+  t_jitter = 0.5
+)
+
+# Model
+m <- lgp_model(y ~ zerosum(id) * gp(age) + gp_warp_vm(diseaseAge) +
+                 categ(z) + gp(age) + gp(x),
+               data = sim@data
+)
 
 test_that("componentwise means sum to total mean", {
   N <- 3
@@ -27,10 +39,7 @@ test_that("componentwise means sum to total mean", {
   y <- rep(1, n1)
 
   fp <- STAN_gp_posterior(KX, y, 1e-6, 1.0, STREAM)
-  f_sum <- fp[[1]]
-  for (j in 2:6) {
-    f_sum <- f_sum + fp[[j]]
-  }
+
   diff <- f_sum - fp[[7]]
   expect_lt(max(abs(diff)), 1e-6)
 })

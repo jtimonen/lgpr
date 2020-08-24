@@ -7,8 +7,8 @@
 list_to_matrix(x, n)
 }
 \arguments{
-\item{x}{a listof length \code{m} where each element is a vector of
-length code \code{n}}
+\item{x}{a list of length \code{m} where each element is a vector of
+length \code{n}}
 
 \item{n}{length of each vector}
 }

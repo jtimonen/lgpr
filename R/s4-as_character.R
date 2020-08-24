@@ -55,8 +55,8 @@ setMethod(
 setMethod(
   f = "as.character", signature = "lgpmodel",
   definition = function(x) {
-    str1 <- covariate_names(x, type = "continuous")
-    str2 <- covariate_names(x, type = "categorical")
+    str1 <- get_covariate_names(x, type = "continuous")
+    str2 <- get_covariate_names(x, type = "categorical")
     desc <- "An object of class lgpmodel.\n"
     desc <- paste0(desc, "\nFormula: ", x@model_formula@call)
     desc <- paste0(desc, "\nContinuous: {", str1, "}")
@@ -81,21 +81,23 @@ setMethod(
   f = "as.character", signature = "lgpfit",
   definition = function(x) {
     desc <- "\n ---------- LGPFIT SUMMARY ----------\n\n"
-    
+
     # Runtime info
     tryCatch(
       {
         runtime <- get_runtime(x)
-        desc <- paste0(desc, "* Average runtime per chain: ",
-                       runtime$warmup, " s (warmup) and ",
-                       runtime$sampling, " s (sampling)\n")
+        desc <- paste0(
+          desc, "* Average runtime per chain: ",
+          runtime$warmup, " s (warmup) and ",
+          runtime$sampling, " s (sampling)\n"
+        )
       },
       error = function(e) {
         cat("* Unable to show runtime info. Reason:\n")
         print(e)
       }
     )
-    
+
     # Convergence info
     tryCatch(
       {
@@ -103,15 +105,17 @@ setMethod(
         Rhat <- diag$Rhat
         imax <- which(Rhat == max(Rhat))
         rhat_str <- round(max(Rhat), 4)
-        desc <- paste0(desc, "* Largest R-hat value is ", rhat_str, " (", 
-                       paste(rownames(diag)[imax], collapse = ", "), ")\n")
+        desc <- paste0(
+          desc, "* Largest R-hat value is ", rhat_str, " (",
+          paste(rownames(diag)[imax], collapse = ", "), ")\n"
+        )
       },
       error = function(e) {
         cat("* Unable to show convergence info. Reason:\n")
         print(e)
       }
     )
-    
+
     # Relevance info
     tryCatch(
       {
@@ -121,14 +125,14 @@ setMethod(
         tr <- sel$threshold
         cat("* Used relevance method = ", rel_method, "\n", sep = "")
         cat("* Used selection threshold = ", tr, "\n", sep = "")
-        
+
         rel <- x@relevances$average
         cn <- names(rel)
         r1 <- round(rel, 3)
         r2 <- cn %in% sel$selected
         DF <- data.frame(r1, r2, r3)
         cat("\n")
-        
+
         colnames(DF) <- c("Relevance", "Selected", "Prob.")
         print(DF)
         cat("\n")
