@@ -91,23 +91,15 @@ lgpmodel <- setClass("lgpmodel",
   )
 )
 
-#' An S4 class to represent the output of the \code{lgp_fit} function
+#' An S4 class to represent the output of the \code{lgp} function
 #'
-#' @slot stan_fit The \code{stanfit} object returned by \code{rstan::sampling}.
-#' @slot model The \code{lgpmodel} object returned by \code{lgp_model}.
-#' @slot relevances Inferred component relevances.
-#' @slot selection Component selection info.
-#' @slot pkg_version Package version number.
-#' @slot diagnostics  A data frame with columns
-#' \code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.
+#' @slot stan_fit An object of class \code{stanfit}.
+#' @slot model An object of class \code{lgpmodel}.
+#' @seealso The main function \code{\link{lgp}}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
-    model = "lgpmodel",
-    relevances = "list",
-    selection = "list",
-    pkg_version = "character",
-    diagnostics = "data.frame"
+    model = "lgpmodel"
   )
 )
 

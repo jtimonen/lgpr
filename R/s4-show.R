@@ -18,8 +18,10 @@ setMethod(
   f = "show",
   signature = "lgpfit",
   definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
+    call <- object@model@model_formula@call
+    info <- paste0('Model formula: ', call, "\n\n")
+    cat(info)
+    print(object@stan_fit, pars = "f_post", include = FALSE)
   }
 )
 

@@ -4,24 +4,18 @@
 \name{lgpfit-class}
 \alias{lgpfit-class}
 \alias{lgpfit}
-\title{An S4 class to represent the output of the \code{lgp_fit} function}
+\title{An S4 class to represent the output of the \code{lgp} function}
 \description{
-An S4 class to represent the output of the \code{lgp_fit} function
+An S4 class to represent the output of the \code{lgp} function
 }
 \section{Slots}{
 
 \describe{
-\item{\code{stan_fit}}{The \code{stanfit} object returned by \code{rstan::sampling}.}
+\item{\code{stan_fit}}{An object of class \code{stanfit}.}
 
-\item{\code{model}}{The \code{lgpmodel} object returned by \code{lgp_model}.}
-
-\item{\code{relevances}}{Inferred component relevances.}
-
-\item{\code{selection}}{Component selection info.}
-
-\item{\code{pkg_version}}{Package version number.}
-
-\item{\code{diagnostics}}{A data frame with columns
-\code{c("Rhat", "Bulk_ESS", "Tail_ESS")}.}
+\item{\code{model}}{An object of class \code{lgpmodel}.}
 }}
 
+\seealso{
+The main function \code{\link{lgp}}.
+}

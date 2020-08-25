@@ -8,7 +8,6 @@
 #'   block of Stan is skipped.
 #'   \item \code{delta} Amount of added jitter to ensure positive definite
 #'   covariance matrices.
-#'   \item \code{verbose} Should more verbose output be printed?
 #' }
 #' @return a named list of parsed options
 parse_options <- function(options = NULL) {
@@ -16,7 +15,6 @@ parse_options <- function(options = NULL) {
 
   # Set defaults
   opts <- list(
-    verbose = FALSE,
     skip_generated = FALSE,
     sample_f = FALSE,
     delta = 1e-8
@@ -31,7 +29,6 @@ parse_options <- function(options = NULL) {
 
   # Format for Stan input
   list(
-    is_verbose = as.numeric(opts$verbose),
     is_generated_skipped = as.numeric(opts$skip_generated),
     is_f_sampled = as.numeric(opts$sample_f),
     delta = opts$delta

@@ -75,7 +75,6 @@ model.}
   block of Stan is skipped.
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
-  \item \code{verbose} Should more verbose output be printed?
 }}
 
 \item{verbose}{Should more verbose output be printed?}

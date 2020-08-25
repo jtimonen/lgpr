@@ -8,7 +8,6 @@
 \alias{as.character,lgpformula-method}
 \alias{as.character,lgpmodel-method}
 \alias{as.character,lgpsim-method}
-\alias{as.character,lgpfit-method}
 \title{Character representations of different S4 objects}
 \usage{
 \S4method{as.character}{lgpexpr}(x)
@@ -22,8 +21,6 @@
 \S4method{as.character}{lgpmodel}(x)
 
 \S4method{as.character}{lgpsim}(x)
-
-\S4method{as.character}{lgpfit}(x)
 }
 \arguments{
 \item{x}{an object of some S4 class}

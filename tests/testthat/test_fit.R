@@ -15,12 +15,12 @@ dat <- data.frame(age, dis_age, id, sex, y)
 
 # -------------------------------------------------------------------------
 
-context("Main stan model")
+context("Main function lgp_fit")
 
 test_that("stan model can be sampled with minimal input", {
   m <- lgp_model(y ~ gp(age) + categ(sex), dat)
   suppressWarnings({
-    fit <- lgp_fit(m, chains = 1, iter = 100, refresh = 0)
+    fit <- lgp_sampling(m, chains = 1, iter = 100, refresh = 0)
     lp <- rstan::extract(fit)$lp__
     expect_equal(length(lp), 50)
   })
@@ -31,7 +31,7 @@ test_that("stan model can be sampled with various components", {
   stan_data <- m@stan_input
 
   suppressWarnings({
-    fit <- lgp_fit(m, chains = 1, iter = 10, refresh = 0)
+    fit <- lgp_sampling(m, chains = 1, iter = 10, refresh = 0)
     lp <- rstan::extract(fit)$lp__
     expect_equal(length(lp), 5)
   })

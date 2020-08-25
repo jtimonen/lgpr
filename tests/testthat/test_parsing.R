@@ -105,7 +105,7 @@ test_that("parse_formula throws error if invalid function or covariate", {
 
 test_that("parse_options does not need arguments", {
   a <- parse_options()
-  e <- c("is_verbose", "is_generated_skipped", "is_f_sampled", "delta")
+  e <- c("is_generated_skipped", "is_f_sampled", "delta")
   expect_equal(names(a), e)
 })
 
@@ -263,10 +263,6 @@ test_that("a formula  term cannot have more than 4 expressions", {
     "term can have at most four expressions! found = 5"
   )
 })
-
-# test_that("terms with uncrt() or heter() expression must contain a gp expr", {
-#  print("TODO")
-# })
 
 test_that("an lgpmodel has correct list fields for stan input", {
   m <- lgp_model(y ~ gp(age) + zerosum(id), dat, options = list(delta = 1e-5))

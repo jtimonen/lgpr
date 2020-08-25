@@ -46,6 +46,9 @@ lgp_model <- function(formula,
   if (verbose) {
     cat(parsed$info)
   }
+  
+  # Other
+  list_other <- list(is_verbose = as.numeric(verbose))
 
   # Create slots of the 'lgpmodel' object
   stan_input <- c(
@@ -54,7 +57,8 @@ lgp_model <- function(formula,
     list_y,
     list_lh,
     list_x,
-    list_prior
+    list_prior,
+    list_other
   )
   info <- list(created = date(), pkg_desc = get_pkg_description())
   var_scalings <- list(y = y_scaling, x_cont = x_cont_scalings)
