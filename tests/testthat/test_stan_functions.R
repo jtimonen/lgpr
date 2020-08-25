@@ -1,15 +1,13 @@
 library(lgpr)
 
-context("Stan stream")
-STREAM <- get_stream()
+# 1. STAN UTILS -----------------------------------------------------------
 
+context("Stan utils")
+
+STREAM <- get_stream()
 test_that("rstan::get_stream is in namespace", {
   expect_true(class(STREAM) == "externalptr")
 })
-
-# 1. STAN UTILS -----------------------------------------------------------
-
-context("Stan utils: input warping")
 
 test_that("STAN_warp_input works for scalar input", {
   w <- STAN_warp_input(-1, 1.32, STREAM)
@@ -38,9 +36,6 @@ test_that("STAN_warp_input works similarly as reference", {
   )
 })
 
-
-context("Stan utils: variance masking")
-
 test_that("STAN_var_mask works for scalar input", {
   m <- STAN_var_mask(-1, 1.32, STREAM)
   expect_equal(m, 0.2108183)
@@ -68,9 +63,6 @@ test_that("STAN_var_mask works similarly as reference", {
   )
 })
 
-
-context("Stan utils: expanding a vector")
-
 test_that("STAN_expand works for valid input", {
   p <- c(0.1, 0.2)
   v <- STAN_expand(p, c(2, 3, 2, 3), STREAM)
@@ -84,9 +76,6 @@ test_that("STAN_expand errors when idx_expand has out of bounds indices", {
   expect_error(STAN_expand(p, idx1, STREAM))
   expect_error(STAN_expand(p, idx2, STREAM))
 })
-
-
-context("Stan utils: editing a covariate according to uncertainty")
 
 test_that("STAN_edit_x_cont works properly", {
   x_dis_age <- c(
@@ -104,9 +93,6 @@ test_that("STAN_edit_x_cont works properly", {
   expect_equal(t_edit, t_expect)
 })
 
-
-context("Stan utils: validitity checks")
-
 test_that("STAN_check_prob_positive works properly", {
   expect_error(STAN_check_prob_positive(1.1, STREAM))
   expect_error(STAN_check_prob_positive(-0.1, STREAM))
@@ -122,8 +108,7 @@ test_that("STAN_check_real_positive works properly", {
 # 2. STAN PRIORS ----------------------------------------------------------
 
 require(stats)
-
-context("Stan priors: log density")
+context("Stan priors")
 
 test_that("normal prior is correct", {
   x <- 0.333
@@ -168,8 +153,6 @@ test_that("log-normal prior is correct", {
   expect_equal(log_p, stats::dlnorm(!!x, !!mu, !!sigma, log = TRUE))
 })
 
-context("Stan priors: log det of Jacobian of a transformation")
-
 test_that("square transform is taken into account", {
   x <- 0.333
   mu <- -0.11
@@ -180,8 +163,6 @@ test_that("square transform is taken into account", {
     stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
   )
 })
-
-context("Stan priors: error handling")
 
 test_that("an error is thrown if <types> is misspecified", {
   x <- 1

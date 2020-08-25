@@ -36,7 +36,7 @@ plot_data <- function(data,
   h <- h + ggplot2::geom_line() + ggplot2::geom_point()
   h <- h + ggplot2::ggtitle(label = titles$main, subtitle = titles$sub)
   if (!is.null(facet_by)) {
-    f <- as.formula(paste("~", facet_by))
+    f <- stats::as.formula(paste("~", facet_by))
     h <- h + ggplot2::facet_wrap(f)
   }
   num_colors <- plot_data_num_colors(df, color_by)

@@ -2,11 +2,11 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
-context("sim: simulating data")
+context("Simulating data (sim)")
 
 test_that("gaussian data can be simulated", {
   dat <- simulate_data(
-    N = 16,
+    N = 8,
     t_data = seq(6, 36, by = 6),
     covariates = c(2, 2),
     lengthscales = c(6, 6, 6, 6),
@@ -25,7 +25,7 @@ test_that("gaussian data can be simulated", {
 
 test_that("as.character method works for class lgpsim", {
   dat <- simulate_data(
-    N = 16,
+    N = 8,
     t_data = seq(6, 36, by = 6),
     covariates = c(2, 2),
     lengthscales = c(6, 6, 6, 6),
@@ -39,7 +39,7 @@ test_that("as.character method works for class lgpsim", {
 
 test_that("poisson data can be simulated", {
   dat <- simulate_data(
-    N = 10,
+    N = 8,
     t_data = seq(6, 36, by = 6),
     covariates = c(2, 2),
     noise_type = "poisson"
@@ -141,11 +141,6 @@ test_that("simulated effect time can be observed late randomly", {
   expect_equal(length(et$observed), 4)
 })
 
-
-# -------------------------------------------------------------------------
-
-context("sim: plotting simulated data")
-
 test_that("simulated data can be plotted", {
   dat <- simulate_data(
     N = 4,
@@ -163,8 +158,7 @@ test_that("simulated data can be plotted", {
 
 # -------------------------------------------------------------------------
 
-context("sim: kernel functions")
-library(lgpr)
+context("Kernel functions (sim)")
 
 test_that("base kernels work correctly", {
   expect_equal(

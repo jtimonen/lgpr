@@ -173,7 +173,7 @@ stan_data_components <- function(model_formula, covariates) {
   num_cases <- length(unique(idx_expand[idx_expand != 0]))
   num_ns <- sum(components[, 5] != 0)
   num_vm <- sum(components[, 6] != 0)
-  VM <- c(0.95, 1)
+  VM <- default_vm_params()
   vm_params <- matrix(rep(VM, num_ns), num_ns, 2, byrow = TRUE)
 
   to_stan <- list(
@@ -246,7 +246,7 @@ term_to_numeric <- function(term, covariates) {
   # Check nonstationary options
   gpk <- parsed$gp_kernel
   if (!is.null(gpk)) {
-    is_warped <- parsed$gp_kernel %in% c("gp_warp_vm", "gp_warp_vm")
+    is_warped <- parsed$gp_kernel %in% c("gp_warp", "gp_warp_vm")
     is_vm <- parsed$gp_kernel == "gp_warp_vm"
   } else {
     is_warped <- FALSE

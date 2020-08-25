@@ -19,7 +19,7 @@ add_categorical_covariate <- function(data, x, id_var = "id") {
   for (id in uid) {
     i_data <- which(data_id == id)
     i_new <- which(x_id == id)
-    xx[i_data] <- x[i_new]
+    xx[i_data] <- as.factor(x[i_new])
   }
   data[[name]] <- xx
   return(data)

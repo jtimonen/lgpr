@@ -1,11 +1,9 @@
 library(lgpr)
-
-context("Stan stream")
 STREAM <- get_stream()
 
 # -------------------------------------------------------------------------
 
-context("Stan base kernels: zero-sum kernel")
+context("Stan base kernels")
 
 test_that("zero-sum kernel works correctly", {
   M <- 2
@@ -35,9 +33,6 @@ test_that("zero-sum kernel errors if number of categories is one", {
   expect_error(STAN_kernel_base_zerosum(x, x, M, STREAM))
 })
 
-
-context("Stan base kernels: ordinary categorical kernel")
-
 test_that("categorical kernel works correctly", {
   x <- c(1, 1, 2)
   a <- c(
@@ -50,9 +45,6 @@ test_that("categorical kernel works correctly", {
   expect_equal(K, K_expect)
 })
 
-
-context("Stan base kernels: binary mask kernel")
-
 test_that("binary mask kernel works correctly", {
   x <- c(0, 0, 1)
   a <- c(
@@ -64,9 +56,6 @@ test_that("binary mask kernel works correctly", {
   K <- STAN_kernel_base_bin_mask(x, x, STREAM)
   expect_equal(K, K_expect)
 })
-
-
-context("Stan base kernels: variance mask kernel")
 
 test_that("variance mask kernel works correctly", {
   x <- c(12, 0, 12)
@@ -81,9 +70,6 @@ test_that("variance mask kernel works correctly", {
   K <- STAN_kernel_base_var_mask(x, x, stp, vm_params, STREAM)
   expect_equal(K, K_expect)
 })
-
-
-context("Stan base kernels: variance mask kernel")
 
 test_that("variance mask kernel works similarly as reference", {
   x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
@@ -116,7 +102,7 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
 
 # -------------------------------------------------------------------------
 
-context("Stan kernels: kernel arrays")
+context("Stan high-level functions")
 
 # Create test input
 sim <- simulate_data(
@@ -170,8 +156,6 @@ test_that("kernel_all works correctly", {
   expect_equal(length(K), 5)
   expect_equal(dim(K[[1]]), c(24, 24))
 })
-
-context("Stan GP posterior")
 
 test_that("gp_posterior works correctly", {
   y <- sim@data$y

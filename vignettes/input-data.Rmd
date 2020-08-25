@@ -30,7 +30,7 @@ require("lgpr")
 The main function of the `lgpr` package is called `lgp`, and it takes a model formula and data frame as input. The data is passed in the so called wide format, meaning that one row corresponds to one data point and there will be one column for each covariate. An example of a valid data frame could be created as below. 
 
 ```{r ex1}
-id   <- rep(1:4, each = 5)
+id   <- as.factor(rep(1:4, each = 5))
 age  <- rep(c(12,24,36,48,60), times = 4)
 data <- data.frame(id, age)
 ```
@@ -46,14 +46,14 @@ Suppose that we want to add a categorical covariate `sex` to the above data fram
 
 ```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 sex <- c('Male', 'Female', 'Female', 'Male')
-id <- c(1:4)
+id <- c(1,2,3,4)
 sex_data <- data.frame(id, sex)
 knitr::kable(t(sex_data))
 ```
 
 The `add_categorical_covariates` function adds a categorical covariate based on a named vector, where the names indicate the individual ID.
 ```{r add1, fig.width=6.6, fig.height=4}
-sex <- c(0, 1, 1, 0) # 0 = Male, 1 = Female
+sex <- as.factor(c('Male', 'Female', 'Female', 'Male'))
 names(sex) <- c(1, 2, 3, 4) # name the vector elements to indicate individual IDs
 data <- add_categorical_covariate(data, sex)
 ```
@@ -94,9 +94,9 @@ data$y <- y
 ## Visualizing data
 Dataframes that are valid inputs for `lgp` can be visualized using `plot_data`.
 ```{r plot1, fig.width=6.6, fig.height=4}
-plot_data(data, highlight = 'sex', response = "y")
+#plot_data(data, color_by = 'sex')
 ```
 
 ```{r plot2, fig.width=6.6, fig.height=4}
-plot_data(data, highlight = 'diseaseAge', response = "y")
+#plot_data(data, color_by = 'group')
 ```

@@ -176,3 +176,10 @@ get_pkg_description <- function() {
 get_stan_model <- function() {
   return(stanmodels[["lgp"]])
 }
+
+#' Default variance masking function parameters are defined here
+#'
+#' @return two numbers
+default_vm_params <- function() {
+  c(0.025, 1)
+}
