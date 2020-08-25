@@ -46,7 +46,7 @@ lgp_model <- function(formula,
   if (verbose) {
     cat(parsed$info)
   }
-  
+
   # Other
   list_other <- list(is_verbose = as.numeric(verbose))
 

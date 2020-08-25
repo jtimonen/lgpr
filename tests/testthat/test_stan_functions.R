@@ -10,55 +10,55 @@ test_that("rstan::get_stream is in namespace", {
 })
 
 test_that("STAN_warp_input works for scalar input", {
-  w <- STAN_warp_input(-1, 1.32, STREAM)
+  w <- warp_input(-1, 1.32)
   expect_equal(w, -0.5783634)
 })
 
 test_that("STAN_warp_input works for vector input", {
-  w <- STAN_warp_input(c(-1, 0, 1), 1.32, STREAM)
+  w <- warp_input(c(-1, 0, 1), 1.32)
   w_correct <- c(-0.5783634, 0.0, 0.5783634)
   expect_equal(w, w_correct)
 })
 
 test_that("STAN_warp_input errors with invalid steepness input", {
-  expect_error(STAN_warp_input(1, -1, STREAM))
-  expect_error(STAN_warp_input(1, 0.0, STREAM))
-  expect_error(STAN_warp_input(1, NaN, STREAM))
-  expect_error(STAN_warp_input(1, Inf, STREAM))
+  expect_error(warp_input(1, -1))
+  expect_error(warp_input(1, 0.0))
+  expect_error(warp_input(1, NaN))
+  expect_error(warp_input(1, Inf))
 })
 
 test_that("STAN_warp_input works similarly as reference", {
   a <- exp(stats::rnorm(1)) # random steepness
   x <- seq(-3, 3, by = 1.33)
   expect_equal(
-    STAN_warp_input(x, a, STREAM),
+    warp_input(x, a),
     sim_warp_input(x, a, 0, 1)
   )
 })
 
 test_that("STAN_var_mask works for scalar input", {
-  m <- STAN_var_mask(-1, 1.32, STREAM)
+  m <- var_mask(-1, 1.32)
   expect_equal(m, 0.2108183)
 })
 
 test_that("STAN_var_mask works for vector input", {
-  m <- STAN_var_mask(c(-1, 0, 1), 1.32, STREAM)
+  m <- var_mask(c(-1, 0, 1), 1.32)
   m_correct <- c(0.2108183, 0.5, 0.7891817)
   expect_equal(m, m_correct)
 })
 
 test_that("STAN_var_mask errors with invalid steepness input", {
-  expect_error(STAN_var_mask(1, -1, STREAM))
-  expect_error(STAN_var_mask(1, 0.0, STREAM))
-  expect_error(STAN_var_mask(1, NaN, STREAM))
-  expect_error(STAN_var_mask(1, Inf, STREAM))
+  expect_error(var_mask(1, -1))
+  expect_error(var_mask(1, 0.0))
+  expect_error(var_mask(1, NaN))
+  expect_error(var_mask(1, Inf))
 })
 
 test_that("STAN_var_mask works similarly as reference", {
   a <- 0.6
   x <- c(-5, 0, 5)
   expect_equal(
-    STAN_var_mask(x, a, STREAM),
+    var_mask(x, a),
     sim_var_mask(x, a)
   )
 })

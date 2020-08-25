@@ -1,16 +1,3 @@
-#' Deprecated function. Use plot_posterior_components instead.
-#'
-#' @export
-#' @param fit fit
-#' @param ... other arguments
-#' @return Nothing. Throws an error when called.
-plot_components_posterior <- function(fit, ...) {
-  stop(
-    "plot_components_posterior is deprecated. ",
-    "Use plot_posterior_components instead."
-  )
-}
-
 #' Plot posterior of f
 #'
 #' @export

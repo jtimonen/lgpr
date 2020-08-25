@@ -14,8 +14,7 @@ plot_data(
   highlight = NULL,
   main = NULL,
   sub = NULL,
-  psize = 2,
-  lwd = 0.5
+  fit = NULL
 )
 }
 \arguments{
@@ -38,9 +37,8 @@ that is highlighted. Can only be used if \code{color_by} is \code{NULL}.}
 
 \item{sub}{plot subtitle}
 
-\item{psize}{point size}
-
-\item{lwd}{line width}
+\item{fit}{An object of class \linkS4class{lgpfit}. If this is provided,
+also the model fit is plotted.}
 }
 \value{
 a \code{ggplot} object

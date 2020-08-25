@@ -85,3 +85,25 @@ kernel_all <- function(K_const, components, x1, x2, x1_unnorm, x2_unnorm,
 gp_posterior <- function(KX, y, delta, sigma, STREAM = get_stream()) {
   STAN_gp_posterior(KX, y, delta, sigma, STREAM)
 }
+
+#' Input warping function
+#'
+#' @description This is a wrapper for \code{STAN_warp_input}
+#' @param x a numeric vector
+#' @param a steepness parameter
+#' @param STREAM an external pointer
+#' @return a vector
+warp_input <- function(x, a, STREAM = get_stream()) {
+  STAN_warp_input(x, a, STREAM)
+}
+
+#' Variance masking function
+#'
+#' @description This is a wrapper for \code{STAN_var_mask}
+#' @param x a numeric vector
+#' @param a steepness parameter
+#' @param STREAM an external pointer
+#' @return a vector
+var_mask <- function(x, a, STREAM = get_stream()) {
+  STAN_var_mask(x, a, STREAM)
+}

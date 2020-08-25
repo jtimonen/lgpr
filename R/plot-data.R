@@ -11,8 +11,8 @@
 #' that is highlighted. Can only be used if \code{color_by} is \code{NULL}.
 #' @param main main plot title
 #' @param sub plot subtitle
-#' @param psize point size
-#' @param lwd line width
+#' @param fit An object of class \linkS4class{lgpfit}. If this is provided,
+#' also the model fit is plotted.
 #' @return a \code{ggplot} object
 plot_data <- function(data,
                       x_name = "age",
@@ -23,8 +23,7 @@ plot_data <- function(data,
                       highlight = NULL,
                       main = NULL,
                       sub = NULL,
-                      psize = 2,
-                      lwd = 0.5) {
+                      fit = NULL) {
   titles <- plot_data_titles(main, sub, data, group_by)
   df <- data[c(x_name, y_name, group_by, color_by, facet_by)]
   df <- plot_data_add_highlight_factor(df, group_by, highlight)
@@ -44,8 +43,23 @@ plot_data <- function(data,
     values <- color_palette(num_colors)
     h <- h + ggplot2::scale_color_manual(values = values)
   }
+  h <- plot_data_add_fit(h, fit)
+
   return(h)
 }
+
+#' Add model fit to data plot
+#'
+#' @inheritParams plot_data
+#' @param h the current \code{ggplot} object
+#' @return a modified \code{ggplot} object
+plot_data_add_fit <- function(h, fit){
+  if (!is.null(fit)) {
+    print(fit)
+  }
+  return(h)
+}
+
 
 #' Create aes for plot_data
 #'

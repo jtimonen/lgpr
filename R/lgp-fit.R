@@ -31,14 +31,14 @@ lgp <- function(formula,
                 relevance_method = "f_mean",
                 verbose = FALSE,
                 ...) {
-  
+
   # Create and fit the model
   model <- lgp_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
     verbose
   )
   stan_fit <- lgp_sampling(model = model, ...)
-  new('lgpfit', model = model, stan_fit = stan_fit)
+  new("lgpfit", model = model, stan_fit = stan_fit)
 }
 
 #' @rdname lgp
