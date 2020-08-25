@@ -2,7 +2,7 @@
 #'
 #' @param square is prior for a square-transformed parameter?
 #' @name priors
-#' @aliases normal, log_normal, gamma, inv_gamma, uniform, student_t
+#' @aliases normal, log_normal, gam, igam, uniform, student_t, bet
 #' @return a named list
 #' @description These use the same parametrizations as defined in the Stan
 #' documentation. See the docs for
@@ -16,7 +16,7 @@
 #' student_t(nu = 1)
 #'
 #' # Exponential prior with rate = 0.1
-#' gamma(shape = 1, inv_scale = 0.1)
+#' gam(shape = 1, inv_scale = 0.1)
 NULL
 
 #' @export
@@ -60,7 +60,7 @@ student_t <- function(nu, square = FALSE) {
 #' @rdname priors
 #' @param shape shape parameter (alpha)
 #' @param inv_scale inverse scale parameter (beta)
-gamma <- function(shape, inv_scale, square = FALSE) {
+gam <- function(shape, inv_scale, square = FALSE) {
   check_numeric(shape, require_positive = TRUE)
   check_numeric(inv_scale, require_positive = TRUE)
   list(
@@ -75,7 +75,7 @@ gamma <- function(shape, inv_scale, square = FALSE) {
 #' @rdname priors
 #' @param shape shape parameter (alpha)
 #' @param scale scale parameter (beta)
-inv_gamma <- function(shape, scale, square = FALSE) {
+igam <- function(shape, scale, square = FALSE) {
   check_numeric(shape, require_positive = TRUE)
   check_numeric(scale, require_positive = TRUE)
   list(
@@ -106,7 +106,7 @@ log_normal <- function(mu, sigma, square = FALSE) {
 #' @rdname priors
 #' @param a shape parameter
 #' @param b shape parameter
-beta <- function(a, b) {
+bet <- function(a, b) {
   check_numeric(a, require_positive = TRUE)
   check_numeric(b, require_positive = TRUE)
   list(

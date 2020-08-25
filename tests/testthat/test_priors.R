@@ -34,7 +34,7 @@ test_that("normal prior does not allow non-positive std", {
   expect_error(normal(mu = 1, sigma = 0), reason)
 })
 
-test_that("studen-t prior is parsed correctly", {
+test_that("student-t prior is parsed correctly", {
   p <- student_t(20)
   num <- prior_to_num(p)
   expect_equal(num$prior, c(3, 0))
@@ -43,7 +43,7 @@ test_that("studen-t prior is parsed correctly", {
 })
 
 test_that("gamma prior is parsed correctly", {
-  p <- gamma(shape = 2, inv_scale = 5)
+  p <- gam(shape = 2, inv_scale = 5)
   num <- prior_to_num(p)
   expect_equal(num$prior, c(4, 0))
   expect_equal(num$hyper, c(2, 5, 0))
@@ -51,7 +51,7 @@ test_that("gamma prior is parsed correctly", {
 })
 
 test_that("inverse gamma prior is parsed correctly", {
-  p <- inv_gamma(shape = 3, scale = 6, square = TRUE)
+  p <- igam(shape = 3, scale = 6, square = TRUE)
   num <- prior_to_num(p)
   expect_equal(num$prior, c(5, 1))
   expect_equal(num$hyper, c(3, 6, 0))
@@ -67,11 +67,10 @@ test_that("log-normal prior is parsed correctly", {
 })
 
 test_that("beta prior is parsed correctly", {
-  p <- beta(0.1, 0.5)
+  p <- bet(0.1, 0.5)
   expect_equal(p$alpha, 0.1)
   expect_equal(p$beta, 0.5)
 })
-
 
 test_that("invalid prior name or hyperparams cannot be given", {
   p <- list(dist = "stupid", square = TRUE)

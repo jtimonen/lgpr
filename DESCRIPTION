@@ -26,6 +26,7 @@ Imports:
     bayesplot (>= 1.7.0),
     MASS (>= 7.3-50),
     stats (>= 3.4),
+    reshape2 (>= 1.4.4),
     ggplot2 (>= 3.1.0),
     ggpubr (>= 0.2)
 LinkingTo: 

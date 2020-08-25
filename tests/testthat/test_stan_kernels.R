@@ -130,8 +130,8 @@ sim <- simulate_data(
 
 # Model
 m <- lgp_model(y ~ zerosum(id) * gp(age) + gp_warp_vm(diseaseAge) +
-                 categ(z) + gp(age) + gp(x),
-               data = sim@data
+  categ(z) + gp(age) + gp(x),
+data = sim@data
 )
 
 # Input
@@ -177,7 +177,7 @@ test_that("gp_posterior works correctly", {
   y <- sim@data$y
   fp <- gp_posterior(K, y, 1e-6, 1.0)
   expect_equal(length(fp), 12)
-  
+
   # test that componentwise means sum to total mean
   f_sum <- fp[[1]]
   for (j in 2:5) {

@@ -104,6 +104,21 @@ test_that("STAN_edit_x_cont works properly", {
   expect_equal(t_edit, t_expect)
 })
 
+
+context("Stan utils: validitity checks")
+
+test_that("STAN_check_prob_positive works properly", {
+  expect_error(STAN_check_prob_positive(1.1, STREAM))
+  expect_error(STAN_check_prob_positive(-0.1, STREAM))
+  expect_error(STAN_check_prob_positive(0, STREAM))
+})
+
+test_that("STAN_check_real_positive works properly", {
+  expect_error(STAN_check_real_positive(-12, STREAM))
+  expect_error(STAN_check_real_positive(0, STREAM))
+})
+
+
 # 2. STAN PRIORS ----------------------------------------------------------
 
 require(stats)

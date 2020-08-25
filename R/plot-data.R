@@ -1,317 +1,112 @@
-#' A spaghetti plot of longitudinal data.
+#' Plotting longitudinal data
 #'
 #' @export
 #' @param data A data frame.
-#' @param highlight Name of a covariate to be highlighted with color,
-#' or id of a subject to be highlighted.
-#' @param id_variable Name of id variable.
-#' @param time_variable Name of time variable.
-#' @param response Name of the response variable.
+#' @param x_name Name of x-axis variable.
+#' @param y_name Name of the y-axis variable.
+#' @param group_by Name of grouping variable (must be a factor).
+#' @param color_by Name of coloring variable (must be a factor).
+#' @param facet_by Name of the faceting variable (must be a factor).
+#' @param highlight Value of category of the \code{group_by} variable
+#' that is highlighted. Can only be used if \code{color_by} is \code{NULL}.
+#' @param main main plot title
+#' @param sub plot subtitle
 #' @param psize point size
 #' @param lwd line width
-#' @param title additional string added to title
-#' @return a ggplot object
+#' @return a \code{ggplot} object
 plot_data <- function(data,
+                      x_name = "age",
+                      y_name = "y",
+                      group_by = "id",
+                      facet_by = NULL,
+                      color_by = NULL,
                       highlight = NULL,
-                      response = "y",
-                      id_variable = "id",
-                      time_variable = "age",
+                      main = NULL,
+                      sub = NULL,
                       psize = 2,
-                      lwd = 0.5,
-                      title = NULL) {
+                      lwd = 0.5) {
+  titles <- plot_data_titles(main, sub, data, group_by)
+  df <- data[c(x_name, y_name, group_by, color_by, facet_by)]
+  df <- plot_data_add_highlight_factor(df, group_by, highlight)
   if (!is.null(highlight)) {
-    if (is.numeric(highlight)) {
-      p <- plot_data_hl_individual(
-        data, highlight,
-        response, id_variable, time_variable,
-        psize, lwd
-      )
-    } else {
-      if (highlight == "disease") {
-        highlight <- "diseaseAge"
-      }
-      if (highlight == "diseaseAge") {
-        p <- plot_data_hl_disease(
-          data, "diseaseAge",
-          response, id_variable, time_variable,
-          psize, lwd
-        )
-      } else {
-        p <- plot_data_hl_cat(
-          data, highlight,
-          response, id_variable, time_variable,
-          psize, lwd
-        )
-      }
-    }
-  } else {
-    p <- plot_data_plain(
-      data, response, id_variable, time_variable,
-      psize, lwd
-    )
+    color_by <- paste0(group_by, "_")
   }
-  p <- p + ggplot2::labs(x = "Age")
-
-  # Edit plot title
-  ptitle <- "Data"
-  subtitle <- paste(length(unique(data$id)), " individuals, ",
-    length(data$id), " data points",
-    sep = ""
-  )
-  if (!is.null(title)) {
-    ptitle <- paste(title, ": ", ptitle, sep = "")
+  aes <- plot_data_aes(x_name, y_name, group_by, color_by)
+  h <- ggplot2::ggplot(df, aes)
+  h <- h + ggplot2::geom_line() + ggplot2::geom_point()
+  h <- h + ggplot2::ggtitle(label = titles$main, subtitle = titles$sub)
+  if (!is.null(facet_by)) {
+    f <- as.formula(paste("~", facet_by))
+    h <- h + ggplot2::facet_wrap(f)
   }
-  p <- p + ggplot2::ggtitle(ptitle, subtitle = subtitle)
-  return(p)
+  num_colors <- plot_data_num_colors(df, color_by)
+  if (num_colors <= 4) {
+    values <- color_palette(num_colors)
+    h <- h + ggplot2::scale_color_manual(values = values)
+  }
+  return(h)
 }
 
-
-#' A spaghetti plot of longitudinal data without highlighting.
-#' @param data A data frame.
-#' @param id_variable Name of id variable.
-#' @param time_variable Name of time variable.
-#' @param response Name of the response variable.
-#' @param psize point size
-#' @param lwd line width
-#' @return a ggplot object
-plot_data_plain <- function(data,
-                            response = "y",
-                            id_variable = "id",
-                            time_variable = "age",
-                            psize = 2,
-                            lwd = 0.5) {
-  data$id <- as.factor(data[[id_variable]])
-  iresp <- which(colnames(data) == response)
-  colnames(data)[iresp] <- "Response"
-
-  ord <- order(data$id, data[[time_variable]])
-  data <- data[ord, ]
-
-  # Extend data frame
-  data <- create_data_plot_df(data, NULL, NULL, NULL)
-
-  # Create plot
-  p <- ggplot2::ggplot(data = data, ggplot2::aes_string(
-    x = time_variable,
-    y = "Response", group = "id"
-  )) +
-    ggplot2::geom_line(size = lwd)
-  if (psize > 0) {
-    p <- p + ggplot2::geom_point(size = psize)
-  }
-  return(p)
-}
-
-#' A spaghetti plot of longitudinal data, highlighting a categorical covariate.
+#' Create aes for plot_data
 #'
-#' @param data A data frame.
-#' @param highlight Name of a categorical covariate to be highlighted
-#' with color.
-#' @param id_variable Name of id variable.
-#' @param time_variable Name of time variable.
-#' @param response Name of the response variable.
-#' @param psize point size
-#' @param lwd line width
-#' @return a ggplot object
-plot_data_hl_cat <- function(data,
-                             highlight = NULL,
-                             response = "y",
-                             id_variable = "id",
-                             time_variable = "age",
-                             psize = 2,
-                             lwd = 0.5) {
-  data$id <- as.factor(data[[id_variable]])
-  iresp <- which(colnames(data) == response)
-  colnames(data)[iresp] <- "Response"
-
-  ord <- order(data[[highlight]], data$id, data[[time_variable]])
-  data <- data[ord, ]
-
-  # Extend data frame
-  data <- create_data_plot_df(data, highlight, NULL, NULL)
-
-  # Create plot
-  p <- ggplot2::ggplot(data = data, ggplot2::aes_string(
-    x = time_variable,
-    y = "Response", group = "id"
-  ))
-
-  # Highlight categories
-  p <- p + ggplot2::labs(colour = highlight)
-  p <- p + ggplot2::scale_color_brewer(palette = "Set1")
-  p <- p + ggplot2::geom_line(ggplot2::aes_string(color = "Z1"), size = lwd)
-  if (psize > 0) {
-    p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"),
-      size = psize
-    )
-  }
-  return(p)
-}
-
-
-#' A spaghetti plot of longitudinal data, highlighting a continuous covariate.
-#' @param data A data frame.
-#' @param highlight Name of a continuous covariate to be highlighted with color.
-#' @param id_variable Name of id variable.
-#' @param time_variable Name of time variable.
-#' @param response Name of the response variable.
-#' @param psize point size
-#' @param lwd line width
-#' @param colgrad color gradient
-#' @return a ggplot object
-plot_data_hl_cont <- function(data,
-                              highlight = NULL,
-                              response = "y",
-                              id_variable = "id",
-                              time_variable = "age",
-                              psize = 2,
-                              lwd = 0.5,
-                              colgrad = ggplot2::scale_colour_gradient2()) {
-  data$id <- as.factor(data[[id_variable]])
-  iresp <- which(colnames(data) == response)
-  colnames(data)[iresp] <- "Response"
-
-  # Extend data frame
-  data <- create_data_plot_df(data, NULL, NULL, highlight)
-
-  # Create plot
-  p <- ggplot2::ggplot(data = data, ggplot2::aes_string(
-    x = time_variable,
-    y = "Response", group = "id"
-  ))
-
-  # Highligh continuous
-  p <- p + ggplot2::geom_line(ggplot2::aes_string(color = "Value"), size = lwd)
-  p <- p + colgrad + ggplot2::labs(colour = highlight)
-  if (psize > 0) {
-    p <- p + ggplot2::geom_point(ggplot2::aes_string(color = "Z1"),
-      size = psize
-    )
-  }
-  return(p)
-}
-
-
-
-#' A spaghetti plot of longitudinal data, highlighting based on disease group.
-#' @param data A data frame.
-#' @param highlight Name of the disease-related age variable.
-#' @param id_variable Name of id variable.
-#' @param time_variable Name of time variable.
-#' @param response Name of the response variable.
-#' @param psize point size
-#' @param lwd line width
-#' @return a ggplot object
-plot_data_hl_disease <- function(data,
-                                 highlight = "diseaseAge",
-                                 response = "y",
-                                 id_variable = "id",
-                                 time_variable = "age",
-                                 psize = 2,
-                                 lwd = 0.5) {
-
-  # Auxiliary group variable indicating diseased and healthy individuals
-  if ("diseaseAge" %in% colnames(data)) {
-    Group <- as.numeric(!is.nan(data[[highlight]]))
-    data <- cbind(data, Group)
+#' @inheritParams plot_data
+#' @return an \code{aes} object
+plot_data_aes <- function(x_name, y_name, group_by, color_by) {
+  if (is.null(color_by)) {
+    aes <- ggplot2::aes_string(x = x_name, y = y_name, group = group_by)
   } else {
-    stop("diseaseAge must be a column of data!")
+    aes <- ggplot2::aes_string(
+      x = x_name, y = y_name, group = group_by,
+      color = color_by
+    )
   }
-
-  ord <- order(data$Group, data$id, data[[time_variable]])
-  data <- data[ord, ]
-  strs <- c("control", "case")
-  data$Group <- strs[data$Group + 1]
-
-  p <- plot_data_hl_cat(
-    data, "Group",
-    response, id_variable, time_variable,
-    psize, lwd
-  )
-  return(p)
+  return(aes)
 }
 
-
-#' A spaghetti plot of longitudinal data, highlighting one individual.
-#' @param data A data frame.
-#' @param highlight Number indicating the individual to highlight.
-#' @param id_variable Name of id variable.
-#' @param time_variable Name of time variable.
-#' @param response Name of the response variable.
-#' @param psize point size
-#' @param lwd line width
-#' @return a ggplot object
-plot_data_hl_individual <- function(data,
-                                    highlight = 1,
-                                    response = "y",
-                                    id_variable = "id",
-                                    time_variable = "age",
-                                    psize = 2,
-                                    lwd = 0.5) {
-
-  # Auxiliary group variable indicating diseased and healthy individuals
-  is_hl <- 1 - as.numeric(data[[id_variable]] == highlight)
-  ID <- c(paste("id =", highlight), "id = other")
-  ID <- ID[is_hl + 1]
-  data <- cbind(data, ID)
-
-  ord <- order(data$ID, data$id, data[[time_variable]])
-  data <- data[ord, ]
-
-  p <- plot_data_hl_cat(
-    data, "ID",
-    response, id_variable, time_variable,
-    psize, lwd
-  )
-  return(p)
-}
-
-#' Create a plotting data frame for ggplot
+#' Create titles for plot_data
 #'
-#' @description A helper function for \code{plot_data}.
-#' @param data a data frame
-#' @param hl_1 highlighting by color
-#' @param hl_2 highlighting by linestyle
-#' @param hl_cont highlighting continuous
-#' @return an extended data frame
-create_data_plot_df <- function(data, hl_1, hl_2, hl_cont) {
-
-  # Color highlight
-  hl <- hl_1
-  if (!is.null(hl)) {
-    if (hl == "diseaseAge" || hl == "disease" || hl == "group") {
-      hl <- "Group"
-    }
-    ihl <- which(colnames(data) == hl)
-    if (hl != "id") {
-      data[[ihl]] <- as.factor(data[[ihl]])
-      colnames(data)[ihl] <- "Z1"
-    } else {
-      Z1 <- data[[ihl]]
-      data <- cbind(data, Z1)
-    }
+#' @inheritParams plot_data
+#' @return a list
+plot_data_titles <- function(main, sub, data, group_by) {
+  g <- data[[group_by]]
+  N <- length(unique(g))
+  n <- dim(data)[1]
+  if (is.null(main)) {
+    main <- paste0(n, " data points")
   }
-
-  # Linestyle highlight
-  hl <- hl_2
-  if (!is.null(hl)) {
-    if (hl == "diseaseAge" || hl == "disease" || hl == "group") {
-      hl <- "Group"
-    }
-    ihl <- which(colnames(data) == hl)
-    if (hl != "id") {
-      data[[ihl]] <- as.factor(data[[ihl]])
-      colnames(data)[ihl] <- "Z2"
-    } else {
-      Z2 <- data[[ihl]]
-      data <- cbind(data, Z2)
-    }
+  if (is.null(sub)) {
+    sub <- paste0(N, " different levels for ", group_by)
   }
+  list(main = main, sub = sub, N = N, n = n)
+}
 
-  # Continuous covariate highlight
-  if (!is.null(hl_cont)) {
-    ihl <- which(colnames(data) == hl_cont)
-    colnames(data)[ihl] <- "Value"
+
+#' Get number of distinct colors needsd by plot_data
+#'
+#' @inheritParams plot_data
+#' @return a list
+plot_data_num_colors <- function(data, color_by) {
+  if (is.null(color_by)) {
+    N <- 1
+  } else {
+    g <- data[[color_by]]
+    N <- length(unique(g))
   }
-  return(data)
+  return(N)
+}
+
+#' Add factor to data frame for highlighting in plot
+#'
+#' @inheritParams plot_data
+#' @param df data frame
+#' @return a list
+plot_data_add_highlight_factor <- function(df, group_by, highlight) {
+  if (!is.null(highlight)) {
+    g <- df[[group_by]]
+    hl <- 1 + as.numeric(g == highlight)
+    levels <- c("other", highlight)
+    name <- paste0(group_by, "_")
+    df[[name]] <- as.factor(levels[hl])
+  }
+  return(df)
 }

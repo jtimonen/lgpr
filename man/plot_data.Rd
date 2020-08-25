@@ -2,40 +2,49 @@
 % Please edit documentation in R/plot-data.R
 \name{plot_data}
 \alias{plot_data}
-\title{A spaghetti plot of longitudinal data.}
+\title{Plotting longitudinal data}
 \usage{
 plot_data(
   data,
+  x_name = "age",
+  y_name = "y",
+  group_by = "id",
+  facet_by = NULL,
+  color_by = NULL,
   highlight = NULL,
-  response = "y",
-  id_variable = "id",
-  time_variable = "age",
+  main = NULL,
+  sub = NULL,
   psize = 2,
-  lwd = 0.5,
-  title = NULL
+  lwd = 0.5
 )
 }
 \arguments{
 \item{data}{A data frame.}
 
-\item{highlight}{Name of a covariate to be highlighted with color,
-or id of a subject to be highlighted.}
+\item{x_name}{Name of x-axis variable.}
 
-\item{response}{Name of the response variable.}
+\item{y_name}{Name of the y-axis variable.}
 
-\item{id_variable}{Name of id variable.}
+\item{group_by}{Name of grouping variable (must be a factor).}
 
-\item{time_variable}{Name of time variable.}
+\item{facet_by}{Name of the faceting variable (must be a factor).}
+
+\item{color_by}{Name of coloring variable (must be a factor).}
+
+\item{highlight}{Value of category of the \code{group_by} variable
+that is highlighted. Can only be used if \code{color_by} is \code{NULL}.}
+
+\item{main}{main plot title}
+
+\item{sub}{plot subtitle}
 
 \item{psize}{point size}
 
 \item{lwd}{line width}
-
-\item{title}{additional string added to title}
 }
 \value{
-a ggplot object
+a \code{ggplot} object
 }
 \description{
-A spaghetti plot of longitudinal data.
+Plotting longitudinal data
 }

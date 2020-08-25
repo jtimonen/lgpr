@@ -4,16 +4,17 @@
 \alias{priors}
 \alias{normal,}
 \alias{log_normal,}
-\alias{gamma,}
-\alias{inv_gamma,}
+\alias{gam,}
+\alias{igam,}
 \alias{uniform,}
-\alias{student_t}
+\alias{student_t,}
+\alias{bet}
 \alias{uniform}
 \alias{normal}
-\alias{gamma}
-\alias{inv_gamma}
+\alias{student_t}
+\alias{gam}
+\alias{igam}
 \alias{log_normal}
-\alias{beta}
 \title{Prior definitions}
 \usage{
 uniform(square = FALSE)
@@ -22,13 +23,13 @@ normal(mu, sigma, square = FALSE)
 
 student_t(nu, square = FALSE)
 
-gamma(shape, inv_scale, square = FALSE)
+gam(shape, inv_scale, square = FALSE)
 
-inv_gamma(shape, scale, square = FALSE)
+igam(shape, scale, square = FALSE)
 
 log_normal(mu, sigma, square = FALSE)
 
-beta(a, b)
+bet(a, b)
 }
 \arguments{
 \item{square}{is prior for a square-transformed parameter?}
@@ -66,5 +67,5 @@ log_normal(mu = 1, sigma = 1)
 student_t(nu = 1)
 
 # Exponential prior with rate = 0.1
-gamma(shape = 1, inv_scale = 0.1)
+gam(shape = 1, inv_scale = 0.1)
 }
