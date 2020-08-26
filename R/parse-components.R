@@ -206,7 +206,7 @@ term_names <- function(rhs) {
   names <- c()
   for (j in seq_len(J)) {
     term <- terms[[j]]
-    names <- c(names, term_as_character(term, verbose = FALSE))
+    names <- c(names, as.character(term))
   }
   return(names)
 }
@@ -236,7 +236,7 @@ term_to_numeric <- function(term, covariates) {
   # Check kernel type
   if (is_cat) {
     kernels <- c("zerosum", "categ")
-    idx <- argument_check(parsed$cat_kernel, allowed = kernels)
+    idx <- check_allowed(parsed$cat_kernel, allowed = kernels)
     ktype <- idx - 1
   } else {
     ktype <- 0

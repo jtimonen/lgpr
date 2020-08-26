@@ -8,7 +8,7 @@ require(lintr)
 require(styler)
 
 # Style the package according to the tidyverse guide
-# styler::style_pkg()
+# styler:::style_active_pkg()
 
 # Specify linters
 linters <- lintr::with_defaults(

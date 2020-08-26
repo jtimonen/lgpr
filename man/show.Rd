@@ -2,16 +2,17 @@
 % Please edit documentation in R/s4-show.R
 \name{show}
 \alias{show}
-\alias{show,lgpfit-method}
+\alias{show,lgpformula-method}
 \alias{show,lgpmodel-method}
+\alias{show,lgpfit-method}
 \alias{show,lgpsim-method}
 \title{Printing S4 object info using the show generic}
 \usage{
 \S4method{show}{lgpformula}(object)
 
-\S4method{show}{lgpfit}(object)
-
 \S4method{show}{lgpmodel}(object)
+
+\S4method{show}{lgpfit}(object)
 
 \S4method{show}{lgpsim}(object)
 }
@@ -22,5 +23,10 @@
 the object invisibly
 }
 \description{
-Printing S4 object info using the show generic
+All of these call the corresponding \code{as.character}
+method and then \code{\link{show_default}} which prints the description
+and returns the original object invisibly.
+}
+\seealso{
+See also \code{\link{show_default}} and \code{\link{as_character}}.
 }

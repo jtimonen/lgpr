@@ -153,7 +153,7 @@ likelihood_as_str <- function(index) {
 likelihood_as_int <- function(likelihood) {
   likelihood <- tolower(likelihood)
   allowed <- likelihood_list()
-  index <- argument_check(likelihood, allowed)
+  index <- check_allowed(likelihood, allowed)
   return(index)
 }
 

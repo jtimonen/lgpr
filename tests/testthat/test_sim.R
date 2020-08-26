@@ -23,20 +23,6 @@ test_that("gaussian data can be simulated", {
   expect_equal(names(dat@info), !!info_names)
 })
 
-test_that("as.character method works for class lgpsim", {
-  dat <- simulate_data(
-    N = 8,
-    t_data = seq(6, 36, by = 6),
-    covariates = c(2, 2),
-    lengthscales = c(6, 6, 6, 6),
-    relevances = c(1, 1, 0, 1),
-    names = c("sex", "location")
-  )
-  a <- as.character(dat)
-  expect_gt(nchar(a), 10)
-})
-
-
 test_that("poisson data can be simulated", {
   dat <- simulate_data(
     N = 8,

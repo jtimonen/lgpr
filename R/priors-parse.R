@@ -178,7 +178,7 @@ parse_prior_single <- function(desc, num) {
 prior_to_num <- function(desc) {
   types <- prior_type_names()
   distribution_name <- desc$dist
-  dist_num <- argument_check(distribution_name, types)
+  dist_num <- check_allowed(distribution_name, types)
   fields <- names(desc)
   fields <- fields[!(fields %in% c("dist", "square"))]
   hyper <- position_hyper_params(desc[fields])

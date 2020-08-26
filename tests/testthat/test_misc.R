@@ -2,18 +2,27 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
-context("Argument checker")
+context("Argument validation")
 
-test_that("argument checker throws error for invalid input", {
-  expect_error(argument_check(arg = c("moi", "hei"), allowed = c("moi", "hei")))
-  expect_error(argument_check(arg = c("moi"), allowed = c("moi")))
-  expect_error(argument_check(arg = "juu", allowed = c("moi", "joo")))
-  expect_error(argument_check(arg = "juu", allowed = c("juu", "juu")))
+test_that("check_allowed throws error for invalid input", {
+  expect_error(check_allowed(arg = c("moi", "hei"), allowed = c("moi", "hei")))
+  expect_error(check_allowed(arg = c("moi"), allowed = c("moi")))
+  expect_error(check_allowed(arg = "juu", allowed = c("moi", "joo")))
+  expect_error(check_allowed(arg = "juu", allowed = c("juu", "juu")))
 })
 
-test_that("argument checker works correctly for valid input", {
-  idx <- argument_check(arg = c("hei"), allowed = c("moi", "hei"))
+test_that("check_allowed works correctly for valid input", {
+  idx <- check_allowed(arg = c("hei"), allowed = c("moi", "hei"))
   expect_equal(idx, 2)
+})
+
+test_that("check_type works correctly", {
+  out1 <- check_type(3.4, "numeric")
+  out2 <- check_type(3.4, c("numeric", "character"))
+  expect_true(out1)
+  expect_true(out2)
+  reason <- "has invalid type 'numeric'"
+  expect_error(check_type(3.4, "list"), reason)
 })
 
 # -------------------------------------------------------------------------
@@ -71,3 +80,15 @@ test_that("color_set works", {
 })
 
 # -------------------------------------------------------------------------
+
+context("Plot colors")
+
+test_that("default color palette can be shown", {
+  p1 <- plot_color_palette(1)
+  p2 <- plot_color_palette(5)
+  p3 <- plot_color_palette(6)
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
+  expect_error(color_palette_plot(7))
+})

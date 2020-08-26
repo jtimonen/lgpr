@@ -15,24 +15,36 @@ dat <- data.frame(age, dis_age, id, sex, y)
 
 # -------------------------------------------------------------------------
 
-context("Main function lgp_fit")
+context("Sampling or optimizing a model")
 
-test_that("stan model can be sampled with minimal input", {
-  m <- lgp_model(y ~ gp(age) + categ(sex), dat)
+test_that("lgpmodel can be sampled with minimal input", {
+  m <- create_model(y ~ gp(age) + categ(sex), dat)
   suppressWarnings({
-    fit <- lgp_sampling(m, chains = 1, iter = 100, refresh = 0)
+    fit <- sample_model(m, chains = 1, iter = 100, refresh = 0)
     lp <- rstan::extract(fit)$lp__
     expect_equal(length(lp), 50)
+    expect_s4_class(fit, "stanfit")
   })
 })
 
-test_that("stan model can be sampled with various components", {
-  m <- lgp_model(y ~ heter(id) * gp(age) + gp_warp(dis_age), dat)
-  stan_data <- m@stan_input
+test_that("lgpmodel with various components can be sampled", {
+  m <- create_model(y ~ heter(id) * gp(age) + gp_warp(dis_age), dat)
 
   suppressWarnings({
-    fit <- lgp_sampling(m, chains = 1, iter = 10, refresh = 0)
+    fit <- sample_model(m, chains = 1, iter = 10, refresh = 0)
     lp <- rstan::extract(fit)$lp__
     expect_equal(length(lp), 5)
   })
 })
+
+
+test_that("lgpmodel can be optimized", {
+  m <- create_model(y ~ heter(id) * gp(age), dat)
+  
+  suppressWarnings({
+    fit <- optimize_model(m, iter = 10)
+    # names(fit) = c("par", "value", "return_code", "theta_tilde")
+    expect_equal(class(fit), "list")
+  })
+})
+

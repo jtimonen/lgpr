@@ -53,7 +53,7 @@ plot_data <- function(data,
 #' @inheritParams plot_data
 #' @param h the current \code{ggplot} object
 #' @return a modified \code{ggplot} object
-plot_data_add_fit <- function(h, fit){
+plot_data_add_fit <- function(h, fit) {
   if (!is.null(fit)) {
     print(fit)
   }

@@ -1,4 +1,24 @@
-#' Check if argument is valid
+#' Check if argument has correct type.
+#'
+#' @param object Any object.
+#' @param allowed Allowed class names.
+#' @return Returns \code{TRUE} if the object has an allowed type.
+check_type <- function(object, allowed) {
+  type <- class(object)
+  ok <- (type %in% allowed)
+  if (!ok) {
+    arg_name <- deparse(substitute(object))
+    str <- paste(allowed, collapse = ", ")
+    msg <- paste0(
+      arg_name, " has invalid type '", type,
+      "'. Allowed types are {", str, "}."
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' Check if argument is one of the allowed options
 #'
 #' @description Replacement for the \code{base} R function \code{match.arg}.
 #' Gives more informative errors and requires exact match. Should only be used
@@ -8,7 +28,7 @@
 #' @param allowed Allowed arguments. Must be have length at least 2.
 #' @return Return the index of \code{arg} in \code{allowed} or
 #' throws an error if argument is not valid.
-argument_check <- function(arg, allowed) {
+check_allowed <- function(arg, allowed) {
 
   # Get names of given arguments and caller function
   arg_name <- deparse(substitute(arg))

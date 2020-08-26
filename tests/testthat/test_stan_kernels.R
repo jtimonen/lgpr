@@ -115,7 +115,7 @@ sim <- simulate_data(
 )
 
 # Model
-m <- lgp_model(y ~ zerosum(id) * gp(age) + gp_warp_vm(diseaseAge) +
+m <- create_model(y ~ zerosum(id) * gp(age) + gp_warp_vm(diseaseAge) +
   categ(z) + gp(age) + gp(x),
 data = sim@data
 )

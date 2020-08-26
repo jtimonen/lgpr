@@ -1,44 +1,32 @@
 #' Printing S4 object info using the show generic
 #'
+#' @description All of these call the corresponding \code{as.character}
+#' method and then \code{\link{show_default}} which prints the description
+#' and returns the original object invisibly.
+#'
+#' @name show
 #' @param object an object of some S4 class
 #' @return the object invisibly
-#' @name show
+#' @seealso See also \code{\link{show_default}} and \code{\link{as_character}}.
+NULL
 
 #' @rdname show
-setMethod(
-  f = "show", signature = "lgpformula",
-  definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
-  }
-)
+setMethod("show", "lgpformula", function(object) show_default(object))
 
 #' @rdname show
-setMethod(
-  f = "show",
-  signature = "lgpfit",
-  definition = function(object) {
-    call <- object@model@model_formula@call
-    info <- paste0("Model formula: ", call, "\n\n")
-    cat(info)
-    print(object@stan_fit, pars = "f_post", include = FALSE)
-  }
-)
+setMethod("show", "lgpmodel", function(object) show_default(object))
 
 #' @rdname show
-setMethod(
-  f = "show", signature = "lgpmodel",
-  definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
-  }
-)
+setMethod("show", "lgpfit", function(object) show_default(object))
 
 #' @rdname show
-setMethod(
-  f = "show", signature = "lgpsim",
-  definition = function(object) {
-    cat(as.character(object))
-    invisible(object)
-  }
-)
+setMethod("show", "lgpsim", function(object) show_default(object))
+
+#' Print the character representation of an S4 object
+#'
+#' @param object an object of some S4 class
+#' @return the object invisibly
+show_default <- function(object) {
+  cat(as.character(object))
+  invisible(object)
+}
