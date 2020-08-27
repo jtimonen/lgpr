@@ -76,14 +76,27 @@ plot_panel_create <- function(data, i_test, y_transform, nrow, ncol) {
 
   # Create faceting
   group_by <- colnames(data)[1]
-  f <- stats::as.formula(paste("~", group_by))
-  h <- h + ggplot2::facet_wrap(f, nrow = nrow, ncol = ncol)
+  h <- plot_panel_add_faceting(h, group_by, nrow, ncol)
+  
+  # Add shape and color scale
   if (show_test) {
     h <- h + ggplot2::scale_shape_manual(values = c(16, 16))
     col3 <- color_palette(3)[3]
     cols <- c(col3, "black")
     h <- h + ggplot2::scale_color_manual(values = cols)
   }
+  return(h)
+}
+
+#' Add faceting to the panel plot
+#'
+#' @inheritParams plot_panel
+#' @param h a \code{ggplot} object
+#' @return a \code{ggplot} object
+plot_panel_add_faceting <- function(h, group_by, nrow, ncol) {
+  f <- stats::as.formula(paste("~", group_by))
+  labfun <- ggplot2::label_both
+  h <- h + ggplot2::facet_wrap(f, nrow = nrow, ncol = ncol, labeller = labfun)
   return(h)
 }
 

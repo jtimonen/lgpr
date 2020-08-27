@@ -39,7 +39,7 @@ plot_data <- function(data,
   h <- h + ggplot2::ggtitle(label = titles$main, subtitle = titles$sub)
   if (!is.null(facet_by)) {
     f <- stats::as.formula(paste("~", facet_by))
-    h <- h + ggplot2::facet_wrap(f)
+    h <- h + ggplot2::facet_wrap(f, labeller = ggplot2::label_both)
   }
   num_colors <- plot_data_num_colors(df, color_by)
   if (num_colors <= 4) {
