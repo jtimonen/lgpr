@@ -1,3 +1,4 @@
+
 #' Validate S4 class objects
 #'
 #' @param object an object to validate

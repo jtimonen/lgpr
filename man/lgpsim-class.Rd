@@ -37,3 +37,11 @@ formalism
 }}
 }}
 
+\section{Related methods and functions}{
+
+\itemize{
+    \item \code{\link{sim_plot}}
+    \item \code{\link{sim_plot_components}}
+}
+}
+

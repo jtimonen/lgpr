@@ -6,10 +6,9 @@
 #' @param fit a list of data frames
 #' @param i_test indices of test points
 #' @param linecolors three line colors
-#' @param dotcolors two dot colros
 #' @param nrow number of rows, an argument for \code{ggplot2::facet_wrap}
 #' @param ncol number of columns, an argument for \code{ggplot2::facet_wrap}
-#' @param y-transform a function
+#' @param y_transform a function
 #' @param true_teff a named vector
 #' @param signal_teff a named vector
 #' @param fit_teff a list of named vectors

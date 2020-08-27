@@ -18,3 +18,8 @@ An S4 class to represent an lgp formula
 \item{\code{call}}{original formula call}
 }}
 
+\seealso{
+See \code{\link{operations}} for performing arithmetics
+on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+objects.
+}

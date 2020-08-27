@@ -33,15 +33,13 @@ plot_panel(
 
 \item{ncol}{number of columns, an argument for \code{ggplot2::facet_wrap}}
 
+\item{y_transform}{a function}
+
 \item{true_teff}{a named vector}
 
 \item{signal_teff}{a named vector}
 
 \item{fit_teff}{a list of named vectors}
-
-\item{dotcolors}{two dot colros}
-
-\item{y-transform}{a function}
 }
 \value{
 a \code{ggplot} object

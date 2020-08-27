@@ -9,8 +9,6 @@ get_integer_encoding(object)
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
 \linkS4class{lgpfit}}
-
-\item{model}{an object of class \linkS4class{lgpmodel}}
 }
 \value{
 A data frame.

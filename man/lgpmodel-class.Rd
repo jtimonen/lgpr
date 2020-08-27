@@ -35,3 +35,11 @@ An S4 class to represent an lgp model
 \item{\code{info}}{Other info in text format.}
 }}
 
+\section{Related methods and functions}{
+
+\itemize{
+    \item \code{\link{prior_summary}}
+    \item \code{\link{get_covariate_names}}
+}
+}
+

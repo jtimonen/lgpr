@@ -16,3 +16,8 @@ An S4 class to represent an lgp expression
 \item{\code{fun}}{function name}
 }}
 
+\seealso{
+See \code{\link{operations}} for performing arithmetics
+on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+objects.
+}

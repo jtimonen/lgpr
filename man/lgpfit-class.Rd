@@ -16,6 +16,16 @@ An S4 class to represent the output of the \code{lgp} function
 \item{\code{model}}{An object of class \code{lgpmodel}.}
 }}
 
+\section{Related methods and functions}{
+
+\itemize{
+    \item \code{\link{plot_posterior}}
+    \item \code{\link{plot_posterior_warp}}
+    \item In addition, all methods that work on \linkS4class{lgpmodel}
+    objects work also on \linkS4class{lgpfit} objects.
+}
+}
+
 \seealso{
 The main function \code{\link{lgp}}.
 }

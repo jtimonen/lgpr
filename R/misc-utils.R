@@ -183,3 +183,18 @@ get_stan_model <- function() {
 default_vm_params <- function() {
   c(0.025, 1)
 }
+
+
+#' Return NULL if vector contains only NaN values
+#'
+#' @param x a vector
+#' @return \code{x} unchanged or \code{NULL}
+null_if_all_nan <- function(x) {
+  L <- length(x)
+  S <- sum(is.nan(x))
+  if (S < L) {
+    return(x)
+  } else {
+    return(NULL)
+  }
+}

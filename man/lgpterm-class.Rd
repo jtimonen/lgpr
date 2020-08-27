@@ -14,3 +14,8 @@ An S4 class to represent one formula term
 \item{\code{factors}}{a list of at most two \linkS4class{lgpexpr}s}
 }}
 
+\seealso{
+See \code{\link{operations}} for performing arithmetics
+on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+objects.
+}

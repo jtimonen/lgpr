@@ -5,6 +5,9 @@ NULL
 #'
 #' @slot covariate name of a covariate
 #' @slot fun function name
+#' @seealso See \code{\link{operations}} for performing arithmetics
+#' on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+#' objects.
 lgpexpr <- setClass("lgpexpr",
   representation = representation(
     covariate = "character",
@@ -17,11 +20,17 @@ lgpexpr <- setClass("lgpexpr",
 #' An S4 class to represent one formula term
 #'
 #' @slot factors a list of at most two \linkS4class{lgpexpr}s
+#' @seealso See \code{\link{operations}} for performing arithmetics
+#' on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+#' objects.
 lgpterm <- setClass("lgpterm", slots = c(factors = "list"))
 
 #' An S4 class to represent the right-hand side of an lgp formula
 #'
 #' @slot summands a list of one or more \linkS4class{lgpterm}s
+#' @seealso See \code{\link{operations}} for performing arithmetics
+#' on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+#' objects.
 lgprhs <- setClass("lgprhs", slots = c(summands = "list"))
 
 #' An S4 class to represent an lgp formula
@@ -29,6 +38,9 @@ lgprhs <- setClass("lgprhs", slots = c(summands = "list"))
 #' @slot terms an object of class \linkS4class{lgprhs}
 #' @slot y_name name of the response variable
 #' @slot call original formula call
+#' @seealso See \code{\link{operations}} for performing arithmetics
+#' on \linkS4class{lgprhs}, \linkS4class{lgpterm} and \linkS4class{lgpexpr}
+#' objects.
 lgpformula <- setClass("lgpformula",
   representation = representation(
     call = "character",
@@ -80,6 +92,11 @@ lgpscaling <- setClass("lgpscaling",
 #'   before converting from factor to numeric.
 #' }
 #' @slot info Other info in text format.
+#' @section Related methods and functions:
+#' \itemize{
+#'     \item \code{\link{prior_summary}}
+#'     \item \code{\link{get_covariate_names}}
+#' }
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
@@ -95,6 +112,13 @@ lgpmodel <- setClass("lgpmodel",
 #'
 #' @slot stan_fit An object of class \code{stanfit}.
 #' @slot model An object of class \code{lgpmodel}.
+#' @section Related methods and functions:
+#' \itemize{
+#'     \item \code{\link{plot_posterior}}
+#'     \item \code{\link{plot_posterior_warp}}
+#'     \item In addition, all methods that work on \linkS4class{lgpmodel}
+#'     objects work also on \linkS4class{lgpfit} objects.
+#' }
 #' @seealso The main function \code{\link{lgp}}.
 lgpfit <- setClass("lgpfit",
   slots = c(
@@ -102,7 +126,6 @@ lgpfit <- setClass("lgpfit",
     model = "lgpmodel"
   )
 )
-
 
 #' An S4 class to represent a data set simulated using the additive GP
 #' formalism
@@ -123,6 +146,11 @@ lgpfit <- setClass("lgpfit",
 #'   \item \code{true} possible true effect times that generate the disease
 #'   effect
 #'   \item \code{observed} possible observed effect times
+#' }
+#' @section Related methods and functions:
+#' \itemize{
+#'     \item \code{\link{sim_plot}}
+#'     \item \code{\link{sim_plot_components}}
 #' }
 lgpsim <- setClass("lgpsim",
   representation = representation(

@@ -19,7 +19,6 @@ get_covariate_names <- function(object, type = "all") {
 #' Get integer encoding of model components
 #'
 #' @inheritParams object_to_model
-#' @param model an object of class \linkS4class{lgpmodel}
 #' @return A data frame.
 get_integer_encoding <- function(object) {
   model <- object_to_model(object)

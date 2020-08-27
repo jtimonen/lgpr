@@ -11,6 +11,8 @@ plot_panel_create(data, i_test, y_transform, nrow, ncol)
 
 \item{i_test}{indices of test points}
 
+\item{y_transform}{a function}
+
 \item{nrow}{number of rows, an argument for \code{ggplot2::facet_wrap}}
 
 \item{ncol}{number of columns, an argument for \code{ggplot2::facet_wrap}}
