@@ -95,6 +95,7 @@ test_that("simulated effect time can be observed exactly", {
     t_observed = "exact"
   )
   t <- c(21, 21, NaN, NaN)
+  names(t) <- 1:4
   et <- dat@effect_times
   expect_equal(et$true, t)
   expect_equal(et$observed, t)
@@ -110,6 +111,8 @@ test_that("simulated effect time can be observed late", {
   )
   t1 <- c(21, 21, NaN, NaN)
   t2 <- c(30, 30, NaN, NaN)
+  names(t1) <- 1:4
+  names(t2) <- 1:4
   et <- dat@effect_times
   expect_equal(et$true, t1)
   expect_equal(et$observed, t2)
@@ -125,20 +128,6 @@ test_that("simulated effect time can be observed late randomly", {
   et <- dat@effect_times
   expect_equal(length(et$true), 4)
   expect_equal(length(et$observed), 4)
-})
-
-test_that("simulated data can be plotted", {
-  dat <- simulate_data(
-    N = 4,
-    t_data = seq(6, 36, by = 6),
-    covariates = c(0, 2),
-    t_observed = "after_1"
-  )
-  p <- sim_plot(dat,
-    i_test = c(1, 2, 3), dotcolor = colorset("green", "dark"),
-    linecolor = "gray30", ncol = 4
-  )
-  expect_s3_class(p, "ggplot")
 })
 
 

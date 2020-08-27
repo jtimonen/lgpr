@@ -11,8 +11,6 @@
 #' that is highlighted. Can only be used if \code{color_by} is \code{NULL}.
 #' @param main main plot title
 #' @param sub plot subtitle
-#' @param fit An object of class \linkS4class{lgpfit}. If this is provided,
-#' also the model fit is plotted.
 #' @return a \code{ggplot} object
 plot_data <- function(data,
                       x_name = "age",
@@ -22,17 +20,22 @@ plot_data <- function(data,
                       color_by = NULL,
                       highlight = NULL,
                       main = NULL,
-                      sub = NULL,
-                      fit = NULL) {
-  titles <- plot_data_titles(main, sub, data, group_by)
+                      sub = NULL) {
+  check_type(data, "data.frame")
+
+  # Create initial plot and add data
   df <- data[c(x_name, y_name, group_by, color_by, facet_by)]
   df <- plot_data_add_highlight_factor(df, group_by, highlight)
-  if (!is.null(highlight)) {
-    color_by <- paste0(group_by, "_")
-  }
+  skip_hl <- is.null(highlight)
+  color_by <- if (skip_hl) color_by else paste0(group_by, "_")
   aes <- plot_data_aes(x_name, y_name, group_by, color_by)
   h <- ggplot2::ggplot(df, aes)
+
+  # Add data
   h <- h + ggplot2::geom_line() + ggplot2::geom_point()
+
+  # Add titles, faceting and coloring
+  titles <- plot_data_titles(main, sub, data, group_by)
   h <- h + ggplot2::ggtitle(label = titles$main, subtitle = titles$sub)
   if (!is.null(facet_by)) {
     f <- stats::as.formula(paste("~", facet_by))
@@ -43,23 +46,9 @@ plot_data <- function(data,
     values <- color_palette(num_colors)
     h <- h + ggplot2::scale_color_manual(values = values)
   }
-  h <- plot_data_add_fit(h, fit)
 
   return(h)
 }
-
-#' Add model fit to data plot
-#'
-#' @inheritParams plot_data
-#' @param h the current \code{ggplot} object
-#' @return a modified \code{ggplot} object
-plot_data_add_fit <- function(h, fit) {
-  if (!is.null(fit)) {
-    print(fit)
-  }
-  return(h)
-}
-
 
 #' Create aes for plot_data
 #'
@@ -89,11 +78,13 @@ plot_data_titles <- function(main, sub, data, group_by) {
     main <- paste0(n, " data points")
   }
   if (is.null(sub)) {
-    sub <- paste0(N, " different levels for ", group_by)
+    sub <- paste0(
+      "Points that share the same value for '", group_by,
+      "' are connected by a line (", N, " levels)."
+    )
   }
   list(main = main, sub = sub, N = N, n = n)
 }
-
 
 #' Get number of distinct colors needsd by plot_data
 #'
@@ -116,7 +107,17 @@ plot_data_num_colors <- function(data, color_by) {
 #' @return a list
 plot_data_add_highlight_factor <- function(df, group_by, highlight) {
   if (!is.null(highlight)) {
+    check_length(highlight, 1)
     g <- df[[group_by]]
+    s <- sum(g == highlight)
+    if (s == 0) {
+      str <- paste(levels(g), collapse = ", ")
+      msg <- paste0(
+        "Invalid <highlight> argument ", highlight, "! The ",
+        "possible values of ", group_by, " are: {", str, "}."
+      )
+      stop(msg)
+    }
     hl <- 1 + as.numeric(g == highlight)
     levels <- c("other", highlight)
     name <- paste0(group_by, "_")

@@ -40,11 +40,10 @@ test_that("lgpmodel with various components can be sampled", {
 
 test_that("lgpmodel can be optimized", {
   m <- create_model(y ~ heter(id) * gp(age), dat)
-  
+
   suppressWarnings({
     fit <- optimize_model(m, iter = 10)
     # names(fit) = c("par", "value", "return_code", "theta_tilde")
     expect_equal(class(fit), "list")
   })
 })
-

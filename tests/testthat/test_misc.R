@@ -25,6 +25,15 @@ test_that("check_type works correctly", {
   expect_error(check_type(3.4, "list"), reason)
 })
 
+test_that("check_length works correctly", {
+  out1 <- check_length("moi", 1)
+  out2 <- check_length(c(4, 3, 2), 3)
+  expect_true(out1)
+  expect_true(out2)
+  reason <- "has length 3, but its length should be 5"
+  expect_error(check_length(c(4, 3, 2), 5), reason)
+})
+
 # -------------------------------------------------------------------------
 
 context("Inverse-gamma distribution")
@@ -68,27 +77,4 @@ context("Misc utility functions")
 test_that("get_stan_model returns a stanmodel", {
   sm <- get_stan_model()
   expect_equal(as.character(class(sm)), "stanmodel")
-})
-
-test_that("color_set works", {
-  col1 <- colorset("blue")
-  col2 <- colorset("red", "dark")
-  expect_equal(nchar(col1), 7)
-  expect_equal(nchar(col2), 7)
-  expect_error(colorset("definitely_not_a_color_name"))
-  expect_error(colorset("green", "asdf"), "Invalid color")
-})
-
-# -------------------------------------------------------------------------
-
-context("Plot colors")
-
-test_that("default color palette can be shown", {
-  p1 <- plot_color_palette(1)
-  p2 <- plot_color_palette(5)
-  p3 <- plot_color_palette(6)
-  expect_s3_class(p1, "ggplot")
-  expect_s3_class(p2, "ggplot")
-  expect_s3_class(p3, "ggplot")
-  expect_error(color_palette_plot(7))
 })

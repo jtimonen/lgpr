@@ -6,6 +6,7 @@
 \alias{as.character,lgpterm-method}
 \alias{as.character,lgprhs-method}
 \alias{as.character,lgpformula-method}
+\alias{as.character,lgpsim-method}
 \alias{as.character,lgpmodel-method}
 \title{Character representations of different S4 objects}
 \usage{
@@ -16,6 +17,8 @@
 \S4method{as.character}{lgprhs}(x)
 
 \S4method{as.character}{lgpformula}(x)
+
+\S4method{as.character}{lgpsim}(x)
 
 \S4method{as.character}{lgpmodel}(x)
 }

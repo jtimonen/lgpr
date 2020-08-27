@@ -89,3 +89,22 @@ check_numeric <- function(arg, arg_name = NULL, require_positive = FALSE) {
   }
   return(TRUE)
 }
+
+#' Check if argument has correct length.
+#'
+#' @param object Any object.
+#' @param expected Expected length.
+#' @return Returns \code{TRUE} if the object has an allowed length.
+check_length <- function(object, expected) {
+  L <- length(object)
+  ok <- (L == expected)
+  if (!ok) {
+    arg_name <- deparse(substitute(object))
+    msg <- paste0(
+      arg_name, " has length ", L, ", but its length should be ",
+      expected, "!"
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}

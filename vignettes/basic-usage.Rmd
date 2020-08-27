@@ -41,7 +41,7 @@ sim <- simulate_data(N            = 6,
                      t_jitter     = 0.5,  # jitter in time points
                      snr          = 5)    # signal-to-noise ratio
 
-show(sim)
+sim
 ```
 
 ```{r plot_sim, fig.width=6.6, fig.height=5}
@@ -61,7 +61,7 @@ fit <- lgp(formula  = formula,
            chains   = 1,
            refresh  = 0)
 
-show(fit$model)
+show(fit@model)
 ```
 
 ## Visualizing inferred components and predictions

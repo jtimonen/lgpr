@@ -2,46 +2,36 @@
 % Please edit documentation in R/sim-plot.R
 \name{sim_plot}
 \alias{sim_plot}
-\title{Plot a simulated longitudinal data set for each individual separately}
+\title{Visualize a simulated longitudinal data set}
 \usage{
 sim_plot(
   simdata,
-  nrow = NULL,
-  ncol = NULL,
-  i_test = NULL,
-  linecolor = colorset("gray"),
-  dotcolor = "black",
-  testcolor = colorset("brightblue", "dark"),
   signal_name = "signal",
-  y_transform = function(x) {     x }
+  signal_column = "f",
+  x_name = "age",
+  y_name = "y",
+  group_by = "id",
+  ...
 )
 }
 \arguments{
 \item{simdata}{an object of class \linkS4class{lgpsim}}
 
-\item{nrow}{number of rows, an argument for \code{ggplot2::facet_wrap}}
+\item{signal_name}{signal label to show in legend}
 
-\item{ncol}{number of columns, an argument for \code{ggplot2::facet_wrap}}
+\item{signal_column}{name of the signal column in \code{simdata$components}}
 
-\item{i_test}{indices of possible test points}
+\item{x_name}{name of x-axis variable}
 
-\item{linecolor}{line color for signal}
+\item{y_name}{name of y-axis variable}
 
-\item{dotcolor}{dot color for data points}
+\item{group_by}{grouping variable}
 
-\item{testcolor}{dot color for possible test points}
-
-\item{signal_name}{name of signal in the legend}
-
-\item{y_transform}{function to transform the data y}
+\item{...}{keyword arguments to \code{\link{plot_panel}}}
 }
 \value{
-a ggplot object
+a \code{ggplot object}
 }
 \description{
-Plot a simulated longitudinal data set for each individual separately
-}
-\seealso{
-For plotting each component separately,
- see \code{\link{sim_plot_components}}
+Creates plots where each observation unit has a separate panel.
 }

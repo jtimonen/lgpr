@@ -135,13 +135,18 @@ simulate_data <- function(N,
   SSR <- sum((g - mean(g))^2)
   SSE <- sum(noise^2)
 
-  # Return S4 class object
-  teff <- list(true = IN$onsets, observed = OBSERVED$onsets_observed)
+  # Create rest of the fields
+  teff_true <- IN$onsets
+  teff_obs <- OBSERVED$onsets_observed
+  teff <- list(true = teff_true, observed = teff_obs)
+
   info <- list(
     par_ell = lengthscales,
     par_cont = IN$par_cont,
     p_signal = SSR / (SSR + SSE)
   )
+
+  # Return S4 class object
   new("lgpsim",
     data = OBSERVED$dat,
     response = "y",
@@ -290,6 +295,7 @@ sim_data_to_observed <- function(dat, t_observed) {
   uid <- unique(id)
   N <- length(uid)
   onsets_observed <- rep(NaN, N)
+  names(onsets_observed) <- c(1:N)
   if (flag) {
     # No modifications to data frame needed
     ret <- list(dat = dat, onsets_observed = onsets_observed)

@@ -158,11 +158,12 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
     X <- cbind(X, dis_age)
   } else {
     dis_age <- NULL
-    teff <- numeric()
+    teff <- rep(NaN, N)
     N_cases <- NaN
   }
 
   # Return
+  names(teff) <- c(1:length(teff))
   list(
     X = X,
     teff = teff,

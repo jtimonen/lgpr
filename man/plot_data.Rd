@@ -13,8 +13,7 @@ plot_data(
   color_by = NULL,
   highlight = NULL,
   main = NULL,
-  sub = NULL,
-  fit = NULL
+  sub = NULL
 )
 }
 \arguments{
@@ -36,9 +35,6 @@ that is highlighted. Can only be used if \code{color_by} is \code{NULL}.}
 \item{main}{main plot title}
 
 \item{sub}{plot subtitle}
-
-\item{fit}{An object of class \linkS4class{lgpfit}. If this is provided,
-also the model fit is plotted.}
 }
 \value{
 a \code{ggplot} object

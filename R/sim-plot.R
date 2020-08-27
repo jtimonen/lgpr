@@ -1,170 +1,38 @@
-#' Plot a simulated longitudinal data set for each individual separately
-#'
+#' Visualize a simulated longitudinal data set
 #'
 #' @export
-#' @inheritParams sim_plot_create
-#' @inheritParams sim_plot_add_signal_and_data
-#' @param nrow number of rows, an argument for \code{ggplot2::facet_wrap}
-#' @param ncol number of columns, an argument for \code{ggplot2::facet_wrap}
-#' @seealso For plotting each component separately,
-#'  see \code{\link{sim_plot_components}}
-#' @return a ggplot object
-sim_plot <- function(simdata,
-                     nrow = NULL,
-                     ncol = NULL,
-                     i_test = NULL,
-                     linecolor = colorset("gray"),
-                     dotcolor = "black",
-                     testcolor = colorset("brightblue", "dark"),
-                     signal_name = "signal",
-                     y_transform = function(x) {
-                       x
-                     }) {
-
-  # Create and add facet
-  created <- sim_plot_create(simdata, i_test, y_transform, signal_name)
-  h <- created$plot
-  N <- created$N
-  h <- h + ggplot2::facet_wrap(. ~ id, nrow = nrow, ncol = ncol)
-  subtitle <- " "
-
-  # Add possible effect times (vertical lines)
-  et <- simdata@effect_times
-  updated <- sim_plot_add_onsets(h, et, N)
-  h <- updated$plot
-  subtitle <- paste0(subtitle, updated$info)
-
-  # Plot signal line and data points
-  h <- sim_plot_add_signal_and_data(h, i_test, linecolor, dotcolor, testcolor)
-
-  # Add axes, theme and titles
-  h <- h + ggplot2::labs(x = "Age", y = "y")
-  h <- h + ggplot2::ggtitle("Simulated data", subtitle = subtitle)
-  h <- h + ggplot2::theme_bw()
-  h <- h + ggplot2::theme(legend.title = ggplot2::element_blank())
-  h <- h + ggplot2::theme(legend.position = "top")
-
-  return(h)
-}
-
-
-#' Initialize a simulated data plot
-#'
-#' @description A helper function for \code{sim_plot}.
+#' @description Creates plots where each observation unit has a separate panel.
 #' @param simdata an object of class \linkS4class{lgpsim}
-#' @param i_test indices of possible test points
-#' @param y_transform function to transform the data y
-#' @param signal_name name of signal in the legend
-#' @return updated \code{ggplot} object
-sim_plot_create <- function(simdata, i_test, y_transform, signal_name) {
-  dat <- simdata@data
-  comp <- simdata@components
-  g <- comp$g
-  y <- y_transform(dat$y)
-  yval <- c(g, y)
-  leg <- rep(c(signal_name, "y (data)"), each = length(g))
-  id <- rep(dat$id, 2)
-  age <- rep(dat$age, 2)
-  n <- length(dat$id)
-  N <- length(unique(dat$id))
+#' @param signal_name signal label to show in legend
+#' @param signal_column name of the signal column in \code{simdata$components}
+#' @param x_name name of x-axis variable
+#' @param y_name name of y-axis variable
+#' @param group_by grouping variable
+#' @param ... keyword arguments to \code{\link{plot_panel}}
+#' @return a \code{ggplot object}
+sim_plot <- function(simdata, signal_name = "signal", signal_column = "f",
+                     x_name = "age", y_name = "y", group_by = "id", ...) {
+  data <- simdata@data
+  df_points <- data[c(group_by, x_name, y_name)]
+  df_lines <- df_points
+  df_lines[[y_name]] <- simdata@components[[signal_column]]
+  colnames(df_lines)[3] <- signal_name
 
-  DF <- data.frame(id, age, yval, leg)
-  DF$age <- as.numeric(age)
-  DF$yval <- as.numeric(yval)
-  is_test <- rep("y_train", n)
-  if (!is.null(i_test)) {
-    is_test[i_test] <- "y_test"
-  }
-  it <- rep(is_test, 2)
-  DF$is_test <- as.factor(it)
+  true_teff <- simdata@effect_times$true
+  signal_teff <- simdata@effect_times$observed
+  h <- plot_panel(
+    data = df_points,
+    signal = df_lines,
+    true_teff = true_teff,
+    signal_teff = signal_teff,
+    ...
+  )
 
-  # Create and return ggplot object
-  aes <- ggplot2::aes_string(x = "age", y = "yval", group = "leg")
-  h <- ggplot2::ggplot(data = DF, aes)
-  list(plot = h, subtitle = "", N = N, n = n)
-}
-
-
-#' Add real and observed disease onsets to plot
-#'
-#' @description A helper function for \code{sim_plot}.
-#' @param h a \code{ggplot} object
-#' @param effect_times a list
-#' @param N number of individuals
-#' @return a list containing the updated \code{ggplot} object and info
-sim_plot_add_onsets <- function(h, effect_times, N) {
-  vlinecolors <- c(colorset("red"), colorset("red", "dark"))
-  vlinetypes <- c(1, 5)
-  ons1 <- effect_times$true
-  ons2 <- effect_times$observed
-  no1 <- sum(!is.nan(ons1))
-  info <- ""
-  if (no1 > 0) {
-    info <- paste0(
-      "Vertical lines are the real effect time (solid) \n",
-      "and observed disease onset / initiation time (dashed)."
-    )
-    vline1.data <- data.frame(z = ons1, id = c(1:N))
-    vline2.data <- data.frame(z = ons2, id = c(1:N))
-
-    # Plot real effect times
-    h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "z"),
-      na.rm = TRUE,
-      data = vline1.data,
-      color = vlinecolors[1],
-      linetype = vlinetypes[1],
-      lwd = 0.7
-    )
-
-    # Plot observed onsets
-    h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "z"),
-      na.rm = TRUE,
-      data = vline2.data,
-      color = vlinecolors[2],
-      linetype = vlinetypes[2],
-      lwd = 0.7
-    )
-  }
-
-  # Return
-  list(plot = h, info = info)
-}
-
-
-#' Add generated signal and data to plot
-#'
-#' @description A helper function for \code{sim_plot}.
-#' @param h a \code{ggplot} object
-#' @inheritParams sim_plot_create
-#' @param linecolor line color for signal
-#' @param dotcolor dot color for data points
-#' @param testcolor dot color for possible test points
-#' @return the updated \code{ggplot} object
-sim_plot_add_signal_and_data <- function(h, i_test,
-                                         linecolor,
-                                         dotcolor,
-                                         testcolor) {
-
-  # Plot signal line
-  aes <- ggplot2::aes_string(linetype = "leg")
-  h <- h + ggplot2::geom_line(aes, color = linecolor, lwd = 1, alpha = 1)
-  h <- h + ggplot2::scale_shape_manual(values = c(NA, 16))
-  h <- h + ggplot2::scale_linetype_manual(values = c(1, 0))
-
-  # Plot data points
-  if (is.null(i_test)) {
-    aes <- ggplot2::aes_string(shape = "leg")
-    h <- h + ggplot2::geom_point(aes, na.rm = TRUE, color = dotcolor)
-  } else {
-    aes <- ggplot2::aes_string(shape = "leg", color = "is_test")
-    h <- h + ggplot2::geom_point(aes, na.rm = TRUE)
-  }
-
-  # Edit point types
-  if (!is.null(i_test)) {
-    h <- h + ggplot2::scale_color_manual(values = c(testcolor, dotcolor))
-  }
-
+  info <- paste0(
+    "Vertical lines are the real effect time (solid) \n",
+    "and observed disease onset / initiation time (dashed)."
+  )
+  h <- h + ggplot2::ggtitle("Simulated data", subtitle = info)
   return(h)
 }
 

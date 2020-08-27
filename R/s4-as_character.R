@@ -38,6 +38,13 @@ setMethod("as.character", "lgpformula", function(x) {
 })
 
 #' @rdname as_character
+setMethod("as.character", "lgpsim", function(x) {
+  n <- dim(x@data)[1]
+  desc <- paste0("A simulated dataset with ", n, " data points.\n")
+  return(desc)
+})
+
+#' @rdname as_character
 setMethod("as.character", "lgpmodel", function(x) {
   str0 <- as.character(x@model_formula)
   str1 <- get_covariate_names(x, type = "continuous")
