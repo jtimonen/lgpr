@@ -31,4 +31,6 @@ test_that("model summary prints output", {
   expect_output(model_summary(model))
 })
 
-
+test_that("print_stan_input prints output", {
+  expect_output(print_stan_input(model))
+})

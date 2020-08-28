@@ -7,6 +7,8 @@
 #'   \item \code{\link{model_summary_brief}} returns a string
 #'   \item \code{\link{model_summary}} prints the summary and
 #' returns \code{object} invisibly
+#'   \item \code{\link{print_stan_input}} prints the stan input
+#'   and returns \code{object} invisibly
 #' }
 model_summary <- function(object) {
   model <- object_to_model(object)
@@ -30,6 +32,14 @@ model_summary_brief <- function(object) {
   line2 <- paste0("Likelihood: ", str2)
   out <- paste0(line1, "\n", line2, "\n")
   return(out)
+}
+
+#' @export
+#' @rdname model_summary
+print_stan_input <- function(object) {
+  alist <- get_stan_input(object)
+  print_list(alist)
+  invisible(model)
 }
 
 #' Parameter summary (priors etc.)
