@@ -4,15 +4,12 @@
 \alias{as_character}
 \alias{as.character,lgpexpr-method}
 \alias{as.character,lgpterm-method}
-\alias{as.character,lgprhs-method}
 \alias{as.character,lgpformula-method}
 \title{Character representations of different S4 objects}
 \usage{
 \S4method{as.character}{lgpexpr}(x)
 
 \S4method{as.character}{lgpterm}(x)
-
-\S4method{as.character}{lgprhs}(x)
 
 \S4method{as.character}{lgpformula}(x)
 }

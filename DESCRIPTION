@@ -47,7 +47,6 @@ Collate:
     's4-validate.R'
     'all_s4_classes.R'
     'lgp-assist.R'
-    'lgp-ppc.R'
     'lgp.R'
     'lgpr-package.R'
     'methods-lgpfit.R'

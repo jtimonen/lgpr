@@ -50,24 +50,3 @@ sim_plot <- function(simdata, signal_name = "signal", signal_column = "f",
   h <- h + ggplot2::ggtitle("Simulated data", subtitle = info)
   return(h)
 }
-
-#' Visualize the components of a simulated data set
-#'
-#' @export
-#' @param simdata an object of class \linkS4class{lgpsim}
-#' @param time_is_xvar is the time variable the x-axis variable
-#' in all subplots?
-#' @param marker point marker
-#' @param ... keyword arguments for \code{\link{plot_components}}
-#' @return an object returned by \code{ggpubr::ggarrange} or a list
-sim_plot_components <- function(simdata,
-                                time_is_xvar = TRUE,
-                                marker = 16, ...) {
-  comp <- simdata@components
-  nnn <- dim(comp)[1]
-  ddd <- dim(comp)[2]
-  comp_1 <- comp[, 1:(ddd - 3)]
-  comp <- array(0, dim = c(1, nnn, ddd - 3))
-  comp[1, , ] <- as.matrix(comp_1)
-  plot_components(comp, NULL, time_is_xvar, marker = marker, ...)
-}

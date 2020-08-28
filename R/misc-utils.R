@@ -299,7 +299,7 @@ print_list <- function(input) {
       skipped <- c(skipped, name)
     }
   }
-  
+
   print(input[printed])
   str <- paste(skipped, collapse = ", ")
   msg <- paste0(
@@ -309,4 +309,3 @@ print_list <- function(input) {
   cat(msg)
   invisible(input)
 }
-

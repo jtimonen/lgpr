@@ -1,5 +1,6 @@
 library(lgpr)
 library(rstan)
+set.seed(123)
 
 # Create test data
 N <- 6

@@ -39,7 +39,7 @@ model_summary_brief <- function(object) {
 print_stan_input <- function(object) {
   alist <- get_stan_input(object)
   print_list(alist)
-  invisible(model)
+  invisible(object)
 }
 
 #' Parameter summary (priors etc.)
