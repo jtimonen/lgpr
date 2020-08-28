@@ -94,8 +94,9 @@ lgpscaling <- setClass("lgpscaling",
 #' @slot info Other info in text format.
 #' @section Related methods and functions:
 #' \itemize{
-#'     \item \code{\link{prior_summary}}
-#'     \item \code{\link{get_covariate_names}}
+#'     \item \code{\link{model_summary}}
+#'     \item \code{\link{prior_summary}} and \code{\link{param_summary}}
+#'     \item \code{\link{model_getters}}
 #' }
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
@@ -114,6 +115,8 @@ lgpmodel <- setClass("lgpmodel",
 #' @slot model An object of class \code{lgpmodel}.
 #' @section Related methods and functions:
 #' \itemize{
+#'     \item \code{\link{fit_summary}}
+#'     \item \code{\link{get_draws}}
 #'     \item \code{\link{plot_posterior}}
 #'     \item \code{\link{plot_posterior_warp}}
 #'     \item In addition, all methods that work on \linkS4class{lgpmodel}

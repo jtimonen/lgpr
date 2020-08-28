@@ -198,3 +198,75 @@ null_if_all_nan <- function(x) {
     return(NULL)
   }
 }
+
+#' Helper function for generic functions
+#'
+#' @description Helper function for generic functions that work on
+#' both of \linkS4class{lgpmodel} and \linkS4class{lgpfit} class objects.
+#' @param object an object of class \linkS4class{lgpmodel} or
+#' \linkS4class{lgpfit}
+#' @return an object of class \linkS4class{lgpmodel}
+object_to_model <- function(object) {
+  allowed <- c("lgpmodel", "lgpfit")
+  check_type(object, allowed)
+  if (class(object) == "lgpfit") {
+    out <- object@model
+  } else {
+    out <- object
+  }
+  return(out)
+}
+
+#' Class info for show methods
+#'
+#' @param class_name class name
+#' @return a string
+class_info <- function(class_name) {
+  str <- paste0(
+    "An object of class ", class_name, ". See ?",
+    class_name, " for more info and related methods/functions.\n"
+  )
+  return(str)
+}
+
+#' Squeeze the second dimension of an array
+#'
+#' @param x an array of shape \code{n1} x \code{n2} x \code{n3}
+#' @return an array of shape \code{n1*n2} x \code{n3}
+squeeze_second_dim <- function(x) {
+  D <- dim(x)
+  L <- length(D)
+  if (L != 3) {
+    msg <- paste0("Number of dimensions in <x> must be 3! found = ", L)
+    stop(msg)
+  }
+  if (D[2] < 1) {
+    msg <- paste0("Second dimension of <x> must be at least 1! found = ", D[2])
+    stop(msg)
+  }
+  a <- c()
+  for (j in seq_len(D[2])) {
+    b <- x[, j, ]
+    a <- rbind(a, b)
+  }
+  return(a)
+}
+
+#' Array reshaping
+#'
+#' @param x an array of shape \code{n} x \code{m}
+#' @param L an integer
+#' @return a list of length \code{L}, where each element is an array of
+#' shape \code{n} x (\code{m}/\code{L})
+array_to_arraylist <- function(x, L) {
+  m <- dim(x)[2]
+  if (m %% L) {
+    stop("Second dimension of <x> must be a multiple of <L>!")
+  }
+  out <- list()
+  for (k in seq_len(L)) {
+    inds <- seq(k, m, by = L)
+    out[[k]] <- x[, inds]
+  }
+  return(out)
+}

@@ -19,6 +19,8 @@ An S4 class to represent the output of the \code{lgp} function
 \section{Related methods and functions}{
 
 \itemize{
+    \item \code{\link{fit_summary}}
+    \item \code{\link{get_draws}}
     \item \code{\link{plot_posterior}}
     \item \code{\link{plot_posterior_warp}}
     \item In addition, all methods that work on \linkS4class{lgpmodel}

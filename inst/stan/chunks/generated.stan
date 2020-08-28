@@ -2,8 +2,8 @@
   number of components (<num_comps>). Then the elemens of <f_post> are
     - [1:D] = component means
     - [D+1] = total mean
-    - [(D+2):(D+2+D)] = component variances
-    - [2*(D+1)] = total variance
+    - [(D+2):(2*D+1)] = component variances
+    - [2*D + 2] = total variance
 */
 vector[num_obs] f_post[is_generated_done, 2*(num_comps+1)];
 

@@ -3,48 +3,67 @@
 #' @description Creates plots where each observation unit has a separate panel
 #' @param data a data frame
 #' @param signal a data frame
-#' @param fit a list of data frames
+#' @param fit a list
 #' @param i_test indices of test points
-#' @param linecolors three line colors
+#' @param linecolors two line colors (signal and fit)
+#' @param vlinecolor color of vertical lines (true and obs. effect time)
 #' @param nrow number of rows, an argument for \code{ggplot2::facet_wrap}
 #' @param ncol number of columns, an argument for \code{ggplot2::facet_wrap}
 #' @param y_transform a function
 #' @param true_teff a named vector
 #' @param signal_teff a named vector
 #' @param fit_teff a list of named vectors
+#' @param fit_alpha line alpha for fit
 #' @return a \code{ggplot} object
 plot_panel <- function(data,
                        signal = NULL,
                        fit = NULL,
                        i_test = NULL,
                        linecolors = color_palette(2),
+                       vlinecolor = colorset("gray", "mid_highlight"),
                        nrow = NULL,
                        ncol = NULL,
                        y_transform = function(x) x,
                        true_teff = NULL,
                        signal_teff = NULL,
-                       fit_teff = list()) {
+                       fit_teff = list(),
+                       fit_alpha = 0.1) {
   check_type(data, "data.frame")
   check_type(y_transform, "function")
   group_by <- colnames(data)[1]
+  x_name <- colnames(data)[2]
 
   # Create the plot
   h <- plot_panel_create(data, i_test, y_transform, nrow, ncol)
 
   # Add true and observed effect times
-  col1 <- colorset("red")
-  col2 <- colorset("red", "dark")
-  h <- plot_panel_add_effect_times(h, true_teff, group_by, col1, 1, 0.7)
-  h <- plot_panel_add_effect_times(h, signal_teff, group_by, col2, 2, 0.7)
+  col <- vlinecolor
+  h <- plot_panel_add_effect_times(h, true_teff, group_by, col, 1, 0.7)
+  h <- plot_panel_add_effect_times(h, signal_teff, group_by, col, 2, 0.7)
+
+  # Add fit
+  if (!is.null(fit)) {
+    df_fit <- plot_panel_create_fit_df(h, fit)
+    aes_fit <- ggplot2::aes_string(x = x_name, y = "f", group = "draw")
+    h <- h + ggplot2::geom_line(
+      data = df_fit,
+      mapping = aes_fit,
+      inherit.aes = FALSE,
+      color = linecolors[2],
+      alpha = fit_alpha
+    )
+  }
 
   # Add signal
-  aes <- plot_panel_create_aes(signal, NULL)
-  h <- h + ggplot2::geom_line(
-    data = signal,
-    mapping = aes,
-    inherit.aes = FALSE,
-    color = linecolors[1]
-  )
+  if (!is.null(signal)) {
+    aes_sig <- plot_panel_create_aes(signal, NULL)
+    h <- h + ggplot2::geom_line(
+      data = signal,
+      mapping = aes_sig,
+      inherit.aes = FALSE,
+      color = linecolors[1]
+    )
+  }
 
   # Add data
   h <- h + ggplot2::geom_point()
@@ -77,7 +96,7 @@ plot_panel_create <- function(data, i_test, y_transform, nrow, ncol) {
   # Create faceting
   group_by <- colnames(data)[1]
   h <- plot_panel_add_faceting(h, group_by, nrow, ncol)
-  
+
   # Add shape and color scale
   if (show_test) {
     h <- h + ggplot2::scale_shape_manual(values = c(16, 16))
@@ -88,10 +107,28 @@ plot_panel_create <- function(data, i_test, y_transform, nrow, ncol) {
   return(h)
 }
 
+#' Data for adding fit to the panel plot
+#'
+#' @inheritParams plot_panel_add_effect_times
+#' @return a data frame
+plot_panel_create_fit_df <- function(h, fit) {
+  check_type(fit, "list")
+  names <- colnames(fit$x)
+  y_m <- fit$y$mean
+  S <- dim(y_m)[1]
+  n <- dim(y_m)[2]
+  X1 <- rep(fit$x[, 1], S)
+  X2 <- rep(fit$x[, 2], S)
+  X3 <- as.numeric(t(y_m))
+  X4 <- rep(1:S, each = n)
+  df <- data.frame(as.factor(X1), X2, X3, as.factor(X4))
+  colnames(df) <- c(names, "f", "draw")
+  return(df)
+}
+
 #' Add faceting to the panel plot
 #'
-#' @inheritParams plot_panel
-#' @param h a \code{ggplot} object
+#' @inheritParams plot_panel_add_effect_times
 #' @return a \code{ggplot} object
 plot_panel_add_faceting <- function(h, group_by, nrow, ncol) {
   f <- stats::as.formula(paste("~", group_by))

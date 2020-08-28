@@ -9,9 +9,7 @@ plot_panel_add_faceting(h, group_by, nrow, ncol)
 \arguments{
 \item{h}{a \code{ggplot} object}
 
-\item{nrow}{number of rows, an argument for \code{ggplot2::facet_wrap}}
-
-\item{ncol}{number of columns, an argument for \code{ggplot2::facet_wrap}}
+\item{group_by}{name of grouping variable}
 }
 \value{
 a \code{ggplot} object

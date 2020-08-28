@@ -50,9 +50,7 @@ test_that("simulated data can be plotted", {
     t_data = seq(6, 36, by = 6),
     covariates = c(1, 2)
   )
-  p <- sim_plot(dat,
-    i_test = c(1, 2, 3), ncol = 4
-  )
+  p <- sim_plot(dat, i_test = c(1, 2, 3), ncol = 4)
   expect_s3_class(p, "ggplot")
 })
 
@@ -63,8 +61,24 @@ test_that("simulated data with disease effect can be plotted", {
     covariates = c(0, 2),
     t_observed = "after_1"
   )
-  p <- sim_plot(dat,
-    i_test = c(1, 2, 3), ncol = 4
-  )
+  p <- sim_plot(dat, i_test = c(1, 2, 3), ncol = 4)
   expect_s3_class(p, "ggplot")
+})
+
+
+test_that("model fit can be visualized with data", {
+  sim <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "after_1"
+  )
+  data <- sim@data
+  suppressWarnings({
+    fit <- lgp(y ~ gp(age) + zerosum(z) * gp(age),
+      data = data, chains = 1, iter = 500, refresh = 0
+    )
+    p <- plot_fit(fit, data)
+    expect_s3_class(p, "ggplot")
+  })
 })

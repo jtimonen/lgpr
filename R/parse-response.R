@@ -94,7 +94,7 @@ parse_likelihood <- function(likelihood, c_hat, num_trials, list_y) {
 #' Set c_hat (non-gaussian observation models)
 #'
 #' @param c_hat the \code{c_hat} argument given as input to
-#' \code{\link{lgp_model}}
+#' \code{\link{create_model}}
 #' @param response response variable
 #' @param LH likelihood as int
 #' @param num_trials the num_trials data (binomial likelihood)

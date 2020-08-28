@@ -1,19 +1,25 @@
-#' Helper function
+#' Visualize a model posterior
 #'
-#' @description Helper function for generic functions that work on
-#' both of \linkS4class{lgpmodel} and \linkS4class{lgpfit} class objects.
-#' @param object an object of class \linkS4class{lgpmodel} or
-#' \linkS4class{lgpfit}
-#' @return an object of class \linkS4class{lgpmodel}
-object_to_model <- function(object) {
-  allowed <- c("lgpmodel", "lgpfit")
-  check_type(object, allowed)
-  if (typeof(object) == "lgpfit") {
-    out <- object@model
-  } else {
-    out <- object
+#' @param x an object of class \linkS4class{lgpfit}
+#' @param y not used
+#' @param ... keyword arguments passed to \code{\link{plot_posterior}}
+#' @return a \code{ggplot} object
+setMethod(
+  f = "plot",
+  signature = signature(x = "lgpfit", y = "missing"),
+  definition = function(x, ...) {
+    plot_posterior(x, ...)
   }
-  return(out)
+)
+
+#' Posterior summary
+#'
+#' @export
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @return a character representation
+fit_summary <- function(fit) {
+  check_type(fit, "lgpfit")
+  print(fit@stan_fit, pars = c("f_post", "lp__"), include = FALSE)
 }
 
 #' Visualize posterior distribution of sampled parameters
@@ -26,7 +32,10 @@ object_to_model <- function(object) {
 #' @return a \code{ggplot} object
 plot_posterior <- function(fit,
                            type = "intervals",
-                           regex_pars = c("alpha", "ell", "wrp", "sigma", "phi"),
+                           regex_pars = c(
+                             "alpha", "ell", "wrp",
+                             "sigma", "phi"
+                           ),
                            ...) {
   check_type(fit, "lgpfit")
   sf <- fit@stan_fit
@@ -39,6 +48,39 @@ plot_posterior <- function(fit,
   }
   return(h)
 }
+
+#' Visualize a model fit against longitudinal data set
+#'
+#' @export
+#' @description Creates plots where each observation unit has a separate panel.
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @param data a data frame
+#' @param x_name name of x-axis variable
+#' @param y_name name of y-axis variable
+#' @param group_by grouping variable
+#' @param ... keyword arguments to \code{\link{plot_panel}}
+#' @return a \code{ggplot object}
+plot_fit <- function(fit, data, x_name = "age", y_name = "y",
+                     group_by = "id", ...) {
+  df_points <- data[c(group_by, x_name, y_name)]
+  df_lines <- data[c(group_by, x_name)]
+  f_post <- get_posterior_f(fit)
+  lines <- list(
+    mean = f_post$means$total,
+    var = f_post$variances$total
+  )
+
+  h <- plot_panel(
+    data = df_points,
+    fit = list(x = df_lines, y = lines),
+    ...
+  )
+  num_draws <- dim(lines$mean)[1]
+  info <- paste("Showing analytic GP mean for", num_draws, "posterior draws.")
+  h <- h + ggplot2::ggtitle("Model fit", subtitle = info)
+  return(h)
+}
+
 
 #' Visualize the input warping function for different parameter samples
 #'
@@ -95,6 +137,55 @@ plot_posterior_warp <- function(fit, p = 300, R = 48,
   if (L == 1) {
     return(out[[1]])
   } else {
+    if (L == 0) {
+      stop("The model does not have warping parameters.")
+    }
     return(out)
   }
+}
+
+#' Extract posterior draws
+#'
+#' @description Uses \code{rstan::extract} with \code{permuted = FALSE} and
+#' \code{inc_warmup = FALSE}.
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @param ... other keyword arguments to \code{rstan::extract}
+#' @return a named list
+get_draws <- function(fit, ...) {
+  check_type(fit, "lgpfit")
+  rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
+}
+
+
+#' Extract posterior of the function f and its components
+#'
+#' @export
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @return a named list where each element is a named list
+#' (length \code{num_components + 1}) of arrays of size
+#' \code{num_draws} x \code{num_chains}
+get_posterior_f <- function(fit, ...) {
+  check_type(fit, "lgpfit")
+  f_sampled <- get_stan_input(fit)$is_f_sampled
+  names <- get_component_names(fit)
+  D <- length(names)
+  R <- D + 1
+  all_names <- c(names, "total")
+  if (!f_sampled) {
+    fp <- get_draws(fit, pars = "f_post")
+    fp <- squeeze_second_dim(fp)
+    alist <- array_to_arraylist(fp, 2 * R)
+    m <- alist[1:R]
+    v <- alist[(R + 1):(2 * R)]
+    names(m) <- all_names
+    names(v) <- all_names
+    out <- list(means = m, variances = v)
+  } else {
+    fp <- get_draws(fit, pars = "f_latent")
+    fp <- squeeze_second_dim(fp)
+    alist <- array_to_arraylist(fp, R)
+    names(alist) <- all_names
+    out <- list(samples = alist)
+  }
+  return(out)
 }

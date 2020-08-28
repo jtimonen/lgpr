@@ -10,12 +10,14 @@ plot_panel(
   fit = NULL,
   i_test = NULL,
   linecolors = color_palette(2),
+  vlinecolor = colorset("gray", "mid_highlight"),
   nrow = NULL,
   ncol = NULL,
   y_transform = function(x) x,
   true_teff = NULL,
   signal_teff = NULL,
-  fit_teff = list()
+  fit_teff = list(),
+  fit_alpha = 0.1
 )
 }
 \arguments{
@@ -23,11 +25,13 @@ plot_panel(
 
 \item{signal}{a data frame}
 
-\item{fit}{a list of data frames}
+\item{fit}{a list}
 
 \item{i_test}{indices of test points}
 
-\item{linecolors}{three line colors}
+\item{linecolors}{two line colors (signal and fit)}
+
+\item{vlinecolor}{color of vertical lines (true and obs. effect time)}
 
 \item{nrow}{number of rows, an argument for \code{ggplot2::facet_wrap}}
 
@@ -40,6 +44,8 @@ plot_panel(
 \item{signal_teff}{a named vector}
 
 \item{fit_teff}{a list of named vectors}
+
+\item{fit_alpha}{line alpha for fit}
 }
 \value{
 a \code{ggplot} object

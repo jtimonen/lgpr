@@ -159,9 +159,9 @@ stan_data_components <- function(model_formula, covariates) {
     comps[j, ] <- term_to_numeric(terms[[j]], covariates)
   }
   colnames(comps) <- c(
-    "comp", "ker", "unused",
-    "heter", "ns", "vm",
-    "uncrt", "i_cat", "i_cont"
+    "type", "ker", "unused",
+    "het", "ns", "vm",
+    "unc", "icat", "icont"
   )
   rownames(comps) <- term_names(model_formula@terms)
   components <- as.matrix(comps)

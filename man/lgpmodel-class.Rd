@@ -38,8 +38,9 @@ An S4 class to represent an lgp model
 \section{Related methods and functions}{
 
 \itemize{
-    \item \code{\link{prior_summary}}
-    \item \code{\link{get_covariate_names}}
+    \item \code{\link{model_summary}}
+    \item \code{\link{prior_summary}} and \code{\link{param_summary}}
+    \item \code{\link{model_getters}}
 }
 }
 

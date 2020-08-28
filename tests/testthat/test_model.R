@@ -22,14 +22,6 @@ test_that("create_model can be used", {
   expect_true(validObject(a))
 })
 
-test_that("lgpmodel and lgpformula have character representations", {
-  f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
-  m <- create_model(f, dat)
-  a <- m@model_formula
-  expect_gt(nchar(as.character(m)), 10)
-  expect_gt(nchar(as.character(a)), 10)
-})
-
 test_that("prior can be parsed from stan_input", {
   f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
   m <- create_model(f, dat)

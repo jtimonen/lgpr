@@ -4,6 +4,7 @@
 #' @param allowed Allowed class names.
 #' @return Returns \code{TRUE} if the object has an allowed type.
 check_type <- function(object, allowed) {
+  check_length(class(object), 1)
   type <- class(object)
   ok <- (type %in% allowed)
   if (!ok) {
