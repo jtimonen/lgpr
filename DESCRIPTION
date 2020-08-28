@@ -66,8 +66,6 @@ Collate:
     'plot-components.R'
     'plot-data.R'
     'plot-panel.R'
-    'plot-posterior-helper.R'
-    'plot-posterior-main.R'
     'plot-samples.R'
     'printing.R'
     'priors-default.R'
