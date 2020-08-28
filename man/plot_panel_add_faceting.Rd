@@ -10,6 +10,10 @@ plot_panel_add_faceting(h, group_by, nrow, ncol)
 \item{h}{a \code{ggplot} object}
 
 \item{group_by}{name of grouping variable}
+
+\item{nrow}{number of rows, an argument for \code{ggplot2::facet_wrap}}
+
+\item{ncol}{number of columns, an argument for \code{ggplot2::facet_wrap}}
 }
 \value{
 a \code{ggplot} object

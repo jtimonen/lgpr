@@ -4,7 +4,7 @@
 \alias{get_posterior_f}
 \title{Extract posterior of the function f and its components}
 \usage{
-get_posterior_f(fit, ...)
+get_posterior_f(fit)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}

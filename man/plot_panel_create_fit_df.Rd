@@ -8,6 +8,8 @@ plot_panel_create_fit_df(h, fit)
 }
 \arguments{
 \item{h}{a \code{ggplot} object}
+
+\item{fit}{a list}
 }
 \value{
 a data frame

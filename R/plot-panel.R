@@ -110,6 +110,7 @@ plot_panel_create <- function(data, i_test, y_transform, nrow, ncol) {
 #' Data for adding fit to the panel plot
 #'
 #' @inheritParams plot_panel_add_effect_times
+#' @inheritParams plot_panel
 #' @return a data frame
 plot_panel_create_fit_df <- function(h, fit) {
   check_type(fit, "list")
@@ -129,6 +130,7 @@ plot_panel_create_fit_df <- function(h, fit) {
 #' Add faceting to the panel plot
 #'
 #' @inheritParams plot_panel_add_effect_times
+#' @inheritParams plot_panel
 #' @return a \code{ggplot} object
 plot_panel_add_faceting <- function(h, group_by, nrow, ncol) {
   f <- stats::as.formula(paste("~", group_by))

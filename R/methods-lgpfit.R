@@ -164,7 +164,7 @@ get_draws <- function(fit, ...) {
 #' @return a named list where each element is a named list
 #' (length \code{num_components + 1}) of arrays of size
 #' \code{num_draws} x \code{num_chains}
-get_posterior_f <- function(fit, ...) {
+get_posterior_f <- function(fit) {
   check_type(fit, "lgpfit")
   f_sampled <- get_stan_input(fit)$is_f_sampled
   names <- get_component_names(fit)
