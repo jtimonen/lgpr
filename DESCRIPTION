@@ -57,7 +57,6 @@ Collate:
     'misc-split.R'
     'misc-utils.R'
     'parse-components.R'
-    'parse-expand.R'
     'parse-formula.R'
     'parse-misc.R'
     'parse-response.R'

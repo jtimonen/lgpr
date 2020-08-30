@@ -163,7 +163,8 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
   }
 
   # Return
-  names(teff) <- c(1:length(teff))
+  lt <- length(teff)
+  names(teff) <- seq_len(lt)
   list(
     X = X,
     teff = teff,

@@ -109,3 +109,35 @@ check_length <- function(object, expected) {
   }
   return(TRUE)
 }
+
+#' Check that argument is not null
+#'
+#' @param arg Any object.
+#' @return Returns \code{TRUE} if the object is not null.
+check_not_null <- function(arg) {
+  arg_name <- deparse(substitute(arg))
+  if (is.null(arg)) {
+    stop(arg_name, " should not be NULL!")
+  }
+  return(TRUE)
+}
+
+#' Check if arguments have the same length
+#'
+#' @param a Any object.
+#' @param b Any object.
+#' @return Returns \code{TRUE} if the arguments have equal length.
+check_lengths <- function(a, b) {
+  L1 <- length(a)
+  L2 <- length(b)
+  a_name <- deparse(substitute(a))
+  b_name <- deparse(substitute(b))
+  if (L1 != L2) {
+    msg <- paste0(
+      "lengths of ", a_name, " and ", b_name, " must match!",
+      " found = ", L1, " and ", L2
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}

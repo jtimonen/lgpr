@@ -34,6 +34,24 @@ test_that("check_length works correctly", {
   expect_error(check_length(c(4, 3, 2), 5), reason)
 })
 
+test_that("check_lengths works correctly", {
+  a1 <- c(1, 2)
+  a2 <- c(3, 2, 1)
+  a3 <- c(3, 2, 1)
+  expect_true(check_lengths(a2, a3))
+  reason <- "lengths of a1 and a3 must match! found = 2 and 3"
+  expect_error(check_lengths(a1, a3), reason)
+})
+
+test_that("check_not_null works correctly", {
+  a1 <- c(1, 2)
+  a2 <- NULL
+  expect_true(check_not_null(a1))
+  reason <- "a2 should not be NULL"
+  expect_error(check_not_null(a2), reason)
+})
+
+
 # -------------------------------------------------------------------------
 
 context("Inverse-gamma distribution")

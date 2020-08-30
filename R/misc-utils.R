@@ -5,9 +5,7 @@
 #' @param n number of times to repeat
 #' @return returns an array of size \code{n} x \code{m}
 repvec <- function(v, n) {
-  if (is.null(v)) {
-    stop("Error in repvec, input <v> is NULL.")
-  }
+  check_not_null(v)
   m <- length(v)
   A <- matrix(rep(v, n), n, m, byrow = TRUE)
   return(as.array(A))
@@ -319,19 +317,12 @@ print_list <- function(input) {
 zip_lists <- function(a, b) {
   check_type(a, "list")
   check_type(b, "list")
-  L1 <- length(a)
-  L2 <- length(b)
+  check_lengths(a, b)
   a_name <- deparse(substitute(a))
   b_name <- deparse(substitute(b))
-  if (L1 != L2) {
-    msg <- paste0(
-      "lengths of ", a_name, " and ", b_name, " must match!",
-      " found = ", L1, " and ", L2
-    )
-    stop(msg)
-  }
   out <- list()
-  for (j in seq_len(L1)) {
+  L <- length(a)
+  for (j in seq_len(L)) {
     list_j <- list(a[[j]], b[[j]])
     names(list_j) <- c(a_name, b_name)
     out[[j]] <- list_j

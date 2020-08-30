@@ -134,7 +134,11 @@ test_that("a formula  term cannot have more than 4 expressions", {
 })
 
 test_that("an lgpmodel has correct list fields for stan input", {
-  m <- create_model(y ~ gp(age) + zerosum(id), dat, options = list(delta = 1e-5))
+  m <- create_model(
+    formula = y ~ gp(age) + zerosum(id),
+    dat,
+    options = list(delta = 1e-5)
+  )
   found_fields <- sort(names(m@stan_input))
   expected_fields <- sort(stan_list_names())
   for (field in expected_fields) {
@@ -200,4 +204,21 @@ test_that("cannot have a continuous covariate with zero variance", {
   newdat$age <- -1
   reason <- "have zero variance"
   expect_error(create_model(y ~ gp(age) + zerosum(id), newdat), reason)
+})
+
+
+test_that("cannot have NaNs on different rows", {
+  newdat <- dat
+  newdat$new_x <- rev(dat$dis_age)
+  reason <- paste0(
+    "NaNs of the continuous covariate must be on the same rows.",
+    " Found discrepancy between dis_age and new_x"
+  )
+  expect_error(
+    create_model(
+      formula = y ~ heter(id) * gp(dis_age) + heter(id) * gp(new_x),
+      data = newdat
+    ),
+    reason
+  )
 })

@@ -130,6 +130,22 @@ test_that("simulated effect time can be observed late randomly", {
   expect_equal(length(et$observed), 4)
 })
 
+test_that("custom dis_fun argument can be given", {
+  dis_fun <- function(x) {
+    as.numeric(x > 0) + as.numeric(x < 20)
+  }
+  dat <- simulate_data(
+    N = 4,
+    t_effect_range = c(8, 10),
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    relevances = c(0, 0, 1, 0),
+    dis_fun = dis_fun
+  )
+  ker <- dat@kernel_matrices
+  expect_equal(dim(ker), c(24, 24, 4))
+})
+
 
 # -------------------------------------------------------------------------
 

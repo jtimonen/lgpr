@@ -76,26 +76,26 @@ plot_panel <- function(df_data,
 #'
 #' @inheritParams plot_panel
 #' @return a \code{ggplot} object
-plot_panel_create <- function(data, i_test, y_transform, nrow, ncol) {
+plot_panel_create <- function(df_data, i_test, y_transform, nrow, ncol) {
 
   # Create dummy variable for type (train/test)
   show_test <- !is.null(i_test)
   if (show_test) {
-    n <- dim(data)[1]
+    n <- dim(df_data)[1]
     a <- rep("train", n)
     a[i_test] <- "test"
     type_name <- "Type"
-    data[[type_name]] <- as.factor(a)
+    df_data[[type_name]] <- as.factor(a)
   } else {
     type_name <- NULL
   }
 
   # Create aes
-  aes <- plot_panel_create_aes(data, type_name)
-  h <- ggplot2::ggplot(data, aes)
+  aes <- plot_panel_create_aes(df_data, type_name)
+  h <- ggplot2::ggplot(df_data, aes)
 
   # Create faceting
-  group_by <- colnames(data)[1]
+  group_by <- colnames(df_data)[1]
   h <- plot_panel_add_faceting(h, group_by, nrow, ncol)
 
   # Add shape and color scale

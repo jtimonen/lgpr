@@ -30,6 +30,8 @@ test_that("prior summary works", {
 
 test_that("model summary prints output", {
   expect_output(model_summary(model))
+  expect_output(show(model))
+  expect_output(show(model@model_formula))
 })
 
 test_that("print_stan_input prints output", {
@@ -101,5 +103,6 @@ test_that("fit summary prints output", {
       data = data, chains = 1, iter = 100, refresh = 0
     )
     expect_output(fit_summary(fit))
+    expect_output(show(fit))
   })
 })
