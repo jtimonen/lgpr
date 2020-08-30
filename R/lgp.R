@@ -46,7 +46,9 @@ lgp <- function(formula,
 #' \code{iter}, \code{chains} or \code{control}. See
 #' \code{\link[rstan]{sampling}} for the possible arguments.
 sample_model <- function(model, ...) {
-  rstan::sampling(object = stanmodels[["lgp"]], data = model@stan_input, ...)
+  object <- stanmodels[[model@stan_model_name]]
+  data <- model@stan_input
+  rstan::sampling(object = object, data = data, check_data = TRUE, ...)
 }
 
 #' @rdname lgp
@@ -56,7 +58,9 @@ sample_model <- function(model, ...) {
 #' \code{algorithm}. See \code{\link[rstan]{optimizing}} for the possible
 #' arguments.
 optimize_model <- function(model, ...) {
-  rstan::optimizing(object = stanmodels[["lgp"]], data = model@stan_input, ...)
+  object <- stanmodels[[model@stan_model_name]]
+  data <- model@stan_input
+  rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
 }
 
 #' Create a model
@@ -132,7 +136,8 @@ create_model <- function(formula,
     var_info = var_info,
     var_scalings = var_scalings,
     stan_input = stan_input,
-    info = info
+    info = info,
+    stan_model_name = "lgp"
   )
   return(out)
 }

@@ -33,6 +33,8 @@ An S4 class to represent an lgp model
 }}
 
 \item{\code{info}}{Other info in text format.}
+
+\item{\code{stan_model_name}}{Name of Stan model.}
 }}
 
 \section{Related methods and functions}{

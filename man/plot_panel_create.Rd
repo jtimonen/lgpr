@@ -7,8 +7,6 @@
 plot_panel_create(data, i_test, y_transform, nrow, ncol)
 }
 \arguments{
-\item{data}{a data frame}
-
 \item{i_test}{indices of test points}
 
 \item{y_transform}{a function}

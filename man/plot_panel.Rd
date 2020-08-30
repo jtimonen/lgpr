@@ -5,9 +5,9 @@
 \title{Visuzalize longitudinal data in panels}
 \usage{
 plot_panel(
-  data,
-  signal = NULL,
-  fit = NULL,
+  df_data,
+  df_signal = NULL,
+  df_fit = NULL,
   i_test = NULL,
   linecolors = color_palette(2),
   vlinecolor = colorset("gray", "mid_highlight"),
@@ -21,11 +21,11 @@ plot_panel(
 )
 }
 \arguments{
-\item{data}{a data frame}
+\item{df_data}{a data frame}
 
-\item{signal}{a data frame}
+\item{df_signal}{a data frame or \code{NULL}}
 
-\item{fit}{a list}
+\item{df_fit}{a data frame or \code{NULL}}
 
 \item{i_test}{indices of test points}
 

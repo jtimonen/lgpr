@@ -4,16 +4,18 @@
 \alias{array_to_arraylist}
 \title{Array reshaping}
 \usage{
-array_to_arraylist(x, L)
+array_to_arraylist(x, L, draws)
 }
 \arguments{
 \item{x}{an array of shape \code{n} x \code{m}}
 
 \item{L}{an integer}
+
+\item{draws}{see the \code{draws} argument of \code{\link{get_posterior_f}}}
 }
 \value{
 a list of length \code{L}, where each element is an array of
-shape \code{n} x (\code{m}/\code{L})
+shape \code{h} x (\code{m}/\code{L}), where \code{h = length(draws)}
 }
 \description{
 Array reshaping

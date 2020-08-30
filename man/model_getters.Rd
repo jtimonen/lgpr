@@ -7,6 +7,7 @@
 \alias{get_component_info}
 \alias{get_component_names}
 \alias{get_num_obs}
+\alias{is_f_sampled}
 \title{Functions that access model properties}
 \usage{
 get_covariate_names(object, type = "all")
@@ -18,6 +19,8 @@ get_component_info(object)
 get_component_names(object)
 
 get_num_obs(object)
+
+is_f_sampled(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
@@ -34,6 +37,7 @@ get_num_obs(object)
   \item \code{get_component_info} returns a data frame
   \item \code{get_component_names} returns an array of names
   \item \code{get_num_obs} returns an integer
+  \item \code{is_f_sampled} returns a boolean value
 }
 }
 \description{

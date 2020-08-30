@@ -1,9 +1,9 @@
 #' Visuzalize longitudinal data in panels
 #'
 #' @description Creates plots where each observation unit has a separate panel
-#' @param data a data frame
-#' @param signal a data frame
-#' @param fit a list
+#' @param df_data a data frame
+#' @param df_signal a data frame or \code{NULL}
+#' @param df_fit a data frame or \code{NULL}
 #' @param i_test indices of test points
 #' @param linecolors two line colors (signal and fit)
 #' @param vlinecolor color of vertical lines (true and obs. effect time)
@@ -15,9 +15,9 @@
 #' @param fit_teff a list of named vectors
 #' @param fit_alpha line alpha for fit
 #' @return a \code{ggplot} object
-plot_panel <- function(data,
-                       signal = NULL,
-                       fit = NULL,
+plot_panel <- function(df_data,
+                       df_signal = NULL,
+                       df_fit = NULL,
                        i_test = NULL,
                        linecolors = color_palette(2),
                        vlinecolor = colorset("gray", "mid_highlight"),
@@ -28,13 +28,13 @@ plot_panel <- function(data,
                        signal_teff = NULL,
                        fit_teff = list(),
                        fit_alpha = 0.1) {
-  check_type(data, "data.frame")
+  check_type(df_data, "data.frame")
   check_type(y_transform, "function")
-  group_by <- colnames(data)[1]
-  x_name <- colnames(data)[2]
+  group_by <- colnames(df_data)[1]
+  x_name <- colnames(df_data)[2]
 
   # Create the plot
-  h <- plot_panel_create(data, i_test, y_transform, nrow, ncol)
+  h <- plot_panel_create(df_data, i_test, y_transform, nrow, ncol)
 
   # Add true and observed effect times
   col <- vlinecolor
@@ -42,8 +42,8 @@ plot_panel <- function(data,
   h <- plot_panel_add_effect_times(h, signal_teff, group_by, col, 2, 0.7)
 
   # Add fit
-  if (!is.null(fit)) {
-    df_fit <- plot_panel_create_fit_df(h, fit)
+  if (!is.null(df_fit)) {
+    check_type(df_fit, "data.frame")
     aes_fit <- ggplot2::aes_string(x = x_name, y = "f", group = "draw")
     h <- h + ggplot2::geom_line(
       data = df_fit,
@@ -55,10 +55,11 @@ plot_panel <- function(data,
   }
 
   # Add signal
-  if (!is.null(signal)) {
-    aes_sig <- plot_panel_create_aes(signal, NULL)
+  if (!is.null(df_signal)) {
+    check_type(df_signal, "data.frame")
+    aes_sig <- plot_panel_create_aes(df_signal, NULL)
     h <- h + ggplot2::geom_line(
-      data = signal,
+      data = df_signal,
       mapping = aes_sig,
       inherit.aes = FALSE,
       color = linecolors[1]
@@ -105,26 +106,6 @@ plot_panel_create <- function(data, i_test, y_transform, nrow, ncol) {
     h <- h + ggplot2::scale_color_manual(values = cols)
   }
   return(h)
-}
-
-#' Data for adding fit to the panel plot
-#'
-#' @inheritParams plot_panel_add_effect_times
-#' @inheritParams plot_panel
-#' @return a data frame
-plot_panel_create_fit_df <- function(h, fit) {
-  check_type(fit, "list")
-  names <- colnames(fit$x)
-  y_m <- fit$y$mean
-  S <- dim(y_m)[1]
-  n <- dim(y_m)[2]
-  X1 <- rep(fit$x[, 1], S)
-  X2 <- rep(fit$x[, 2], S)
-  X3 <- as.numeric(t(y_m))
-  X4 <- rep(1:S, each = n)
-  df <- data.frame(as.factor(X1), X2, X3, as.factor(X4))
-  colnames(df) <- c(names, "f", "draw")
-  return(df)
 }
 
 #' Add faceting to the panel plot
@@ -179,7 +160,8 @@ plot_panel_add_effect_times <- function(h, teff, group_by,
     z <- as.numeric(teff)
     df <- data.frame(z, names)
     colnames(df) <- c("z", group_by)
-    h <- h + ggplot2::geom_vline(ggplot2::aes_string(xintercept = "z"),
+    aes <- ggplot2::aes_string(xintercept = "z")
+    h <- h + ggplot2::geom_vline(aes,
       na.rm = TRUE,
       data = df,
       color = linecolor,

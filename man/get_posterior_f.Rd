@@ -4,15 +4,27 @@
 \alias{get_posterior_f}
 \title{Extract posterior of the function f and its components}
 \usage{
-get_posterior_f(fit)
+get_posterior_f(fit, draws = NULL)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
+
+\item{draws}{Indices of posterior draws for which to get \code{f}. This can
+be a single integer, a vector of indices, or \code{NULL} (default). In the
+latter case all draws are obtained.}
 }
 \value{
-a named list where each element is a named list
-(length \code{num_components + 1}) of arrays of size
-\code{num_draws} x \code{num_chains}
+Returns a named list of which has length equal to the number of
+components plus one. Let \code{S = length(draws)}. Each list element is
+\itemize{
+  \item An array of size \code{S} x \code{num_obs}, if
+  \code{is_sampled(model)} is \code{TRUE}. Each row of this array is one
+  posterior draw of the function f.
+  \item A list with fields \code{mean} and \code{variance}, if
+  \code{is_sampled(model)} is \code{FALSE}. Both fields are arrays of size
+  \code{S} x \code{num_obs}. These are the analytically computed means and
+  variances for each posterior draw.
+}
 }
 \description{
 Extract posterior of the function f and its components

@@ -92,6 +92,7 @@ lgpscaling <- setClass("lgpscaling",
 #'   before converting from factor to numeric.
 #' }
 #' @slot info Other info in text format.
+#' @slot stan_model_name Name of Stan model.
 #' @section Related methods and functions:
 #' \itemize{
 #'     \item \code{\link{model_summary}}
@@ -105,7 +106,8 @@ lgpmodel <- setClass("lgpmodel",
     var_names = "list",
     var_scalings = "list",
     var_info = "list",
-    info = "list"
+    info = "list",
+    stan_model_name = "character"
   )
 )
 
@@ -153,7 +155,6 @@ lgpfit <- setClass("lgpfit",
 #' @section Related methods and functions:
 #' \itemize{
 #'     \item \code{\link{sim_plot}}
-#'     \item \code{\link{sim_plot_components}}
 #' }
 lgpsim <- setClass("lgpsim",
   representation = representation(

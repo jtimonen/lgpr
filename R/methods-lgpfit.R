@@ -58,29 +58,43 @@ plot_posterior <- function(fit,
 #' @param x_name name of x-axis variable
 #' @param y_name name of y-axis variable
 #' @param group_by grouping variable
+#' @param draws see the \code{draws} argument of \code{\link{get_posterior_f}}
 #' @param ... keyword arguments to \code{\link{plot_panel}}
 #' @return a \code{ggplot object}
 plot_fit <- function(fit, data, x_name = "age", y_name = "y",
-                     group_by = "id", ...) {
-  df_points <- data[c(group_by, x_name, y_name)]
-  df_lines <- data[c(group_by, x_name)]
-  f_post <- get_posterior_f(fit)
-  lines <- list(
-    mean = f_post$means$total,
-    var = f_post$variances$total
-  )
-
-  h <- plot_panel(
-    data = df_points,
-    fit = list(x = df_lines, y = lines),
-    ...
-  )
-  num_draws <- dim(lines$mean)[1]
+                     group_by = "id", draws = NULL, ...) {
+  df_data <- data[c(group_by, x_name, y_name)]
+  df <- data[c(group_by, x_name)]
+  list_f <- get_posterior_f(fit, draws)[["total"]]
+  df_fit <- plot_fit_create_df(df, list_f)
+  h <- plot_panel(df_data = df_data, df_fit = df_fit, ...)
+  # TODO: edit
+  num_draws <- dim(list_f$mean)[1]
   info <- paste("Showing analytic GP mean for", num_draws, "posterior draws.")
   h <- h + ggplot2::ggtitle("Model fit", subtitle = info)
   return(h)
 }
 
+#' Helper function
+#'
+#' @param df a data frame with group_by factor and x-variable
+#' @param list_fit a list with fields mean and variance
+#' @return a data frame
+plot_fit_create_df <- function(df, list_fit) {
+  check_type(df, "data.frame")
+  check_type(list_fit, "list")
+  names <- colnames(df)
+  y_m <- list_fit$mean
+  S <- dim(y_m)[1]
+  n <- dim(y_m)[2]
+  X1 <- rep(df[, 1], S)
+  X2 <- rep(df[, 2], S)
+  X3 <- as.numeric(t(y_m))
+  X4 <- rep(1:S, each = n)
+  df_fit <- data.frame(as.factor(X1), X2, X3, as.factor(X4))
+  colnames(df_fit) <- c(names, "f", "draw")
+  return(df_fit)
+}
 
 #' Visualize the input warping function for different parameter samples
 #'
@@ -156,36 +170,46 @@ get_draws <- function(fit, ...) {
   rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
 }
 
-
 #' Extract posterior of the function f and its components
 #'
 #' @export
 #' @param fit an object of class \linkS4class{lgpfit}
-#' @return a named list where each element is a named list
-#' (length \code{num_components + 1}) of arrays of size
-#' \code{num_draws} x \code{num_chains}
-get_posterior_f <- function(fit) {
+#' @param draws Indices of posterior draws for which to get \code{f}. This can
+#' be a single integer, a vector of indices, or \code{NULL} (default). In the
+#' latter case all draws are obtained.
+#' @return Returns a named list of which has length equal to the number of
+#' components plus one. Let \code{S = length(draws)}. Each list element is
+#' \itemize{
+#'   \item An array of size \code{S} x \code{num_obs}, if
+#'   \code{is_sampled(model)} is \code{TRUE}. Each row of this array is one
+#'   posterior draw of the function f.
+#'   \item A list with fields \code{mean} and \code{variance}, if
+#'   \code{is_sampled(model)} is \code{FALSE}. Both fields are arrays of size
+#'   \code{S} x \code{num_obs}. These are the analytically computed means and
+#'   variances for each posterior draw.
+#' }
+get_posterior_f <- function(fit, draws = NULL) {
   check_type(fit, "lgpfit")
-  f_sampled <- get_stan_input(fit)$is_f_sampled
+  f_sampled <- is_f_sampled(fit)
   names <- get_component_names(fit)
   D <- length(names)
   R <- D + 1
   all_names <- c(names, "total")
-  if (!f_sampled) {
-    fp <- get_draws(fit, pars = "f_post")
-    fp <- squeeze_second_dim(fp)
-    alist <- array_to_arraylist(fp, 2 * R)
-    m <- alist[1:R]
-    v <- alist[(R + 1):(2 * R)]
-    names(m) <- all_names
-    names(v) <- all_names
-    out <- list(means = m, variances = v)
-  } else {
-    fp <- get_draws(fit, pars = "f_latent")
-    fp <- squeeze_second_dim(fp)
-    alist <- array_to_arraylist(fp, R)
-    names(alist) <- all_names
-    out <- list(samples = alist)
+  pars <- if (f_sampled) "f_latent" else "f_post"
+  fp <- get_draws(fit, pars = pars)
+  fp <- squeeze_second_dim(fp)
+  S <- dim(fp)[1]
+  if (is.null(draws)) {
+    draws <- c(1:S)
   }
+  if (!f_sampled) {
+    alist <- array_to_arraylist(fp, 2 * R, draws)
+    mean <- alist[1:R]
+    variance <- alist[(R + 1):(2 * R)]
+    out <- zip_lists(mean, variance)
+  } else {
+    out <- array_to_arraylist(fp, R, draws)
+  }
+  names(out) <- all_names
   return(out)
 }

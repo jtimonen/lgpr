@@ -71,6 +71,7 @@ prior_summary <- function(object, digits = 3) {
 #'   \item \code{get_component_info} returns a data frame
 #'   \item \code{get_component_names} returns an array of names
 #'   \item \code{get_num_obs} returns an integer
+#'   \item \code{is_f_sampled} returns a boolean value
 #' }
 NULL
 
@@ -119,4 +120,11 @@ get_component_names <- function(object) {
 #' @rdname model_getters
 get_num_obs <- function(object) {
   get_stan_input(object)$num_obs
+}
+
+#' @export
+#' @rdname model_getters
+is_f_sampled <- function(object) {
+  val <- get_stan_input(object)$is_f_sampled
+  as.logical(val)
 }

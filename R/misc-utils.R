@@ -256,9 +256,10 @@ squeeze_second_dim <- function(x) {
 #'
 #' @param x an array of shape \code{n} x \code{m}
 #' @param L an integer
+#' @param draws see the \code{draws} argument of \code{\link{get_posterior_f}}
 #' @return a list of length \code{L}, where each element is an array of
-#' shape \code{n} x (\code{m}/\code{L})
-array_to_arraylist <- function(x, L) {
+#' shape \code{h} x (\code{m}/\code{L}), where \code{h = length(draws)}
+array_to_arraylist <- function(x, L, draws) {
   m <- dim(x)[2]
   if (m %% L) {
     stop("Second dimension of <x> must be a multiple of <L>!")
@@ -266,7 +267,7 @@ array_to_arraylist <- function(x, L) {
   out <- list()
   for (k in seq_len(L)) {
     inds <- seq(k, m, by = L)
-    out[[k]] <- x[, inds]
+    out[[k]] <- x[draws, inds]
   }
   return(out)
 }
@@ -308,4 +309,32 @@ print_list <- function(input) {
   )
   cat(msg)
   invisible(input)
+}
+
+#' Zip two lists into a list of lists of length 2
+#'
+#' @param a a list of length \code{L}
+#' @param b a list of length \code{L}
+#' @return a list of length \code{L}
+zip_lists <- function(a, b) {
+  check_type(a, "list")
+  check_type(b, "list")
+  L1 <- length(a)
+  L2 <- length(b)
+  a_name <- deparse(substitute(a))
+  b_name <- deparse(substitute(b))
+  if (L1 != L2) {
+    msg <- paste0(
+      "lengths of ", a_name, " and ", b_name, " must match!",
+      " found = ", L1, " and ", L2
+    )
+    stop(msg)
+  }
+  out <- list()
+  for (j in seq_len(L1)) {
+    list_j <- list(a[[j]], b[[j]])
+    names(list_j) <- c(a_name, b_name)
+    out[[j]] <- list_j
+  }
+  return(out)
 }

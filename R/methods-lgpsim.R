@@ -36,8 +36,8 @@ sim_plot <- function(simdata, signal_name = "signal", signal_column = "f",
   signal_teff <- null_if_all_nan(simdata@effect_times$observed)
 
   h <- plot_panel(
-    data = df_points,
-    signal = df_lines,
+    df_data = df_points,
+    df_signal = df_lines,
     true_teff = true_teff,
     signal_teff = signal_teff,
     ...
