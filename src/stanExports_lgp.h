@@ -478,7 +478,7 @@ STAN_gp_posterior_helper(const Eigen::Matrix<T0__, Eigen::Dynamic, Eigen::Dynami
         current_statement_begin__ = 117;
         stan::model::assign(f_post, 
                     stan::model::cons_list(stan::model::index_uni(2), stan::model::nil_index_list()), 
-                    diagonal(subtract(K, crossprod(A))), 
+                    stan::math::sqrt(diagonal(subtract(K, crossprod(A)))), 
                     "assigning variable f_post");
         current_statement_begin__ = 118;
         return stan::math::promote_scalar<fun_return_scalar_t__>(f_post);

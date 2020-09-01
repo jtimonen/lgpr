@@ -1,3 +1,42 @@
+#' Is an object printable
+#'
+#' @param object an object
+is_printable <- function(object) {
+  d <- dim(object)
+  if (is.null(d)) {
+    return(TRUE)
+  } else if (prod(d) == 0) {
+    return(FALSE)
+  }
+  TRUE
+}
+
+#' Print a list in a more compact format
+#'
+#' @param input a named list
+print_list <- function(input) {
+  nam <- names(input)
+  printed <- c()
+  skipped <- c()
+  for (name in nam) {
+    f <- input[[name]]
+    if (is_printable(f)) {
+      printed <- c(printed, name)
+    } else {
+      skipped <- c(skipped, name)
+    }
+  }
+
+  print(input[printed])
+  str <- paste(skipped, collapse = ", ")
+  msg <- paste0(
+    "Did not print fields with at least one zero dimension:\n    ",
+    str, "\n"
+  )
+  cat(msg)
+  invisible(input)
+}
+
 #' Repeat a vector as a rows of an array
 #'
 #' @description Throws an error if \code{v} is \code{NULL}.
@@ -9,6 +48,24 @@ repvec <- function(v, n) {
   m <- length(v)
   A <- matrix(rep(v, n), n, m, byrow = TRUE)
   return(as.array(A))
+}
+
+#' Ensure that v is 2-dimensional
+#'
+#' @param v a vector of length \code{m} or an array of size \code{n} x \code{m}
+#' @return returns a 2-dimensional array
+ensure_2dim <- function(v) {
+  check_not_null(v)
+  L <- length(dim(v))
+  if (L == 2) {
+    out <- v
+  } else if (L < 2) {
+    n <- length(v)
+    out <- array(v, dim = c(1, n))
+  } else {
+    stop("<v> must have one or two dimensions!")
+  }
+  return(out)
 }
 
 #' Access list field and throw error if it is NULL
@@ -65,63 +122,6 @@ matrix_to_list <- function(x) {
     L[[i]] <- x[i, ]
   }
   return(L)
-}
-
-#' Names that the list given as data to Stan should contain
-#'
-#' @return a character vector
-stan_list_names <- function() {
-  c(
-    "is_verbose",
-    "is_generated_skipped",
-    "is_f_sampled",
-    "is_likelihood_skipped",
-
-    "num_obs",
-    "num_cov_cont",
-    "num_cov_cat",
-    "num_comps",
-    "num_ell",
-    "num_ns",
-    "num_heter",
-    "num_uncrt",
-    "num_cases",
-
-    "obs_model",
-    "components",
-    "y_cont",
-    "y_disc",
-    "y_num_trials",
-    "x_cat",
-    "x_cat_num_levels",
-    "x_cont",
-    "x_cont_unnorm",
-    "x_cont_mask",
-
-    "c_hat",
-    "delta",
-    "vm_params",
-    "idx_expand",
-
-    "prior_alpha",
-    "prior_ell",
-    "prior_wrp",
-    "prior_sigma",
-    "prior_phi",
-    "prior_teff",
-
-    "hyper_alpha",
-    "hyper_ell",
-    "hyper_wrp",
-    "hyper_phi",
-    "hyper_sigma",
-    "hyper_beta",
-    "hyper_teff",
-
-    "teff_obs",
-    "teff_lb",
-    "teff_ub"
-  )
 }
 
 #' List of allowed observation models
@@ -181,7 +181,6 @@ get_stan_model <- function() {
 default_vm_params <- function() {
   c(0.025, 1)
 }
-
 
 #' Return NULL if vector contains only NaN values
 #'
@@ -265,48 +264,9 @@ array_to_arraylist <- function(x, L, draws) {
   out <- list()
   for (k in seq_len(L)) {
     inds <- seq(k, m, by = L)
-    out[[k]] <- x[draws, inds]
+    out[[k]] <- ensure_2dim(x[draws, inds])
   }
   return(out)
-}
-
-#' Is an object printable
-#'
-#' @param object an object
-is_printable <- function(object) {
-  d <- dim(object)
-  if (is.null(d)) {
-    return(TRUE)
-  } else if (prod(d) == 0) {
-    return(FALSE)
-  }
-  TRUE
-}
-
-#' Print a list in a more compact format
-#'
-#' @param input a named list
-print_list <- function(input) {
-  nam <- names(input)
-  printed <- c()
-  skipped <- c()
-  for (name in nam) {
-    f <- input[[name]]
-    if (is_printable(f)) {
-      printed <- c(printed, name)
-    } else {
-      skipped <- c(skipped, name)
-    }
-  }
-
-  print(input[printed])
-  str <- paste(skipped, collapse = ", ")
-  msg <- paste0(
-    "Did not print fields with at least one zero dimension:\n    ",
-    str, "\n"
-  )
-  cat(msg)
-  invisible(input)
 }
 
 #' Zip two lists into a list of lists of length 2
@@ -328,4 +288,94 @@ zip_lists <- function(a, b) {
     out[[j]] <- list_j
   }
   return(out)
+}
+
+#' Get observed effect times from a data frame
+#'
+#' @param data a data frame
+#' @param age_variable age variable name
+#' @param disage_variable disease-related age variable name
+#' @param id_variable id variable name
+#' @return a named vector
+get_observed_effect_times <- function(data,
+                                      age_variable,
+                                      disage_variable,
+                                      id_variable) {
+  check_type(data, "data.frame")
+  fac <- data[[id_variable]]
+  t1 <- data[[age_variable]]
+  t2 <- data[[disage_variable]]
+  uid <- unique(fac)
+  L <- length(uid)
+  teff <- rep(0, L)
+  for (j in seq_len(L)) {
+    bbb <- as.numeric(fac == uid[j]) + as.numeric(t2 == 0)
+    i0 <- which(bbb == 2)
+    L <- length(i0)
+    if (L > 0) {
+      idx <- i0[1]
+      teff[j] <- t1[idx]
+    } else {
+      teff[j] <- NaN
+    }
+    names(teff)[j] <- uid[j]
+  }
+  return(teff)
+}
+
+#' Names that the list given as data to Stan should contain
+#'
+#' @return a character vector
+stan_list_names <- function() {
+  c(
+    "is_verbose",
+    "is_generated_skipped",
+    "is_f_sampled",
+    "is_likelihood_skipped",
+
+    "num_obs",
+    "num_cov_cont",
+    "num_cov_cat",
+    "num_comps",
+    "num_ell",
+    "num_ns",
+    "num_heter",
+    "num_uncrt",
+    "num_cases",
+
+    "obs_model",
+    "components",
+    "y_cont",
+    "y_disc",
+    "y_num_trials",
+    "x_cat",
+    "x_cat_num_levels",
+    "x_cont",
+    "x_cont_unnorm",
+    "x_cont_mask",
+
+    "c_hat",
+    "delta",
+    "vm_params",
+    "idx_expand",
+
+    "prior_alpha",
+    "prior_ell",
+    "prior_wrp",
+    "prior_sigma",
+    "prior_phi",
+    "prior_teff",
+
+    "hyper_alpha",
+    "hyper_ell",
+    "hyper_wrp",
+    "hyper_phi",
+    "hyper_sigma",
+    "hyper_beta",
+    "hyper_teff",
+
+    "teff_obs",
+    "teff_lb",
+    "teff_ub"
+  )
 }

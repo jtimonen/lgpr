@@ -21,6 +21,7 @@ An S4 class to represent the output of the \code{lgp} function
 \itemize{
     \item \code{\link{fit_summary}}
     \item \code{\link{get_draws}}
+    \item \code{\link{get_posterior_f}}
     \item \code{\link{plot_posterior}}
     \item \code{\link{plot_posterior_warp}}
     \item In addition, all methods that work on \linkS4class{lgpmodel}
@@ -29,5 +30,6 @@ An S4 class to represent the output of the \code{lgp} function
 }
 
 \seealso{
-The main function \code{\link{lgp}}.
+For complete info on accessing the properties of the \code{stan_fit}
+slot, see \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
 }

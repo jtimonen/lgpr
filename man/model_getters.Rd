@@ -5,9 +5,12 @@
 \alias{get_covariate_names}
 \alias{get_stan_input}
 \alias{get_component_info}
+\alias{get_covariate_info}
 \alias{get_component_names}
 \alias{get_num_obs}
 \alias{is_f_sampled}
+\alias{get_obs_model}
+\alias{get_ns_covariates}
 \title{Functions that access model properties}
 \usage{
 get_covariate_names(object, type = "all")
@@ -16,11 +19,17 @@ get_stan_input(object)
 
 get_component_info(object)
 
+get_covariate_info(object)
+
 get_component_names(object)
 
 get_num_obs(object)
 
 is_f_sampled(object)
+
+get_obs_model(object)
+
+get_ns_covariates(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
@@ -35,9 +44,12 @@ is_f_sampled(object)
   are separated by a comma
   \item \code{get_stan_input} returns a list
   \item \code{get_component_info} returns a data frame
+  \item \code{get_covariate_info} returns TODO
   \item \code{get_component_names} returns an array of names
   \item \code{get_num_obs} returns an integer
   \item \code{is_f_sampled} returns a boolean value
+  \item \code{get_obs_model} returns a character string
+  \item \code{get_ns_covariates} returns a character vector
 }
 }
 \description{

@@ -61,3 +61,14 @@ plot_color_palette <- function(n) {
   h <- h + ggplot2::ggtitle("Colors")
   return(h)
 }
+
+#' Line alpha decider function
+#'
+#' @description A function that takes as parameter the number of lines and
+#' returns a line alpha value (between 0 and 1).
+#' @param num_lines number of lines to draw
+#' @return a value between 0 and 1
+line_alpha_fun <- function(num_lines) {
+  alpha <- exp(-0.013 * num_lines)
+  max(alpha, 0.01)
+}

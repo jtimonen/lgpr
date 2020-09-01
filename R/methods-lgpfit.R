@@ -63,37 +63,18 @@ plot_posterior <- function(fit,
 #' @return a \code{ggplot object}
 plot_fit <- function(fit, data, x_name = "age", y_name = "y",
                      group_by = "id", draws = NULL, ...) {
-  df_data <- data[c(group_by, x_name, y_name)]
-  df <- data[c(group_by, x_name)]
-  list_f <- get_posterior_f(fit, draws)[["total"]]
-  df_fit <- plot_fit_create_df(df, list_f)
-  h <- plot_panel(df_data = df_data, df_fit = df_fit, ...)
-  # TODO: edit
-  num_draws <- dim(list_f$mean)[1]
-  info <- paste("Showing analytic GP mean for", num_draws, "posterior draws.")
-  h <- h + ggplot2::ggtitle("Model fit", subtitle = info)
+  DF <- plot_fit_helper(fit, data, x_name, y_name, group_by, draws)
+  h <- plot_panel(
+    df_data = DF$df_data,
+    df_fit = DF$df_fit,
+    df_ribbon = DF$df_ribbon,
+    fit_alpha = DF$fit_alpha,
+    teff_obs = DF$teff_obs,
+    teff_fit = DF$teff_fit,
+    ...
+  )
+  h <- h + ggplot2::ggtitle("Model fit", subtitle = DF$info)
   return(h)
-}
-
-#' Helper function
-#'
-#' @param df a data frame with group_by factor and x-variable
-#' @param list_fit a list with fields mean and variance
-#' @return a data frame
-plot_fit_create_df <- function(df, list_fit) {
-  check_type(df, "data.frame")
-  check_type(list_fit, "list")
-  names <- colnames(df)
-  y_m <- list_fit$mean
-  S <- dim(y_m)[1]
-  n <- dim(y_m)[2]
-  X1 <- rep(df[, 1], S)
-  X2 <- rep(df[, 2], S)
-  X3 <- as.numeric(t(y_m))
-  X4 <- rep(1:S, each = n)
-  df_fit <- data.frame(as.factor(X1), X2, X3, as.factor(X4))
-  colnames(df_fit) <- c(names, "f", "draw")
-  return(df_fit)
 }
 
 #' Visualize the input warping function for different parameter samples
@@ -102,48 +83,18 @@ plot_fit_create_df <- function(df, list_fit) {
 #' @param fit an object of class \linkS4class{lgpfit}
 #' @param p number of plot points
 #' @param R width of time window
-#' @param color_scheme name of \code{bayesplot} color scheme
+#' @inheritParams plot_posterior_warp_helper
 #' @return a \code{ggplot} object or list of them
 plot_posterior_warp <- function(fit, p = 300, R = 48,
                                 color_scheme = "brightblue") {
   check_type(fit, "lgpfit")
-
-  # Colors
-  scheme <- bayesplot::color_scheme_get(color_scheme)
-  color_line <- scheme$dark
-  color_inner <- scheme$light_highlight
-  color_outer <- scheme$light
-
-  # Plot
   num_ns <- fit@model@stan_input$num_ns
-  ttt <- seq(-R / 2, R / 2, length.out = p)
+  dis_age <- seq(-R / 2, R / 2, length.out = p)
   out <- list()
   for (j in seq_len(num_ns)) {
     par_name <- paste0("wrp[", j, "]")
-    tsmr <- rstan::summary(fit@stan_fit, pars = c(par_name))$summary
-    w_50 <- warp_input(ttt, a = tsmr[6])
-    w_75 <- warp_input(ttt, a = tsmr[7])
-    w_25 <- warp_input(ttt, a = tsmr[5])
-    w_025 <- warp_input(ttt, a = tsmr[4])
-    w_975 <- warp_input(ttt, a = tsmr[8])
-
-    diseaseAge <- ttt
-    DF <- data.frame(cbind(diseaseAge, w_50, w_75, w_25, w_025, w_975))
-
-    # Create ggplot object
-    h <- ggplot2::ggplot(DF, ggplot2::aes_string(x = "ttt", y = "w_50")) +
-      ggplot2::geom_ribbon(ggplot2::aes_string(ymin = "w_025", ymax = "w_975"),
-        fill = color_outer
-      ) +
-      ggplot2::geom_ribbon(ggplot2::aes_string(ymin = "w_25", ymax = "w_75"),
-        fill = color_inner
-      ) +
-      ggplot2::geom_line(color = color_line)
-
-    h <- h + ggplot2::labs(x = "Input", y = "Warped input")
-    subt <- paste("Median steepness =", round(tsmr[6], 3))
-    h <- h + ggplot2::ggtitle("Input-warping function", subtitle = subt)
-    out[[j]] <- h
+    par_summary <- rstan::summary(fit@stan_fit, pars = c(par_name))$summary
+    out[[j]] <- plot_posterior_warp_helper(par_summary, dis_age, color_scheme)
   }
 
   # Return ggplot object or list of them
@@ -177,16 +128,16 @@ get_draws <- function(fit, ...) {
 #' @param draws Indices of posterior draws for which to get \code{f}. This can
 #' be a single integer, a vector of indices, or \code{NULL} (default). In the
 #' latter case all draws are obtained.
-#' @return Returns a named list of which has length equal to the number of
+#' @return Returns a list with names \code{num_draws} and \code{f}.
+#' The latter is a named list of which has length equal to the number of
 #' components plus one. Let \code{S = length(draws)}. Each list element is
 #' \itemize{
-#'   \item An array of size \code{S} x \code{num_obs}, if
-#'   \code{is_sampled(model)} is \code{TRUE}. Each row of this array is one
-#'   posterior draw of the function f.
-#'   \item A list with fields \code{mean} and \code{variance}, if
+#'   \item Array of size \code{S} x \code{num_obs}, where each row is one
+#'   posterior draw of the function f, \code{is_sampled(model)} is \code{TRUE}.
+#'   \item A list with fields \code{mean} and \code{std}, if
 #'   \code{is_sampled(model)} is \code{FALSE}. Both fields are arrays of size
 #'   \code{S} x \code{num_obs}. These are the analytically computed means and
-#'   variances for each posterior draw.
+#'   standard deviations for each posterior draw.
 #' }
 get_posterior_f <- function(fit, draws = NULL) {
   check_type(fit, "lgpfit")
@@ -204,12 +155,35 @@ get_posterior_f <- function(fit, draws = NULL) {
   }
   if (!f_sampled) {
     alist <- array_to_arraylist(fp, 2 * R, draws)
-    mean <- alist[1:R]
-    variance <- alist[(R + 1):(2 * R)]
-    out <- zip_lists(mean, variance)
+    mean <- alist[1:R] # means
+    std <- alist[(R + 1):(2 * R)] # stds
+    f_out <- zip_lists(mean, std)
   } else {
-    out <- array_to_arraylist(fp, R, draws)
+    f_out <- array_to_arraylist(fp, R, draws)
   }
-  names(out) <- all_names
-  return(out)
+  names(f_out) <- all_names
+
+  # Return
+  list(
+    f = f_out,
+    num_draws = length(draws)
+  )
+}
+
+#' Scale the function f posterior to original unnormalized scale
+#'
+#' @export
+#' @description Can only be used with Gaussian observation model.
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @param f_total a list with fields \code{mean} and \code{std}
+#' @return a similar object as \code{f_total}
+scale_f_total <- function(fit, f_total) {
+  check_type(fit, "lgpfit")
+  check_not_null(f_total)
+  f_sampled <- is_f_sampled(fit)
+  check_false(f_sampled)
+  fun_inv <- fit@model@var_scalings$y@fun_inv
+  f_total$mean <- scale_f_post_helper(fun_inv, f_total$mean)
+  f_total$std <- scale_f_post_helper(fun_inv, f_total$std)
+  return(f_total)
 }

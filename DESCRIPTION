@@ -50,6 +50,7 @@ Collate:
     'lgp.R'
     'lgpr-package.R'
     'methods-lgpfit.R'
+    'methods-lgpfit_helper.R'
     'methods-lgpmodel.R'
     'methods-lgpsim.R'
     'misc-argcheck.R'

@@ -3,8 +3,8 @@ vector[] STAN_gp_posterior_helper(matrix Ly, matrix K, vector v){
   int n = num_elements(v);
   matrix[n, n] A = mdivide_left_tri_low(Ly, transpose(K));
   vector[n] f_post[2];
-  f_post[1] = transpose(A)*v;
-  f_post[2] = diagonal(K - crossprod(A));
+  f_post[1] = transpose(A)*v; // mean
+  f_post[2] = sqrt(diagonal(K - crossprod(A))); // std
   return(f_post);
 }
 
@@ -39,13 +39,13 @@ vector[] STAN_gp_posterior(
   Ly = cholesky_decompose(Ky);
   v = mdivide_left_tri_low(Ly, y);
   
-  // Component-wise means and variances
+  // Component-wise means and stds
   for(j in 1:num_comps){
     inds = {j, J + j};
     F_POST[inds] = STAN_gp_posterior_helper(Ly, KX[j], v);
   }
   
-  // Total mean and variance
+  // Total mean and std
   inds = {J, 2*J};
   F_POST[inds] = STAN_gp_posterior_helper(Ly, Kx, v);
   return(F_POST);

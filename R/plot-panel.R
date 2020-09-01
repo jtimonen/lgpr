@@ -4,30 +4,36 @@
 #' @param df_data a data frame
 #' @param df_signal a data frame or \code{NULL}
 #' @param df_fit a data frame or \code{NULL}
+#' @param df_ribbon a data frame or \code{NULL}
 #' @param i_test indices of test points
 #' @param linecolors two line colors (signal and fit)
 #' @param vlinecolor color of vertical lines (true and obs. effect time)
+#' @param ribbon_color ribbon color
 #' @param nrow number of rows, an argument for \code{ggplot2::facet_wrap}
 #' @param ncol number of columns, an argument for \code{ggplot2::facet_wrap}
 #' @param y_transform a function
-#' @param true_teff a named vector
-#' @param signal_teff a named vector
-#' @param fit_teff a list of named vectors
-#' @param fit_alpha line alpha for fit
+#' @param teff_true a named vector
+#' @param teff_obs a named vector
+#' @param teff_fit a list of named vectors
+#' @param fit_alpha a value between 0 and 1
+#' @param ribbon_alpha a value between 0 and 1
 #' @return a \code{ggplot} object
 plot_panel <- function(df_data,
                        df_signal = NULL,
                        df_fit = NULL,
+                       df_ribbon = NULL,
                        i_test = NULL,
                        linecolors = color_palette(2),
                        vlinecolor = colorset("gray", "mid_highlight"),
+                       ribbon_color = colorset("red", "light_highlight"),
                        nrow = NULL,
                        ncol = NULL,
                        y_transform = function(x) x,
-                       true_teff = NULL,
-                       signal_teff = NULL,
-                       fit_teff = list(),
-                       fit_alpha = 0.1) {
+                       teff_true = NULL,
+                       teff_obs = NULL,
+                       teff_fit = list(),
+                       fit_alpha = 1.0,
+                       ribbon_alpha = 1.0) {
   check_type(df_data, "data.frame")
   check_type(y_transform, "function")
   group_by <- colnames(df_data)[1]
@@ -38,8 +44,22 @@ plot_panel <- function(df_data,
 
   # Add true and observed effect times
   col <- vlinecolor
-  h <- plot_panel_add_effect_times(h, true_teff, group_by, col, 1, 0.7)
-  h <- plot_panel_add_effect_times(h, signal_teff, group_by, col, 2, 0.7)
+  h <- plot_panel_add_effect_times(h, teff_true, group_by, col, 1, 0.7)
+  h <- plot_panel_add_effect_times(h, teff_obs, group_by, col, 2, 0.7)
+
+  # Add ribbon
+  if (!is.null(df_ribbon)) {
+    check_type(df_ribbon, "data.frame")
+    aes_rib <- ggplot2::aes_string(x = x_name, ymin = "lower", ymax = "upper")
+    h <- h + ggplot2::geom_ribbon(
+      data = df_ribbon,
+      mapping = aes_rib,
+      inherit.aes = FALSE,
+      color = ribbon_color,
+      fill = ribbon_color,
+      alpha = ribbon_alpha
+    )
+  }
 
   # Add fit
   if (!is.null(df_fit)) {

@@ -141,3 +141,19 @@ check_lengths <- function(a, b) {
   }
   return(TRUE)
 }
+
+#' Check that argument is false or zero
+#'
+#' @param arg the argument
+#' @return Returns \code{TRUE} if the check passes.
+check_false <- function(arg) {
+  arg_name <- deparse(substitute(arg))
+  check_not_null(arg)
+  if (arg) {
+    msg <- paste0(
+      "Expected <", arg_name, "> to be FALSE or 0, but found ", arg
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}

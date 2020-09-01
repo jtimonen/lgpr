@@ -38,7 +38,6 @@ test_that("lgpmodel with various components can be sampled", {
   })
 })
 
-
 test_that("lgpmodel can be optimized", {
   m <- create_model(y ~ heter(id) * gp(age), dat)
 

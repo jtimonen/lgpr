@@ -8,16 +8,19 @@ plot_panel(
   df_data,
   df_signal = NULL,
   df_fit = NULL,
+  df_ribbon = NULL,
   i_test = NULL,
   linecolors = color_palette(2),
   vlinecolor = colorset("gray", "mid_highlight"),
+  ribbon_color = colorset("red", "light_highlight"),
   nrow = NULL,
   ncol = NULL,
   y_transform = function(x) x,
-  true_teff = NULL,
-  signal_teff = NULL,
-  fit_teff = list(),
-  fit_alpha = 0.1
+  teff_true = NULL,
+  teff_obs = NULL,
+  teff_fit = list(),
+  fit_alpha = 1,
+  ribbon_alpha = 1
 )
 }
 \arguments{
@@ -27,11 +30,15 @@ plot_panel(
 
 \item{df_fit}{a data frame or \code{NULL}}
 
+\item{df_ribbon}{a data frame or \code{NULL}}
+
 \item{i_test}{indices of test points}
 
 \item{linecolors}{two line colors (signal and fit)}
 
 \item{vlinecolor}{color of vertical lines (true and obs. effect time)}
+
+\item{ribbon_color}{ribbon color}
 
 \item{nrow}{number of rows, an argument for \code{ggplot2::facet_wrap}}
 
@@ -39,13 +46,15 @@ plot_panel(
 
 \item{y_transform}{a function}
 
-\item{true_teff}{a named vector}
+\item{teff_true}{a named vector}
 
-\item{signal_teff}{a named vector}
+\item{teff_obs}{a named vector}
 
-\item{fit_teff}{a list of named vectors}
+\item{teff_fit}{a list of named vectors}
 
-\item{fit_alpha}{line alpha for fit}
+\item{fit_alpha}{a value between 0 and 1}
+
+\item{ribbon_alpha}{a value between 0 and 1}
 }
 \value{
 a \code{ggplot} object

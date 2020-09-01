@@ -119,12 +119,14 @@ lgpmodel <- setClass("lgpmodel",
 #' \itemize{
 #'     \item \code{\link{fit_summary}}
 #'     \item \code{\link{get_draws}}
+#'     \item \code{\link{get_posterior_f}}
 #'     \item \code{\link{plot_posterior}}
 #'     \item \code{\link{plot_posterior_warp}}
 #'     \item In addition, all methods that work on \linkS4class{lgpmodel}
 #'     objects work also on \linkS4class{lgpfit} objects.
 #' }
-#' @seealso The main function \code{\link{lgp}}.
+#' @seealso For complete info on accessing the properties of the \code{stan_fit}
+#' slot, see \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",

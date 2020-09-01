@@ -86,14 +86,19 @@ sim <- simulate_data(
   t_observed = "after_1"
 )
 data <- sim@data
+data$y <- data$y + 5
 
-test_that("model fit can be visualized with data", {
+test_that("model fit can be visualized with data on original scale", {
   suppressWarnings({
-    fit <- lgp(y ~ gp(age) + zerosum(z) * gp(age),
+    fit <- lgp(y ~ gp(age) + zerosum(z) * gp(age) + gp_warp_vm(diseaseAge),
       data = data, chains = 1, iter = 300, refresh = 0
     )
-    p <- plot_fit(fit, data)
-    expect_s3_class(p, "ggplot")
+    p1 <- plot_fit(fit, data)
+    p2 <- plot_fit(fit, data, draws = c(2, 3))
+    p3 <- plot_fit(fit, data, draws = 3)
+    expect_s3_class(p1, "ggplot")
+    expect_s3_class(p2, "ggplot")
+    expect_s3_class(p3, "ggplot")
   })
 })
 

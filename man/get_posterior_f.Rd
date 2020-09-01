@@ -14,16 +14,16 @@ be a single integer, a vector of indices, or \code{NULL} (default). In the
 latter case all draws are obtained.}
 }
 \value{
-Returns a named list of which has length equal to the number of
+Returns a list with names \code{num_draws} and \code{f}.
+The latter is a named list of which has length equal to the number of
 components plus one. Let \code{S = length(draws)}. Each list element is
 \itemize{
-  \item An array of size \code{S} x \code{num_obs}, if
-  \code{is_sampled(model)} is \code{TRUE}. Each row of this array is one
-  posterior draw of the function f.
-  \item A list with fields \code{mean} and \code{variance}, if
+  \item Array of size \code{S} x \code{num_obs}, where each row is one
+  posterior draw of the function f, \code{is_sampled(model)} is \code{TRUE}.
+  \item A list with fields \code{mean} and \code{std}, if
   \code{is_sampled(model)} is \code{FALSE}. Both fields are arrays of size
   \code{S} x \code{num_obs}. These are the analytically computed means and
-  variances for each posterior draw.
+  standard deviations for each posterior draw.
 }
 }
 \description{
