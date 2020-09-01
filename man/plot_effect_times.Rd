@@ -29,3 +29,12 @@ a ggplot object
 \description{
 Can only be used if the uncertainty of effect time was modeled.
 }
+\seealso{
+Other model fit visualization functions: 
+\code{\link{plot,lgpfit,missing-method}},
+\code{\link{plot_beta}()},
+\code{\link{plot_fit}()},
+\code{\link{plot_posterior_warp}()},
+\code{\link{plot_posterior}()}
+}
+\concept{model fit visualization functions}

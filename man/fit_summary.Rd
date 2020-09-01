@@ -15,3 +15,10 @@ a character representation
 \description{
 Posterior summary
 }
+\seealso{
+Other fit postprocessing functions: 
+\code{\link{get_draws}()},
+\code{\link{get_posterior_f}()},
+\code{\link{scale_f_total}()}
+}
+\concept{fit postprocessing functions}

@@ -29,3 +29,10 @@ components plus one. Let \code{S = length(draws)}. Each list element is
 \description{
 Extract posterior of the function f and its components
 }
+\seealso{
+Other fit postprocessing functions: 
+\code{\link{fit_summary}()},
+\code{\link{get_draws}()},
+\code{\link{scale_f_total}()}
+}
+\concept{fit postprocessing functions}

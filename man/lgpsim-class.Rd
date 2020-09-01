@@ -37,10 +37,6 @@ formalism
 }}
 }}
 
-\section{Related methods and functions}{
-
-\itemize{
-    \item \code{\link{sim_plot}}
+\seealso{
+For plotting, see \code{\link{sim_plot}}.
 }
-}
-

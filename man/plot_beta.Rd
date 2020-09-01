@@ -21,3 +21,12 @@ a ggplot object
 Can only be used if the disease effect was modeled
 heterogeneously.
 }
+\seealso{
+Other model fit visualization functions: 
+\code{\link{plot,lgpfit,missing-method}},
+\code{\link{plot_effect_times}()},
+\code{\link{plot_fit}()},
+\code{\link{plot_posterior_warp}()},
+\code{\link{plot_posterior}()}
+}
+\concept{model fit visualization functions}

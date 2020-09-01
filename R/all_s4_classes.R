@@ -93,12 +93,8 @@ lgpscaling <- setClass("lgpscaling",
 #' }
 #' @slot info Other info in text format.
 #' @slot stan_model_name Name of Stan model.
-#' @section Related methods and functions:
-#' \itemize{
-#'     \item \code{\link{model_summary}}
-#'     \item \code{\link{prior_summary}} and \code{\link{param_summary}}
-#'     \item \code{\link{model_getters}}
-#' }
+#' @seealso
+#' \code{\link{model_getters}}
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
@@ -116,17 +112,14 @@ lgpmodel <- setClass("lgpmodel",
 #' @slot stan_fit An object of class \code{stanfit}.
 #' @slot model An object of class \code{lgpmodel}.
 #' @section Related methods and functions:
-#' \itemize{
-#'     \item \code{\link{fit_summary}}
-#'     \item \code{\link{get_draws}}
-#'     \item \code{\link{get_posterior_f}}
-#'     \item \code{\link{plot_posterior}}
-#'     \item \code{\link{plot_posterior_warp}}
-#'     \item In addition, all methods that work on \linkS4class{lgpmodel}
-#'     objects work also on \linkS4class{lgpfit} objects.
-#' }
-#' @seealso For complete info on accessing the properties of the \code{stan_fit}
-#' slot, see \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
+#' @family model fit vizualization functions
+#' @seealso  All methods that work on \linkS4class{lgpmodel}
+#' objects work also on \linkS4class{lgpfit} objects.
+#' @seealso For complete info on
+#' accessing the properties of the \code{stan_fit} slot, see
+#' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
+#' @seealso
+#' For plotting, see \code{\link{plot_fit}}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
@@ -154,10 +147,8 @@ lgpfit <- setClass("lgpfit",
 #'   effect
 #'   \item \code{observed} possible observed effect times
 #' }
-#' @section Related methods and functions:
-#' \itemize{
-#'     \item \code{\link{sim_plot}}
-#' }
+#' @seealso
+#' For plotting, see \code{\link{sim_plot}}.
 lgpsim <- setClass("lgpsim",
   representation = representation(
     data = "data.frame",

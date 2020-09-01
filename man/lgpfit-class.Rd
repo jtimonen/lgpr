@@ -18,18 +18,16 @@ An S4 class to represent the output of the \code{lgp} function
 
 \section{Related methods and functions}{
 
-\itemize{
-    \item \code{\link{fit_summary}}
-    \item \code{\link{get_draws}}
-    \item \code{\link{get_posterior_f}}
-    \item \code{\link{plot_posterior}}
-    \item \code{\link{plot_posterior_warp}}
-    \item In addition, all methods that work on \linkS4class{lgpmodel}
-    objects work also on \linkS4class{lgpfit} objects.
-}
 }
 
 \seealso{
-For complete info on accessing the properties of the \code{stan_fit}
-slot, see \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
+All methods that work on \linkS4class{lgpmodel}
+objects work also on \linkS4class{lgpfit} objects.
+
+For complete info on
+accessing the properties of the \code{stan_fit} slot, see
+\href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
+
+For plotting, see \code{\link{plot_fit}}.
 }
+\concept{model fit vizualization functions}

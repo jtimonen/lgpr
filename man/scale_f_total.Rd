@@ -17,3 +17,10 @@ a similar object as \code{f_total}
 \description{
 Can only be used with Gaussian observation model.
 }
+\seealso{
+Other fit postprocessing functions: 
+\code{\link{fit_summary}()},
+\code{\link{get_draws}()},
+\code{\link{get_posterior_f}()}
+}
+\concept{fit postprocessing functions}

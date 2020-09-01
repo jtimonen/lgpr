@@ -7,6 +7,7 @@
 #' @param prob Inner interval
 #' @param prob_outer Outer interval
 #' @param point_est Point estimate type
+#' @family model fit visualization functions
 #' @return a ggplot object
 plot_effect_times <- function(fit,
                               color_scheme = "red",
@@ -46,6 +47,7 @@ plot_effect_times <- function(fit,
 #' @param fit An object of class \code{lgpfit}.
 #' @param color_scheme Name of bayesplot color scheme.
 #' @param threshold Threshold for median.
+#' @family model fit visualization functions
 #' @return a ggplot object
 plot_beta <- function(fit,
                       color_scheme = "red",

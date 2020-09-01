@@ -18,3 +18,10 @@ a named list
 Uses \code{rstan::extract} with \code{permuted = FALSE} and
 \code{inc_warmup = FALSE}.
 }
+\seealso{
+Other fit postprocessing functions: 
+\code{\link{fit_summary}()},
+\code{\link{get_posterior_f}()},
+\code{\link{scale_f_total}()}
+}
+\concept{fit postprocessing functions}

@@ -20,3 +20,8 @@ Replacement for the \code{base} R function \code{match.arg}.
 Gives more informative errors and requires exact match. Should only be used
 as a subroutine of other functions and never directly.
 }
+\seealso{
+Other argument checks: 
+\code{\link{checks}}
+}
+\concept{argument checks}

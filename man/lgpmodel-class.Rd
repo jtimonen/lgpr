@@ -37,12 +37,6 @@ An S4 class to represent an lgp model
 \item{\code{stan_model_name}}{Name of Stan model.}
 }}
 
-\section{Related methods and functions}{
-
-\itemize{
-    \item \code{\link{model_summary}}
-    \item \code{\link{prior_summary}} and \code{\link{param_summary}}
-    \item \code{\link{model_getters}}
+\seealso{
+\code{\link{model_getters}}
 }
-}
-
