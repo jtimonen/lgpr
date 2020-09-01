@@ -16,6 +16,11 @@ model_summary <- function(object) {
   cat(brief)
   cat("\n")
   print(get_component_info(object))
+  ci <- get_covariate_info(object)
+  cat("\n")
+  print(ci$continuous)
+  cat("\n")
+  print(ci$categorical)
   cat("\n")
   print(param_summary(model))
   invisible(object)
@@ -69,7 +74,7 @@ prior_summary <- function(object, digits = 3) {
 #'   are separated by a comma
 #'   \item \code{get_stan_input} returns a list
 #'   \item \code{get_component_info} returns a data frame
-#'   \item \code{get_covariate_info} returns TODO
+#'   \item \code{get_covariate_info} returns a list
 #'   \item \code{get_component_names} returns an array of names
 #'   \item \code{get_num_obs} returns an integer
 #'   \item \code{is_f_sampled} returns a boolean value
@@ -115,10 +120,12 @@ get_component_info <- function(object) {
 #' @export
 #' @rdname model_getters
 get_covariate_info <- function(object) {
-  comps <- get_stan_input(object)$components
-  names <- c("x_cont", "x_cat", "x_cat_num_levels")
-  lst <- get_stan_input(object)[names]
-  return(lst)
+  info1 <- get_covariate_info_cont(object)
+  info2 <- get_covariate_info_cat(object)
+  list(
+    continuous = info1,
+    categorical = info2
+  )
 }
 
 #' @export
@@ -128,27 +135,23 @@ get_component_names <- function(object) {
   rownames(comps)
 }
 
-#' @export
 #' @rdname model_getters
 get_num_obs <- function(object) {
   get_stan_input(object)$num_obs
 }
 
-#' @export
 #' @rdname model_getters
 is_f_sampled <- function(object) {
   val <- get_stan_input(object)$is_f_sampled
   as.logical(val)
 }
 
-#' @export
 #' @rdname model_getters
 get_obs_model <- function(object) {
   lh <- get_stan_input(object)$obs_model
   likelihood_as_str(lh)
 }
 
-#' @export
 #' @rdname model_getters
 get_ns_covariates <- function(object) {
   cinfo <- get_component_info(object)

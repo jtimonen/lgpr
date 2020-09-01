@@ -42,8 +42,7 @@ setMethod("show", "lgpfit", function(object) {
 class_info <- function(class_name) {
   str <- paste0(
     "An object of class ", class_name, ". See ?",
-    class_name, " for more info.\n"
+    class_name, " for more info."
   )
   return(str)
 }
-

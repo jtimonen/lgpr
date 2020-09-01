@@ -54,7 +54,7 @@ get_posterior_f <- function(fit, draws = NULL) {
     f_out <- array_to_arraylist(fp, R, draws)
   }
   names(f_out) <- all_names
-  
+
   # Return
   list(
     f = f_out,

@@ -53,6 +53,7 @@ Collate:
     'methods-lgpfit_helper.R'
     'methods-lgpfit_plot.R'
     'methods-lgpmodel.R'
+    'methods-lgpmodel_helper.R'
     'methods-lgpsim.R'
     'misc-argcheck.R'
     'misc-invgamma.R'
