@@ -39,3 +39,35 @@ test_that("an lgpfit object is returned and can be plotted", {
     expect_s3_class(p2, "ggplot")
   })
 })
+
+
+# Create test input
+sim <- simulate_data(
+  N = 4,
+  t_data = seq(6, 36, by = 6),
+  covariates = c(0),
+  lengthscales = rep(12, 3),
+  relevances = rep(1, 3),
+  t_jitter = 0.5
+)
+
+# Formula
+formula <- y ~ zerosum(id) * gp(age) + uncrt(id) * gp_warp_vm(diseaseAge)
+
+test_that("a model with uncertain disease age can be created and fit", {
+  model <- create_model(formula = formula, data = sim@data)
+  si <- get_stan_input(model)
+  expect_equal(si$num_cases, 2)
+  expect_equal(si$num_vm, 1)
+  expect_equal(si$num_ns, 1)
+  expect_equal(si$num_heter, 0)
+  suppressWarnings({
+    fit <- sample_model(model,
+      iter = 400,
+      chains = 2,
+      refresh = 0,
+      cores = 2
+    )
+    expect_s4_class(fit, "lgpfit")
+  })
+})

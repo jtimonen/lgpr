@@ -13,10 +13,6 @@ test_that("uniform prior is parsed correctly", {
   })
 })
 
-test_that("defining uniform prior gives warning", {
-  expect_warning(uniform())
-})
-
 test_that("normal prior is parsed correctly", {
   p <- normal(mu = -1.1, sigma = 2.1)
   num <- prior_to_num(p)

@@ -14,13 +14,15 @@ parse_covs_and_comps <- function(data, model_formula) {
   # Create the inputs to Stan
   covariates <- stan_data_covariates(data, x_names)
   components <- stan_data_components(model_formula, covariates)
-  to_stan <- c(covariates$to_stan, components$to_stan)
+  ts1 <- dollar(covariates, "to_stan")
+  ts2 <- dollar(components, "to_stan")
 
   # Return
   list(
-    to_stan = to_stan,
-    x_cont_scalings = covariates$x_cont_scalings,
-    x_cat_levels = covariates$x_cat_levels
+    to_stan = c(ts1, ts2),
+    x_cont_scalings = dollar(covariates, "x_cont_scalings"),
+    x_cat_levels = dollar(covariates, "x_cat_levels"),
+    caseid_map = dollar(components, "caseid_map")
   )
 }
 
@@ -161,16 +163,19 @@ stan_data_components <- function(model_formula, covariates) {
   colnames(comps) <- c(
     "type", "ker", "unused",
     "het", "ns", "vm",
-    "unc", "icat", "icont"
+    "unc", "cat", "cont"
   )
   rownames(comps) <- term_names(model_formula@terms)
   components <- as.matrix(comps)
 
   # Create idx_expand, num_cases and vm_params
-  x_cat <- covariates$to_stan$x_cat
-  x_cont_mask <- covariates$to_stan$x_cont_mask
-  idx_expand <- create_idx_expand(components, x_cat, x_cont_mask)
-  num_cases <- length(unique(idx_expand[idx_expand != 0]))
+  cts <- dollar(covariates, "to_stan")
+  x_cat <- dollar(cts, "x_cat")
+  x_cont_mask <- dollar(cts, "x_cont_mask")
+  lst <- create_idx_expand(components, x_cat, x_cont_mask)
+  idx_expand <- dollar(lst, "idx_expand")
+  caseid_map <- dollar(lst, "map")
+  num_cases <- length(unique(idx_expand[idx_expand > 1]))
   num_ns <- sum(components[, 5] != 0)
   num_vm <- sum(components[, 6] != 0)
   VM <- default_vm_params()
@@ -191,7 +196,8 @@ stan_data_components <- function(model_formula, covariates) {
 
   # Return
   list(
-    to_stan = to_stan
+    to_stan = to_stan,
+    caseid_map = caseid_map
   )
 }
 
@@ -224,8 +230,8 @@ term_to_numeric <- function(term, covariates) {
   parsed <- check_term_factors(term)
 
   # Check component type
-  is_gp <- !is.null(parsed$gp_kernel)
-  is_cat <- !is.null(parsed$cat_kernel)
+  is_gp <- !is.null(dollar(parsed, "gp_kernel"))
+  is_cat <- !is.null(dollar(parsed, "cat_kernel"))
   if (!is_gp) {
     ctype <- 0
   } else {
@@ -236,7 +242,7 @@ term_to_numeric <- function(term, covariates) {
   # Check kernel type
   if (is_cat) {
     kernels <- c("zerosum", "categ")
-    idx <- check_allowed(parsed$cat_kernel, allowed = kernels)
+    idx <- check_allowed(dollar(parsed, "cat_kernel"), allowed = kernels)
     ktype <- idx - 1
   } else {
     ktype <- 0
@@ -244,10 +250,10 @@ term_to_numeric <- function(term, covariates) {
   out[2] <- ktype
 
   # Check nonstationary options
-  gpk <- parsed$gp_kernel
+  gpk <- dollar(parsed, "gp_kernel")
   if (!is.null(gpk)) {
-    is_warped <- parsed$gp_kernel %in% c("gp_warp", "gp_warp_vm")
-    is_vm <- parsed$gp_kernel == "gp_warp_vm"
+    is_warped <- gpk %in% c("gp_warp", "gp_warp_vm")
+    is_vm <- gpk == "gp_warp_vm"
   } else {
     is_warped <- FALSE
     is_vm <- FALSE
@@ -272,8 +278,9 @@ term_to_numeric <- function(term, covariates) {
 #' @param pf a list returned by \code{\link{check_term_factors}}
 #' @return two integers
 check_term_covariates <- function(covariates, pf) {
-  cat_names <- rownames(covariates$to_stan$x_cat)
-  cont_names <- rownames(covariates$to_stan$x_cont)
+  cts <- dollar(covariates, "to_stan")
+  cat_names <- rownames(dollar(cts, "x_cat"))
+  cont_names <- rownames(dollar(cts, "x_cont"))
   nams <- list(categorical_names = cat_names, continuous_names = cont_names)
 
   check_type <- function(cov_name, allowed, type, fun) {
@@ -325,13 +332,13 @@ check_term_factors <- function(term) {
   # Check for heter() expressions
   facs <- term@factors
   reduced <- reduce_factors_expr(facs, "heter")
-  facs <- reduced$factors
-  heter_covariate <- reduced$covariate
+  facs <- dollar(reduced, "factors")
+  heter_covariate <- dollar(reduced, "covariate")
 
   # Check for uncrt() expressions
   reduced <- reduce_factors_expr(facs, "uncrt")
-  facs <- reduced$factors
-  uncrt_covariate <- reduced$covariate
+  facs <- dollar(reduced, "factors")
+  uncrt_covariate <- dollar(reduced, "covariate")
 
   # Check compatibility
   if (!is.null(uncrt_covariate) && !is.null(heter_covariate)) {
@@ -348,9 +355,9 @@ check_term_factors <- function(term) {
 
   # Check for gp, gp_warp and gp_warp_vm expressions
   reduced <- reduce_factors_gp(facs)
-  facs <- reduced$factors
-  gp_covariate <- reduced$covariate
-  gp_kernel <- reduced$kernel
+  facs <- dollar(reduced, "factors")
+  gp_covariate <- dollar(reduced, "covariate")
+  gp_kernel <- dollar(reduced, "kernel")
 
   # Check for categorical kernel expression
   D <- length(facs)

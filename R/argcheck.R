@@ -10,6 +10,7 @@
 #'   \item \code{check_false} checks if argument is false or zero
 #'   \item \code{check_length} checks if argument has correct length
 #'   \item \code{check_lengths} checks if two argument have equal length
+#'   \item \code{check_in_data} checks that variable exists in a data frame
 #' }
 #' @return \code{TRUE} if the check passes.
 #' @family argument checks
@@ -103,6 +104,23 @@ check_false <- function(arg) {
   if (arg) {
     msg <- paste0(
       "Expected <", arg_name, "> to be FALSE or 0, but found ", arg
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param var_name the variable to be searched for
+#' @param data a data frame
+check_in_data <- function(var_name, data) {
+  d_names <- colnames(data)
+  ok <- (var_name %in% d_names)
+  if (!ok) {
+    str <- paste(d_names, collapse = ", ")
+    msg <- paste0(
+      "The variable '", var_name, "' not found in <data>! ",
+      " Found data columns = {", str, "}."
     )
     stop(msg)
   }

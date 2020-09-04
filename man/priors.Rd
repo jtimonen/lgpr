@@ -68,4 +68,11 @@ student_t(nu = 1)
 
 # Exponential prior with rate = 0.1
 gam(shape = 1, inv_scale = 0.1)
+
+# Create a similar priors as in LonGP (Cheng et al., 2019)
+# Not recommended, because a lengthscale close to 0 is possible.
+a <- log(1) - log(0.1)
+log_normal(mu = 0, sigma = a / 2) # for continuous lengthscale
+student_t(nu = 4) # for interaction lengthscale
+igam(shape = 0.5, scale = 0.005, square = TRUE) # for sigma
 }

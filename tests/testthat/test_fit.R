@@ -14,26 +14,27 @@ dis_age[id %in% c(1, 4, 5)] <- NA
 y <- sin(10 * age) + 0.5 * as.numeric(sex)
 dat <- data.frame(age, dis_age, id, sex, y)
 
-# -------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 context("Sampling or optimizing a model")
 
 test_that("lgpmodel can be sampled with minimal input", {
   m <- create_model(y ~ gp(age) + categ(sex), dat)
+  num_cases <- get_stan_input(m)$num_cases
+  expect_equal(num_cases, 0)
   suppressWarnings({
     fit <- sample_model(m, chains = 1, iter = 100, refresh = 0)
-    lp <- rstan::extract(fit)$lp__
+    lp <- rstan::extract(fit@stan_fit)$lp__
     expect_equal(length(lp), 50)
-    expect_s4_class(fit, "stanfit")
+    expect_s4_class(fit, "lgpfit")
   })
 })
 
 test_that("lgpmodel with various components can be sampled", {
   m <- create_model(y ~ heter(id) * gp(age) + gp_warp(dis_age), dat)
-
   suppressWarnings({
     fit <- sample_model(m, chains = 1, iter = 10, refresh = 0)
-    lp <- rstan::extract(fit)$lp__
+    lp <- rstan::extract(fit@stan_fit)$lp__
     expect_equal(length(lp), 5)
   })
 })

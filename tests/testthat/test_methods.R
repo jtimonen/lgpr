@@ -24,7 +24,7 @@ test_that("lgpmodel getters work", {
 
 test_that("prior summary works", {
   ps <- prior_summary(model, digits = 4)
-  pars <- c("alpha[1]", "alpha[2]", "ell[1]", "ell[2]", "sigma[1]")
+  pars <- c("alpha[1]", "alpha[2]", "ell[1]", "ell[2]", "(sigma[1])^2")
   expect_equal(ps$Parameter, pars)
 })
 
