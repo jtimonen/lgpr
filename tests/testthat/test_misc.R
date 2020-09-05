@@ -51,7 +51,6 @@ test_that("check_not_null works correctly", {
   expect_error(check_not_null(a2), reason)
 })
 
-
 # -------------------------------------------------------------------------
 
 context("Inverse-gamma distribution")
@@ -90,7 +89,24 @@ test_that("plotting the inverse gamma distribution works", {
 
 # -------------------------------------------------------------------------
 
-context("Misc utility functions")
+context("Utility functions")
+
+test_that("ensure_len works correctly", {
+  reason <- "length of <a> was expected to be 1 or 5, but found length 3"
+  a <- c(1, 2, 3)
+  expect_error(ensure_len(a, 5), reason)
+  expect_equal(ensure_len(a, 3), a)
+  expect_equal(ensure_len(4.2, 3), c(4.2, 4.2, 4.2))
+})
+
+test_that("dollar errors correctly", {
+  a <- list(moi = c(2, 3, 4), juu = 1)
+  reason <- paste0(
+    "Element with name 'joo' not found in <a>! ",
+    "Found elements:"
+  )
+  expect_error(dollar(a, "joo"), reason)
+})
 
 test_that("get_stan_model returns a stanmodel", {
   sm <- get_stan_model()

@@ -54,10 +54,18 @@ sim <- simulate_data(
 # Formula
 formula <- y ~ zerosum(id) * gp(age) + uncrt(id) * gp_warp_vm(diseaseAge)
 
+test_that("a model with uncertain disease age needs prior specified", {
+  data <- sim@data
+  reason <- "you must specify 'effect_time_info' in the prior list"
+  expect_error(create_model(formula = formula, data = data), reason)
+})
+
 test_that("a model with uncertain disease age can be created and fit", {
-  model <- create_model(formula = formula, data = sim@data)
+  et <- list(backwards = FALSE, lower = 15, upper = 30, zero = 0)
+  prior <- list(effect_time_info = et)
+  model <- create_model(formula = formula, data = data, prior = prior)
   si <- get_stan_input(model)
-  expect_equal(si$num_cases, 2)
+  expect_equal(si$num_bt, 2)
   expect_equal(si$num_vm, 1)
   expect_equal(si$num_ns, 1)
   expect_equal(si$num_heter, 0)

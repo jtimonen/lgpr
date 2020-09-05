@@ -16,10 +16,6 @@ An S4 class to represent the output of the \code{lgp} function
 \item{\code{model}}{An object of class \code{lgpmodel}.}
 }}
 
-\section{Related methods and functions}{
-
-}
-
 \seealso{
 All methods that work on \linkS4class{lgpmodel}
 objects work also on \linkS4class{lgpfit} objects.

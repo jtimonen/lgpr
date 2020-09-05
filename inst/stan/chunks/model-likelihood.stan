@@ -36,7 +36,7 @@ if(is_f_sampled){
   matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
       K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
       alpha, ell, wrp, beta, teff,
-      vm_params, idx_expand, idx_expand, teff_obs);
+      vm_params, idx_expand, idx_expand, teff_zero);
 
   if(obs_model!=1){
     reject("<obs_model> must be 1 if the latent functions are not sampled!")

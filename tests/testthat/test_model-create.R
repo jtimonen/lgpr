@@ -44,15 +44,6 @@ test_that("a heterogeneous component can be added", {
   expect_equal(idx_heter, 1)
 })
 
-test_that("an uncertain component can be added", {
-  m <- create_model(y ~ uncrt(id) * zerosum(sex) * gp(age) + categ(id), dat)
-  si <- m@stan_input
-  idx_heter <- si$components[1, 4]
-  idx_uncrt <- si$components[1, 7]
-  expect_equal(idx_heter, 0)
-  expect_equal(idx_uncrt, 1)
-})
-
 test_that("a heterogeneity component must take a categorical covariate", {
   expect_error(
     create_model(y ~ heter(age) * zerosum(sex) + categ(id), dat),

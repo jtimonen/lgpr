@@ -58,12 +58,12 @@ plot_fit <- function(fit, data, x_name = "age", y_name = "y",
                      group_by = "id", draws = NULL, ...) {
   DF <- plot_fit_helper(fit, data, x_name, y_name, group_by, draws)
   h <- plot_panel(
-    df_data = DF$df_data,
-    df_fit = DF$df_fit,
-    df_ribbon = DF$df_ribbon,
-    fit_alpha = DF$fit_alpha,
-    teff_obs = DF$teff_obs,
-    teff_fit = DF$teff_fit,
+    df_data = dollar(DF, "df_data"),
+    df_fit =  dollar(DF, "df_fit"),
+    df_ribbon = dollar(DF, "df_ribbon"),
+    fit_alpha = dollar(DF, "fit_alpha"),
+    teff_obs =  dollar(DF, "teff_obs"),
+    teff_fit =  dollar(DF, "teff_fit"),
     ...
   )
   h <- h + ggplot2::ggtitle("Model fit", subtitle = DF$info)
@@ -228,9 +228,9 @@ plot_posterior_warp_helper <- function(par_summary,
 
   # Get colors and quantiles
   scheme <- bayesplot::color_scheme_get(color_scheme)
-  color_line <- scheme$dark
-  color_inner <- scheme$light_highlight
-  color_outer <- scheme$light
+  color_line <- dollar(scheme, "dark")
+  color_inner <- dollar(scheme, "light_highlight")
+  color_outer <- dollar(scheme, "light")
   w_50 <- warp_input(dis_age, a = par_summary[6])
   w_75 <- warp_input(dis_age, a = par_summary[7])
   w_25 <- warp_input(dis_age, a = par_summary[5])
@@ -283,7 +283,10 @@ plot_fit_helper <- function(fit, data, x_name, y_name, group_by, draws) {
   } else {
     da_name <- get_ns_covariates(fit)
     check_length(da_name, 1)
-    teff_obs <- get_observed_effect_times(data, x_name, da_name, group_by)
+    teff_obs <- get_teff_obs(data, x_name, da_name, group_by)
+    nams <- dollar(teff_obs, group_by)
+    teff_obs <- dollar(teff_obs, x_name)
+    names(teff_obs) <- nams
   }
 
   # Plot title

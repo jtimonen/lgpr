@@ -137,10 +137,11 @@ vm_params <- input$vm_params
 ix <- input$idx_expand
 
 # All kernels
+teff_zero <- dollar(input, "teff_zero")
 K <- kernel_all(
   K_const, comp, x, x, x_unnorm, x_unnorm,
   alpha, ell, 0.5, list(), list(),
-  vm_params, ix, ix, input$teff_obs
+  vm_params, ix, ix, teff_zero
 )
 
 test_that("kernel_const_all works correctly", {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{dollar}
 \alias{dollar}
-\title{Dollar operator but so that the variable must exist}
+\title{A safer alternative for the dollar operator}
 \usage{
 dollar(object, var_name)
 }
@@ -12,10 +12,12 @@ dollar(object, var_name)
 \item{var_name}{name of the variable to access}
 }
 \value{
-equivalent to \code{object[[var_name]]} if variable exists
+Returns \code{object[[var_name, exact = TRUE]]} if variable
+exists.
 }
 \description{
-throws error if \code{var_name} is not in \code{names(object)}
+Requires exact match and throws error if \code{var_name} is
+not in \code{names(object)}.
 }
 \seealso{
 Other list utilities: 

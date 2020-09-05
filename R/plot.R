@@ -176,9 +176,9 @@ plot_panel_create_aes <- function(data, type_name) {
 plot_panel_add_effect_times <- function(h, teff, group_by,
                                         linecolor, linetype, lwd) {
   if (!is.null(teff)) {
-    names <- names(teff)
+    nams <- names(teff)
     z <- as.numeric(teff)
-    df <- data.frame(z, names)
+    df <- data.frame(z, nams)
     colnames(df) <- c("z", group_by)
     aes <- ggplot2::aes_string(xintercept = "z")
     h <- h + ggplot2::geom_vline(aes,
@@ -231,7 +231,9 @@ plot_data <- function(data,
 
   # Add titles, faceting and coloring
   titles <- plot_data_titles(main, sub, data, group_by)
-  h <- h + ggplot2::ggtitle(label = titles$main, subtitle = titles$sub)
+  label <- dollar(titles, "main")
+  subtitle <- dollar(titles, "sub")
+  h <- h + ggplot2::ggtitle(label = label, subtitle = subtitle)
   if (!is.null(facet_by)) {
     f <- stats::as.formula(paste("~", facet_by))
     h <- h + ggplot2::facet_wrap(f, labeller = ggplot2::label_both)
@@ -352,7 +354,7 @@ plot_effect_times <- function(fit,
     color_scheme = color_scheme
   )
 
-  form <- fit@model@info$formula
+  form <- dollar(fit@model@info, "formula")
   p <- p + ggplot2::labs(
     subtitle = paste("Model:", form),
     title = ptitle

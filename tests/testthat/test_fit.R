@@ -20,8 +20,8 @@ context("Sampling or optimizing a model")
 
 test_that("lgpmodel can be sampled with minimal input", {
   m <- create_model(y ~ gp(age) + categ(sex), dat)
-  num_cases <- get_stan_input(m)$num_cases
-  expect_equal(num_cases, 0)
+  num_bt <- get_stan_input(m)$num_bt
+  expect_equal(num_bt, 0)
   suppressWarnings({
     fit <- sample_model(m, chains = 1, iter = 100, refresh = 0)
     lp <- rstan::extract(fit@stan_fit)$lp__

@@ -39,7 +39,7 @@ matrix[] STAN_kernel_all(
   data real[,] vm_params,
   data int[] idx1_expand,
   data int[] idx2_expand,
-  data vector[] teff_obs)
+  data vector[] teff_zero)
 {
   int idx_ell = 0;
   int idx_wrp = 0;
@@ -99,8 +99,8 @@ matrix[] STAN_kernel_all(
       
       // 4.1 Handle possible uncertainty
       if(is_uncrt){
-        X1 = STAN_edit_x_cont(X1, idx1_expand, teff_obs[1], teff[1]);
-        X2 = STAN_edit_x_cont(X2, idx2_expand, teff_obs[1], teff[1]);
+        X1 = STAN_edit_x_cont(X1, idx1_expand, teff_zero[1], teff[1]);
+        X2 = STAN_edit_x_cont(X2, idx2_expand, teff_zero[1], teff[1]);
       }
       
       // 4.2 Input warping

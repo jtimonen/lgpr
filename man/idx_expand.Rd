@@ -12,7 +12,7 @@ create_idx_expand(components, x_cat, x_cont_mask)
 
 create_idx_expand_picker(components, x_cat)
 
-map_factor_to_caseid(x_fac, x_cont_mask)
+map_factor_to_caseid(x_fac, x_cont_mask, factor_name)
 
 map_caseid_to_row(x_fac, map)
 }
@@ -24,6 +24,8 @@ map_caseid_to_row(x_fac, map)
 \item{x_cont_mask}{the \code{x_cont_mask} input for Stan}
 
 \item{x_fac}{object returned by \code{\link{create_idx_expand_picker}}}
+
+\item{factor_name}{factor name}
 
 \item{map}{object returned by \code{\link{map_factor_to_caseid}}}
 }

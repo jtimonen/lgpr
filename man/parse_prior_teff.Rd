@@ -4,7 +4,7 @@
 \alias{parse_prior_teff}
 \title{Create the teff_ inputs to Stan}
 \usage{
-parse_prior_teff(desc, num_uncrt, num_cases)
+parse_prior_teff(desc, info, num_uncrt, num_bt)
 }
 \arguments{
 \item{desc}{Prior description as a named list, containing fields
@@ -16,9 +16,11 @@ parse_prior_teff(desc, num_uncrt, num_cases)
 }
 Other list fields are interpreted as hyperparameters.}
 
+\item{info}{effect time info}
+
 \item{num_uncrt}{the \code{num_uncrt} input created for Stan}
 
-\item{num_cases}{the \code{num_cases} input created for Stan}
+\item{num_bt}{the \code{num_bt} input created for Stan}
 }
 \value{
 a named list

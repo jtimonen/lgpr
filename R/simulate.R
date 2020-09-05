@@ -81,7 +81,7 @@ simulate_data <- function(N,
     continuous_info = continuous_info
   )
   if (verbose) {
-    cat(IN$info)
+    cat(dollar(IN, "info"))
   }
 
   # Compute X_affected
@@ -90,7 +90,7 @@ simulate_data <- function(N,
 
   # Simulate the components F
   COMP <- sim_create_f(
-    IN$X,
+    dollar(IN, "X"),
     covariates,
     relevances,
     lengthscales,
@@ -101,7 +101,7 @@ simulate_data <- function(N,
     vm_params,
     force_zeromean
   )
-  FFF <- COMP$FFF
+  FFF <- dollar(COMP, "FFF")
 
   # Total signal f is a (scaled) sum of the components plus a constant
   f <- rowSums(FFF)
@@ -119,12 +119,12 @@ simulate_data <- function(N,
     snr = snr, phi = phi,
     N_trials = N_trials
   )
-  g <- NOISY$g
-  y <- NOISY$y
+  g <- dollar(NOISY, "g")
+  y <- dollar(NOISY, "y")
   noise <- y - g
 
   # Create the output objects
-  dat <- cbind(IN$X, y)
+  dat <- cbind(dollar(IN, "X"), y)
   rownames(dat) <- 1:(N * k)
   comp <- cbind(FFF, f, g, noise, y)
 
@@ -136,22 +136,22 @@ simulate_data <- function(N,
   SSE <- sum(noise^2)
 
   # Create rest of the fields
-  teff_true <- IN$onsets
-  teff_obs <- OBSERVED$onsets_observed
+  teff_true <- dollar(IN, "onsets")
+  teff_obs <- dollar(OBSERVED, "onsets_observed")
   teff <- list(true = teff_true, observed = teff_obs)
 
   info <- list(
     par_ell = lengthscales,
-    par_cont = IN$par_cont,
+    par_cont = dollar(IN, "par_cont"),
     p_signal = SSR / (SSR + SSE)
   )
 
   # Return S4 class object
   new("lgpsim",
-    data = OBSERVED$dat,
+    data = dollar(OBSERVED, "dat"),
     response = "y",
     components = comp,
-    kernel_matrices = COMP$KKK,
+    kernel_matrices = dollar(COMP, "KKK"),
     effect_times = teff,
     info = info
   )
@@ -291,7 +291,7 @@ sim_generate_names <- function(covariates) {
 #' @return a new data frame and observed onsets
 sim_data_to_observed <- function(dat, t_observed) {
   flag <- !("diseaseAge" %in% colnames(dat))
-  id <- dat$id
+  id <- dollar(dat, "id")
   uid <- unique(id)
   N <- length(uid)
   onsets_observed <- rep(NaN, N)
@@ -301,8 +301,8 @@ sim_data_to_observed <- function(dat, t_observed) {
     ret <- list(dat = dat, onsets_observed = onsets_observed)
     return(ret)
   } else {
-    age <- dat$age
-    dis_age <- dat$diseaseAge
+    age <- dollar(dat, "age")
+    dis_age <- dollar(dat, "diseaseAge")
     j <- 0
     for (ID in uid) {
       j <- j + 1
@@ -330,14 +330,16 @@ sim_data_to_observed <- function(dat, t_observed) {
           }
         } else {
           parsed <- sim_parse_t_obs(t_observed)
-          if (parsed$type == "random") {
-            idx0 <- sim_rtgeom(length(irem), parsed$value)
+          typ <- dollar(parsed, "type")
+          val <- dollar(parsed, "value")
+          if (typ == "random") {
+            idx0 <- sim_rtgeom(length(irem), val)
             if (idx0 > length(rem)) {
               stop("Not enough data points to go that far!")
             }
             t0 <- rem[idx0]
-          } else if (parsed$type == "after") {
-            idx0 <- parsed$value + 1
+          } else if (typ == "after") {
+            idx0 <- val + 1
             if (idx0 > length(rem)) {
               stop("Not enough data points to go that far!")
             }
@@ -692,22 +694,23 @@ sim_create_x <- function(N,
   X <- data.frame(id, age)
 
   # Effect times and disease ages
-  parsed_dis <- sim_create_x_dis_age(X, k, N, D, age, checked$t_effect_range)
+  et_range <- dollar(checked, "t_effect_range")
+  parsed_dis <- sim_create_x_dis_age(X, k, N, D, age, et_range)
   dis_age <- parsed_dis$dis_age
   X <- parsed_dis$X
 
   # Other covariates
   cinfo <- continuous_info
   parsed_x <- sim_create_x_other(X, k, N, D, n_categs, dis_age, cinfo)
-  X <- parsed_x$X
+  X <- dollar(parsed_x, "X")
   colnames(X) <- names
 
   # Return
   list(
-    info = checked$info,
-    onsets = parsed_dis$teff,
-    N_cases = parsed_dis$N_cases,
-    par_cont = parsed_x$par_cont,
+    info = dollar(checked, "info"),
+    onsets = dollar(parsed_dis, "teff"),
+    N_cases = dollar(parsed_dis, "N_cases"),
+    par_cont = dollar(parsed_x, "par_cont"),
     X = X
   )
 }
@@ -856,11 +859,15 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
 #' @return a list
 sim_create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
   if (D[2] > 0) {
-    mu <- continuous_info$mu
-    lambda <- continuous_info$lambda
+    mu <- dollar(continuous_info, "mu")
+    lambda <- dollar(continuous_info, "lambda")
     CONT <- sim_draw_continuous(N, k, D[2], mu, lambda)
-    cont <- CONT$C
-    par_cont <- list(a = CONT$A, b = CONT$B, offset = CONT$OFS)
+    cont <- dollar(CONT, "C")
+    par_cont <- list(
+      a = dollar(CONT, "A"),
+      b = dollar(CONT, "B"),
+      offset = dollar(CONT, "OFS")
+    )
     X <- cbind(X, cont)
   } else {
     par_cont <- list(a = NULL, b = NULL, offset = NULL)

@@ -19,7 +19,7 @@ int<lower=0> num_ell;            // number of ell parameters
 int<lower=0> num_ns;             // number of nonstationary components
 int<lower=0> num_heter;          // number of heterogeneous components
 int<lower=0> num_uncrt;          // number of uncertain continuous covariates
-int<lower=0> num_cases;          // number of case individuals
+int<lower=0> num_bt;             // number of beta and/or teff params
 
 /*
   Observation model
@@ -77,7 +77,7 @@ int<lower=1> y_num_trials[obs_model==4, num_obs];
 int<lower=0> x_cat_num_levels[num_cov_cat];
 
 // Inputs related to expanding beta and t_effect
-int<lower=1, upper=num_cases+1> idx_expand[num_obs];
+int<lower=1, upper=num_bt+1> idx_expand[num_obs];
 
 /* 
   Prior types and transforms for kernel and noise parameters
@@ -94,9 +94,8 @@ int<lower=0> prior_phi[obs_model==3, 2];
   Prior types for effect time uncertainty
   - [,1]: prior type
   - [,2]: is prior "backwards"?
-  - [,3]: is prior relative to the observed effect time?
 */
-int<lower=0> prior_teff[num_uncrt>0, 3];
+int<lower=0> prior_teff[num_uncrt>0, 2];
 
 // Hyperparameters of the priors
 real hyper_alpha[num_comps, 3];
@@ -108,9 +107,9 @@ real hyper_teff[num_uncrt>0, 3];
 real hyper_beta[num_heter>0, 2];
 
 // Observed effect times and uncertainty bounds for each case subject
-vector[num_cases] teff_obs[num_uncrt>0];
-vector[num_cases] teff_lb[num_uncrt>0];
-vector[num_cases] teff_ub[num_uncrt>0];
+vector[num_bt] teff_zero[num_uncrt>0];
+vector[num_bt] teff_lb[num_uncrt>0];
+vector[num_bt] teff_ub[num_uncrt>0];
 
 // Misc
 vector[num_obs] c_hat; // GP mean vector 

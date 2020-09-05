@@ -1,21 +1,25 @@
-#' Dollar operator but so that the variable must exist
+#' A safer alternative for the dollar operator
 #'
-#' @description throws error if \code{var_name} is not in \code{names(object)}
+#' @description Requires exact match and throws error if \code{var_name} is
+#' not in \code{names(object)}.
 #' @param object a list or data frame
 #' @param var_name name of the variable to access
-#' @return equivalent to \code{object[[var_name]]} if variable exists
+#' @return Returns \code{object[[var_name, exact = TRUE]]} if variable
+#' exists.
 #' @family list utilities
 dollar <- function(object, var_name) {
   obj_name <- deparse(substitute(object))
   nams <- names(object)
-  ok <- var_name %in% nams
-  if (!ok) {
-    str <- paste(nams, collapse = ", ")
-    msg <- paste0("Variable '", var_name, "' not found in <", obj_name, ">!")
-    msg <- paste0(msg, " Found variables: {", str, "}")
+  if (!(var_name %in% nams)) {
+    valid <- paste(nams, collapse = ", ")
+    msg <- paste0(
+      "Element with name '", var_name,
+      "' not found in <", obj_name, ">!"
+    )
+    msg <- paste0(msg, " Found elements: {", valid, "}")
     stop(msg)
   }
-  object[[var_name]]
+  object[[var_name, exact = TRUE]]
 }
 
 #' Printing a list in a more compact format
@@ -258,24 +262,25 @@ object_to_model <- function(object) {
   return(out)
 }
 
-#' Get observed effect times from a data frame
+#' Infer observed effect times from a data frame
 #'
 #' @param data a data frame
 #' @param age_variable age variable name
 #' @param disage_variable disease-related age variable name
 #' @param id_variable id variable name
-#' @return a named vector
-get_observed_effect_times <- function(data,
-                                      age_variable,
-                                      disage_variable,
-                                      id_variable) {
+#' @return a data frame
+get_teff_obs <- function(data,
+                         age_variable,
+                         disage_variable,
+                         id_variable) {
   check_type(data, "data.frame")
-  fac <- data[[id_variable]]
-  t1 <- data[[age_variable]]
-  t2 <- data[[disage_variable]]
+  fac <- dollar(data, id_variable)
+  t1 <- dollar(data, age_variable)
+  t2 <- dollar(data, disage_variable)
   uid <- unique(fac)
   L <- length(uid)
   teff <- rep(0, L)
+  nam <- rep(0, L)
   for (j in seq_len(L)) {
     bbb <- as.numeric(fac == uid[j]) + as.numeric(t2 == 0)
     i0 <- which(bbb == 2)
@@ -286,9 +291,11 @@ get_observed_effect_times <- function(data,
     } else {
       teff[j] <- NaN
     }
-    names(teff)[j] <- uid[j]
+    nam[j] <- uid[j]
   }
-  return(teff)
+  df <- data.frame(nam, teff)
+  colnames(df) <- c(id_variable, age_variable)
+  return(df)
 }
 
 #' Names that the list given as data to Stan should contain
@@ -309,7 +316,7 @@ stan_list_names <- function() {
     "num_ns",
     "num_heter",
     "num_uncrt",
-    "num_cases",
+    "num_bt",
 
     "obs_model",
     "components",
@@ -342,7 +349,7 @@ stan_list_names <- function() {
     "hyper_beta",
     "hyper_teff",
 
-    "teff_obs",
+    "teff_zero",
     "teff_lb",
     "teff_ub"
   )
@@ -418,4 +425,24 @@ get_stan_model <- function() {
 #' @return two numbers
 default_vm_params <- function() {
   c(0.025, 1)
+}
+
+#' Ensure vector has expected length
+#'
+#' @param len the expected length
+#' @param v original vector or just one value that is replicated
+#' @return a vector of length \code{len}
+ensure_len <- function(v, len) {
+  v_name <- deparse(substitute(v))
+  L <- length(v)
+  if (L == 1) {
+    v <- rep(v, len)
+  } else if (L != len) {
+    msg <- paste0(
+      "length of <", v_name, "> was expected to be 1 or ", len,
+      ", but found length ", L
+    )
+    stop(msg)
+  }
+  return(v)
 }

@@ -156,7 +156,8 @@ prior_get_default <- function(name) {
 #' @param obs_model observation model as integer
 #' @return a named list of parsed options
 parse_prior <- function(prior, stan_input, obs_model) {
-  filled <- fill_prior(prior)
+  num_uncrt <- dollar(stan_input, "num_uncrt")
+  filled <- fill_prior(prior, num_uncrt)
   spec <- dollar(filled, "specified")
   def <- dollar(filled, "defaulted")
   str1 <- paste(spec, collapse = ", ")
@@ -176,10 +177,11 @@ parse_prior <- function(prior, stan_input, obs_model) {
 #' Fill a partially defined prior
 #'
 #' @inheritParams parse_prior
+#' @param num_uncrt number of uncertain components
 #' @return a named list
-fill_prior <- function(prior) {
+fill_prior <- function(prior, num_uncrt) {
   names <- c("alpha", "ell", "wrp", "sigma", "phi", "beta")
-  names <- c(names, "effect_time")
+  names <- c(names, "effect_time", "effect_time_info")
   defaulted <- c()
   specified <- c()
   for (name in names) {
@@ -195,7 +197,18 @@ fill_prior <- function(prior) {
     } else {
       # Default prior
       defaulted <- c(defaulted, name)
-      prior[[name]] <- list(prior_get_default(name))
+      if (name == "effect_time_info") {
+        if (num_uncrt > 0) {
+          msg <- "you must specify 'effect_time_info' in the prior list!"
+          stop(msg)
+        } else {
+          desc <- list(backwards = FALSE, lower = NaN, upper = NaN, zero = NaN)
+          desc <- list(desc)
+        }
+      } else {
+        desc <- list(prior_get_default(name))
+      }
+      prior[[name]] <- desc
     }
   }
   list(
@@ -204,7 +217,6 @@ fill_prior <- function(prior) {
     specified = specified
   )
 }
-
 
 #' Parse given fully defined prior
 #'
@@ -218,7 +230,7 @@ parse_prior_full <- function(prior, stan_input, obs_model) {
   num_phi <- as.numeric(obs_model == 3)
   num_uncrt <- dollar(stan_input, "num_uncrt")
   num_heter <- dollar(stan_input, "num_heter")
-  num_cases <- dollar(stan_input, "num_cases")
+  num_bt <- dollar(stan_input, "num_bt")
   pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
   nums <- c(unlist(nums), num_sigma, num_phi)
   names(nums)[4:5] <- c("num_sigma", "num_phi")
@@ -242,7 +254,8 @@ parse_prior_full <- function(prior, stan_input, obs_model) {
   # Beta and teff parameters
   common[["hyper_beta"]] <- create_hyper_beta(prior, num_heter)
   desc <- dollar(prior, "effect_time")
-  teff <- parse_prior_teff(desc, num_uncrt, num_cases)
+  info <- dollar(prior, "effect_time_info")
+  teff <- parse_prior_teff(desc, info, num_uncrt, num_bt)
 
   # Return
   c(common, teff)
@@ -251,32 +264,33 @@ parse_prior_full <- function(prior, stan_input, obs_model) {
 #' Create the teff_ inputs to Stan
 #'
 #' @inheritParams prior_to_num
+#' @param info effect time info
 #' @param num_uncrt the \code{num_uncrt} input created for Stan
-#' @param num_cases the \code{num_cases} input created for Stan
+#' @param num_bt the \code{num_bt} input created for Stan
 #' @return a named list
-parse_prior_teff <- function(desc, num_uncrt, num_cases) {
-
-  # Prior type
+parse_prior_teff <- function(desc, info, num_uncrt, num_bt) {
+  effect_time_info <- info[[1]]
+  is_backwards <- as.numeric(dollar(effect_time_info, "backwards"))
+  lower <- dollar(effect_time_info, "lower")
+  upper <- dollar(effect_time_info, "upper")
+  zero <- dollar(effect_time_info, "zero")
+  lower <- ensure_len(lower, num_bt)
+  upper <- ensure_len(upper, num_bt)
+  zero <- ensure_len(zero, num_bt)
   DIM <- as.numeric(num_uncrt > 0)
-  out <- prior_to_num(desc[[1]])
-  backwards <- 0
-  relative <- 0
-  type <- dollar(out, "prior")
-  prior <- c(type[1], backwards, relative)
-  hyper <- dollar(out, "hyper")
 
-  # Bounds
-  teff_obs <- rep(15, num_cases)
-  teff_lb <- rep(0, num_cases)
-  teff_ub <- rep(30, num_cases)
+  out <- prior_to_num(desc[[1]])
+  type <- dollar(out, "prior")
+  hyper <- dollar(out, "hyper")
+  prior <- c(type[1], is_backwards)
 
   # Return
-  list(
+  out <- list(
     prior_teff = repvec(prior, DIM),
     hyper_teff = repvec(hyper, DIM),
-    teff_obs = repvec(teff_obs, DIM),
-    teff_lb = repvec(teff_lb, DIM),
-    teff_ub = repvec(teff_ub, DIM)
+    teff_zero = repvec(zero, DIM),
+    teff_lb = repvec(lower, DIM),
+    teff_ub = repvec(upper, DIM)
   )
 }
 

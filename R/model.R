@@ -122,7 +122,6 @@ parse_options <- function(options = NULL) {
   )
 }
 
-
 #' Create the function that does a standardizing transform and its inverse
 #'
 #' @param y variable measurements
@@ -160,7 +159,9 @@ NULL
 
 #' @rdname idx_expand
 create_idx_expand <- function(components, x_cat, x_cont_mask) {
-  x_fac <- create_idx_expand_picker(components, x_cat)
+  pick <- create_idx_expand_picker(components, x_cat)
+  x_fac <- dollar(pick, "x_fac")
+  factor_name <- dollar(pick, "factor_name")
   inds <- which(components[, 4] + components[, 7] > 0)
   inds <- as.numeric(inds) # remove names
   L <- length(inds)
@@ -174,7 +175,7 @@ create_idx_expand <- function(components, x_cat, x_cont_mask) {
       to_red <- repvec(to_red, 1)
     }
     idx_mask <- reduce_rows(to_red)
-    map <- map_factor_to_caseid(x_fac, idx_mask)
+    map <- map_factor_to_caseid(x_fac, idx_mask, factor_name)
     idx_expand <- map_caseid_to_row(x_fac, map) + 1 # note the plus 1
   }
 
@@ -189,23 +190,31 @@ create_idx_expand_picker <- function(components, x_cat) {
   inds <- as.numeric(inds[inds != 0])
   J <- length(inds)
   if (J == 0) {
-    return(rep(1, n_obs))
+    x_fac <- rep(1, n_obs)
+    name <- NULL
+  } else {
+    all_same <- all(inds == inds[1])
+    if (!all_same) {
+      str <- paste(inds, collapse = ", ")
+      msg <- paste0(
+        "The heter() and uncrt() expressions must have the same ",
+        "categorical covariate in every term! ",
+        "Found inds = {", str, "}"
+      )
+      stop(msg)
+    }
+    i1 <- inds[1]
+    x_fac <- as.numeric(x_cat[i1, ])
+    name <- rownames(x_cat)[i1]
   }
-  all_same <- all(inds == inds[1])
-  if (!all_same) {
-    str <- paste(inds, collapse = ", ")
-    msg <- paste0(
-      "The heter() and uncrt() expressions must have the same ",
-      "categorical covariate in every term! ",
-      "Found inds = {", str, "}"
-    )
-    stop(msg)
-  }
-  x_cat[inds[1], ]
+
+  # Return
+  list(x_fac = x_fac, factor_name = name)
 }
 
 #' @rdname idx_expand
-map_factor_to_caseid <- function(x_fac, x_cont_mask) {
+#' @param factor_name factor name
+map_factor_to_caseid <- function(x_fac, x_cont_mask, factor_name) {
   id <- c()
   case_id <- c()
   num_cases <- 0
@@ -227,7 +236,7 @@ map_factor_to_caseid <- function(x_fac, x_cont_mask) {
     }
   }
   out <- data.frame(id, case_id)
-  colnames(out) <- c("Level", "CaseID")
+  colnames(out) <- c(factor_name, "case_id")
   return(out)
 }
 

@@ -171,7 +171,6 @@ lgpmodel <- setClass("lgpmodel",
 #'
 #' @slot stan_fit An object of class \code{stanfit}.
 #' @slot model An object of class \code{lgpmodel}.
-#' @section Related methods and functions:
 #' @family model fit vizualization functions
 #' @seealso  All methods that work on \linkS4class{lgpmodel}
 #' objects work also on \linkS4class{lgpfit} objects.

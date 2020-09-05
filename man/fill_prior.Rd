@@ -4,11 +4,13 @@
 \alias{fill_prior}
 \title{Fill a partially defined prior}
 \usage{
-fill_prior(prior)
+fill_prior(prior, num_uncrt)
 }
 \arguments{
 \item{prior}{A named list, defining the prior distribution of model
 (hyper)parameters.}
+
+\item{num_uncrt}{number of uncertain components}
 }
 \value{
 a named list

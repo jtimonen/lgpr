@@ -15,6 +15,7 @@ stan_data_components(model_formula, covariates)
 a named list with fields
 \itemize{
   \item \code{to_stan}: a list of stan data
+  \item \code{caseid_map}: a data frame
 }
 }
 \description{

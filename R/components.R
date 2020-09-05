@@ -143,6 +143,7 @@ stan_data_covariates <- function(data, x_names) {
   )
 }
 
+
 #' Create model components data for Stan input
 #'
 #' @param model_formula an object of class \linkS4class{lgpformula}
@@ -150,23 +151,10 @@ stan_data_covariates <- function(data, x_names) {
 #' @return a named list with fields
 #' \itemize{
 #'   \item \code{to_stan}: a list of stan data
+#'   \item \code{caseid_map}: a data frame
 #' }
 stan_data_components <- function(model_formula, covariates) {
-  terms <- model_formula@terms@summands
-  J <- length(terms)
-
-  # Create the components integer array
-  comps <- array(0, dim = c(J, 9))
-  for (j in seq_len(J)) {
-    comps[j, ] <- term_to_numeric(terms[[j]], covariates)
-  }
-  colnames(comps) <- c(
-    "type", "ker", "unused",
-    "het", "ns", "vm",
-    "unc", "cat", "cont"
-  )
-  rownames(comps) <- term_names(model_formula@terms)
-  components <- as.matrix(comps)
+  components <- create_components_encoding(model_formula, covariates)
 
   # Create idx_expand, num_cases and vm_params
   cts <- dollar(covariates, "to_stan")
@@ -175,7 +163,7 @@ stan_data_components <- function(model_formula, covariates) {
   lst <- create_idx_expand(components, x_cat, x_cont_mask)
   idx_expand <- dollar(lst, "idx_expand")
   caseid_map <- dollar(lst, "map")
-  num_cases <- length(unique(idx_expand[idx_expand > 1]))
+  num_bt <- length(unique(idx_expand[idx_expand > 1]))
   num_ns <- sum(components[, 5] != 0)
   num_vm <- sum(components[, 6] != 0)
   VM <- default_vm_params()
@@ -184,7 +172,7 @@ stan_data_components <- function(model_formula, covariates) {
   to_stan <- list(
     components = components,
     idx_expand = idx_expand,
-    num_cases = num_cases,
+    num_bt = num_bt,
     num_ell = sum(components[, 1] != 0),
     num_heter = sum(components[, 4] != 0),
     num_ns = num_ns,
@@ -201,6 +189,26 @@ stan_data_components <- function(model_formula, covariates) {
   )
 }
 
+
+#' Create the components integer array
+#'
+#' @inheritParams stan_data_components
+#' @return a matrix of integers
+create_components_encoding <- function(model_formula, covariates) {
+  terms <- model_formula@terms@summands
+  J <- length(terms)
+  comps <- array(0, dim = c(J, 9))
+  for (j in seq_len(J)) {
+    comps[j, ] <- term_to_numeric(terms[[j]], covariates)
+  }
+  colnames(comps) <- c(
+    "type", "ker", "unused",
+    "het", "ns", "vm",
+    "unc", "cat", "cont"
+  )
+  rownames(comps) <- term_names(model_formula@terms)
+  as.matrix(comps)
+}
 
 #' Map a list of terms to their "names"
 #'
