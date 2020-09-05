@@ -355,15 +355,6 @@ stan_list_names <- function() {
   )
 }
 
-#' Wrapper for rstan::get_stream
-#'
-#' @description See \code{\link[rstan]{get_stream}}.
-#' @return an external pointer
-get_stream <- function() {
-  rstan::get_stream()
-}
-
-
 #' Integer encoding of likelihod function names
 #'
 #' @description
@@ -412,12 +403,13 @@ get_pkg_description <- function() {
   return(descr)
 }
 
-#' Get main stan model of the package
+#' Get a stan model of the package
 #'
 #' @export
+#' @param name name of the model
 #' @return an object of class stanmodel
-get_stan_model <- function() {
-  return(stanmodels[["lgp"]])
+get_stan_model <- function(name = "lgp") {
+  dollar(stanmodels, name)
 }
 
 #' Default variance masking function parameters are defined here

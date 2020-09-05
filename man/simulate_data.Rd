@@ -21,7 +21,7 @@ simulate_data(
   t_effect_range = "auto",
   t_observed = "after_0",
   c_hat = 0,
-  dis_fun = "gp_vm",
+  dis_fun = "gp_warp_vm",
   bin_kernel = FALSE,
   steepness = 0.5,
   vm_params = c(0.025, 1),

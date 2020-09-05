@@ -116,7 +116,7 @@ stan_data_covariates <- function(data, x_names) {
   rownames(x_cont) <- x_cont_names
   rownames(x_cont_unnorm) <- x_cont_names
   rownames(x_cont_mask) <- x_cont_names
-  
+
   if (!is.null(x_cat_num_levels)) {
     x_cat_num_levels <- array(x_cat_num_levels, dim = c(num_cat))
   } else {

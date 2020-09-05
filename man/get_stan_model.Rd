@@ -2,13 +2,16 @@
 % Please edit documentation in R/utils.R
 \name{get_stan_model}
 \alias{get_stan_model}
-\title{Get main stan model of the package}
+\title{Get a stan model of the package}
 \usage{
-get_stan_model()
+get_stan_model(name = "lgp")
+}
+\arguments{
+\item{name}{name of the model}
 }
 \value{
 an object of class stanmodel
 }
 \description{
-Get main stan model of the package
+Get a stan model of the package
 }

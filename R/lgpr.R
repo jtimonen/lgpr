@@ -127,6 +127,6 @@ optimize_model <- function(model, ...) {
 #' @inheritParams lgp
 #' @param ... keyword arguments to \code{\link{lgp}}
 #' @return lgpfit
-sbc <- function(formula, data, ...) {
+calibrate <- function(formula, data, ...) {
   lgp(formula, data, ..., prior_only = TRUE)
 }

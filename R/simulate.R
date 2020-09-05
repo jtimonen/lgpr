@@ -43,7 +43,7 @@ simulate_data <- function(N,
                           t_effect_range = "auto",
                           t_observed = "after_0",
                           c_hat = 0,
-                          dis_fun = "gp_vm",
+                          dis_fun = "gp_warp_vm",
                           bin_kernel = FALSE,
                           steepness = 0.5,
                           vm_params = c(0.025, 1),
@@ -104,14 +104,10 @@ simulate_data <- function(N,
   FFF <- dollar(COMP, "FFF")
 
   # Total signal f is a (scaled) sum of the components plus a constant
+  # - if there are zero components, define total signal as just noise
   f <- rowSums(FFF)
   SD <- stats::sd(f)
-  if (SD > 0) {
-    f <- sqrt(f_var) / SD * f
-  } else {
-    # if the sum of components is zero, define total signal as just noise
-    f <- stats::rnorm(n = length(f))
-  }
+  f <- if (SD > 0) sqrt(f_var) / SD * f else stats::rnorm(n = length(f))
   f <- f + c_hat
 
   # Generate noise
@@ -441,9 +437,9 @@ sim_create_f <- function(X,
   D <- c(1, 2, covariates + 3)
   useMaskedVarianceKernel <- TRUE
   if (is.character(dis_fun)) {
-    if (dis_fun == "gp_vm") {
+    if (dis_fun == "gp_warp_vm") {
       useMaskedVarianceKernel <- TRUE
-    } else if (dis_fun == "gp_ns") {
+    } else if (dis_fun == "gp_warp") {
       useMaskedVarianceKernel <- FALSE
     } else {
       stop("Invalid keyword for input dis_fun (", dis_fun, ")")
@@ -905,9 +901,7 @@ sim_create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
 sim_draw_measurement_times <- function(N, t_data, t_jitter) {
   k <- length(t_data)
   age <- rep(0, N * k)
-  if (t_jitter < 0) {
-    stop("t_jitter must be positive!")
-  }
+  check_non_negative(t_jitter)
   for (i in 1:N) {
     idx <- (1 + (i - 1) * k):(i * k)
     t <- t_data + stats::rnorm(k, mean = 0, sd = t_jitter)
@@ -998,12 +992,8 @@ sim_draw_categorical <- function(N, k, v) {
 #' @param ell lengthscale (default = 1)
 #' @return A kernel matrix of size n x m
 sim_kernel_se <- function(x1, x2, alpha = 1, ell = 1) {
-  if (ell <= 0) {
-    stop("ell must be positive!")
-  }
-  if (alpha < 0) {
-    stop("alpha cannot be negative")
-  }
+  check_positive(ell)
+  check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
   X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
@@ -1021,9 +1011,7 @@ sim_kernel_se <- function(x1, x2, alpha = 1, ell = 1) {
 #' @param alpha marginal std (default = 1)
 #' @return A (binary) kernel matrix of size n x m
 sim_kernel_zerosum <- function(x1, x2, M, alpha = 1) {
-  if (alpha < 0) {
-    stop("alpha cannot be negative")
-  }
+  check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
   K <- matrix(0, n1, n2)
@@ -1047,9 +1035,7 @@ sim_kernel_zerosum <- function(x1, x2, M, alpha = 1) {
 #' @param pos_class the positive class label
 #' @return A kernel matrix of size n x m
 sim_kernel_bin <- function(x1, x2 = NULL, alpha = 1, pos_class = 1) {
-  if (alpha < 0) {
-    stop("alpha cannot be negative")
-  }
+  check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
   X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
@@ -1072,12 +1058,8 @@ sim_kernel_bin <- function(x1, x2 = NULL, alpha = 1, pos_class = 1) {
 #' @return A kernel matrix of size n x m
 sim_kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c,
                           nan_replace = 0) {
-  if (a <= 0) {
-    stop("a must be positive")
-  }
-  if (c <= 0) {
-    stop("c must be positive")
-  }
+  check_positive(a)
+  check_positive(c)
   x1[is.nan(x1)] <- nan_replace
   x2[is.nan(x2)] <- nan_replace
   w1 <- sim_warp_input(x1, a, b, c)

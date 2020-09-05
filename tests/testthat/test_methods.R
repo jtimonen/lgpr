@@ -1,17 +1,15 @@
 library(lgpr)
-set.seed(123)
 
 # -------------------------------------------------------------------------
 
 context("Methods for lgpmodel objects")
 
-sim <- simulate_data(
-  N = 4,
-  t_data = seq(6, 36, by = 6),
-  covariates = c(0, 2),
-  t_observed = "after_1"
+et <- list(lower = 10, zero = 0, backwards = FALSE, upper = 20)
+model <- create_model(y ~ uncrt(id) * heter(id) * gp_warp(dis_age) +
+  zerosum(sex) * gp(age),
+prior = list(effect_time_info = et),
+data = testdata_001
 )
-model <- create_model(y ~ gp(age) + zerosum(z) * gp(age), data = sim@data)
 
 test_that("lgpmodel getters work", {
   n <- get_num_obs(model)
@@ -19,13 +17,12 @@ test_that("lgpmodel getters work", {
   nams <- get_covariate_names(model)
   expect_equal(n, 24)
   expect_equal(dim(df), c(2, 9))
-  expect_equal(nams, "age, z")
+  expect_equal(nams, "dis_age, age, id, sex")
 })
 
 test_that("prior summary works", {
   ps <- prior_summary(model, digits = 4)
-  pars <- c("alpha[1]", "alpha[2]", "ell[1]", "ell[2]", "(sigma[1])^2")
-  expect_equal(ps$Parameter, pars)
+  expect_equal(length(ps$Parameter), 9)
 })
 
 test_that("model summary prints output", {
@@ -42,6 +39,7 @@ test_that("print_stan_input prints output", {
 # -------------------------------------------------------------------------
 
 context("Methods for lgpsim objects")
+set.seed(123)
 
 test_that("simulated data can be plotted", {
   dat <- simulate_data(

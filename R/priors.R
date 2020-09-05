@@ -41,7 +41,7 @@ uniform <- function(square = FALSE) {
 #' @param sigma standard deviation
 normal <- function(mu, sigma, square = FALSE) {
   check_numeric(mu)
-  check_numeric(sigma, require_positive = TRUE)
+  check_positive(sigma)
   list(
     dist = "normal",
     square = square,
@@ -54,7 +54,7 @@ normal <- function(mu, sigma, square = FALSE) {
 #' @rdname priors
 #' @param nu degrees of freedom
 student_t <- function(nu, square = FALSE) {
-  check_numeric(nu, require_positive = TRUE)
+  check_positive(nu)
   list(
     dist = "student-t",
     square = square,
@@ -67,8 +67,8 @@ student_t <- function(nu, square = FALSE) {
 #' @param shape shape parameter (alpha)
 #' @param inv_scale inverse scale parameter (beta)
 gam <- function(shape, inv_scale, square = FALSE) {
-  check_numeric(shape, require_positive = TRUE)
-  check_numeric(inv_scale, require_positive = TRUE)
+  check_positive(shape)
+  check_positive(inv_scale)
   list(
     dist = "gamma",
     alpha = shape,
@@ -82,8 +82,8 @@ gam <- function(shape, inv_scale, square = FALSE) {
 #' @param shape shape parameter (alpha)
 #' @param scale scale parameter (beta)
 igam <- function(shape, scale, square = FALSE) {
-  check_numeric(shape, require_positive = TRUE)
-  check_numeric(scale, require_positive = TRUE)
+  check_positive(shape)
+  check_positive(scale)
   list(
     dist = "inv-gamma",
     alpha = shape,
@@ -98,7 +98,7 @@ igam <- function(shape, scale, square = FALSE) {
 #' @param sigma standard deviation
 log_normal <- function(mu, sigma, square = FALSE) {
   check_numeric(mu)
-  check_numeric(sigma, require_positive = TRUE)
+  check_positive(sigma)
   list(
     dist = "log-normal",
     square = square,
@@ -113,8 +113,8 @@ log_normal <- function(mu, sigma, square = FALSE) {
 #' @param a shape parameter
 #' @param b shape parameter
 bet <- function(a, b) {
-  check_numeric(a, require_positive = TRUE)
-  check_numeric(b, require_positive = TRUE)
+  check_positive(a)
+  check_positive(b)
   list(
     dist = "beta",
     square = FALSE,
@@ -426,32 +426,47 @@ prior_type_names <- function(idx = NULL) {
   }
 }
 
-#' Convert the given prior in a Stan input to a human-readable format
+#' Convert the Stan input encoding of a prior to a human-readable format
 #'
-#' @inheritParams prior_to_df_oneparam
+#' @param stan_input a list of stan input fields
+#' @inheritParams prior_to_char
+#' @name prior_df
 #' @return a data frame
+NULL
+
+#' @rdname prior_df
 prior_to_df <- function(stan_input, digits = 3) {
+
+  # Common parameters
   pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
   df <- NULL
   for (p in pnames) {
     df_p <- prior_to_df_oneparam(stan_input, p, digits)
-    if (is.null(df)) {
-      df <- df_p
-    } else {
-      df <- rbind(df, df_p)
-    }
+    df <- rbind(df, df_p)
   }
+
+  # Beta
+  num_heter <- dollar(stan_input, "num_heter")
+  num_uncrt <- dollar(stan_input, "num_uncrt")
+  if (num_heter > 0) {
+    df_p <- prior_to_df_beta(stan_input)
+    df <- rbind(df, df_p)
+  }
+
+  # Effect time
+  if (num_uncrt > 0) {
+    df_p <- prior_to_df_teff(stan_input, digits)
+    df <- rbind(df, df_p)
+  }
+
   return(df)
 }
 
-#' Convert the given prior for one parameter type into a human-readable format
-#'
-#' @param stan_input a list of stan input fields
-#' @inheritParams prior_to_char
-#' @return a data frame
+#' @rdname prior_df
+#' @param parname parameter name
 prior_to_df_oneparam <- function(stan_input, parname, digits) {
-  prior <- stan_input[[paste0("prior_", parname)]]
-  hyper <- stan_input[[paste0("hyper_", parname)]]
+  prior <- dollar(stan_input, paste0("prior_", parname))
+  hyper <- dollar(stan_input, paste0("hyper_", parname))
   D <- dim(prior)[1]
   pnames <- rep("foo", D)
   dnames <- rep("foo", D)
@@ -459,14 +474,61 @@ prior_to_df_oneparam <- function(stan_input, parname, digits) {
   for (j in seq_len(D)) {
     par <- paste0(parname, "[", j, "]")
     out <- prior_to_char(par, prior[j, ], hyper[j, ], digits)
-    pnames[j] <- dollar(out, "parname")
-    dnames[j] <- dollar(out, "distribution")
+    tpar <- dollar(out, "parname")
+    pnames[j] <- par
+    dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
     bounds[j] <- "[0, Inf)"
   }
   df <- data.frame(pnames, bounds, dnames)
   colnames(df) <- c("Parameter", "Bounds", "Prior")
   return(df)
 }
+
+#' @rdname prior_df
+prior_to_df_beta <- function(stan_input) {
+  num_bt <- dollar(stan_input, "num_bt")
+  hyper <- dollar(stan_input, paste0("hyper_beta"))
+  dist <- paste0("beta(", hyper[1], ", ", hyper[2], ")")
+  bounds <- "[0, 1]"
+  par <- paste0("beta[1-", num_bt, "]")
+  dist <- paste0(par, " ~ ", dist)
+  df <- data.frame(par, bounds, dist)
+  colnames(df) <- c("Parameter", "Bounds", "Prior")
+  return(df)
+}
+
+#' @rdname prior_df
+prior_to_df_teff <- function(stan_input, digits) {
+  num_bt <- dollar(stan_input, "num_bt")
+  prior <- dollar(stan_input, "prior_teff")
+  type <- prior[1]
+  backwards <- prior[2]
+  hyper <- dollar(stan_input, "hyper_teff")
+  zero <- dollar(stan_input, "teff_zero")
+  lower <- dollar(stan_input, "teff_lb")
+  upper <- dollar(stan_input, "teff_ub")
+  pnames <- rep("foo", num_bt)
+  dnames <- rep("foo", num_bt)
+  bounds <- rep("foo", num_bt)
+  for (j in seq_len(num_bt)) {
+    par <- paste0("teff[", j, "]")
+    tpar <- par
+    if (zero[j] != 0) {
+      tpar <- paste0(tpar, " - ", zero[j])
+    }
+    if (backwards == 1) {
+      tpar <- paste0(" - (", tpar, ")")
+    }
+    out <- prior_to_char(par, c(type, 0), hyper, digits)
+    pnames[j] <- par
+    dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
+    bounds[j] <- paste0("[", lower[j], ", ", upper[j], "]")
+  }
+  df <- data.frame(pnames, bounds, dnames)
+  colnames(df) <- c("Parameter", "Bounds", "Prior")
+  return(df)
+}
+
 
 #' Human-readable prior statement
 #'

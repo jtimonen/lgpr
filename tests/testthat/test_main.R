@@ -40,9 +40,9 @@ test_that("an lgpfit object is returned and can be plotted", {
   })
 })
 
-test_that("sbc can be used", {
+test_that("sbc can be performed", {
   suppressWarnings({
-    fit <- sbc(
+    fit <- calibrate(
       formula = formula,
       data = sim@data,
       iter = 1000,

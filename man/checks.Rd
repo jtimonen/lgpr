@@ -4,6 +4,8 @@
 \alias{checks}
 \alias{check_type}
 \alias{check_numeric}
+\alias{check_positive}
+\alias{check_non_negative}
 \alias{check_length}
 \alias{check_not_null}
 \alias{check_lengths}
@@ -13,7 +15,11 @@
 \usage{
 check_type(arg, allowed)
 
-check_numeric(arg, arg_name = NULL, require_positive = FALSE)
+check_numeric(arg)
+
+check_positive(arg)
+
+check_non_negative(arg)
 
 check_length(arg, expected)
 
@@ -29,11 +35,6 @@ check_in_data(var_name, data)
 \item{arg}{An argument to check.}
 
 \item{allowed}{Allowed class names.}
-
-\item{arg_name}{Argument name.}
-
-\item{require_positive}{Should it also be checked that \code{arg} is
-positive?}
 
 \item{expected}{Expected length.}
 
@@ -52,6 +53,8 @@ positive?}
 \itemize{
   \item \code{check_type} checks if argument has correct class
   \item \code{check_numeric} checks if argument is numeric
+  \item \code{check_positive} checks if argument is positive
+  \item \code{check_non_negative} checks if argument is non-negative
   \item \code{check_not_null} checks if argument is not null
   \item \code{check_false} checks if argument is false or zero
   \item \code{check_length} checks if argument has correct length
