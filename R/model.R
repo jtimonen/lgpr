@@ -6,6 +6,8 @@
 #' @inheritParams parse_prior
 #' @inheritParams parse_covs_and_comps
 #' @inheritParams parse_options
+#' @param prior_only Should this run in prior sampling mode,
+#' where likelihood is ignored?
 #' @param verbose Should more verbose output be printed?
 create_model <- function(formula,
                          data,
@@ -14,12 +16,12 @@ create_model <- function(formula,
                          c_hat = NULL,
                          num_trials = NULL,
                          options = NULL,
+                         prior_only = FALSE,
                          verbose = FALSE) {
 
   # Parse the formula and options
   model_formula <- parse_formula(formula)
   list_opts <- parse_options(options)
-  list_dopts <- list()
 
   # Parse response and likelihood
   parsed <- parse_response(data, likelihood, model_formula)
@@ -51,12 +53,14 @@ create_model <- function(formula,
   }
 
   # Other
-  list_other <- list(is_verbose = as.numeric(verbose))
+  list_other <- list(
+    is_verbose = as.numeric(verbose),
+    is_likelihood_skipped = as.numeric(prior_only)
+  )
 
   # Create slots of the 'lgpmodel' object
   stan_input <- c(
     list_opts,
-    list_dopts,
     list_y,
     list_lh,
     list_x,
@@ -342,8 +346,7 @@ parse_likelihood <- function(likelihood, c_hat, num_trials, list_y) {
   list(
     obs_model = LH,
     y_num_trials = num_trials,
-    c_hat = c_hat,
-    is_likelihood_skipped = 0
+    c_hat = c_hat
   )
 }
 

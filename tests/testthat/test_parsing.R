@@ -79,7 +79,7 @@ test_that("parse_options does not need arguments", {
 test_that("parse_likelihood can be used", {
   list_y <- list(y_cont = c(1, 2))
   a <- parse_likelihood("gaussian", NULL, NULL, list_y)
-  e <- c("obs_model", "y_num_trials", "c_hat", "is_likelihood_skipped")
+  e <- c("obs_model", "y_num_trials", "c_hat")
   expect_equal(names(a), e)
 })
 

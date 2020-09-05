@@ -67,10 +67,7 @@ plot_invgamma <- function(alpha, beta, by = 0.01,
 
   max <- 1.2 * q2
   t <- seq(by, max, by = by)
-  ylab <- "Prob."
-  if (log) {
-    ylab <- "Log prob."
-  }
+  ylab <- if (log) "Log prob." else "Prob."
   y <- dinvgamma_stanlike(t, alpha = alpha, beta = beta, log = log)
   df <- data.frame(t, y)
 

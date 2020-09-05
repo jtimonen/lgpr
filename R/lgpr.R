@@ -84,13 +84,14 @@ lgp <- function(formula,
                 c_hat = NULL,
                 num_trials = NULL,
                 options = NULL,
+                prior_only = FALSE,
                 verbose = FALSE,
                 ...) {
 
   # Create and fit the model
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
-    verbose
+    prior_only, verbose
   )
   sample_model(model = model, ...)
 }
@@ -118,4 +119,14 @@ optimize_model <- function(model, ...) {
   object <- stanmodels[[model@stan_model_name]]
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
+}
+
+#' Simulation based calibration
+#'
+#' @export
+#' @inheritParams lgp
+#' @param ... keyword arguments to \code{\link{lgp}}
+#' @return lgpfit
+sbc <- function(formula, data, ...) {
+  lgp(formula, data, ..., prior_only = TRUE)
 }

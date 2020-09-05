@@ -20,7 +20,7 @@ test_that("plot_color_palette works", {
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
-  expect_error(color_palette_plot(7))
+  expect_error(plot_color_palette(7))
 })
 
 # Create test data

@@ -12,6 +12,7 @@ create_model(
   c_hat = NULL,
   num_trials = NULL,
   options = NULL,
+  prior_only = FALSE,
   verbose = FALSE
 )
 }
@@ -76,6 +77,9 @@ model.}
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
 }}
+
+\item{prior_only}{Should this run in prior sampling mode,
+where likelihood is ignored?}
 
 \item{verbose}{Should more verbose output be printed?}
 }

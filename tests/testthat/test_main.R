@@ -40,6 +40,21 @@ test_that("an lgpfit object is returned and can be plotted", {
   })
 })
 
+test_that("sbc can be used", {
+  suppressWarnings({
+    fit <- sbc(
+      formula = formula,
+      data = sim@data,
+      iter = 1000,
+      chains = 2,
+      refresh = 0
+    )
+    expect_s4_class(fit, "lgpfit")
+    p <- plot_posterior(fit)
+    expect_s3_class(p, "ggplot")
+  })
+})
+
 
 # Create test input
 sim <- simulate_data(
@@ -63,7 +78,7 @@ test_that("a model with uncertain disease age needs prior specified", {
 test_that("a model with uncertain disease age can be created and fit", {
   et <- list(backwards = FALSE, lower = 15, upper = 30, zero = 0)
   prior <- list(effect_time_info = et)
-  model <- create_model(formula = formula, data = data, prior = prior)
+  model <- create_model(formula = formula, data = sim@data, prior = prior)
   si <- get_stan_input(model)
   expect_equal(si$num_bt, 2)
   expect_equal(si$num_vm, 1)
