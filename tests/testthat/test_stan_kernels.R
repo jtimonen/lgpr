@@ -157,7 +157,7 @@ test_that("gp_posterior works correctly", {
   fp <- gp_posterior(K, y, 1e-6, 1.0)
   expect_equal(length(fp), 12)
 
-  # test that componentwise means sum to total mean
+  # test that component-wise means sum to total mean
   f_sum <- fp[[1]]
   for (j in 2:5) {
     f_sum <- f_sum + fp[[j]]

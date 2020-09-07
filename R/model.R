@@ -17,7 +17,8 @@ create_model <- function(formula,
                          num_trials = NULL,
                          options = NULL,
                          prior_only = FALSE,
-                         verbose = FALSE) {
+                         verbose = FALSE,
+                         sample_f = !(likelihood == "gaussian")) {
 
   # Parse the formula and options
   model_formula <- parse_formula(formula)
@@ -27,7 +28,7 @@ create_model <- function(formula,
   parsed <- parse_response(data, likelihood, model_formula)
   list_y <- dollar(parsed, "to_stan")
   y_scaling <- dollar(parsed, "scaling")
-  list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y)
+  list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y, sample_f)
 
   # Parse covariates and components
   parsed <- parse_covs_and_comps(data, model_formula)
@@ -93,8 +94,6 @@ create_model <- function(formula,
 #'
 #' @param options A named list with the following possible fields:
 #' \itemize{
-#'   \item \code{sample_f} Determines if the function values are be sampled
-#'   (must be \code{TRUE} if likelihood is not \code{"gaussian"}).
 #'   \item \code{skip_generated} If this is true, the generated quantities
 #'   block of Stan is skipped.
 #'   \item \code{delta} Amount of added jitter to ensure positive definite
@@ -107,7 +106,6 @@ parse_options <- function(options = NULL) {
   # Set defaults
   opts <- list(
     skip_generated = FALSE,
-    sample_f = FALSE,
     delta = 1e-8
   )
 
@@ -121,7 +119,6 @@ parse_options <- function(options = NULL) {
   # Format for Stan input
   list(
     is_generated_skipped = as.numeric(dollar(opts, "skip_generated")),
-    is_f_sampled = as.numeric(dollar(opts, "sample_f")),
     delta = dollar(opts, "delta")
   )
 }
@@ -335,18 +332,25 @@ parse_response <- function(data, likelihood, model_formula) {
 #' points. Setting \code{num_trials=1} corresponds to Bernoulli observation
 #' model.
 #' @param list_y a list field returned by \code{\link{parse_response}}
+#' @param sample_f Determines if the latent function values are be sampled
+#' (must be \code{TRUE} if likelihood is not \code{"gaussian"}).
 #' @return a list of parsed options
-parse_likelihood <- function(likelihood, c_hat, num_trials, list_y) {
+parse_likelihood <- function(likelihood, c_hat, num_trials, list_y, sample_f) {
   LH <- likelihood_as_int(likelihood)
   y <- if (LH != 1) dollar(list_y, "y_disc") else dollar(list_y, "y_cont")
   y <- as.numeric(y)
   num_obs <- length(y)
   num_trials <- set_num_trials(num_trials, num_obs, LH)
   c_hat <- set_c_hat(c_hat, y, LH, num_trials)
+  sample_f_final <- if (LH != 1) TRUE else sample_f
+  if (sample_f_final != sample_f) {
+    stop("sample_f must be TRUE when likelihood is ", likelihood)
+  }
   list(
     obs_model = LH,
     y_num_trials = num_trials,
-    c_hat = c_hat
+    c_hat = c_hat,
+    is_f_sampled = as.numeric(sample_f_final)
   )
 }
 

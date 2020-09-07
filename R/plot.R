@@ -323,82 +323,136 @@ plot_data_add_highlight_factor <- function(df, group_by, highlight) {
   return(df)
 }
 
-#' Visualize posterior uncertainty in the disease effect times
-#'
-#' @export
-#' @description Can only be used if the uncertainty of effect time was modeled.
-#' @param fit An object of class \code{lgpfit}.
-#' @param color_scheme Name of bayesplot color scheme.
-#' @param prob Inner interval
-#' @param prob_outer Outer interval
-#' @param point_est Point estimate type
-#' @family model fit visualization functions
-#' @return a ggplot object
-plot_effect_times <- function(fit,
-                              color_scheme = "red",
-                              prob = 1,
-                              prob_outer = 1,
-                              point_est = "none") {
-  if (class(fit) != "lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  ptitle <- "Posterior distribution of the inferred disease effect time"
-  sd <- fit@model@stan_dat
-  if (sd$UNCRT == 0) {
-    stop("The disease effect time was not modeled as uncertain!")
-  }
-  p <- plot_samples(fit,
-    regex_pars = "T_effect",
-    type = "areas",
-    point_est = point_est,
-    prob = prob,
-    prob_outer = prob_outer,
-    color_scheme = color_scheme
-  )
 
-  form <- dollar(fit@model@info, "formula")
-  p <- p + ggplot2::labs(
-    subtitle = paste("Model:", form),
-    title = ptitle
-  )
-  return(p)
+
+#' Helper function
+#'
+#' @param par_summary summary of warping parameter
+#' @param dis_age the x-axis values
+#' @param color_scheme name of \code{bayesplot} color scheme
+#' @return a \code{ggplot} object
+plot_warp_helper <- function(par_summary,
+                             dis_age,
+                             color_scheme = "brightblue") {
+
+  # Get colors and quantiles
+  scheme <- bayesplot::color_scheme_get(color_scheme)
+  color_line <- dollar(scheme, "dark")
+  color_inner <- dollar(scheme, "light_highlight")
+  color_outer <- dollar(scheme, "light")
+  w_50 <- warp_input(dis_age, a = par_summary[6])
+  w_75 <- warp_input(dis_age, a = par_summary[7])
+  w_25 <- warp_input(dis_age, a = par_summary[5])
+  w_025 <- warp_input(dis_age, a = par_summary[4])
+  w_975 <- warp_input(dis_age, a = par_summary[8])
+  DF <- data.frame(cbind(dis_age, w_50, w_75, w_25, w_025, w_975))
+
+  # Create ggplot object
+  aes_line <- ggplot2::aes_string(x = "dis_age", y = "w_50")
+  aes_outer <- ggplot2::aes_string(ymin = "w_025", ymax = "w_975")
+  aes_inner <- ggplot2::aes_string(ymin = "w_25", ymax = "w_75")
+  h <- ggplot2::ggplot(DF, aes_line) +
+    ggplot2::geom_ribbon(aes_outer, fill = color_outer) +
+    ggplot2::geom_ribbon(aes_inner, fill = color_inner) +
+    ggplot2::geom_line(color = color_line)
+
+  # Add titles and labels
+  h <- h + ggplot2::labs(x = "Input", y = "Warped input")
+  subt <- paste("Median steepness =", round(par_summary[6], 3))
+  h <- h + ggplot2::ggtitle("Input-warping function", subtitle = subt)
+  return(h)
 }
 
-
-#' Visualize posterior samples of individual-specific disease effect magnitude
-#' parameters
+#' Helper function
 #'
-#' @export
-#' @description Can only be used if the disease effect was modeled
-#' heterogeneously.
-#' @param fit An object of class \code{lgpfit}.
-#' @param color_scheme Name of bayesplot color scheme.
-#' @param threshold Threshold for median.
-#' @family model fit visualization functions
-#' @return a ggplot object
-plot_beta <- function(fit,
-                      color_scheme = "red",
-                      threshold = 0.5) {
-  if (class(fit) != "lgpfit") stop("Class of 'fit' must be 'lgpfit'!")
-  ptitle <- paste0(
-    "Posterior distribution of individual-specific ",
-    "disease effect magnitudes"
-  )
-  aff <- affected(fit, threshold = threshold)
-  df <- as.data.frame(fit@stan_fit)
-  ibeta <- grep("beta", names(df))
-  df <- df[, ibeta]
-  colnames(df) <- paste("id = ", names(aff), sep = "")
-  bayesplot::color_scheme_set(scheme = color_scheme)
-  p <- bayesplot::mcmc_dens(df)
-  beta <- "beta" # avoid note from R CMD check
-  p <- p + ggplot2::xlab(expression(beta))
+#' @inheritParams plot_fit
+#' @return a \code{ggplot object}
+plot_fit_helper <- function(fit, data, x_name, y_name, group_by, draws) {
+  df_data <- data[c(group_by, x_name, y_name)]
+  df <- data[c(group_by, x_name)]
+  f_draws <- get_f(fit, draws)
+  num_draws <- dollar(f_draws, "num_draws")
+  f <- dollar(f_draws, "f")
+  f_total <- dollar(f, "total")
+  f_total <- scale_f_total(fit, f_total)
 
-  str <- paste("Affected individuals: ",
-    paste(names(which(aff)), collapse = ", "),
-    sep = ""
+  # GP mean
+  df_fit <- plot_fit_create_df(df, f_total$mean)
+
+  # GP std
+  if (num_draws > 1) {
+    df_ribbon <- NULL
+  } else {
+    df_ribbon <- plot_fit_create_df_ribbon(df, f_total$mean, f_total$std, 2)
+  }
+
+  # Add effect time
+  num_ns <- dollar(get_stan_input(fit), "num_ns")
+  if (num_ns == 0) {
+    teff_obs <- NULL
+  } else {
+    da_name <- get_ns_covariates(fit)
+    check_length(da_name, 1)
+    teff_obs <- get_teff_obs(data, x_name, da_name, group_by)
+    nams <- dollar(teff_obs, group_by)
+    teff_obs <- dollar(teff_obs, x_name)
+    names(teff_obs) <- nams
+  }
+
+  # Plot title
+  info <- "Showing analytic GP mean"
+  if (num_draws > 1) {
+    info <- paste(info, "for", num_draws, " draws.")
+  } else {
+    info <- paste0(info, " and 2*std for draw #", draws, ".")
+  }
+
+  # Return
+  list(
+    df_data = df_data,
+    df_fit = df_fit,
+    df_ribbon = df_ribbon,
+    teff_obs = teff_obs,
+    teff_fit = NULL,
+    info = info,
+    fit_alpha = line_alpha_fun(num_draws)
   )
-  p <- p + ggplot2::labs(
-    subtitle = str,
-    title = ptitle
-  )
-  return(p)
+}
+
+#' Helper function
+#'
+#' @param df a data frame with group_by factor and x-variable
+#' @param f an array of size \code{num_draws} x \code{num_obs}
+#' @return a data frame
+plot_fit_create_df <- function(df, f) {
+  check_type(df, "data.frame")
+  names <- colnames(df)
+  S <- dim(f)[1]
+  n <- dim(f)[2]
+  X1 <- rep(df[, 1], S)
+  X2 <- rep(df[, 2], S)
+  X3 <- as.numeric(t(f))
+  X4 <- rep(1:S, each = n)
+  df_fit <- data.frame(as.factor(X1), X2, X3, as.factor(X4))
+  colnames(df_fit) <- c(names, "f", "draw")
+  return(df_fit)
+}
+
+#' Helper function
+#'
+#' @inheritParams plot_fit_create_df
+#' @param f_mean an array of size \code{1} x \code{num_obs}
+#' @param f_std an array of size \code{1} x \code{num_obs}
+#' @param M multiplier for std
+#' @return a data frame
+plot_fit_create_df_ribbon <- function(df, f_mean, f_std, M) {
+  check_type(df, "data.frame")
+  check_not_null(M)
+  f <- as.numeric(f_mean)
+  std <- as.numeric(f_std)
+  upper <- f + M * std
+  lower <- f - M * std
+  df_ribbon <- data.frame(lower, upper)
+  df_ribbon <- cbind(df, df_ribbon)
+  return(df_ribbon)
 }

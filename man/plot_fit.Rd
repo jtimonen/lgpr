@@ -25,7 +25,7 @@ plot_fit(
 
 \item{group_by}{grouping variable}
 
-\item{draws}{see the \code{draws} argument of \code{\link{get_posterior_f}}}
+\item{draws}{see the \code{draws} argument of \code{\link{get_f}}}
 
 \item{...}{keyword arguments to \code{\link{plot_panel}}}
 }
@@ -38,9 +38,6 @@ Creates plots where each observation unit has a separate panel.
 \seealso{
 Other model fit visualization functions: 
 \code{\link{plot,lgpfit,missing-method}},
-\code{\link{plot_beta}()},
-\code{\link{plot_effect_times}()},
-\code{\link{plot_posterior_warp}()},
-\code{\link{plot_posterior}()}
+\code{\link{plot_draws}()}
 }
 \concept{model fit visualization functions}

@@ -11,7 +11,7 @@ array_to_arraylist(x, L, draws)
 
 \item{L}{an integer}
 
-\item{draws}{see the \code{draws} argument of \code{\link{get_posterior_f}}}
+\item{draws}{see the \code{draws} argument of \code{\link{get_f}}}
 }
 \value{
 a list of length \code{L}, where each element is an array of

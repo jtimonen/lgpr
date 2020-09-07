@@ -16,12 +16,18 @@ model_summary <- function(object) {
   cat(brief)
   cat("\n")
   print(get_component_info(object))
+  cat("\n")
   ci <- get_covariate_info(object)
-  cat("\n")
-  print(ci$continuous)
-  cat("\n")
-  print(ci$categorical)
-  cat("\n")
+  info_cont <- dollar(ci, "continuous")
+  info_cat <- dollar(ci, "categorical")
+  if (!is.null(info_cont)) {
+    print(info_cont)
+    cat("\n")
+  }
+  if (!is.null(info_cat)) {
+    print(info_cat)
+    cat("\n")
+  }
   print(param_summary(model))
   invisible(object)
 }
@@ -109,10 +115,14 @@ get_stan_input <- function(object) {
 #' @export
 #' @rdname model_getters
 get_component_info <- function(object) {
-  comps <- get_stan_input(object)$components
-  a <- cbind(comps[, 1:2], comps[, 4:9])
-  Component <- rownames(a)
+  comps <- dollar(get_stan_input(object), "components")
+  nams <- colnames(comps)
+  p1 <- ensure_2dim(comps[, 1:2])
+  p2 <- ensure_2dim(comps[, 4:9])
+  a <- cbind(p1, p2)
+  Component <- rownames(comps)
   a <- cbind(Component, a)
+  colnames(a) <- c("Component", nams[1:2], nams[4:9])
   rownames(a) <- NULL
   data.frame(a)
 }
@@ -172,6 +182,9 @@ get_covariate_info_cont <- function(object) {
   model <- object_to_model(object)
   vn <- model@var_names
   nam <- vn$x_cont
+  if (is.null(nam)) {
+    return(NULL)
+  }
   num_nan <- rowSums(model@stan_input$x_cont_mask == 1)
   df <- data.frame(nam, num_nan)
   colnames(df) <- c("Variable", "#Missing")
@@ -184,6 +197,9 @@ get_covariate_info_cat <- function(object) {
   model <- object_to_model(object)
   vn <- model@var_names
   nam <- vn$x_cat
+  if (is.null(nam)) {
+    return(NULL)
+  }
   num_levels <- model@stan_input$x_cat_num_levels
   levels <- model@var_info$x_cat_levels
   level_names <- c()

@@ -21,7 +21,7 @@ Uses \code{rstan::extract} with \code{permuted = FALSE} and
 \seealso{
 Other fit postprocessing functions: 
 \code{\link{fit_summary}()},
-\code{\link{get_posterior_f}()},
+\code{\link{get_f}()},
 \code{\link{scale_f_total}()}
 }
 \concept{fit postprocessing functions}

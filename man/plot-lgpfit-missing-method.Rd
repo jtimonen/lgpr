@@ -2,7 +2,7 @@
 % Please edit documentation in R/MethodsFit.R
 \name{plot,lgpfit,missing-method}
 \alias{plot,lgpfit,missing-method}
-\title{Visualize a model posterior}
+\title{Visualize parameter draws}
 \usage{
 \S4method{plot}{lgpfit,missing}(x, y, ...)
 }
@@ -11,20 +11,17 @@
 
 \item{y}{not used}
 
-\item{...}{keyword arguments passed to \code{\link{plot_posterior}}}
+\item{...}{keyword arguments passed to \code{\link{plot_draws}}}
 }
 \value{
 a \code{ggplot} object
 }
 \description{
-Visualize a model posterior
+Visualize parameter draws
 }
 \seealso{
 Other model fit visualization functions: 
-\code{\link{plot_beta}()},
-\code{\link{plot_effect_times}()},
-\code{\link{plot_fit}()},
-\code{\link{plot_posterior_warp}()},
-\code{\link{plot_posterior}()}
+\code{\link{plot_draws}()},
+\code{\link{plot_fit}()}
 }
 \concept{model fit visualization functions}

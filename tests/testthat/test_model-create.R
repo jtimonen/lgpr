@@ -19,6 +19,18 @@ test_that("created model is valid", {
   expect_true(validObject(a))
 })
 
+test_that("cannot create nb model where sample_f is FALSE", {
+  dat <- testdata_001
+  dat$y <- round(exp(dat$y))
+  reason <- "sample_f must be TRUE when likelihood is nb"
+  expect_error(create_model(
+    formula = y ~ gp(age) + categ(sex) * gp(age),
+    likelihood = "nb",
+    data = dat,
+    sample_f = FALSE
+  ), reason)
+})
+
 test_that("prior can be parsed from stan_input", {
   f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
   m <- create_model(f, testdata_001)

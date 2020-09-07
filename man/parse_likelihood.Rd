@@ -4,7 +4,7 @@
 \alias{parse_likelihood}
 \title{Parse the given observation model}
 \usage{
-parse_likelihood(likelihood, c_hat, num_trials, list_y)
+parse_likelihood(likelihood, c_hat, num_trials, list_y, sample_f)
 }
 \arguments{
 \item{likelihood}{Determines the observation model. Must be either
@@ -33,6 +33,9 @@ points. Setting \code{num_trials=1} corresponds to Bernoulli observation
 model.}
 
 \item{list_y}{a list field returned by \code{\link{parse_response}}}
+
+\item{sample_f}{Determines if the latent function values are be sampled
+(must be \code{TRUE} if likelihood is not \code{"gaussian"}).}
 }
 \value{
 a list of parsed options

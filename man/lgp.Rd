@@ -16,6 +16,7 @@ lgp(
   options = NULL,
   prior_only = FALSE,
   verbose = FALSE,
+  sample_f = !(likelihood == "gaussian"),
   ...
 )
 
@@ -77,8 +78,6 @@ model.}
 
 \item{options}{A named list with the following possible fields:
 \itemize{
-  \item \code{sample_f} Determines if the function values are be sampled
-  (must be \code{TRUE} if likelihood is not \code{"gaussian"}).
   \item \code{skip_generated} If this is true, the generated quantities
   block of Stan is skipped.
   \item \code{delta} Amount of added jitter to ensure positive definite
@@ -89,6 +88,9 @@ model.}
 where likelihood is ignored?}
 
 \item{verbose}{Should more verbose output be printed?}
+
+\item{sample_f}{Determines if the latent function values are be sampled
+(must be \code{TRUE} if likelihood is not \code{"gaussian"}).}
 
 \item{...}{Optional arguments passed to \code{rstan::optimizing}, such as
 \code{algorithm}. See \code{\link[rstan]{optimizing}} for the possible

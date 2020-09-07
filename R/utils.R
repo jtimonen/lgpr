@@ -179,7 +179,7 @@ squeeze_second_dim <- function(x) {
 #'
 #' @param x an array of shape \code{n} x \code{m}
 #' @param L an integer
-#' @param draws see the \code{draws} argument of \code{\link{get_posterior_f}}
+#' @param draws see the \code{draws} argument of \code{\link{get_f}}
 #' @return a list of length \code{L}, where each element is an array of
 #' shape \code{h} x (\code{m}/\code{L}), where \code{h = length(draws)}
 #' @family array utilities

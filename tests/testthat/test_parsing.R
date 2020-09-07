@@ -72,14 +72,14 @@ test_that("parse_formula throws error if invalid function or covariate", {
 
 test_that("parse_options does not need arguments", {
   a <- parse_options()
-  e <- c("is_generated_skipped", "is_f_sampled", "delta")
+  e <- c("is_generated_skipped", "delta")
   expect_equal(names(a), e)
 })
 
 test_that("parse_likelihood can be used", {
   list_y <- list(y_cont = c(1, 2))
-  a <- parse_likelihood("gaussian", NULL, NULL, list_y)
-  e <- c("obs_model", "y_num_trials", "c_hat")
+  a <- parse_likelihood("gaussian", NULL, NULL, list_y, TRUE)
+  e <- c("obs_model", "y_num_trials", "c_hat", "is_f_sampled")
   expect_equal(names(a), e)
 })
 
@@ -93,14 +93,14 @@ test_that("parse_likelihood errors correctly", {
 
 test_that("parse_likelihood works correctly with binomial likelihood", {
   list_y <- list(y_disc = c(1, 2))
-  a <- parse_likelihood("binomial", 1.2, 9, list_y)
-  b <- parse_likelihood("binomial", NULL, 9, list_y)
+  a <- parse_likelihood("binomial", 1.2, 9, list_y, TRUE)
+  b <- parse_likelihood("binomial", NULL, 9, list_y, TRUE)
   expect_equal(a$obs_model, 4)
   expect_equal(length(a$y_num_trials), 2)
   diff <- abs(b$c_hat - (-1.609438))
   expect_lt(max(diff), 1e-6)
-  expect_error(parse_likelihood("binomial", NULL, c(1, 1, 1), c(1, 2)))
-  expect_error(parse_likelihood("binomial", c(1, 1, 1), NULL, c(1, 2)))
+  expect_error(parse_likelihood("binomial", NULL, c(1, 1, 1), c(1, 2), FALSE))
+  expect_error(parse_likelihood("binomial", c(1, 1, 1), NULL, c(1, 2), FALSE))
 })
 
 test_that("y_scaling is created and and applied", {
