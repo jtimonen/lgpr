@@ -230,16 +230,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // STAN_log_prior
-double STAN_log_prior(const double& x, const std::vector<int>& types, const std::vector<double>& hyper, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_log_prior(SEXP xSEXP, SEXP typesSEXP, SEXP hyperSEXP, SEXP pstream__SEXP) {
+double STAN_log_prior(const double& x, const std::vector<int>& types, const std::vector<double>& p, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_log_prior(SEXP xSEXP, SEXP typesSEXP, SEXP pSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const double& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const std::vector<int>& >::type types(typesSEXP);
-    Rcpp::traits::input_parameter< const std::vector<double>& >::type hyper(hyperSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type p(pSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_log_prior(x, types, hyper, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_log_prior(x, types, p, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }

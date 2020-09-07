@@ -46,23 +46,19 @@ matrix[] STAN_kernel_all(
   int idx_alpha = 0;
   int num_comps = size(components);
   matrix[n1, n2] KX[num_comps];
-  int L1 = size(x1);
-  int L2 = size(x2);
-  int L3 = size(K_const);
-  int L4 = size(components[1]);
 
   // Input validation
-  if(L1 != L2){
-    reject("first dims of <x1> and <x2> must match! ",
-           "found = (", L1, ", ", L2, ")");
-  }
-  if(num_comps != L3){
-    reject("first dim of <components> and first dim of <K_const> must match! ",
-           "found = (", num_comps, ", ", L3, ")");
-  }
-  if(L4 != 9){
-    reject("second dimension of <components> must be 9!");
-  }
+  //int L1 = size(x1); int L2 = size(x2); int L3 = size(K_const);
+  //int L4 = size(components[1]);
+  //if(L1 != L2){
+  //  reject("first dims of <x1> and <x2> must match! ",
+  //         "found = (", L1, ", ", L2, ")");
+  //}
+  //if(num_comps != L3){
+  //  reject("first dim of <components> and first dim of <K_const> must match! ",
+  //         "found = (", num_comps, ", ", L3, ")");
+  //}
+  //if(L4 != 9){ reject("second dimension of <components> must be 9!");}
   
   // Loop through components
   for(j in 1:num_comps){

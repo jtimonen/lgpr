@@ -27,12 +27,6 @@ test_that("zero-sum kernel works similarly as reference", {
   )
 })
 
-test_that("zero-sum kernel errors if number of categories is one", {
-  M <- 1
-  x <- sample.int(M, size = 8, replace = TRUE)
-  expect_error(STAN_kernel_base_zerosum(x, x, M, STREAM))
-})
-
 test_that("categorical kernel works correctly", {
   x <- c(1, 1, 2)
   a <- c(

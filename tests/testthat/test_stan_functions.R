@@ -163,18 +163,3 @@ test_that("square transform is taken into account", {
     stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
   )
 })
-
-test_that("an error is thrown if <types> is misspecified", {
-  x <- 1
-  expect_error(STAN_log_prior(x, c(6), c(1, 1, 0), STREAM))
-  expect_error(STAN_log_prior(x, c(0, 1), c(1, 1, 0), STREAM))
-  expect_error(STAN_log_prior(x, c(7, 1), c(1, 1, 0), STREAM))
-  expect_error(STAN_log_prior(x, c(1, 3), c(1, 1, 0), STREAM))
-})
-
-test_that("an error is thrown if <hyper> is misspecified", {
-  x <- 1
-  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1), STREAM))
-  expect_error(STAN_log_prior(x, c(2, 0), c(1, 1, 0, 1), STREAM))
-  expect_error(STAN_log_prior(x, c(2, 0), c(1, -1, 0), STREAM))
-})

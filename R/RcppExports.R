@@ -61,7 +61,7 @@ STAN_gp_posterior <- function(KX, y, delta, sigma, pstream__ = 0L) {
     .Call(`_lgpr_STAN_gp_posterior`, KX, y, delta, sigma, pstream__)
 }
 
-STAN_log_prior <- function(x, types, hyper, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_log_prior`, x, types, hyper, pstream__)
+STAN_log_prior <- function(x, types, p, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_log_prior`, x, types, p, pstream__)
 }
 
