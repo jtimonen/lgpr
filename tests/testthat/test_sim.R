@@ -61,6 +61,50 @@ test_that("binomial data can be simulated", {
   expect_lt(max(diff), 1e-6)
 })
 
+test_that("error is thrown with invalid input", {
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2, 2),
+    noise_type = "blaablaa",
+  ), "Invalid input noise_type")
+
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2),
+    names = c("sex", "country")
+  ), "must be the same as length")
+
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2),
+    relevances = c(1, 1, 1, 1)
+  ), "must be")
+
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2),
+    n_categs = c(2, 3, 3)
+  ), "The argument n_cat has invalid length")
+
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2),
+    n_categs = c(1)
+  ), "must only contain integers larger than 1")
+
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2),
+    lengthscales = c(10, 10, 3, 3)
+  ), "lengthscales has length 4, should be 3")
+})
+
 test_that("different types of components can be simulated", {
   dat <- simulate_data(
     N = 4,

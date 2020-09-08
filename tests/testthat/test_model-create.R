@@ -127,7 +127,11 @@ test_that("covariate must be same in uncrt() and heter() expression", {
   dat <- testdata_001
   expect_error(
     create_model(y ~ heter(id) * uncrt(sex) * gp(age) + gp(dis_age), dat),
-    "expressions must match! Found = "
+    "Names of the covariates in"
+  )
+  expect_error(
+    create_model(y ~ heter(id) * gp(age) + uncrt(sex) * gp(dis_age), dat),
+    "expressions must have the same categorical covariate in every term"
   )
 })
 

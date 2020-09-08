@@ -56,9 +56,11 @@ test_that("lgpmodel getters work", {
   n <- get_num_obs(model)
   df <- get_component_info(model)
   nams <- get_covariate_names(model)
+  om <- get_obs_model(model)
   expect_equal(n, 24)
   expect_equal(dim(df), c(2, 9))
   expect_equal(nams, "dis_age, age, id, sex")
+  expect_equal(om, "gaussian")
 })
 
 test_that("prior summary works", {
