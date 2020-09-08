@@ -8,6 +8,7 @@
 #'   \item \code{check_numeric} checks if argument is numeric
 #'   \item \code{check_positive} checks if argument is positive
 #'   \item \code{check_non_negative} checks if argument is non-negative
+#'   \item \code{check_interval} checks if argument is inside a given interval
 #'   \item \code{check_not_null} checks if argument is not null
 #'   \item \code{check_false} checks if argument is false or zero
 #'   \item \code{check_length} checks if argument has correct length
@@ -63,6 +64,22 @@ check_non_negative <- function(arg) {
   if (arg < 0) {
     arg_name <- deparse(substitute(arg))
     msg <- paste0("<", arg_name, "> must be non-negative! found = ", arg)
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param lower interval minimum
+#' @param upper interval maximum
+check_interval <- function(arg, lower, upper) {
+  check_numeric(arg)
+  if (arg < lower || arg > upper) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0(
+      "<", arg_name, "> must be on the interval [",
+      lower, ", ", upper, "]! found = ", arg
+    )
     stop(msg)
   }
   return(TRUE)

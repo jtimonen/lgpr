@@ -58,16 +58,13 @@ simulate_data <- function(N,
   # Input checks
   noise_type <- tolower(noise_type)
   if (N < 2) stop("There must be at least 2 individuals!")
-  if (length(t_data) < 3) {
-    stop("There must be at least 3 time points per individual!")
-  }
+  L <- length(t_data)
+  if (L < 3) stop("There must be at least 3 time points per individual!")
   names <- sim_check_covariates(covariates, relevances, names, n_categs)
-  if (N_affected > round(N / 2)) {
-    stop("N_affected cannot be greater than round(N/2)!")
-  }
-  if (is.unsorted(covariates)) {
-    stop("The covariates vector must be increasing!")
-  }
+  bad <- N_affected > round(N / 2)
+  if (bad) stop("N_affected cannot be greater than round(N/2)!")
+  bad <- is.unsorted(covariates)
+  if (bad) stop("The covariates vector must be increasing!")
 
   # Generate the covariates
   IN <- sim_create_x(
@@ -80,9 +77,7 @@ simulate_data <- function(N,
     t_effect_range = t_effect_range,
     continuous_info = continuous_info
   )
-  if (verbose) {
-    cat(dollar(IN, "info"))
-  }
+  if (verbose) cat(dollar(IN, "info"))
 
   # Compute X_affected
   k <- length(t_data)
@@ -229,11 +224,7 @@ sim_check_covariates <- function(covariates, relevances, names, n_cat) {
     # Generate default names
     names <- sim_generate_names(covariates)
   }
-
-  if (sum(relevances < 0) > 0) {
-    stop("The relevances must be non-negative!")
-  }
-
+  if (sum(relevances < 0) > 0) stop("The relevances must be non-negative!")
   return(names)
 }
 
@@ -242,7 +233,6 @@ sim_check_covariates <- function(covariates, relevances, names, n_cat) {
 #' @param covariates vector of covariate types
 #' @return covariate names
 sim_generate_names <- function(covariates) {
-
 
   # Get default names
   names <- c("id", "age")
@@ -604,9 +594,7 @@ sim_scale_relevances <- function(FFF, relevances,
 
   # Some input checking
   d <- dim(FFF)[2]
-  if (any(relevances < 0)) {
-    stop("negative relevances not allowed!")
-  }
+  if (any(relevances < 0)) stop("negative relevances not allowed!")
 
   # Scale the columns to correct relevances
   for (j in 1:d) {
@@ -1113,16 +1101,11 @@ sim_kernel_var_mask <- function(disAge1, disAge2, vm_params,
                                 stp, nan_replace = 0) {
   disAge1[is.nan(disAge1)] <- nan_replace
   disAge2[is.nan(disAge2)] <- nan_replace
+  check_interval(vm_params[1], 0, 1)
+  check_positive(vm_params[1])
+  check_positive(vm_params[2])
   a <- stp * vm_params[2]
-  h <- vm_params[1]
-  if (h >= 1 || h <= 0) {
-    stop("vm_params[1] must be between 0 and 1!")
-  }
-  if (vm_params[2] <= 0) {
-    stop("vm_params[2] must be greater than 0!")
-  }
-
-  r <- 1 / a * log(h / (1 - h))
+  r <- 1 / a * log(vm_params[1] / (1 - vm_params[1]))
   s1 <- sim_var_mask(disAge1 - r, a)
   s2 <- sim_var_mask(disAge2 - r, a)
   M <- tcrossprod(s1, s2)

@@ -51,6 +51,13 @@ test_that("check_not_null works correctly", {
   expect_error(check_not_null(a2), reason)
 })
 
+test_that("check_interval works correctly", {
+  x <- 0.3
+  reason <- "<x> must be on the interval"
+  expect_error(check_interval(x, 1, 2), reason)
+  expect_true(check_interval(1.53, 1, 2))
+})
+
 # -------------------------------------------------------------------------
 
 context("Inverse-gamma distribution")
