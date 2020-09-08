@@ -13,6 +13,7 @@
 \alias{check_false}
 \alias{check_in_data}
 \alias{check_all_leq}
+\alias{check_not_named}
 \title{Argument validation}
 \usage{
 check_type(arg, allowed)
@@ -36,6 +37,8 @@ check_false(arg)
 check_in_data(var_name, data)
 
 check_all_leq(arg, maximums)
+
+check_not_named(arg)
 }
 \arguments{
 \item{arg}{An argument to check.}
@@ -75,6 +78,7 @@ check_all_leq(arg, maximums)
   \item \code{check_in_data} checks that variable exists in a data frame
   \item \code{check_all_leq} checks that argument has values less than equal
   to given maximums, elementwise
+  \item \code{check_not_named} checks that \code{names(arg)} is NULL
 }
 }
 \seealso{

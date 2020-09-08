@@ -16,6 +16,7 @@
 #'   \item \code{check_in_data} checks that variable exists in a data frame
 #'   \item \code{check_all_leq} checks that argument has values less than equal
 #'   to given maximums, elementwise
+#'   \item \code{check_not_named} checks that \code{names(arg)} is NULL
 #' }
 #' @return \code{TRUE} if the check passes.
 #' @family argument checks
@@ -177,6 +178,18 @@ check_all_leq <- function(arg, maximums) {
       )
       stop(msg)
     }
+  }
+  TRUE
+}
+
+#' @rdname checks
+check_not_named <- function(arg) {
+  arg_name <- deparse(substitute(arg))
+  nams <- names(arg)
+  if (!is.null(nams)) {
+    str <- paste(nams, collapse = ", ")
+    msg <- paste0("<", arg_name, "> should not have names! found = {", str, "}")
+    stop(msg)
   }
   TRUE
 }

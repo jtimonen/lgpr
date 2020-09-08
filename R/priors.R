@@ -319,25 +319,17 @@ create_hyper_beta <- function(prior, num_heter) {
 #' @param num number of parameters of this type
 #' @return a named list of parsed options
 parse_prior_single <- function(desc, num) {
-  nams <- names(desc)
-  if (!is.null(nams)) {
-    str <- paste(nams, collapse = ", ")
-    stop("the list <desc> should not have names! found = {", str, "}")
-  }
+  check_not_named(desc)
   L <- length(desc)
+  err_msg <- paste0("<desc> should have length 1 or ", num, "! found = ", L)
   if (L != num) {
     if (L == 1) {
-
       # The parameter type has the same prior in all components
       out <- prior_to_num(desc[[1]])
       prior <- repvec(dollar(out, "prior"), num)
       hyper <- repvec(dollar(out, "hyper"), num)
     } else {
-      msg <- paste0(
-        "<desc> should be a list of length 1 or ", num,
-        "! found = ", L
-      )
-      stop(msg)
+      stop(err_msg)
     }
   } else {
 
@@ -389,21 +381,13 @@ prior_to_num <- function(desc) {
 position_hyper_params <- function(desc) {
   hyper <- c(0, 0, 0)
   NAMES <- names(desc)
+  H1 <- c("mu", "alpha", "nu")
+  H2 <- c("sigma", "beta")
   for (name in NAMES) {
-    val <- desc[[name]]
-    H1 <- c("mu", "alpha", "nu")
-    H2 <- c("sigma", "beta")
-    if (name %in% H1) {
-      hyper[1] <- val
-    } else if (name %in% H2) {
-      hyper[2] <- val
-    } else {
-      msg <- paste0(
-        "invalid hyperparameter name '", name, "'! must be one of {",
-        paste(c(H1, H2), collapse = ", "), "}"
-      )
-      stop(msg)
-    }
+    check_allowed(name, c(H1, H2))
+    val <- dollar(desc, name)
+    idx <- if (name %in% H2) 2 else 1
+    hyper[idx] <- val
   }
   return(hyper)
 }
@@ -415,15 +399,16 @@ position_hyper_params <- function(desc) {
 #' @return a character vector
 prior_type_names <- function(idx = NULL) {
   names <- c(
-    "Uniform", "Normal", "Student-t",
-    "Gamma", "Inv-Gamma", "Log-Normal"
+    "Uniform",
+    "Normal",
+    "Student-t",
+    "Gamma",
+    "Inv-Gamma",
+    "Log-Normal"
   )
   names <- tolower(names)
-  if (!is.null(idx)) {
-    return(names[idx])
-  } else {
-    return(names)
-  }
+  out <- if (!is.null(idx)) names[idx] else names
+  return(out)
 }
 
 #' Convert the Stan input encoding of a prior to a human-readable format
@@ -513,12 +498,8 @@ prior_to_df_teff <- function(stan_input, digits) {
   for (j in seq_len(num_bt)) {
     par <- paste0("teff[", j, "]")
     tpar <- par
-    if (zero[j] != 0) {
-      tpar <- paste0(tpar, " - ", zero[j])
-    }
-    if (backwards == 1) {
-      tpar <- paste0(" - (", tpar, ")")
-    }
+    if (zero[j] != 0) tpar <- paste0(tpar, " - ", zero[j])
+    if (backwards == 1) tpar <- paste0(" - (", tpar, ")")
     out <- prior_to_char(par, c(type, 0), hyper, digits)
     pnames[j] <- par
     dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
@@ -542,25 +523,14 @@ prior_to_char <- function(parname, prior, hyper, digits) {
 
   # Check distribution type
   tp <- prior[1]
-  if (tp < 1 || tp > 6) {
-    stop("Prior type must 1, 2, 3, 4, 5 or 6! Found = ", tp)
-  }
+  check_allowed(tp, seq_len(6))
   names <- prior_type_names()
   pname <- names[tp]
 
   # Check if there is a transform
   tf <- prior[2]
-  if (tf == 1) {
-    parname <- paste0("(", parname, ")^2")
-  } else if (tf == 0) {
-    parname <- parname
-  } else {
-    msg <- paste0(
-      "Transform must be either 0 (identity) or 1 (squaring). ",
-      "Found = ", tf
-    )
-    stop(msg)
-  }
+  check_allowed(tf, c(0, 1))
+  if (tf == 1) parname <- paste0("(", parname, ")^2")
 
   # Get prior statement
   if (tp %in% c(2, 4, 5, 6)) {

@@ -92,7 +92,14 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
   expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6), STREAM))
 })
 
-
+test_that("variance mask kernel errors if <vm_params> is not valid", {
+  x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
+  vm_params <- c(0.05, 0.6)
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(-0.05, 0.6), STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(1.6, 0.6), STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(0.05, NaN), STREAM))
+  expect_error(STAN_kernel_base_var_mask(x, x, 1, c(NaN, 0.6), STREAM))
+})
 
 # -------------------------------------------------------------------------
 
