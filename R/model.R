@@ -358,7 +358,7 @@ parse_likelihood <- function(likelihood, c_hat, num_trials, list_y, sample_f) {
 #'
 #' @param c_hat the \code{c_hat} argument given as input to
 #' \code{\link{create_model}}
-#' @param response response variable
+#' @param response response variable data
 #' @param LH likelihood as int
 #' @param num_trials the num_trials data (binomial likelihood)
 #' @return a real number
@@ -369,6 +369,7 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
     if (nb_or_pois) {
       c_hat <- log(mean(response))
     } else if (binomial) {
+      check_all_leq(response, num_trials)
       p <- mean(response / num_trials)
       c_hat <- log(p / (1 - p))
     } else {

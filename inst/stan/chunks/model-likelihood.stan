@@ -7,12 +7,7 @@ if(is_f_sampled){
   }
 
   // Compute likelihood
-  if(obs_model==1){
-    // 1. Gaussian observation model
-    real MU[num_obs] = to_array_1d(f_sum); // means
-    real SIGMA[num_obs] = to_array_1d(rep_vector(sigma[1], num_obs)); // stds
-    target += normal_lpdf(y_cont[1] | MU, SIGMA);
-  }else if(obs_model==2){
+  if(obs_model==2){
     // 2. Poisson observation model
     real LOG_MU[num_obs] = to_array_1d(f_sum); // means (log-scale)
     target += poisson_log_lpmf(y_disc[1] | LOG_MU);
@@ -26,7 +21,10 @@ if(is_f_sampled){
     real LOGIT_P[num_obs] = to_array_1d(f_sum); // p success (logit-scale)
     target += binomial_logit_lpmf(y_disc[1] | y_num_trials[1], LOGIT_P);
   }else{
-    reject("<obs_model> must be 1, 2, 3 or 4!");
+    // 1. Gaussian observation model (obs_model should be 1)
+    real MU[num_obs] = to_array_1d(f_sum); // means
+    real SIGMA[num_obs] = to_array_1d(rep_vector(sigma[1], num_obs)); // stds
+    target += normal_lpdf(y_cont[1] | MU, SIGMA);
   }
 
 }else{

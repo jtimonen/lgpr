@@ -12,6 +12,7 @@
 \alias{check_lengths}
 \alias{check_false}
 \alias{check_in_data}
+\alias{check_all_leq}
 \title{Argument validation}
 \usage{
 check_type(arg, allowed)
@@ -33,6 +34,8 @@ check_lengths(a, b)
 check_false(arg)
 
 check_in_data(var_name, data)
+
+check_all_leq(arg, maximums)
 }
 \arguments{
 \item{arg}{An argument to check.}
@@ -52,6 +55,8 @@ check_in_data(var_name, data)
 \item{var_name}{the variable to be searched for}
 
 \item{data}{a data frame}
+
+\item{maximums}{maximum allowed values for \code{arg}}
 }
 \value{
 \code{TRUE} if the check passes.
@@ -68,6 +73,8 @@ check_in_data(var_name, data)
   \item \code{check_length} checks if argument has correct length
   \item \code{check_lengths} checks if two argument have equal length
   \item \code{check_in_data} checks that variable exists in a data frame
+  \item \code{check_all_leq} checks that argument has values less than equal
+  to given maximums, elementwise
 }
 }
 \seealso{

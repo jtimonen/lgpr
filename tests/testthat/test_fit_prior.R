@@ -2,31 +2,7 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
-context("Prior sampling")
-
-test_that("a model with nb likelihood can be sampled", {
-  dat <- testdata_001
-  dat$y <- round(exp(dat$y))
-  suppressWarnings({
-    fit <- lgp(
-      formula = y ~ gp(age) + categ(sex) * gp(age),
-      likelihood = "nb",
-      data = dat,
-      iter = 600,
-      chains = 1,
-      refresh = 0,
-    )
-    expect_s4_class(fit, "lgpfit")
-    p1 <- plot_draws(fit)
-    p2 <- plot_draws(fit, regex_pars = "f_latent")
-    expect_s3_class(p1, "ggplot")
-    expect_s3_class(p2, "ggplot")
-
-    a <- get_f(fit)
-    expect_equal(dim(a$f$`gp(age)`), c(300, 16))
-  })
-})
-
+context("Prior sampling with different modeling options")
 
 test_that("a model with uncertain disease age needs prior specified", {
   formula <- y ~ gp(age) + uncrt(id) * gp_warp_vm(dis_age)

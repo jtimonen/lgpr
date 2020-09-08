@@ -8,16 +8,3 @@ vector[num_obs] delta_vec = rep_vector(delta, num_obs);
 
 // Other options
 int is_generated_done = (1 - is_f_sampled) * (1 - is_generated_skipped);
-
-// Print info
-if(is_verbose){
-  print("");
-  print("Stan info:");
-  print(" - number of observations = ", num_obs);
-  print(" - number of components = ", num_comps);
-  print(" - number of continuous covariates = ", num_cov_cont);
-  print(" - number of categorical covariates = ", num_cov_cat);
-  print(" - observation model = ", obs_model);
-  print("");
-}
-

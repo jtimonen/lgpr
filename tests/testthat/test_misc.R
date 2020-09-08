@@ -58,6 +58,14 @@ test_that("check_interval works correctly", {
   expect_true(check_interval(1.53, 1, 2))
 })
 
+test_that("check_all_leq works correctly", {
+  x <- c(4, 3, 4, 5)
+  y <- c(4, 3, 2, 1)
+  reason <- "value of <x> is larger than value of <y> at index 3"
+  expect_error(check_all_leq(x, y), reason)
+  expect_true(check_all_leq(c(1, 1, 1, 1), y))
+})
+
 # -------------------------------------------------------------------------
 
 context("Inverse-gamma distribution")

@@ -14,6 +14,8 @@
 #'   \item \code{check_length} checks if argument has correct length
 #'   \item \code{check_lengths} checks if two argument have equal length
 #'   \item \code{check_in_data} checks that variable exists in a data frame
+#'   \item \code{check_all_leq} checks that argument has values less than equal
+#'   to given maximums, elementwise
 #' }
 #' @return \code{TRUE} if the check passes.
 #' @family argument checks
@@ -158,6 +160,26 @@ check_in_data <- function(var_name, data) {
   return(TRUE)
 }
 
+#' @rdname checks
+#' @param maximums maximum allowed values for \code{arg}
+check_all_leq <- function(arg, maximums) {
+  check_lengths(arg, maximums)
+  L <- length(arg)
+  for (j in seq_len(L)) {
+    a <- arg[j]
+    b <- maximums[j]
+    if (a > b) {
+      arg_name <- deparse(substitute(arg))
+      m_name <- deparse(substitute(maximums))
+      msg <- paste0(
+        "value of <", arg_name, "> is larger than value of <",
+        m_name, "> at index ", j, "!"
+      )
+      stop(msg)
+    }
+  }
+  TRUE
+}
 
 #' Check if argument is one of the allowed options
 #'

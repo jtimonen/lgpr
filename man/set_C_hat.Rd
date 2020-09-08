@@ -10,7 +10,7 @@ set_c_hat(c_hat, response, LH, num_trials)
 \item{c_hat}{the \code{c_hat} argument given as input to
 \code{\link{create_model}}}
 
-\item{response}{response variable}
+\item{response}{response variable data}
 
 \item{LH}{likelihood as int}
 
