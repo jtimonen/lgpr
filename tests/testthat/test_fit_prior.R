@@ -73,7 +73,6 @@ test_that("model with heterogeneous disease effect can be created and fit", {
   model <- create_model(
     formula = formula,
     data = data,
-    prior = prior,
     prior_only = TRUE
   )
   si <- get_stan_input(model)

@@ -2,9 +2,7 @@
 % Please edit documentation in R/assist.R
 \name{adjusted_c_hat}
 \alias{adjusted_c_hat}
-\title{Create the GP mean input for \code{lgp}, so that it accounts
-for normalization between data points in the Poisson or NB
-observation model}
+\title{Create the GP mean vector}
 \usage{
 adjusted_c_hat(y, norm_factors)
 }
@@ -18,7 +16,14 @@ a vector of length \code{n}, which can be used as
 the \code{c_hat} input to the \code{lgp} function
 }
 \description{
-Create the GP mean input for \code{lgp}, so that it accounts
-for normalization between data points in the Poisson or NB
-observation model
+Creates the \code{c_hat} input for \code{lgp},
+so that it accounts for normalization between data points in the
+Poisson or NB observation model
 }
+\seealso{
+Other user assist functions: 
+\code{\link{add_dis_age}()},
+\code{\link{add_factor}()},
+\code{\link{split}()}
+}
+\concept{user assist functions}

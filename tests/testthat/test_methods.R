@@ -2,6 +2,42 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
+context("Validation of expr, formula and scaling objects")
+
+test_that("lgpexpr validation works correctly", {
+  a <- lgpexpr(fun = "gp", covariate = "x")
+  expect_true(validObject(a))
+  b <- a
+  b@fun <- "moi"
+  expect_error(validObject(b), "<fun> must be one of")
+  c <- a
+  c@covariate <- ""
+  expect_error(validObject(c), "covariate name cannot be empty")
+})
+
+test_that("lgpformula validation works correctly", {
+  a <- parse_formula(as.formula("y ~ gp(x) + zerosum(a)"))
+  expect_true(validObject(a))
+  b <- a
+  b@y_name <- "x"
+  expect_error(validObject(b), "response variable cannot be also")
+})
+
+test_that("lgpscaling validation works correctly", {
+  f1 <- function(x) x / 2
+  f2 <- function(x) 2 * x
+  a <- new("lgpscaling", fun = f1, fun_inv = f2, var_name = "x")
+  expect_true(validObject(a))
+  b <- a
+  b@var_name <- ""
+  expect_error(validObject(b), "name length must be at least 1")
+  c <- a
+  c@fun <- function(x) 3 * x
+  expect_error(validObject(c), "<f_inv> is not an inverse function of <f>")
+})
+
+# -------------------------------------------------------------------------
+
 context("Methods for lgpmodel objects")
 
 et <- list(lower = 10, zero = 0, backwards = FALSE, upper = 20)
