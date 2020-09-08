@@ -105,20 +105,10 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
 
 context("Stan high-level functions")
 
-# Create test input
-sim <- simulate_data(
-  N = 4,
-  t_data = seq(6, 36, by = 6),
-  covariates = c(0, 1, 2, 3),
-  lengthscales = rep(12, 5),
-  relevances = rep(1, 6),
-  t_jitter = 0.5
-)
-
 # Model
-m <- create_model(y ~ zerosum(id) * gp(age) + gp_warp_vm(diseaseAge) +
-  categ(z) + gp(age) + gp(x),
-data = sim@data
+m <- create_model(y ~ zerosum(id) * gp(age) + heter(id)*gp_warp_vm(dis_age) +
+  categ(sex) + gp(age) + gp(blood),
+data = testdata_001
 )
 
 # Input
@@ -132,6 +122,7 @@ K_const <- kernel_const_all(x_cat, x_cat, x_mask, x_mask, num_levels, comp)
 # Params
 alpha <- c(1, 1, 1, 1, 1)
 ell <- c(1, 1, 1, 1)
+beta <- list(c(0.5, 1.0))
 x <- input$x_cont
 x_unnorm <- input$x_cont_unnorm
 vm_params <- input$vm_params
@@ -141,7 +132,7 @@ ix <- input$idx_expand
 teff_zero <- dollar(input, "teff_zero")
 K <- kernel_all(
   K_const, comp, x, x, x_unnorm, x_unnorm,
-  alpha, ell, 0.5, list(), list(),
+  alpha, ell, 0.5, beta, list(),
   vm_params, ix, ix, teff_zero
 )
 
@@ -160,7 +151,7 @@ test_that("kernel_all works correctly", {
 })
 
 test_that("gp_posterior works correctly", {
-  y <- sim@data$y
+  y <- testdata_001$y
   fp <- gp_posterior(K, y, 1e-6, 1.0)
   expect_equal(length(fp), 12)
 
