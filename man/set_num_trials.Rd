@@ -2,7 +2,7 @@
 % Please edit documentation in R/model.R
 \name{set_num_trials}
 \alias{set_num_trials}
-\title{Set num_trials (binomial and Bernoulli observation models)}
+\title{Set num_trials (binomial and beta-binomial observation models)}
 \usage{
 set_num_trials(num_trials, num_obs, LH)
 }
@@ -17,5 +17,5 @@ set_num_trials(num_trials, num_obs, LH)
 a numeric vector
 }
 \description{
-Set num_trials (binomial and Bernoulli observation models)
+Set num_trials (binomial and beta-binomial observation models)
 }

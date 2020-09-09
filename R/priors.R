@@ -140,6 +140,8 @@ prior_get_default <- function(name) {
     prior <- igam(shape = 14, scale = 5)
   } else if (name == "beta") {
     prior <- bet(a = 0.2, b = 0.2)
+  } else if (name == "kappa") {
+    prior <- log_normal(mu = 1, sigma = 1, square = TRUE)
   } else if (name == "effect_time") {
     prior <- uniform()
   } else {
@@ -180,7 +182,7 @@ parse_prior <- function(prior, stan_input, obs_model) {
 #' @param num_uncrt number of uncertain components
 #' @return a named list
 fill_prior <- function(prior, num_uncrt) {
-  names <- c("alpha", "ell", "wrp", "sigma", "phi", "beta")
+  names <- c("alpha", "ell", "wrp", "sigma", "phi", "beta", "kappa")
   names <- c(names, "effect_time", "effect_time_info")
   defaulted <- c()
   specified <- c()
@@ -228,12 +230,13 @@ parse_prior_full <- function(prior, stan_input, obs_model) {
   nums <- stan_input[c("num_comps", "num_ell", "num_ns")]
   num_sigma <- as.numeric(obs_model == 1)
   num_phi <- as.numeric(obs_model == 3)
+  num_kappa <- as.numeric(obs_model == 5)
   num_uncrt <- dollar(stan_input, "num_uncrt")
   num_heter <- dollar(stan_input, "num_heter")
   num_bt <- dollar(stan_input, "num_bt")
-  pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
-  nums <- c(unlist(nums), num_sigma, num_phi)
-  names(nums)[4:5] <- c("num_sigma", "num_phi")
+  pnames <- c("alpha", "ell", "wrp", "sigma", "phi", "kappa")
+  nums <- c(unlist(nums), num_sigma, num_phi, num_kappa)
+  names(nums)[4:6] <- c("num_sigma", "num_phi", "num_kappa")
 
   # Common parameters
   common <- c()
@@ -423,7 +426,7 @@ NULL
 prior_to_df <- function(stan_input, digits = 3) {
 
   # Common parameters
-  pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
+  pnames <- c("alpha", "ell", "wrp", "sigma", "phi", "kappa")
   df <- NULL
   for (p in pnames) {
     df_p <- prior_to_df_oneparam(stan_input, p, digits)

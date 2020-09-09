@@ -347,6 +347,7 @@ stan_list_names <- function() {
     "hyper_phi",
     "hyper_sigma",
     "hyper_beta",
+    "hyper_kappa",
     "hyper_teff",
 
     "teff_zero",
@@ -370,7 +371,7 @@ stan_list_names <- function() {
 
 #' @rdname likelihood_encoding
 likelihood_list <- function() {
-  c("gaussian", "poisson", "nb", "binomial")
+  c("gaussian", "poisson", "nb", "binomial", "bb")
 }
 
 #' @rdname likelihood_encoding

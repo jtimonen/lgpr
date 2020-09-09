@@ -10,7 +10,8 @@ my_prior <- list(
   sigma = normal(1, 0.1)
 )
 
-model <- create_model(y ~ gp(age), testdata_001, prior = my_prior)
+dat <- testdata_001
+model <- create_model(y ~ gp(age), dat, prior = my_prior)
 
 test_that("sample_model can do posterior sampling", {
   fit <- sample_model(
@@ -37,6 +38,22 @@ test_that("optimize_model can optimize MAP parameters", {
 # -------------------------------------------------------------------------
 
 context("Posterior sampling of f with different obs models")
+
+test_that("f can be sampled with gaussian likelihood", {
+  dat <- testdata_001
+  suppressWarnings({
+    fit <- lgp(
+      formula = y ~ gp(age) + categ(sex),
+      sample_f = TRUE,
+      data = dat,
+      iter = 200,
+      chains = 1,
+      refresh = 0,
+    )
+    expect_s4_class(fit, "lgpfit")
+    expect_equal(get_stan_input(fit)$is_f_sampled, 1)
+  })
+})
 
 test_that("f can be sampled with poisson likelihood", {
   dat <- testdata_001
@@ -84,6 +101,23 @@ test_that("f can be sampled with binomial likelihood", {
     fit <- lgp(
       formula = y ~ gp(age) + zerosum(sex) * gp(age),
       likelihood = "binomial",
+      data = dat,
+      iter = 200,
+      chains = 1,
+      refresh = 0,
+      num_trials = 10
+    )
+    expect_s4_class(fit, "lgpfit")
+  })
+})
+
+test_that("f can be sampled with beta-binomial likelihood", {
+  dat <- testdata_001
+  dat$y <- round(exp(dat$y))
+  suppressWarnings({
+    fit <- lgp(
+      formula = y ~ gp(age) + zerosum(sex) * gp(age),
+      likelihood = "bb",
       data = dat,
       iter = 200,
       chains = 1,

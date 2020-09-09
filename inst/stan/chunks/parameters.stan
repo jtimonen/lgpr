@@ -4,6 +4,7 @@ real<lower=0> ell[num_ell];
 real<lower=0> wrp[num_ns];
 real<lower=0> sigma[obs_model==1];
 real<lower=0> phi[obs_model==3];
+real<lower=0> kappa[obs_model==5];
 
 // Effect time uncertainty
 vector<lower=0, upper=1>[num_bt] teff_raw[num_uncrt>0];

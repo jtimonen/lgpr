@@ -1,3 +1,13 @@
+// Compute total signal by summing components
+vector STAN_vectorsum(vector[] vecs, data int L){
+  int num_vecs = size(vecs);
+  vector[L] s = rep_vector(0, L);
+  for (j in 1:num_vecs){
+    s += vecs[j];
+  }
+  return(s);
+}
+
 // Check that number is a positive real number
 void STAN_check_real_positive(real a){
   if(a<=0){ reject("argument must be positive!"); }

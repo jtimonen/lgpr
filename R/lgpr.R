@@ -122,12 +122,14 @@ optimize_model <- function(model, ...) {
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
 }
 
-#' Simulation based calibration
+#' Prior predictive check
 #'
 #' @export
 #' @inheritParams lgp
 #' @param ... keyword arguments to \code{\link{lgp}}
-#' @return lgpfit
-calibrate <- function(formula, data, ...) {
-  lgp(formula, data, ..., prior_only = TRUE)
+#' @return an array of shape \code{num_draws} x \code{num_obs}
+prior_predict <- function(formula, data, ...) {
+  fit <- lgp(formula, data, ..., prior_only = TRUE, sample_f = TRUE)
+  out <- get_y_rng(fit, original_scale = TRUE)
+  return(out)
 }

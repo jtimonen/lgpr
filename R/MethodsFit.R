@@ -71,7 +71,7 @@ plot_draws <- function(fit,
                        type = "intervals",
                        regex_pars = c(
                          "alpha", "ell", "wrp",
-                         "sigma", "phi"
+                         "sigma", "phi", "kappa"
                        ),
                        ...) {
   check_type(fit, "lgpfit")
@@ -156,6 +156,30 @@ get_draws <- function(fit, ...) {
   rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
 }
 
+#' Extract posterior or prior predictive distribution draws
+#'
+#' @export
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @param original_scale should the draws be scaled back to original y scale
+#' (only has effect if likelihood is "gaussian", when data has been normalized
+#' to zero mean and unit variance)
+#' @return an array of shape \code{num_draws} x \code{num_obs}
+#' @family fit postprocessing functions
+get_y_rng <- function(fit, original_scale = TRUE) {
+  f_sampled <- is_f_sampled(fit)
+  if (!f_sampled) stop("f was not sampled!")
+  obs_model <- get_obs_model(fit)
+  par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
+  out <- get_draws(fit, pars = par_name)
+  out <- squeeze_second_dim(out)
+  if (obs_model == "gaussian" && original_scale) {
+    scl <- fit@model@var_scalings$y
+    out <- scl@fun_inv(out)
+  }
+  colnames(out) <- NULL
+  return(out)
+}
+
 #' Extract draws of the function f and its components
 #'
 #' @export
@@ -234,8 +258,8 @@ scale_f_total <- function(fit, f_total) {
 #' @family fit postprocessing functions
 fit_summary <- function(fit,
                         ignore_pars = c(
-                          "f_post", "f_latent", "teff_raw",
-                          "lp__"
+                          "f_post", "f_latent", "eta",
+                          "y_rng_disc", "y_rng_cont", "teff_raw", "lp__"
                         )) {
   check_type(fit, "lgpfit")
   print(fit@stan_fit, pars = ignore_pars, include = FALSE)

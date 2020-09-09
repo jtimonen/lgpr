@@ -7,6 +7,19 @@
 
 using namespace Rcpp;
 
+// STAN_vectorsum
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_vectorsum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& vecs, const int& L, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_vectorsum(SEXP vecsSEXP, SEXP LSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type vecs(vecsSEXP);
+    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_vectorsum(vecs, L, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
 // STAN_check_real_positive
 void STAN_check_real_positive(const double& a, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_check_real_positive(SEXP aSEXP, SEXP pstream__SEXP) {
@@ -247,6 +260,7 @@ END_RCPP
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
     {"_lgpr_STAN_check_real_positive", (DL_FUNC) &_lgpr_STAN_check_real_positive, 2},
     {"_lgpr_STAN_check_prob_positive", (DL_FUNC) &_lgpr_STAN_check_prob_positive, 2},
     {"_lgpr_STAN_warp_input", (DL_FUNC) &_lgpr_STAN_warp_input, 3},

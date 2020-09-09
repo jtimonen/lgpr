@@ -3,12 +3,10 @@
   - is verbose mode used?
   - are function values be sampled?
   - should likelihood evaluation be skipped?
-  - should the generated quantities block be skipped? 
 */
 int<lower=0, upper=1> is_verbose;
 int<lower=0, upper=1> is_f_sampled;
 int<lower=0, upper=1> is_likelihood_skipped;
-int<lower=0, upper=1> is_generated_skipped;
 
 // Dimensions
 int<lower=0> num_obs;            // number of observations
@@ -27,8 +25,9 @@ int<lower=0> num_bt;             // number of beta and/or teff params
   - 2 = Poisson
   - 3 = Negative Binomial
   - 4 = Binomial
+  - 5 = Beta-Binomial
 */
-int<lower=1,upper=4> obs_model;
+int<lower=1,upper=5> obs_model;
 
 /* 
   Each additive function component can be related to at most one continuous and
@@ -71,7 +70,7 @@ int x_cont_mask[num_cov_cont, num_obs];
 int x_cat[num_cov_cat, num_obs];
 
 // Number of trials (binomial or bernoulli model)
-int<lower=1> y_num_trials[obs_model==4, num_obs];
+int<lower=1> y_num_trials[obs_model>3, num_obs];
 
 // Number of levels for each categorical covariate
 int<lower=0> x_cat_num_levels[num_cov_cat];
@@ -89,6 +88,7 @@ int<lower=0> prior_ell[num_ell, 2];
 int<lower=0> prior_wrp[num_ns, 2];
 int<lower=0> prior_sigma[obs_model==1, 2];
 int<lower=0> prior_phi[obs_model==3, 2];
+int<lower=0> prior_kappa[obs_model==5, 2];
 
 /*
   Prior types for effect time uncertainty
@@ -104,6 +104,7 @@ real hyper_wrp[num_ns, 3];
 real hyper_sigma[obs_model==1, 3];
 real hyper_phi[obs_model==3, 3];
 real hyper_teff[num_uncrt>0, 3];
+real hyper_kappa[obs_model==5, 3];
 real hyper_beta[num_heter>0, 2];
 
 // Observed effect times and uncertainty bounds for each case subject

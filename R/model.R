@@ -364,7 +364,7 @@ parse_likelihood <- function(likelihood, c_hat, num_trials, list_y, sample_f) {
 #' @return a real number
 set_c_hat <- function(c_hat, response, LH, num_trials) {
   nb_or_pois <- LH %in% c(2, 3)
-  binomial <- LH == 4
+  binomial <- LH %in% c(4, 5)
   if (is.null(c_hat)) {
     if (nb_or_pois) {
       c_hat <- log(mean(response))
@@ -399,18 +399,23 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
   return(c_hat)
 }
 
-#' Set num_trials (binomial and Bernoulli observation models)
+#' Set num_trials (binomial and beta-binomial observation models)
 #'
 #' @param num_trials the \code{num_trials} argument
 #' @param num_obs number of observations
 #' @param LH likelihood as integer encoding
 #' @return a numeric vector
 set_num_trials <- function(num_trials, num_obs, LH) {
+  is_binom <- LH %in% c(4, 5)
   if (is.null(num_trials)) {
     num_trials <- rep(1, num_obs)
   } else {
-    if (LH != 4) {
-      stop("Only give the <num_trials> argument if likelihood is binomial!")
+    if (!is_binom) {
+      msg <- paste0(
+        "Only give the <num_trials> argument if likelihood is",
+        " binomial or beta-binomial (bb)!"
+      )
+      stop(msg)
     }
     L <- length(num_trials)
     if (L == 1) {
@@ -422,8 +427,8 @@ set_num_trials <- function(num_trials, num_obs, LH) {
       )
     }
   }
-  is_binomial <- as.numeric(LH == 4)
-  num_trials <- array(num_trials, dim = c(is_binomial, num_obs))
+  DIM <- as.numeric(is_binom)
+  num_trials <- array(num_trials, dim = c(DIM, num_obs))
   return(num_trials)
 }
 

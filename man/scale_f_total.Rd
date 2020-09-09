@@ -21,6 +21,7 @@ Can only be used with Gaussian observation model.
 Other fit postprocessing functions: 
 \code{\link{fit_summary}()},
 \code{\link{get_draws}()},
-\code{\link{get_f}()}
+\code{\link{get_f}()},
+\code{\link{get_y_rng}()}
 }
 \concept{fit postprocessing functions}

@@ -1,25 +1,28 @@
 if(is_f_sampled){
   
   // Compute total signal + offset c_hat
-  vector[num_obs] f_sum = c_hat;
-  for (j in 1:num_comps){
-    f_sum += f_latent[1,j];
-  }
+  vector[num_obs] f_sum = STAN_vectorsum(f_latent[1], num_obs) + c_hat;
 
   // Compute likelihood
   if(obs_model==2){
-    // 2. Poisson observation model
+    // 2. Poisson
     real LOG_MU[num_obs] = to_array_1d(f_sum); // means (log-scale)
     target += poisson_log_lpmf(y_disc[1] | LOG_MU);
   }else if(obs_model==3){
-    // 3. Negative binomial observation model
+    // 3. Negative binomial
     real LOG_MU[num_obs] = to_array_1d(f_sum); // means (log-scale)
     real PHI[num_obs] = to_array_1d(rep_vector(phi[1], num_obs)); // dispersion
     target += neg_binomial_2_log_lpmf(y_disc[1] | LOG_MU, PHI);
   }else if(obs_model==4){
-    // 4. Bernoulli or binomial observation model
+    // 4. Binomial
     real LOGIT_P[num_obs] = to_array_1d(f_sum); // p success (logit-scale)
     target += binomial_logit_lpmf(y_disc[1] | y_num_trials[1], LOGIT_P);
+  }else if(obs_model==5){
+    // 5. Beta-binomial
+    vector[num_obs] P = inv_logit(f_sum); // p success
+    real aa[num_obs] = to_array_1d(P * kappa[1]);
+    real bb[num_obs] = to_array_1d((1.0 - P) * kappa[1]);
+    target += beta_binomial_lpmf(y_disc[1] | y_num_trials[1], aa, bb);
   }else{
     // 1. Gaussian observation model (obs_model should be 1)
     real MU[num_obs] = to_array_1d(f_sum); // means

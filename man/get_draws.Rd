@@ -22,6 +22,7 @@ Uses \code{rstan::extract} with \code{permuted = FALSE} and
 Other fit postprocessing functions: 
 \code{\link{fit_summary}()},
 \code{\link{get_f}()},
+\code{\link{get_y_rng}()},
 \code{\link{scale_f_total}()}
 }
 \concept{fit postprocessing functions}

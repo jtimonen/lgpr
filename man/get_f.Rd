@@ -33,6 +33,7 @@ Extract draws of the function f and its components
 Other fit postprocessing functions: 
 \code{\link{fit_summary}()},
 \code{\link{get_draws}()},
+\code{\link{get_y_rng}()},
 \code{\link{scale_f_total}()}
 }
 \concept{fit postprocessing functions}
