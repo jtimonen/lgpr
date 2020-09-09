@@ -10,6 +10,7 @@
 \alias{get_num_obs}
 \alias{is_f_sampled}
 \alias{get_obs_model}
+\alias{get_y_name}
 \alias{get_ns_covariates}
 \alias{get_covariate_info_cont}
 \alias{get_covariate_info_cat}
@@ -30,6 +31,8 @@ get_num_obs(object)
 is_f_sampled(object)
 
 get_obs_model(object)
+
+get_y_name(object)
 
 get_ns_covariates(object)
 
@@ -56,6 +59,7 @@ get_covariate_info_cat(object)
   \item \code{is_f_sampled} returns a boolean value
   \item \code{get_obs_model} returns a character string
   \item \code{get_ns_covariates} returns a character vector
+  \item \code{get_y_name} returns the response variable name
 }
 }
 \description{

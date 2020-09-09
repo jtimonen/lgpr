@@ -86,6 +86,7 @@ prior_summary <- function(object, digits = 3) {
 #'   \item \code{is_f_sampled} returns a boolean value
 #'   \item \code{get_obs_model} returns a character string
 #'   \item \code{get_ns_covariates} returns a character vector
+#'   \item \code{get_y_name} returns the response variable name
 #' }
 NULL
 
@@ -160,6 +161,12 @@ is_f_sampled <- function(object) {
 get_obs_model <- function(object) {
   lh <- get_stan_input(object)$obs_model
   likelihood_as_str(lh)
+}
+
+#' @rdname model_getters
+get_y_name <- function(object) {
+  model <- object_to_model(object)
+  model@var_names$y
 }
 
 #' @rdname model_getters

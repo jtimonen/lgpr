@@ -1,3 +1,22 @@
+#' Posterior or prior predictive checks for lgpfit objects
+#'
+#' @export
+#' @inheritParams get_draws
+#' @param data the original data frame
+#' @param fun \code{bayesplot} function name
+#' @param ... arguments passed to the default \code{pp_check} method in
+#' \code{bayesplot}
+#' @return a \code{ggplot} object
+ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
+  check_type(fit, "lgpfit")
+  check_type(data, "data.frame")
+  check_type(fun, "function")
+  y_name <- get_y_name(fit)
+  y <- dollar(data, y_name)
+  y_rep <- get_y_rng(fit, original_scale = TRUE)
+  bayesplot::pp_check(y, y_rep, fun, ...)
+}
+
 #' Visualize parameter draws
 #'
 #' @param x an object of class \linkS4class{lgpfit}
@@ -17,7 +36,7 @@ setMethod(
 #'
 #' @export
 #' @description Creates plots where each observation unit has a separate panel.
-#' @param fit an object of class \linkS4class{lgpfit}
+#' @inheritParams get_draws
 #' @param data a data frame
 #' @param x_name name of x-axis variable
 #' @param y_name name of y-axis variable
@@ -56,7 +75,7 @@ plot_fit <- function(fit, data, x_name = "age", y_name = "y",
 #'   \item \code{plot_warp} visualizes the input warping function for
 #'   different parameter draws
 #' }
-#' @param fit an object of class \linkS4class{lgpfit}
+#' @inheritParams get_draws
 #' @param type plot type
 #' @param regex_pars regex for parameter names to plot
 #' @param ... other arguments to bayesplot functions
@@ -159,7 +178,7 @@ get_draws <- function(fit, ...) {
 #' Extract posterior or prior predictive distribution draws
 #'
 #' @export
-#' @param fit an object of class \linkS4class{lgpfit}
+#' @inheritParams get_draws
 #' @param original_scale should the draws be scaled back to original y scale
 #' (only has effect if likelihood is "gaussian", when data has been normalized
 #' to zero mean and unit variance)
@@ -183,7 +202,7 @@ get_y_rng <- function(fit, original_scale = TRUE) {
 #' Extract draws of the function f and its components
 #'
 #' @export
-#' @param fit an object of class \linkS4class{lgpfit}
+#' @inheritParams get_draws
 #' @param draws Indices of posterior draws for which to get \code{f}. This can
 #' be a single integer, a vector of indices, or \code{NULL} (default). In the
 #' latter case all draws are obtained.
@@ -234,7 +253,7 @@ get_f <- function(fit, draws = NULL) {
 #'
 #' @export
 #' @description Can only be used with Gaussian observation model.
-#' @param fit an object of class \linkS4class{lgpfit}
+#' @inheritParams get_draws
 #' @param f_total a list with fields \code{mean} and \code{std}
 #' @return a similar object as \code{f_total}
 #' @family fit postprocessing functions
@@ -252,7 +271,7 @@ scale_f_total <- function(fit, f_total) {
 #' Posterior summary
 #'
 #' @export
-#' @param fit an object of class \linkS4class{lgpfit}
+#' @inheritParams get_draws
 #' @param ignore_pars names of parameters and generated quantities to ingore
 #' @return a character representation
 #' @family fit postprocessing functions

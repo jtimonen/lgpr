@@ -35,7 +35,7 @@
 #' @import methods
 #' @import Rcpp
 #' @import rstantools
-#' @importFrom rstan sampling get_rng get_stream
+#' @importFrom rstan get_rng get_stream
 #'
 #' @references
 #' \enumerate{
@@ -120,16 +120,4 @@ optimize_model <- function(model, ...) {
   object <- stanmodels[[model@stan_model_name]]
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
-}
-
-#' Prior predictive check
-#'
-#' @export
-#' @inheritParams lgp
-#' @param ... keyword arguments to \code{\link{lgp}}
-#' @return an array of shape \code{num_draws} x \code{num_obs}
-prior_predict <- function(formula, data, ...) {
-  fit <- lgp(formula, data, ..., prior_only = TRUE, sample_f = TRUE)
-  out <- get_y_rng(fit, original_scale = TRUE)
-  return(out)
 }
