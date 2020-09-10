@@ -19,13 +19,12 @@ if(obs_model==1){
 }else if(obs_model==3){
   target += STAN_log_prior(phi[1], prior_phi[1], hyper_phi[1]);
 }else if(obs_model==5){
-  target += STAN_log_prior(kappa[1], prior_kappa[1], hyper_kappa[1]);
+  target += beta_lpdf(gamma[1] | hyper_gamma[1][2], hyper_gamma[1][2]);
 }
 
 // Heterogeneity parameters
 for(j in 1:num_heter){
-  real a[2] = hyper_beta[j];
-  target += beta_lpdf(beta[j] | a[1], a[2]);
+  target += beta_lpdf(beta[j] | hyper_beta[j][1], hyper_beta[j][2]);
 }
 
 // Disease-related age uncertainty

@@ -85,6 +85,18 @@ zip_lists <- function(a, b) {
   return(out)
 }
 
+#' Wrap list into a list of length 1 if the original list is named
+#'
+#' @param x a list
+#' @return a list with no names
+#' @family list utilities
+list_if_named <- function(x) {
+  check_type(x, "list")
+  is_named <- !is.null(names(x))
+  if (is_named) x <- list(x)
+  return(x)
+}
+
 #' List elements to matrix rows
 #'
 #' @param x a list of length \code{m} where each element is a vector of
@@ -298,64 +310,6 @@ get_teff_obs <- function(data,
   return(df)
 }
 
-#' Names that the list given as data to Stan should contain
-#'
-#' @return a character vector
-stan_list_names <- function() {
-  c(
-    "is_verbose",
-    "is_generated_skipped",
-    "is_f_sampled",
-    "is_likelihood_skipped",
-
-    "num_obs",
-    "num_cov_cont",
-    "num_cov_cat",
-    "num_comps",
-    "num_ell",
-    "num_ns",
-    "num_heter",
-    "num_uncrt",
-    "num_bt",
-
-    "obs_model",
-    "components",
-    "y_cont",
-    "y_disc",
-    "y_num_trials",
-    "x_cat",
-    "x_cat_num_levels",
-    "x_cont",
-    "x_cont_unnorm",
-    "x_cont_mask",
-
-    "c_hat",
-    "delta",
-    "vm_params",
-    "idx_expand",
-
-    "prior_alpha",
-    "prior_ell",
-    "prior_wrp",
-    "prior_sigma",
-    "prior_phi",
-    "prior_teff",
-
-    "hyper_alpha",
-    "hyper_ell",
-    "hyper_wrp",
-    "hyper_phi",
-    "hyper_sigma",
-    "hyper_beta",
-    "hyper_kappa",
-    "hyper_teff",
-
-    "teff_zero",
-    "teff_lb",
-    "teff_ub"
-  )
-}
-
 #' Integer encoding of likelihod function names
 #'
 #' @description
@@ -411,13 +365,6 @@ get_pkg_description <- function() {
 #' @return an object of class stanmodel
 get_stan_model <- function(name = "lgp") {
   dollar(stanmodels, name)
-}
-
-#' Default variance masking function parameters are defined here
-#'
-#' @return two numbers
-default_vm_params <- function() {
-  c(0.025, 1)
 }
 
 #' Ensure vector has expected length

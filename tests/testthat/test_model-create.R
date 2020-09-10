@@ -149,12 +149,8 @@ test_that("an lgpmodel has correct list fields for stan input", {
     data = testdata_001,
     options = list(delta = 1e-5)
   )
-  found_fields <- sort(names(m@stan_input))
-  expected_fields <- sort(stan_list_names())
-  for (field in expected_fields) {
-    expect_true(!!field %in% found_fields)
-  }
-  expect_equal(m@stan_input$delta, 1e-5)
+  L <- length(m@stan_input)
+  expect_equal(L, 45)
 })
 
 test_that("creating an lgpmodel errors with invalid data", {

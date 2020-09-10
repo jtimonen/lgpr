@@ -15,6 +15,7 @@ Printing a list in a more compact format
 \seealso{
 Other list utilities: 
 \code{\link{dollar}()},
+\code{\link{list_if_named}()},
 \code{\link{list_to_matrix}()},
 \code{\link{matrix_to_list}()},
 \code{\link{zip_lists}()}

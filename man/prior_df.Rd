@@ -3,16 +3,21 @@
 \name{prior_df}
 \alias{prior_df}
 \alias{prior_to_df}
-\alias{prior_to_df_oneparam}
-\alias{prior_to_df_beta}
+\alias{prior_to_df_pos}
+\alias{prior_to_df_unit}
+\alias{prior_to_df_gamma}
 \alias{prior_to_df_teff}
 \title{Convert the Stan input encoding of a prior to a human-readable format}
 \usage{
 prior_to_df(stan_input, digits = 3)
 
-prior_to_df_oneparam(stan_input, parname, digits)
+prior_to_df_pos(stan_input, parname, digits)
 
-prior_to_df_beta(stan_input)
+prior_to_df_unit(stan_input, parname, num, digits)
+
+prior_to_df_unit(stan_input, parname, num, digits)
+
+prior_to_df_gamma(stan_input)
 
 prior_to_df_teff(stan_input, digits)
 }
@@ -22,6 +27,8 @@ prior_to_df_teff(stan_input, digits)
 \item{digits}{number of digits to show for floats}
 
 \item{parname}{parameter name}
+
+\item{num}{number of parameters of the type}
 }
 \value{
 a data frame

@@ -79,7 +79,7 @@ int<lower=0> x_cat_num_levels[num_cov_cat];
 int<lower=1, upper=num_bt+1> idx_expand[num_obs];
 
 /* 
-  Prior types and transforms for kernel and noise parameters
+  Prior types and transforms for positive parameters
   - [,1]: prior types
   - [,2]: prior transforms
 */
@@ -88,7 +88,6 @@ int<lower=0> prior_ell[num_ell, 2];
 int<lower=0> prior_wrp[num_ns, 2];
 int<lower=0> prior_sigma[obs_model==1, 2];
 int<lower=0> prior_phi[obs_model==3, 2];
-int<lower=0> prior_kappa[obs_model==5, 2];
 
 /*
   Prior types for effect time uncertainty
@@ -97,14 +96,16 @@ int<lower=0> prior_kappa[obs_model==5, 2];
 */
 int<lower=0> prior_teff[num_uncrt>0, 2];
 
-// Hyperparameters of the priors
+// Hyperparameters of the priors for positive parameters
 real hyper_alpha[num_comps, 3];
 real hyper_ell[num_ell, 3];
 real hyper_wrp[num_ns, 3];
 real hyper_sigma[obs_model==1, 3];
 real hyper_phi[obs_model==3, 3];
 real hyper_teff[num_uncrt>0, 3];
-real hyper_kappa[obs_model==5, 3];
+
+// Hyperparameters of the beta priors for parameters on [0, 1]
+real hyper_gamma[obs_model==5, 2];
 real hyper_beta[num_heter>0, 2];
 
 // Observed effect times and uncertainty bounds for each case subject

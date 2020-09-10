@@ -7,7 +7,7 @@ context("Prior sampling with different modeling options")
 test_that("a model with uncertain disease age needs prior specified", {
   formula <- y ~ gp(age) + uncrt(id) * gp_warp_vm(dis_age)
   data <- testdata_001
-  reason <- "you must specify 'effect_time_info' in the prior list"
+  reason <- "you must specify 'effect_time_info' in"
   expect_error(create_model(formula = formula, data = data), reason)
 })
 

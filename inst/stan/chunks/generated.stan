@@ -38,9 +38,10 @@ if(is_f_sampled==0){
     y_rng_disc[1] = binomial_rng(y_num_trials[1], P);
   }else if(obs_model==5){
     // 5. Beta-binomial
+    real tgam = inv(gamma[1]) - 1.0;
     vector[num_obs] P = inv_logit(f_sum); // p success
-    real aa[num_obs] = to_array_1d(P * kappa[1]);
-    real bb[num_obs] = to_array_1d((1.0 - P) * kappa[1]);
+    real aa[num_obs] = to_array_1d(P * tgam);
+    real bb[num_obs] = to_array_1d((1.0 - P) * tgam);
     y_rng_disc[1] = beta_binomial_rng(y_num_trials[1], aa, bb);
   }else{
     // 1. Gaussian (obs_model should be 1)

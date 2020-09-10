@@ -123,32 +123,6 @@ bet <- function(a, b) {
   )
 }
 
-#' Default prior for a named parameter
-#'
-#' @param name parameter name
-#' @return a named list
-prior_get_default <- function(name) {
-  if (name == "alpha") {
-    prior <- student_t(nu = 20)
-  } else if (name == "ell") {
-    prior <- log_normal(mu = 0, sigma = 1)
-  } else if (name == "sigma") {
-    prior <- igam(shape = 2, scale = 1, square = TRUE)
-  } else if (name == "phi") {
-    prior <- log_normal(mu = 1, sigma = 1, square = TRUE)
-  } else if (name == "wrp") {
-    prior <- igam(shape = 14, scale = 5)
-  } else if (name == "beta") {
-    prior <- bet(a = 0.2, b = 0.2)
-  } else if (name == "kappa") {
-    prior <- log_normal(mu = 1, sigma = 1, square = TRUE)
-  } else if (name == "effect_time") {
-    prior <- uniform()
-  } else {
-    stop("invalid parameter name '", name, "'")
-  }
-  return(prior)
-}
 
 #' Parse given prior
 #'
@@ -182,35 +156,20 @@ parse_prior <- function(prior, stan_input, obs_model) {
 #' @param num_uncrt number of uncertain components
 #' @return a named list
 fill_prior <- function(prior, num_uncrt) {
-  names <- c("alpha", "ell", "wrp", "sigma", "phi", "beta", "kappa")
-  names <- c(names, "effect_time", "effect_time_info")
+  par_names <- c("alpha", "ell", "wrp", "sigma", "phi", "beta", "gamma")
+  par_names <- c(par_names, "effect_time", "effect_time_info")
   defaulted <- c()
   specified <- c()
-  for (name in names) {
+  for (name in par_names) {
     if (name %in% names(prior)) {
       # User-specified prior
       specified <- c(specified, name)
-      pr <- prior[[name]]
-      is_named <- !is.null(names(pr))
-      if (is_named) {
-        pr <- list(pr)
-      }
-      prior[[name]] <- pr
+      pr <- dollar(prior, name)
+      prior[[name]] <- list_if_named(pr)
     } else {
       # Default prior
       defaulted <- c(defaulted, name)
-      if (name == "effect_time_info") {
-        if (num_uncrt > 0) {
-          msg <- "you must specify 'effect_time_info' in the prior list!"
-          stop(msg)
-        } else {
-          desc <- list(backwards = FALSE, lower = NaN, upper = NaN, zero = NaN)
-          desc <- list(desc)
-        }
-      } else {
-        desc <- list(prior_get_default(name))
-      }
-      prior[[name]] <- desc
+      prior[[name]] <- default_prior(name, num_uncrt)
     }
   }
   list(
@@ -219,182 +178,6 @@ fill_prior <- function(prior, num_uncrt) {
     specified = specified
   )
 }
-
-#' Parse given fully defined prior
-#'
-#' @inheritParams parse_prior
-#' @return a named list of parsed options
-parse_prior_full <- function(prior, stan_input, obs_model) {
-
-  # Count number of different parameters
-  nums <- stan_input[c("num_comps", "num_ell", "num_ns")]
-  num_sigma <- as.numeric(obs_model == 1)
-  num_phi <- as.numeric(obs_model == 3)
-  num_kappa <- as.numeric(obs_model == 5)
-  num_uncrt <- dollar(stan_input, "num_uncrt")
-  num_heter <- dollar(stan_input, "num_heter")
-  num_bt <- dollar(stan_input, "num_bt")
-  pnames <- c("alpha", "ell", "wrp", "sigma", "phi", "kappa")
-  nums <- c(unlist(nums), num_sigma, num_phi, num_kappa)
-  names(nums)[4:6] <- c("num_sigma", "num_phi", "num_kappa")
-
-  # Common parameters
-  common <- c()
-  K <- length(pnames)
-  for (k in seq_len(K)) {
-
-    # Ensure that prior definition exists for this parameter
-    desc <- dollar(prior, pnames[k])
-
-    # Prior type and hyper params to stan input format
-    pp <- parse_prior_single(desc, nums[k])
-    f1 <- paste0("prior_", pnames[k])
-    f2 <- paste0("hyper_", pnames[k])
-    common[[f1]] <- dollar(pp, "prior")
-    common[[f2]] <- dollar(pp, "hyper")
-  }
-
-  # Beta and teff parameters
-  common[["hyper_beta"]] <- create_hyper_beta(prior, num_heter)
-  desc <- dollar(prior, "effect_time")
-  info <- dollar(prior, "effect_time_info")
-  teff <- parse_prior_teff(desc, info, num_uncrt, num_bt)
-
-  # Return
-  c(common, teff)
-}
-
-#' Create the teff_ inputs to Stan
-#'
-#' @inheritParams prior_to_num
-#' @param info effect time info
-#' @param num_uncrt the \code{num_uncrt} input created for Stan
-#' @param num_bt the \code{num_bt} input created for Stan
-#' @return a named list
-parse_prior_teff <- function(desc, info, num_uncrt, num_bt) {
-  effect_time_info <- info[[1]]
-  is_backwards <- as.numeric(dollar(effect_time_info, "backwards"))
-  lower <- dollar(effect_time_info, "lower")
-  upper <- dollar(effect_time_info, "upper")
-  zero <- dollar(effect_time_info, "zero")
-  lower <- ensure_len(lower, num_bt)
-  upper <- ensure_len(upper, num_bt)
-  zero <- ensure_len(zero, num_bt)
-  DIM <- as.numeric(num_uncrt > 0)
-
-  out <- prior_to_num(desc[[1]])
-  type <- dollar(out, "prior")
-  hyper <- dollar(out, "hyper")
-  prior <- c(type[1], is_backwards)
-
-  # Return
-  out <- list(
-    prior_teff = repvec(prior, DIM),
-    hyper_teff = repvec(hyper, DIM),
-    teff_zero = repvec(zero, DIM),
-    teff_lb = repvec(lower, DIM),
-    teff_ub = repvec(upper, DIM)
-  )
-}
-
-#' Create the hyper_beta input to Stan
-#'
-#' @inheritParams parse_prior_full
-#' @param num_heter the \code{num_heter} input created for Stan
-#' @return an array of size (0, 2) or (1, 2)
-create_hyper_beta <- function(prior, num_heter) {
-  desc <- dollar(prior, "beta")
-  L <- length(desc)
-  if (L != 1) {
-    stop("length of prior$beta must be 1!")
-  }
-  a <- dollar(desc[[1]], "alpha")
-  b <- dollar(desc[[1]], "beta")
-  bet <- c(a, b)
-  n_rows <- as.numeric(num_heter > 0)
-  out <- repvec(bet, n_rows)
-  return(out)
-}
-
-#' Parse the given prior for a single parameter type
-#'
-#' @param desc An unnamed list of prior descriptions.
-#' @param num number of parameters of this type
-#' @return a named list of parsed options
-parse_prior_single <- function(desc, num) {
-  check_not_named(desc)
-  L <- length(desc)
-  err_msg <- paste0("<desc> should have length 1 or ", num, "! found = ", L)
-  if (L != num) {
-    if (L == 1) {
-      # The parameter type has the same prior in all components
-      out <- prior_to_num(desc[[1]])
-      prior <- repvec(dollar(out, "prior"), num)
-      hyper <- repvec(dollar(out, "hyper"), num)
-    } else {
-      stop(err_msg)
-    }
-  } else {
-
-    # The parameter type has possibly different prior in different components
-    prior <- repvec(c(0, 0), L)
-    hyper <- repvec(c(0, 0, 0), L)
-    for (j in seq_len(L)) {
-      out <- prior_to_num(desc[[j]])
-      prior[j, ] <- repvec(dollar(out, "prior"), num)
-      hyper[j, ] <- repvec(dollar(out, "hyper"), num)
-    }
-  }
-  list(
-    prior = prior,
-    hyper = hyper
-  )
-}
-
-#' Parse the given prior to numeric format
-#'
-#' @param desc Prior description as a named list, containing fields
-#' \itemize{
-#'   \item \code{dist} - Distribution name. Must be one of
-#'   {'uniform', 'normal', 'student-t', 'gamma', 'inv-gamma', 'log-normal'}
-#'   (case-insensitive)
-#'   \item \code{square} - Is the prior for a square-transformed parameter.
-#' }
-#' Other list fields are interpreted as hyperparameters.
-#' @return a named list of parsed options
-prior_to_num <- function(desc) {
-  types <- prior_type_names()
-  distribution_name <- dollar(desc, "dist")
-  dist_num <- check_allowed(distribution_name, types)
-  fields <- names(desc)
-  fields <- fields[!(fields %in% c("dist", "square"))]
-  hyper <- position_hyper_params(desc[fields])
-  sq <- dollar(desc, "square")
-  list(
-    prior = c(dist_num, as.numeric(sq)),
-    hyper = hyper,
-    hyper_names = fields
-  )
-}
-
-#' Position the hyper parameters from a list to a vector that goes to Stan
-#'
-#' @param desc Hyperparameters as a named list
-#' @return three real numbers
-position_hyper_params <- function(desc) {
-  hyper <- c(0, 0, 0)
-  NAMES <- names(desc)
-  H1 <- c("mu", "alpha", "nu")
-  H2 <- c("sigma", "beta")
-  for (name in NAMES) {
-    check_allowed(name, c(H1, H2))
-    val <- dollar(desc, name)
-    idx <- if (name %in% H2) 2 else 1
-    hyper[idx] <- val
-  }
-  return(hyper)
-}
-
 
 #' Names of allowed  prior types
 #'
@@ -417,7 +200,7 @@ prior_type_names <- function(idx = NULL) {
 #' Convert the Stan input encoding of a prior to a human-readable format
 #'
 #' @param stan_input a list of stan input fields
-#' @inheritParams prior_to_char
+#' @inheritParams prior_to_str
 #' @name prior_df
 #' @return a data frame
 NULL
@@ -425,23 +208,30 @@ NULL
 #' @rdname prior_df
 prior_to_df <- function(stan_input, digits = 3) {
 
-  # Common parameters
-  pnames <- c("alpha", "ell", "wrp", "sigma", "phi", "kappa")
+  # Positive parameters
+  pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
   df <- NULL
   for (p in pnames) {
-    df_p <- prior_to_df_oneparam(stan_input, p, digits)
-    df <- rbind(df, df_p)
+    df <- rbind(df, prior_to_df_pos(stan_input, p, digits))
   }
 
   # Beta
   num_heter <- dollar(stan_input, "num_heter")
-  num_uncrt <- dollar(stan_input, "num_uncrt")
   if (num_heter > 0) {
-    df_p <- prior_to_df_beta(stan_input)
-    df <- rbind(df, df_p)
+    num_bt <- dollar(stan_input, "num_bt")
+    df_bet <- prior_to_df_unit(stan_input, "beta", num_bt, digits)
+    df <- rbind(df, df_bet)
+  }
+
+  # Gamma
+  obs_model <- dollar(stan_input, "obs_model")
+  if (obs_model == 5) {
+    df_bet <- prior_to_df_unit(stan_input, "gamma", 1, digits)
+    df <- rbind(df, df_bet)
   }
 
   # Effect time
+  num_uncrt <- dollar(stan_input, "num_uncrt")
   if (num_uncrt > 0) {
     df_p <- prior_to_df_teff(stan_input, digits)
     df <- rbind(df, df_p)
@@ -452,7 +242,7 @@ prior_to_df <- function(stan_input, digits = 3) {
 
 #' @rdname prior_df
 #' @param parname parameter name
-prior_to_df_oneparam <- function(stan_input, parname, digits) {
+prior_to_df_pos <- function(stan_input, parname, digits) {
   prior <- dollar(stan_input, paste0("prior_", parname))
   hyper <- dollar(stan_input, paste0("hyper_", parname))
   D <- dim(prior)[1]
@@ -461,7 +251,7 @@ prior_to_df_oneparam <- function(stan_input, parname, digits) {
   bounds <- rep("foo", D)
   for (j in seq_len(D)) {
     par <- paste0(parname, "[", j, "]")
-    out <- prior_to_char(par, prior[j, ], hyper[j, ], digits)
+    out <- prior_to_str(par, prior[j, ], hyper[j, ], digits)
     tpar <- dollar(out, "parname")
     pnames[j] <- par
     dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
@@ -473,12 +263,50 @@ prior_to_df_oneparam <- function(stan_input, parname, digits) {
 }
 
 #' @rdname prior_df
-prior_to_df_beta <- function(stan_input) {
-  num_bt <- dollar(stan_input, "num_bt")
-  hyper <- dollar(stan_input, paste0("hyper_beta"))
-  dist <- paste0("beta(", hyper[1], ", ", hyper[2], ")")
+#' @param parname parameter name
+prior_to_df_unit <- function(stan_input, parname, digits) {
+  prior <- dollar(stan_input, paste0("prior_", parname))
+  hyper <- dollar(stan_input, paste0("hyper_", parname))
+  D <- dim(prior)[1]
+  pnames <- rep("foo", D)
+  dnames <- rep("foo", D)
+  bounds <- rep("foo", D)
+  for (j in seq_len(D)) {
+    par <- paste0(parname, "[", j, "]")
+    out <- prior_to_str(par, prior[j, ], hyper[j, ], digits)
+    tpar <- dollar(out, "parname")
+    pnames[j] <- par
+    dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
+    bounds[j] <- "[0, Inf)"
+  }
+  df <- data.frame(pnames, bounds, dnames)
+  colnames(df) <- c("Parameter", "Bounds", "Prior")
+  return(df)
+}
+
+#' @rdname prior_df
+#' @param num number of parameters of the type
+prior_to_df_unit <- function(stan_input, parname, num, digits) {
+  hyper <- dollar(stan_input, paste0("hyper_", parname))
+  a <- round(hyper[1], digits = digits)
+  b <- round(hyper[2], digits = digits)
+  dist <- paste0("beta(", a, ", ", b, ")")
   bounds <- "[0, 1]"
-  par <- paste0("beta[1-", num_bt, "]")
+  nam1 <- paste0(parname, "[1]")
+  nam2 <- paste0(parname, "[1-", num, "]")
+  par <- if (num > 1) nam2 else nam1
+  dist <- paste0(par, " ~ ", dist)
+  df <- data.frame(par, bounds, dist)
+  colnames(df) <- c("Parameter", "Bounds", "Prior")
+  return(df)
+}
+
+#' @rdname prior_df
+prior_to_df_gamma <- function(stan_input) {
+  hyper <- dollar(stan_input, paste0("hyper_gamma"))
+  dist <- beta_str(hyper[1], hyper[2])
+  par <- gamma[1]
+  bounds <- "[0, 1]"
   dist <- paste0(par, " ~ ", dist)
   df <- data.frame(par, bounds, dist)
   colnames(df) <- c("Parameter", "Bounds", "Prior")
@@ -503,7 +331,7 @@ prior_to_df_teff <- function(stan_input, digits) {
     tpar <- par
     if (zero[j] != 0) tpar <- paste0(tpar, " - ", zero[j])
     if (backwards == 1) tpar <- paste0(" - (", tpar, ")")
-    out <- prior_to_char(par, c(type, 0), hyper, digits)
+    out <- prior_to_str(par, c(type, 0), hyper, digits)
     pnames[j] <- par
     dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
     bounds[j] <- paste0("[", lower[j], ", ", upper[j], "]")
@@ -513,7 +341,6 @@ prior_to_df_teff <- function(stan_input, digits) {
   return(df)
 }
 
-
 #' Human-readable prior statement
 #'
 #' @param parname parameter name
@@ -521,7 +348,7 @@ prior_to_df_teff <- function(stan_input, digits) {
 #' @param hyper three real numbers
 #' @param digits number of digits to show for floats
 #' @return A list.
-prior_to_char <- function(parname, prior, hyper, digits) {
+prior_to_str <- function(parname, prior, hyper, digits) {
   hyper <- round(hyper, digits)
 
   # Check distribution type
