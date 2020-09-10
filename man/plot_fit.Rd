@@ -4,26 +4,10 @@
 \alias{plot_fit}
 \title{Visualize a model fit against longitudinal data set}
 \usage{
-plot_fit(
-  fit,
-  data,
-  x_name = "age",
-  y_name = "y",
-  group_by = "id",
-  draws = NULL,
-  ...
-)
+plot_fit(fit, draws = NULL, ...)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
-
-\item{data}{a data frame}
-
-\item{x_name}{name of x-axis variable}
-
-\item{y_name}{name of y-axis variable}
-
-\item{group_by}{grouping variable}
 
 \item{draws}{see the \code{draws} argument of \code{\link{get_f}}}
 

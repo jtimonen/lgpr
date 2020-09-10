@@ -21,6 +21,7 @@ Other array utilities:
 \code{\link{ensure_2dim}()},
 \code{\link{null_if_all_nan}()},
 \code{\link{reduce_rows}()},
-\code{\link{repvec}()}
+\code{\link{repvec}()},
+\code{\link{select_row}()}
 }
 \concept{array utilities}

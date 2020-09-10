@@ -149,12 +149,13 @@ test_that("model fit can be visualized with data on original scale", {
     fit <- lgp(y ~ gp(age) + zerosum(z) * gp(age) + gp_warp_vm(diseaseAge),
       data = data, chains = 1, iter = 300, refresh = 0
     )
-    p1 <- plot_fit(fit, data)
-    p2 <- plot_fit(fit, data, draws = c(2, 3))
-    p3 <- plot_fit(fit, data, draws = 3)
+    p1 <- plot_fit(fit)
+    p2 <- plot_fit(fit, draws = c(2, 3))
+    p3 <- plot_fit(fit, draws = 3)
     expect_s3_class(p1, "ggplot")
     expect_s3_class(p2, "ggplot")
     expect_s3_class(p3, "ggplot")
+    relevances(fit)
   })
 })
 

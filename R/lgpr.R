@@ -87,12 +87,14 @@ lgp <- function(formula,
                 prior_only = FALSE,
                 verbose = FALSE,
                 sample_f = !(likelihood == "gaussian"),
+                id_variable = "id",
+                time_variable = "age",
                 ...) {
 
   # Create and fit the model
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
-    prior_only, verbose, sample_f
+    prior_only, verbose, sample_f, id_variable, time_variable
   )
   sample_model(model = model, ...)
 }

@@ -163,6 +163,17 @@ ensure_2dim <- function(v) {
   return(out)
 }
 
+#' Select named row of an array
+#'
+#' @param x an array of shape \code{n} x \code{m}
+#' @param name name of the row
+#' @return a vector of length \code{m}
+#' @family array utilities
+select_row <- function(x, name) {
+  df <- data.frame(t(x))
+  dollar(df, name)
+}
+
 #' Squeeze the second dimension of an array
 #'
 #' @param x an array of shape \code{n1} x \code{n2} x \code{n3}
@@ -344,6 +355,38 @@ likelihood_as_int <- function(likelihood) {
   allowed <- likelihood_list()
   index <- check_allowed(likelihood, allowed)
   return(index)
+}
+
+#' Link functions and their inverses
+#'
+#' @param x the input
+#' @param likelihood name of the likelihood model
+#' @returns transformed input
+#' @name link
+NULL
+
+#' @rdname link
+link <- function(x, likelihood) {
+  allowed <- likelihood_list()
+  check_allowed(likelihood, allowed)
+  if (likelihood %in% c("poisson", "nb")) {
+    x <- log(x)
+  } else if (likelihood %in% c("binomial", "bb")) {
+    x <- log(x) - log(1 - x)
+  }
+  return(x)
+}
+
+#' @rdname link
+link_inv <- function(x, likelihood) {
+  allowed <- likelihood_list()
+  check_allowed(likelihood, allowed)
+  if (likelihood %in% c("poisson", "nb")) {
+    x <- exp(x)
+  } else if (likelihood %in% c("binomial", "bb")) {
+    x <- 1 / (1 + exp(-x))
+  }
+  return(x)
 }
 
 #' Get lgpr version description

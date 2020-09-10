@@ -4,18 +4,10 @@
 \alias{plot_fit_helper}
 \title{Helper function}
 \usage{
-plot_fit_helper(fit, data, x_name, y_name, group_by, draws)
+plot_fit_helper(fit, draws)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
-
-\item{data}{a data frame}
-
-\item{x_name}{name of x-axis variable}
-
-\item{y_name}{name of y-axis variable}
-
-\item{group_by}{grouping variable}
 
 \item{draws}{see the \code{draws} argument of \code{\link{get_f}}}
 }

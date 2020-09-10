@@ -14,7 +14,9 @@ create_model(
   options = NULL,
   prior_only = FALSE,
   verbose = FALSE,
-  sample_f = !(likelihood == "gaussian")
+  sample_f = !(likelihood == "gaussian"),
+  id_variable = "id",
+  time_variable = "age"
 )
 }
 \arguments{
@@ -84,6 +86,10 @@ where likelihood is ignored?}
 
 \item{sample_f}{Determines if the latent function values are be sampled
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}).}
+
+\item{id_variable}{Name of the subject identifier variable.}
+
+\item{time_variable}{Name of the time variable.}
 }
 \description{
 Create a model

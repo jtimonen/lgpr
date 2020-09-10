@@ -37,7 +37,7 @@ test_that("model with uncertain disease age can be created and fit", {
   expect_s4_class(fit, "lgpfit")
   p1 <- plot_warp(fit)
   p2 <- plot_effect_times(fit)
-  p3 <- plot_fit(fit, data = data)
+  p3 <- plot_fit(fit)
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")

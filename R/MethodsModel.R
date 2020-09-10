@@ -39,9 +39,14 @@ model_summary_brief <- function(object) {
   stan_list <- get_stan_input(object)
   str1 <- as.character(model@model_formula)
   str2 <- likelihood_as_str(stan_list$obs_model)
+  num_indiv <- length(levels(model@id_variable$values))
+  str3 <- paste0(model@id_variable$name, ", ", num_indiv, " levels")
+  str4 <- model@time_variable$name
   line1 <- paste0("Formula: ", str1)
   line2 <- paste0("Likelihood: ", str2)
-  out <- paste0(line1, "\n", line2, "\n")
+  line3 <- paste0("ID variable: ", str3)
+  line4 <- paste0("Time variable: ", str4)
+  out <- paste0(line1, "\n", line2, "\n", line3, "\n", line4, "\n")
   return(out)
 }
 
@@ -68,6 +73,22 @@ param_summary <- function(object, digits = 3) {
 #' @rdname param_summary
 prior_summary <- function(object, digits = 3) {
   param_summary(object, digits)
+}
+
+#' Helper function for plots
+#'
+#' @export
+#' @inheritParams object_to_model
+#' @return a data frame
+create_plot_df <- function(object) {
+  model <- object_to_model(object)
+  id_var <- model@id_variable
+  time_var <- model@time_variable
+  y <- as.numeric(get_y(model))
+  y_name <- get_y_name(model)
+  df <- data.frame(id_var$values, time_var$values, y)
+  colnames(df) <- c(id_var$name, time_var$name, y_name)
+  return(df)
 }
 
 #' Functions that access model properties
@@ -284,4 +305,30 @@ get_x_cont <- function(object, original = TRUE, mask_with = NaN) {
     }
   }
   return(out)
+}
+
+#' Get observed disease effect times
+#'
+#' @export
+#' @inheritParams object_to_model
+#' @return a named vector, where the names are individual IDs
+get_teff_observed <- function(object) {
+  model <- object_to_model(object)
+  df_data <- create_plot_df(model)
+  da_name <- get_ns_covariates(model)
+  if (length(da_name) == 0) {
+    stop("There are no nonstationary components in the model!")
+  } else if (length(da_name) > 1) {
+    stop("There are more than one nonstationary components in the model!")
+  }
+  dis_age <- select_row(get_x_cont(model), da_name)
+  age_var <- model@time_variable$name
+  id_var <- model@id_variable$name
+  df_ext <- df_data
+  df_ext$dis_age <- dis_age
+  teff_obs <- get_teff_obs(df_ext, age_var, "dis_age", id_var)
+  nams <- dollar(teff_obs, id_var)
+  teff_obs <- dollar(teff_obs, age_var)
+  names(teff_obs) <- nams
+  return(teff_obs)
 }

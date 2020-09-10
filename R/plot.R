@@ -324,7 +324,6 @@ plot_data_add_highlight_factor <- function(df, group_by, highlight) {
 }
 
 
-
 #' Helper function
 #'
 #' @param par_summary summary of warping parameter
@@ -367,9 +366,10 @@ plot_warp_helper <- function(par_summary,
 #'
 #' @inheritParams plot_fit
 #' @return a \code{ggplot object}
-plot_fit_helper <- function(fit, data, x_name, y_name, group_by, draws) {
-  df_data <- data[c(group_by, x_name, y_name)]
-  df <- data[c(group_by, x_name)]
+plot_fit_helper <- function(fit, draws) {
+  df_data <- create_plot_df(fit)
+  df <- df_data[, 1:2]
+
   f_draws <- get_f(fit, draws)
   num_draws <- dollar(f_draws, "num_draws")
   f <- dollar(f_draws, "f")
@@ -377,26 +377,15 @@ plot_fit_helper <- function(fit, data, x_name, y_name, group_by, draws) {
   f_total <- scale_f_total(fit, f_total)
 
   # GP mean
-  df_fit <- plot_fit_create_df(df, f_total$mean)
+  df_fit <- plot_fit_create_df(df, dollar(f_total, "mean"))
 
   # GP std
   if (num_draws > 1) {
     df_ribbon <- NULL
   } else {
-    df_ribbon <- plot_fit_create_df_ribbon(df, f_total$mean, f_total$std, 2)
-  }
-
-  # Add effect time
-  num_ns <- dollar(get_stan_input(fit), "num_ns")
-  if (num_ns == 0) {
-    teff_obs <- NULL
-  } else {
-    da_name <- get_ns_covariates(fit)
-    check_length(da_name, 1)
-    teff_obs <- get_teff_obs(data, x_name, da_name, group_by)
-    nams <- dollar(teff_obs, group_by)
-    teff_obs <- dollar(teff_obs, x_name)
-    names(teff_obs) <- nams
+    m <- dollar(f_total, "mean")
+    s <- dollar(f_total, "std")
+    df_ribbon <- plot_fit_create_df_ribbon(df, m, s, 2)
   }
 
   # Plot title
@@ -412,8 +401,6 @@ plot_fit_helper <- function(fit, data, x_name, y_name, group_by, draws) {
     df_data = df_data,
     df_fit = df_fit,
     df_ribbon = df_ribbon,
-    teff_obs = teff_obs,
-    teff_fit = NULL,
     info = info,
     fit_alpha = line_alpha_fun(num_draws)
   )
