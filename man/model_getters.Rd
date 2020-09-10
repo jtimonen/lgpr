@@ -65,3 +65,8 @@ get_covariate_info_cat(object)
 \description{
 Functions that access model properties
 }
+\seealso{
+Other lgpmodel accessors: 
+\code{\link{data_getters}}
+}
+\concept{lgpmodel accessors}

@@ -10,7 +10,7 @@
 plot_draws(
   fit,
   type = "intervals",
-  regex_pars = c("alpha", "ell", "wrp", "sigma", "phi", "kappa"),
+  regex_pars = c("alpha", "ell", "wrp", "sigma", "phi", "gamma"),
   ...
 )
 

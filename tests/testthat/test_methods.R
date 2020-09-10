@@ -63,6 +63,21 @@ test_that("lgpmodel getters work", {
   expect_equal(om, "gaussian")
 })
 
+test_that("get_y works", {
+  y1 <- get_y(model)
+  y2 <- get_y(model, original = FALSE)
+  expect_equal(length(y1), 24)
+  expect_equal(length(y2), 24)
+  expect_gt(stats::sd(y1), stats::sd(y2))
+})
+
+test_that("get_x_cat and get_x_cont work", {
+  x <- get_x_cat(model)
+  expect_equal(rownames(x), c("id", "sex"))
+  x <- get_x_cont(model)
+  expect_equal(sum(is.nan(x)), 12)
+})
+
 test_that("prior summary works", {
   ps <- prior_summary(model, digits = 4)
   expect_equal(length(ps$Parameter), 9)

@@ -90,7 +90,7 @@ plot_draws <- function(fit,
                        type = "intervals",
                        regex_pars = c(
                          "alpha", "ell", "wrp",
-                         "sigma", "phi", "kappa"
+                         "sigma", "phi", "gamma"
                        ),
                        ...) {
   check_type(fit, "lgpfit")

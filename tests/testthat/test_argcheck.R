@@ -73,3 +73,18 @@ test_that("check_not_named works correctly", {
   reason <- "<x> should not have names! found = "
   expect_error(check_not_named(x), reason)
 })
+
+test_that("check_numeric works correctly", {
+  reason <- "must be numeric"
+  expect_error(check_numeric("moi"), reason)
+  expect_true(check_numeric(1))
+})
+
+test_that("check_false works correctly", {
+  a <- TRUE
+  reason <- "to be FALSE"
+  expect_error(check_false(a), reason)
+  expect_error(check_false(2), reason)
+  expect_true(check_false(0))
+  expect_true(check_false(!a))
+})

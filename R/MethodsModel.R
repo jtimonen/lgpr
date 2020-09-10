@@ -88,6 +88,7 @@ prior_summary <- function(object, digits = 3) {
 #'   \item \code{get_ns_covariates} returns a character vector
 #'   \item \code{get_y_name} returns the response variable name
 #' }
+#' @family lgpmodel accessors
 NULL
 
 #' @export
@@ -146,17 +147,20 @@ get_component_names <- function(object) {
   rownames(comps)
 }
 
+#' @export
 #' @rdname model_getters
 get_num_obs <- function(object) {
   get_stan_input(object)$num_obs
 }
 
+#' @export
 #' @rdname model_getters
 is_f_sampled <- function(object) {
   val <- get_stan_input(object)$is_f_sampled
   as.logical(val)
 }
 
+#' @export
 #' @rdname model_getters
 get_obs_model <- function(object) {
   lh <- get_stan_input(object)$obs_model
@@ -182,7 +186,6 @@ get_ns_covariates <- function(object) {
   }
   return(out)
 }
-
 
 #' @rdname model_getters
 get_covariate_info_cont <- function(object) {
@@ -224,4 +227,61 @@ get_covariate_info_cat <- function(object) {
   colnames(df) <- c("Factor", "#Levels", "Values")
   rownames(df) <- seq_len(dim(df)[1])
   return(df)
+}
+
+
+#' Functions that access original data stored in a model object
+#'
+#' @name data_getters
+#' @inheritParams object_to_model
+#' @param original should the variable be in its original form
+#' @param mask_with value to use to mask the originally missing
+#' values in the data
+#' @return
+#' \itemize{
+#'   \item \code{get_y} gets response variable measurements
+#'   (on their original scaled if \code{original} is \code{TRUE})
+#'   \item \code{get_x_cat} gets the categorical covariate matrix
+#'   \item \code{get_x_cont} gets the continuous covariate matrix (with
+#'   variables on original scale and \code{NaN}s in their original locations
+#'   if \code{original} is \code{TRUE})
+#' }
+#' @family lgpmodel accessors
+NULL
+
+#' @rdname data_getters
+get_y <- function(object, original = TRUE) {
+  model <- object_to_model(object)
+  is_gauss <- get_obs_model(model) == "gaussian"
+  nam <- if (is_gauss) "y_cont" else "y_disc"
+  y <- dollar(get_stan_input(model), nam)
+  scl <- model@var_scalings$y
+  rescale <- original && is_gauss
+  y <- if (rescale) scl@fun_inv(y) else y
+  rownames(y) <- get_y_name(model)
+  return(y)
+}
+
+#' @rdname data_getters
+get_x_cat <- function(object) {
+  x <- dollar(get_stan_input(object), "x_cat")
+  out <- if (nrow(x) == 0) NULL else x
+  return(out)
+}
+
+#' @rdname data_getters
+get_x_cont <- function(object, original = TRUE, mask_with = NaN) {
+  nam <- if (original) "x_cont_unnorm" else "x_cont"
+  si <- get_stan_input(object)
+  x <- dollar(si, nam)
+  if (nrow(x) == 0) {
+    out <- NULL
+  } else {
+    out <- x
+    if (original) {
+      mask <- as.logical(dollar(si, "x_cont_mask"))
+      out[mask] <- mask_with
+    }
+  }
+  return(out)
 }
