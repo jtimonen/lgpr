@@ -1,3 +1,48 @@
+#' Validate data array
+#'
+#' @param data a data frame
+#' @param id_name name of the id variable
+#' @return a data frame
+#' @name valid_data
+NULL
+
+#' @export
+#' @rdname valid_data
+validate_data <- function(data, id_name = "id") {
+  id <- dollar(data, id_name)
+  check_type(id, "factor")
+  D <- dim(data)[2]
+  for (j in seq_len(D)) {
+    x <- data[, j]
+    if (is.factor(x)) {
+      nam <- names(data)[j]
+      validate_factor(x, id, nam)
+    }
+  }
+  TRUE
+}
+
+#' @rdname valid_data
+#' @param x a factor
+#' @param id the id factor
+#' @param name factor name
+validate_factor <- function(x, id, name) {
+  check_type(x, "factor")
+  check_type(id, "factor")
+  check_lengths(x, id)
+  for (lev in levels(id)) {
+    inds <- which(id == lev)
+    nu <- length(unique(x[inds]))
+    msg <- paste0(
+      "measurements corresponding to <id> level ", lev, " do not",
+      " all have the same level for factor '", name, "'!"
+    )
+    if (nu > 1) stop(msg)
+  }
+  TRUE
+}
+
+
 #' Easily add a categorical covariate to a data frame
 #'
 #' @export

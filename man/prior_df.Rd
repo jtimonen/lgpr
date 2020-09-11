@@ -5,7 +5,6 @@
 \alias{prior_to_df}
 \alias{prior_to_df_pos}
 \alias{prior_to_df_unit}
-\alias{prior_to_df_gamma}
 \alias{prior_to_df_teff}
 \title{Convert the Stan input encoding of a prior to a human-readable format}
 \usage{
@@ -16,8 +15,6 @@ prior_to_df_pos(stan_input, parname, digits)
 prior_to_df_unit(stan_input, parname, num, digits)
 
 prior_to_df_unit(stan_input, parname, num, digits)
-
-prior_to_df_gamma(stan_input)
 
 prior_to_df_teff(stan_input, digits)
 }

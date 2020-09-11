@@ -105,3 +105,10 @@ test_that("computing observed effect times from data works correctly", {
   expect_equal(names(x), c("4", "6"))
   expect_equal(as.numeric(x), c(20, NaN))
 })
+
+test_that("data validation works correctly", {
+  dat <- testdata_001
+  dat$sex[1] <- "Female"
+  expect_error(validate_data(dat), "do not all have the same")
+  expect_true(validate_data(testdata_001))
+})

@@ -302,18 +302,6 @@ prior_to_df_unit <- function(stan_input, parname, num, digits) {
 }
 
 #' @rdname prior_df
-prior_to_df_gamma <- function(stan_input) {
-  hyper <- dollar(stan_input, paste0("hyper_gamma"))
-  dist <- beta_str(hyper[1], hyper[2])
-  par <- gamma[1]
-  bounds <- "[0, 1]"
-  dist <- paste0(par, " ~ ", dist)
-  df <- data.frame(par, bounds, dist)
-  colnames(df) <- c("Parameter", "Bounds", "Prior")
-  return(df)
-}
-
-#' @rdname prior_df
 prior_to_df_teff <- function(stan_input, digits) {
   num_bt <- dollar(stan_input, "num_bt")
   prior <- dollar(stan_input, "prior_teff")
