@@ -156,6 +156,10 @@ test_that("model fit can be visualized with data on original scale", {
     expect_s3_class(p2, "ggplot")
     expect_s3_class(p3, "ggplot")
     relevances(fit)
+    dra <- get_teff_obs(fit)
+    expect_equal(sum(is.nan(dra), 2))
+    reason <- "age is not a nonstationary covariate"
+    expect_error(get_teff_obs(fit, dra = "age"), reason)
   })
 })
 

@@ -62,7 +62,6 @@ test_that("get_stan_model returns a stanmodel", {
   expect_equal(as.character(class(sm)), "stanmodel")
 })
 
-
 test_that("add_sum_arraylist works correctly", {
   a <- 2 * diag(3)
   b <- 0.5 * diag(3)
@@ -73,4 +72,36 @@ test_that("add_sum_arraylist works correctly", {
   x <- add_sum_arraylist(x1)
   expect_equal(length(x), 3)
   expect_equal(x[[3]][1, 1], 2.5)
+})
+
+test_that("common array utilities work correctly", {
+  a <- matrix(c(1, 2, 3, 10, 20, 30), 2, 3, byrow = TRUE)
+  expect_equal(row_vars(a), c(1.0, 100.0))
+  expect_equal(rowSums(normalize_rows(a)), c(1.0, 1.0))
+  rownames(a) <- c("jaa", "hei")
+  expect_equal(select_row(a, "hei"), c(10, 20, 30))
+  expect_error(squeeze_second_dim(a), "dimensions in <x> must be 3")
+  b <- array(a, dim = c(2, 0, 3))
+  expect_error(squeeze_second_dim(b), "Second dimension of <x> must be")
+  expect_error(array_to_arraylist(a, 2, c(1, 2, 3)), "must be a multiple of <L>")
+  expect_error(add_sum_arraylist(list()), "has length 0")
+  x <- repvec(c(1, 2, 3), 4)
+  expect_equal(reduce_rows(x), c(1, 2, 3))
+})
+
+test_that("link_inv functions are inverses of the link functions", {
+  x <- c(1.2, -1, 0, 2)
+  for (likelihood in likelihood_list()) {
+    y <- link_inv(x, likelihood)
+    expect_equal(x, link(y, !!likelihood))
+  }
+})
+
+test_that("computing observed effect times from data works correctly", {
+  age <- c(10, 20, 30, 10, 20, 30)
+  dage <- c(-10, 0, 10, NaN, NaN, NaN)
+  id <- as.factor(c(4, 4, 4, 6, 6, 6))
+  x <- compute_teff_obs(id, age, dage)
+  expect_equal(names(a), c("4", "6"))
+  expect_equal(as.numeric(a), c(20, NaN))
 })

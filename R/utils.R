@@ -324,40 +324,24 @@ object_to_model <- function(object) {
   return(out)
 }
 
-#' Infer observed effect times from a data frame
+#' Compute observed effect times using other variables
 #'
-#' @param data a data frame
-#' @param age_variable age variable name
-#' @param disage_variable disease-related age variable name
-#' @param id_variable id variable name
-#' @return a data frame
-get_teff_obs <- function(data,
-                         age_variable,
-                         disage_variable,
-                         id_variable) {
-  check_type(data, "data.frame")
-  fac <- dollar(data, id_variable)
-  t1 <- dollar(data, age_variable)
-  t2 <- dollar(data, disage_variable)
-  uid <- unique(fac)
-  L <- length(uid)
-  teff <- rep(0, L)
-  nam <- rep(0, L)
-  for (j in seq_len(L)) {
-    bbb <- as.numeric(fac == uid[j]) + as.numeric(t2 == 0)
-    i0 <- which(bbb == 2)
-    L <- length(i0)
-    if (L > 0) {
-      idx <- i0[1]
-      teff[j] <- t1[idx]
-    } else {
-      teff[j] <- NaN
-    }
-    nam[j] <- uid[j]
+#' @param id id variable, a factor
+#' @param age age variable on original scale, a vector
+#' @param dis_age disease-related age variable on original scale,
+#' a vector
+#' @return a named vector with length equal to number of levels in id
+compute_teff_obs <- function(id, age, dis_age) {
+  check_type(id, "factor")
+  teff <- c()
+  for (val in levels(id)) {
+    suitability <- as.numeric(id == val) + as.numeric(dis_age == 0)
+    i0 <- which(suitability == 2)
+    t0 <- if (length(i0) > 0) age[i0[1]] else NaN
+    teff <- c(teff, t0)
   }
-  df <- data.frame(nam, teff)
-  colnames(df) <- c(id_variable, age_variable)
-  return(df)
+  names(teff) <- levels(id)
+  return(teff)
 }
 
 #' Integer encoding of likelihod function names

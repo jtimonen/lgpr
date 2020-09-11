@@ -311,24 +311,16 @@ get_x_cont <- function(object, original = TRUE, mask_with = NaN) {
 #'
 #' @export
 #' @inheritParams object_to_model
+#' @param dra name of the disease-related age variable
 #' @return a named vector, where the names are individual IDs
-get_teff_observed <- function(object) {
+get_teff_obs <- function(object, dra = "diseaseAge") {
   model <- object_to_model(object)
   df_data <- create_plot_df(model)
-  da_name <- get_ns_covariates(model)
-  if (length(da_name) == 0) {
-    stop("There are no nonstationary components in the model!")
-  } else if (length(da_name) > 1) {
-    stop("There are more than one nonstationary components in the model!")
-  }
-  dis_age <- select_row(get_x_cont(model), da_name)
-  age_var <- model@time_variable$name
-  id_var <- model@id_variable$name
-  df_ext <- df_data
-  df_ext$dis_age <- dis_age
-  teff_obs <- get_teff_obs(df_ext, age_var, "dis_age", id_var)
-  nams <- dollar(teff_obs, id_var)
-  teff_obs <- dollar(teff_obs, age_var)
-  names(teff_obs) <- nams
-  return(teff_obs)
+  ns_names <- get_ns_covariates(model)
+  ok <- dra %in% ns_names
+  if (!ok) stop(dra, " is not a nonstationary covariate in the model!")
+  dis_ages <- select_row(get_x_cont(model), dra)
+  ids <- df_data[, 1]
+  ages <- df_data[, 2]
+  compute_teff_obs(ids, ages, dis_ages)
 }
