@@ -23,9 +23,11 @@ Array reshaping
 \seealso{
 Other array utilities: 
 \code{\link{ensure_2dim}()},
+\code{\link{normalize_rows}()},
 \code{\link{null_if_all_nan}()},
 \code{\link{reduce_rows}()},
 \code{\link{repvec}()},
+\code{\link{row_vars}()},
 \code{\link{select_row}()},
 \code{\link{squeeze_second_dim}()}
 }

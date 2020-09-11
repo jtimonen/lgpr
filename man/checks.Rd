@@ -9,6 +9,7 @@
 \alias{check_interval}
 \alias{check_length}
 \alias{check_not_null}
+\alias{check_null}
 \alias{check_lengths}
 \alias{check_false}
 \alias{check_in_data}
@@ -30,6 +31,8 @@ check_length(arg, expected)
 
 check_not_null(arg)
 
+check_null(arg, reason = NULL)
+
 check_lengths(a, b)
 
 check_false(arg)
@@ -50,6 +53,8 @@ check_not_named(arg)
 \item{upper}{interval maximum}
 
 \item{expected}{Expected length.}
+
+\item{reason}{explanation why the argument should be NULL}
 
 \item{a}{An argument to check.}
 
@@ -79,6 +84,7 @@ check_not_named(arg)
   \item \code{check_all_leq} checks that argument has values less than equal
   to given maximums, elementwise
   \item \code{check_not_named} checks that \code{names(arg)} is NULL
+  \item \code{check_null} checks that \code{arg} is NULL
 }
 }
 \seealso{

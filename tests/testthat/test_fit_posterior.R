@@ -27,6 +27,8 @@ test_that("sample_model can do posterior sampling", {
   p2 <- plot_draws(fit, type = "trace")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
+  r <- relevances(fit)
+  expect_equal(sum(r$Relevance), 1.0)
 })
 
 test_that("optimize_model can optimize MAP parameters", {
@@ -90,7 +92,9 @@ test_that("f can be sampled with nb likelihood", {
     expect_s3_class(p2, "ggplot")
 
     a <- get_f(fit)
-    expect_equal(dim(a$f$`gp(age)`), c(100, 16))
+    expect_equal(dim(a$f$`gp(age)`), c(100, 24))
+    r <- relevances(fit)
+    expect_equal(dim(r), c(3, 2))
   })
 })
 

@@ -17,6 +17,7 @@
 #'   \item \code{check_all_leq} checks that argument has values less than equal
 #'   to given maximums, elementwise
 #'   \item \code{check_not_named} checks that \code{names(arg)} is NULL
+#'   \item \code{check_null} checks that \code{arg} is NULL
 #' }
 #' @return \code{TRUE} if the check passes.
 #' @family argument checks
@@ -109,6 +110,20 @@ check_not_null <- function(arg) {
   arg_name <- deparse(substitute(arg))
   if (is.null(arg)) {
     stop(arg_name, " should not be NULL!")
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param reason explanation why the argument should be NULL
+check_null <- function(arg, reason = NULL) {
+  arg_name <- deparse(substitute(arg))
+  if (!is.null(arg)) {
+    msg <- paste0("<", arg_name, "> should be NULL!")
+    if (!is.null(reason)) {
+      msg <- paste0(msg, " Reason: ", reason)
+    }
+    stop(msg)
   }
   return(TRUE)
 }

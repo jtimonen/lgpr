@@ -163,6 +163,28 @@ ensure_2dim <- function(v) {
   return(out)
 }
 
+#' Compute row variances for a 2-dimensional array
+#'
+#' @param x an array of size \code{n} x \code{m}
+#' @return returns a vector
+#' @family array utilities
+row_vars <- function(x) {
+  check_not_null(x)
+  L <- length(dim(x))
+  if (L != 2) stop("<x> must be 2-dimensional")
+  apply(x, 1, stats::var)
+}
+
+#' Normalize matrix or data frame rows so that they sum to 1
+#'
+#' @param x an array of size \code{n} x \code{m}
+#' @return an array of size \code{n} x \code{m}
+#' @family array utilities
+normalize_rows <- function(x) {
+  s <- rowSums(x)
+  x / s
+}
+
 #' Select named row of an array
 #'
 #' @param x an array of shape \code{n} x \code{m}
@@ -217,6 +239,23 @@ array_to_arraylist <- function(x, L, draws) {
     out[[k]] <- ensure_2dim(x[draws, inds])
   }
   return(out)
+}
+
+#' Add the sum of all arrays in a list to the list
+#'
+#' @param x  a list of arrays of shape \code{n} x \code{m}, with
+#' length \code{L}
+#' @return a list of arrays of shape \code{n} x \code{m},
+#' with length \code{L + 1}
+add_sum_arraylist <- function(x) {
+  L <- length(x)
+  if (L == 0) stop("list has length 0!")
+  s <- x[[1]]
+  for (j in 2:L) {
+    s <- s + x[[j]]
+  }
+  x[[L + 1]] <- s
+  return(x)
 }
 
 #' Return NULL if vector contains only NaN values

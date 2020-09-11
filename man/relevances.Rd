@@ -2,15 +2,12 @@
 % Please edit documentation in R/relevances.R
 \name{relevances}
 \alias{relevances}
-\alias{relevances.f_sampled}
-\alias{relevances.f_marginalized}
+\alias{relevances.default}
 \title{Assess component relevances}
 \usage{
 relevances(fit)
 
-relevances.f_sampled(fit)
-
-relevances.f_marginalized(fit)
+relevances.default(fit)
 }
 \arguments{
 \item{fit}{an object of class \code{lgpfit}}
@@ -18,9 +15,6 @@ relevances.f_marginalized(fit)
 \description{
 \itemize{
   \item \code{relevances} assesses covariate relevances
-  \item \code{relevances.f_marginalized} assesses covariate relevances for a
-  model where the latent function \code{f} was not sampled
-  \item \code{relevances.f_sampled} assesses covariate relevances for a
-  model where the latent function \code{f} was sampled
+  \item \code{relevances.default} is the only currently implemented method
 }
 }

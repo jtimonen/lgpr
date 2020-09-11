@@ -231,7 +231,8 @@ get_f <- function(fit, draws = NULL) {
     std <- alist[(R + 1):(2 * R)] # stds
     f_out <- zip_lists(mean, std)
   } else {
-    f_out <- array_to_arraylist(fp, R, draws)
+    f_out <- array_to_arraylist(fp, D, draws)
+    f_out <- add_sum_arraylist(f_out)
   }
   names(f_out) <- all_names
 
@@ -288,4 +289,58 @@ scale_f_helper <- function(fun, arr) {
   a <- as.numeric(t(arr))
   a <- fun(a)
   matrix(a, DIM[1], DIM[2], byrow = TRUE)
+}
+
+#' Extract modeled signal or its components
+#'
+#' @description
+#' \itemize{
+#'   \item \code{get_f_total} gets total signal for each sample
+#'   \item \code{get_f_components} gets signal components for each sample
+#'   \item \code{get_g} gets total signal, mapped through
+#'   the inverse link function, for each sample
+#' }
+#' @param field Should be \code{"mean"}, \code{"std"}, or \code{NULL}.
+#' @inheritParams get_draws
+#' @return an array of shape \code{num_samples} x \code{num_obs} (or a list of
+#' them for \code{get_f_components})
+#' @name signal
+NULL
+
+#' @rdname signal
+get_f_total <- function(fit, field = "mean") {
+  f <- dollar(get_f(fit), "f")
+  f <- dollar(f, "total")
+  if (is_f_sampled(fit)) {
+    check_null(field, "f was sampled in this model")
+  } else {
+    allowed <- c("mean", "std")
+    check_allowed(field, allowed)
+    f <- dollar(f, field)
+  }
+  colnames(f) <- NULL
+  return(f)
+}
+
+#' @rdname signal
+get_f_components <- function(fit, field = "mean") {
+  f <- dollar(get_f(fit), "f")
+  f[["total"]] <- NULL
+  if (is_f_sampled(fit)) {
+    check_null(field, "f was sampled in this model")
+  } else {
+    allowed <- c("mean", "std")
+    check_allowed(field, allowed)
+    f <- lapply(f, "[[", field)
+  }
+  return(f)
+}
+
+#' @rdname signal
+get_g <- function(fit) {
+  flag <- is_f_sampled(fit)
+  field <- if (flag) NULL else "mean"
+  f <- get_f_total(fit, field)
+  likelihood <- get_obs_model(fit)
+  link_inv(f, likelihood)
 }

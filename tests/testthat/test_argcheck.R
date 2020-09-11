@@ -80,6 +80,13 @@ test_that("check_numeric works correctly", {
   expect_true(check_numeric(1))
 })
 
+test_that("check_null works correctly", {
+  a <- 123
+  msg <- "should be NULL! Reason: no reason"
+  expect_error(check_null(a, "no reason"), msg)
+  expect_true(check_null(NULL))
+})
+
 test_that("check_false works correctly", {
   a <- TRUE
   reason <- "to be FALSE"
