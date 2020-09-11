@@ -102,6 +102,6 @@ test_that("computing observed effect times from data works correctly", {
   dage <- c(-10, 0, 10, NaN, NaN, NaN)
   id <- as.factor(c(4, 4, 4, 6, 6, 6))
   x <- compute_teff_obs(id, age, dage)
-  expect_equal(names(a), c("4", "6"))
-  expect_equal(as.numeric(a), c(20, NaN))
+  expect_equal(names(x), c("4", "6"))
+  expect_equal(as.numeric(x), c(20, NaN))
 })
