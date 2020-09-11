@@ -1,4 +1,6 @@
 # lgpr
+[![codecov](https://codecov.io/gh/jtimonen/lgpr/branch/development/graph/badge.svg)](https://codecov.io/gh/jtimonen/lgpr)
+
 This repository contains the source code for the R-package **lgpr**. 
 
 ### Getting started
