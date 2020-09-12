@@ -4,10 +4,12 @@
 \alias{plot_fit_helper}
 \title{Helper function}
 \usage{
-plot_fit_helper(fit, draws)
+plot_fit_helper(fit, df_data, draws)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
+
+\item{df_data}{a data frame returned by \code{\link{create_plot_df}}}
 
 \item{draws}{see the \code{draws} argument of \code{\link{get_f}}}
 }

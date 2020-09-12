@@ -4,11 +4,16 @@
 \alias{create_plot_df}
 \title{Helper function for plots}
 \usage{
-create_plot_df(object)
+create_plot_df(object, x = "age", group_by = "id")
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
 \linkS4class{lgpfit}}
+
+\item{x}{x-axis variable name or a vector to be used as x-axis values}
+
+\item{group_by}{grouping variable name or a factor to be used for grouping
+the plot into panels}
 }
 \value{
 a data frame

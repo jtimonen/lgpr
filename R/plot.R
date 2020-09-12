@@ -365,9 +365,9 @@ plot_warp_helper <- function(par_summary,
 #' Helper function
 #'
 #' @inheritParams plot_fit
+#' @param df_data a data frame returned by \code{\link{create_plot_df}}
 #' @return a \code{ggplot object}
-plot_fit_helper <- function(fit, draws) {
-  df_data <- create_plot_df(fit)
+plot_fit_helper <- function(fit, df_data, draws) {
   df <- df_data[, 1:2]
 
   f_draws <- get_f(fit, draws)
@@ -398,7 +398,6 @@ plot_fit_helper <- function(fit, draws) {
 
   # Return
   list(
-    df_data = df_data,
     df_fit = df_fit,
     df_ribbon = df_ribbon,
     info = info,

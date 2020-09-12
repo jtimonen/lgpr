@@ -9,8 +9,6 @@
 #' @param prior_only Should this run in prior sampling mode,
 #' where likelihood is ignored?
 #' @param verbose Should more verbose output be printed?
-#' @param id_variable Name of the subject identifier variable.
-#' @param time_variable Name of the time variable.
 create_model <- function(formula,
                          data,
                          likelihood = "gaussian",
@@ -20,9 +18,7 @@ create_model <- function(formula,
                          options = NULL,
                          prior_only = FALSE,
                          verbose = FALSE,
-                         sample_f = !(likelihood == "gaussian"),
-                         id_variable = "id",
-                         time_variable = "age") {
+                         sample_f = !(likelihood == "gaussian")) {
 
   # Parse formula and options
   model_formula <- parse_formula(formula)
@@ -33,16 +29,6 @@ create_model <- function(formula,
   list_y <- dollar(parsed, "to_stan")
   y_scaling <- dollar(parsed, "scaling")
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y, sample_f)
-
-  # Parse id variable
-  id_values <- dollar(data, id_variable)
-  if (!is.factor(id_values)) stop("id_variable must be a factor!")
-  id_var <- list(name = id_variable, values = id_values)
-
-  # Parse time variable
-  time_values <- dollar(data, time_variable)
-  if (!is.numeric(time_values)) stop("time_variable must be numeric!")
-  time_var <- list(name = time_variable, values = time_values)
 
   # Parse covariates and components
   parsed <- parse_covs_and_comps(data, model_formula)
@@ -99,9 +85,7 @@ create_model <- function(formula,
     stan_input = stan_input,
     info = info,
     stan_model_name = "lgp",
-    full_prior = full_prior,
-    id_variable = id_var,
-    time_variable = time_var
+    full_prior = full_prior
   )
   return(out)
 }

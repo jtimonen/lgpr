@@ -5,6 +5,7 @@
 \alias{get_y}
 \alias{get_x_cat}
 \alias{get_x_cont}
+\alias{get_covariate}
 \title{Functions that access original data stored in a model object}
 \usage{
 get_y(object, original = TRUE)
@@ -12,6 +13,8 @@ get_y(object, original = TRUE)
 get_x_cat(object)
 
 get_x_cont(object, original = TRUE, mask_with = NaN)
+
+get_covariate(object, name)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
@@ -21,6 +24,8 @@ get_x_cont(object, original = TRUE, mask_with = NaN)
 
 \item{mask_with}{value to use to mask the originally missing
 values in the data}
+
+\item{name}{covariate name}
 }
 \value{
 \itemize{
@@ -30,6 +35,7 @@ values in the data}
   \item \code{get_x_cont} gets the continuous covariate matrix (with
   variables on original scale and \code{NaN}s in their original locations
   if \code{original} is \code{TRUE})
+  \item \code{get_covariate} gets a single covariate
 }
 }
 \description{

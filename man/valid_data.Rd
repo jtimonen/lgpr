@@ -9,6 +9,8 @@
 validate_data(data, id_name = "id")
 
 validate_factor(x, id, name)
+
+validate_data(data, id_name = "id")
 }
 \arguments{
 \item{data}{a data frame}

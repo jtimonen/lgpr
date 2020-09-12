@@ -37,10 +37,6 @@ An S4 class to represent an lgp model
 \item{\code{stan_model_name}}{Name of Stan model.}
 
 \item{\code{full_prior}}{Complete prior information.}
-
-\item{\code{id_variable}}{a named list with fields \code{name} and \code{values}}
-
-\item{\code{time_variable}}{a named list with fields \code{name} and \code{values}}
 }}
 
 \seealso{

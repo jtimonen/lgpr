@@ -39,14 +39,9 @@ model_summary_brief <- function(object) {
   stan_list <- get_stan_input(object)
   str1 <- as.character(model@model_formula)
   str2 <- likelihood_as_str(stan_list$obs_model)
-  num_indiv <- length(levels(model@id_variable$values))
-  str3 <- paste0(model@id_variable$name, ", ", num_indiv, " levels")
-  str4 <- model@time_variable$name
   line1 <- paste0("Formula: ", str1)
   line2 <- paste0("Likelihood: ", str2)
-  line3 <- paste0("ID variable: ", str3)
-  line4 <- paste0("Time variable: ", str4)
-  out <- paste0(line1, "\n", line2, "\n", line3, "\n", line4, "\n")
+  out <- paste0(line1, "\n", line2, "\n")
   return(out)
 }
 
@@ -79,15 +74,39 @@ prior_summary <- function(object, digits = 3) {
 #'
 #' @export
 #' @inheritParams object_to_model
+#' @param x x-axis variable name or a vector to be used as x-axis values
+#' @param group_by grouping variable name or a factor to be used for grouping
+#' the plot into panels
 #' @return a data frame
-create_plot_df <- function(object) {
-  model <- object_to_model(object)
-  id_var <- model@id_variable
-  time_var <- model@time_variable
-  y <- as.numeric(get_y(model))
-  y_name <- get_y_name(model)
-  df <- data.frame(id_var$values, time_var$values, y)
-  colnames(df) <- c(id_var$name, time_var$name, y_name)
+create_plot_df <- function(object, x = "age", group_by = "id") {
+  num_obs <- get_num_obs(object)
+
+  # Get the x-axis variable
+  if (is.character(x)) {
+    x_name <- x
+    x <- get_covariate(object, x)
+    check_type(x, "numeric")
+  } else {
+    x_name <- deparse(substitute(x))
+    check_type(x, "numeric")
+    check_length(x, num_obs)
+  }
+
+  # Get the grouping factor
+  if (is.character(group_by)) {
+    g_name <- group_by
+    group_by <- get_covariate(object, group_by)
+    check_type(group_by, "factor")
+  } else {
+    g_name <- deparse(substitute(group_by))
+    check_type(group_by, "factor")
+    check_length(group_by, num_obs)
+  }
+
+  y <- as.numeric(get_y(object))
+  y_name <- get_y_name(object)
+  df <- data.frame(group_by, x, y)
+  colnames(df) <- c(g_name, x_name, y_name)
   return(df)
 }
 
@@ -266,6 +285,7 @@ get_covariate_info_cat <- function(object) {
 #'   \item \code{get_x_cont} gets the continuous covariate matrix (with
 #'   variables on original scale and \code{NaN}s in their original locations
 #'   if \code{original} is \code{TRUE})
+#'   \item \code{get_covariate} gets a single covariate
 #' }
 #' @family lgpmodel accessors
 NULL
@@ -305,6 +325,22 @@ get_x_cont <- function(object, original = TRUE, mask_with = NaN) {
     }
   }
   return(out)
+}
+
+#' @rdname data_getters
+#' @param name covariate name
+get_covariate <- function(object, name) {
+  x_cat <- get_x_cat(object)
+  x_cont <- get_x_cont(object, original = TRUE, mask_with = NaN)
+  if (name %in% rownames(x_cat)) {
+    x <- select_row(x_cat, name)
+    return(as.factor(x))
+  } else if (name %in% rownames(x_cont)) {
+    x <- select_row(x_cont, name)
+    return(as.numeric(x))
+  } else {
+    stop("covariate not found!")
+  }
 }
 
 #' Get observed disease effect times

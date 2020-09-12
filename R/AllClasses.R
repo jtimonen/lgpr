@@ -152,8 +152,6 @@ lgpscaling <- setClass("lgpscaling",
 #' @slot info Other info in text format.
 #' @slot stan_model_name Name of Stan model.
 #' @slot full_prior Complete prior information.
-#' @slot id_variable a named list with fields \code{name} and \code{values}
-#' @slot time_variable a named list with fields \code{name} and \code{values}
 #' @seealso
 #' \code{\link{model_getters}}
 lgpmodel <- setClass("lgpmodel",
@@ -165,9 +163,7 @@ lgpmodel <- setClass("lgpmodel",
     var_info = "list",
     info = "list",
     stan_model_name = "character",
-    full_prior = "list",
-    id_variable = "list",
-    time_variable = "list"
+    full_prior = "list"
   )
 )
 

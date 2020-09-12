@@ -93,6 +93,11 @@ test_that("print_stan_input prints output", {
   expect_output(print_stan_input(model))
 })
 
+test_that("create_plot_df works correctly", {
+  df <- create_plot_df(model)
+  expect_equal(names(df), c("id", "age", "y"))
+})
+
 
 # -------------------------------------------------------------------------
 
@@ -146,7 +151,7 @@ data$y <- data$y + 5
 
 test_that("model fit can be visualized with data on original scale", {
   suppressWarnings({
-    fit <- lgp(y ~ gp(age) + zerosum(z) * gp(age) + gp_warp_vm(diseaseAge),
+    fit <- lgp(y ~ gp(age) + zerosum(id) + gp_warp_vm(diseaseAge),
       data = data, chains = 1, iter = 300, refresh = 0
     )
     p1 <- plot_fit(fit)

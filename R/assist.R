@@ -42,6 +42,21 @@ validate_factor <- function(x, id, name) {
   TRUE
 }
 
+#' @export
+#' @rdname valid_data
+validate_data <- function(data, id_name = "id") {
+  id <- dollar(data, id_name)
+  check_type(id, "factor")
+  D <- dim(data)[2]
+  for (j in seq_len(D)) {
+    x <- data[, j]
+    if (is.factor(x)) {
+      nam <- names(data)[j]
+      validate_factor(x, id, nam)
+    }
+  }
+  TRUE
+}
 
 #' Easily add a categorical covariate to a data frame
 #'

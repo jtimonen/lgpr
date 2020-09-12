@@ -37,14 +37,16 @@ setMethod(
 #' @export
 #' @description Creates plots where each observation unit has a separate panel.
 #' @inheritParams get_draws
+#' @inheritParams create_plot_df
 #' @param draws see the \code{draws} argument of \code{\link{get_f}}
 #' @param ... keyword arguments to \code{\link{plot_panel}}
 #' @return a \code{ggplot object}
 #' @family model fit visualization functions
-plot_fit <- function(fit, draws = NULL, ...) {
-  DF <- plot_fit_helper(fit, draws)
+plot_fit <- function(fit, x = "age", group_by = "id", draws = NULL, ...) {
+  df_data <- create_plot_df(fit, x, group_by)
+  DF <- plot_fit_helper(fit, df_data, draws)
   h <- plot_panel(
-    df_data = dollar(DF, "df_data"),
+    df_data = df_data,
     df_fit =  dollar(DF, "df_fit"),
     df_ribbon = dollar(DF, "df_ribbon"),
     fit_alpha = dollar(DF, "fit_alpha"),
