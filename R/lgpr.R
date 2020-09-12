@@ -54,7 +54,7 @@
 #'
 NULL
 
-#' Main functions of the `lgpr` package
+#' Main functions of the package
 #'
 #' @export
 #' @description

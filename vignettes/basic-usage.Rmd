@@ -11,12 +11,6 @@ vignette: >
     %\VignetteEncoding{UTF-8}
 ---
 
-```{css, echo=FALSE}
-a:hover { color: #4ca5ff; }
-a { color: #0065cc; }
-body { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif; }
-```
-
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#")
 knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
@@ -24,7 +18,7 @@ knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 
 This vignette demonstrates how to model a longitudinal data set and perform covariate selection using the `lgp` function of the `lgpr` package. In the example cases, the number of data points is small enough so that the experiments can be run in just a few seconds.
 
-```{r load, message=FALSE}
+```{r load}
 require("lgpr")
 set.seed(123)
 ```

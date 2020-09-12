@@ -9,8 +9,8 @@
 have to be numeric.
 * Easier prior specification with `normal()`, `log_normal()`, `student_t()` etc.
 * Beta binomial observation model.
-* Prior and posterior predictive checks using `ppc()`, interfacing to
-  `bayesplot`.
+* Prior and posterior predictive checks using`ppc()`, which interfaces to
+  [bayesplot](http://mc-stan.org/bayesplot/).
 * Covariate relevance assessment is now separated from model fitting.
 functionality into the `relevances()` function.
 * More general visualization options with `plot_data()` and`plot_panel()`.

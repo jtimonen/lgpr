@@ -1,40 +1,69 @@
 template:
   params:
-    bootswatch: sandstone
-  
+    bootswatch: lumen
+
 reference:
-
 - title: "Main"
-  desc: "Creating and fitting a model"
 - contents: 
   - lgp
   - create_model
   - sample_model
   - optimize_model
-
-- title: "Model"
-  desc: "Specifying a model"
-- contents: 
-  - lgp
-  - create_model
-  - sample_model
-  - optimize_model
+  - uniform
+  - normal
+  - student_t
+  - log_normal
+  - gam
+  - igam
+  - bet
+  - fit_summary
+  - relevances
+  - ppc
+  - plot_data
+  - plot_draws
+  - plot_fit
+  - get_f
   
-- title: "Postprocessing"
-  desc: "Studying a fitted model"
-- contents:
-    - relevances
-    - ppc
-    - predict
-    - plot_fit
-
-- title: "Simulation"
-  desc: "Generating artificial data"
-- contents:
-  - simulate
+  - model_summary
+  - add_factor
+  - add_dis_age
+  - adjusted_c_hat
+  - simulate_data
   - sim_plot
+  
+- title: "Data"
+- contents:
+  - testdata_001
 
-- title: "Other"
-  desc: "Full documentation"
+- title: "Full documentation"
+  desc: ~
 - contents:
   - starts_with("")
+  
+development:
+  mode: auto
+  version_label: info
+  version_tooltip: "Development version"
+
+navbar:
+  structure:
+    left:  [home, reference, articles, news]
+    
+  components:
+    articles:
+      text: Tutorials
+      menu:
+      - text: Basic usage
+        href: articles/basic-usage.html
+      - text: Priors
+        href: articles/prior-specifications.html
+      - text: Vignettes
+        href: articles/index.html
+    reference:
+      text: Documentation
+      href: reference/index.html
+    news:
+      text: News
+      href: news/index.html
+    github: ~ 
+

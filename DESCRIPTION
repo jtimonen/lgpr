@@ -42,3 +42,5 @@ Suggests:
     testthat,
     covr
 VignetteBuilder: knitr
+URL: https://github.com/jtimonen/lgpr
+BugReports: https://github.com/jtimonen/lgpr/issues

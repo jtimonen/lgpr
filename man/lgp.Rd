@@ -4,7 +4,7 @@
 \alias{lgp}
 \alias{sample_model}
 \alias{optimize_model}
-\title{Main functions of the `lgpr` package}
+\title{Main functions of the package}
 \usage{
 lgp(
   formula,
