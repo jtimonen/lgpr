@@ -9,3 +9,7 @@ tests/testthat/stan_files/.*\.cc$
 tests/testthat/stan_files/.*\.hpp$
 ^\.github$
 ^CONTRIBUTING\.md$
+^NEWS\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

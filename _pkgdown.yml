@@ -1,0 +1,40 @@
+template:
+  params:
+    bootswatch: sandstone
+  
+reference:
+
+- title: "Main"
+  desc: "Creating and fitting a model"
+- contents: 
+  - lgp
+  - create_model
+  - sample_model
+  - optimize_model
+
+- title: "Model"
+  desc: "Specifying a model"
+- contents: 
+  - lgp
+  - create_model
+  - sample_model
+  - optimize_model
+  
+- title: "Postprocessing"
+  desc: "Studying a fitted model"
+- contents:
+    - relevances
+    - ppc
+    - predict
+    - plot_fit
+
+- title: "Simulation"
+  desc: "Generating artificial data"
+- contents:
+  - simulate
+  - sim_plot
+
+- title: "Other"
+  desc: "Full documentation"
+- contents:
+  - starts_with("")

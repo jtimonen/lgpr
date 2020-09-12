@@ -1,13 +1,11 @@
 # lgpr
-[![codecov](https://codecov.io/gh/jtimonen/lgpr/branch/development/graph/badge.svg)](https://codecov.io/gh/jtimonen/lgpr)
+[![coverage](https://codecov.io/gh/jtimonen/lgpr/branch/development/graph/badge.svg)](https://codecov.io/gh/jtimonen/lgpr)
+[![static release](https://zenodo.org/badge/DOI/10.5281/zenodo.3632542.svg)](https://doi.org/10.5281/zenodo.3632542)
 
-This repository contains the source code for the R-package **lgpr**. 
+R package for longitudinal additive Gaussian process regression. 
 
 ### Getting started
 See tutorials, installation instructions and documentation [here](https://jtimonen.github.io/lgpr-usage/index.html).
-
-### Static release
-v0.33.0: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3632542.svg)](https://doi.org/10.5281/zenodo.3632542)
 
 ### Citation
 Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki (2019). *An interpretable probabilistic
