@@ -96,6 +96,14 @@ test_that("print_stan_input prints output", {
 test_that("create_plot_df works correctly", {
   df <- create_plot_df(model)
   expect_equal(names(df), c("id", "age", "y"))
+  a <- c(1,2,3)
+  b <- seq(1, 24, by = 1)
+  expect_error(create_plot_df(model, x = a), "length should be")
+  reason <- "group_by has invalid type 'numeric'. Allowed types are"
+  expect_error(create_plot_df(model, x = b, group_by = b), reason)
+  ID <- as.factor(paste0("M", rep(c(1:4), each = 6)))
+  df <- create_plot_df(model, x = b, group_by = ID)
+  expect_equal(names(df), c("ID", "b", "y"))
 })
 
 
@@ -110,7 +118,7 @@ test_that("simulated data can be plotted", {
     t_data = seq(6, 36, by = 6),
     covariates = c(1, 2)
   )
-  p <- sim_plot(dat, i_test = c(1, 2, 3), ncol = 4)
+  p <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4)
   expect_s3_class(p, "ggplot")
 })
 
@@ -121,7 +129,7 @@ test_that("simulated data with disease effect can be plotted", {
     covariates = c(0, 2),
     t_observed = "after_1"
   )
-  p <- sim_plot(dat, i_test = c(1, 2, 3), ncol = 4)
+  p <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4)
   expect_s3_class(p, "ggplot")
 })
 

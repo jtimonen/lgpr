@@ -53,7 +53,6 @@ a \code{ggplot} object or list of them
 }
 \seealso{
 Other model fit visualization functions: 
-\code{\link{plot,lgpfit,missing-method}},
 \code{\link{plot_fit}()}
 }
 \concept{model fit visualization functions}

@@ -38,5 +38,5 @@ formalism
 }}
 
 \seealso{
-For plotting, see \code{\link{sim_plot}}.
+For visualizing, see \code{\link{plot_sim}}.
 }

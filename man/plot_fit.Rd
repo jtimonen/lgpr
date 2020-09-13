@@ -26,7 +26,6 @@ Creates plots where each observation unit has a separate panel.
 }
 \seealso{
 Other model fit visualization functions: 
-\code{\link{plot,lgpfit,missing-method}},
 \code{\link{plot_draws}()}
 }
 \concept{model fit visualization functions}

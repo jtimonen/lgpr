@@ -207,7 +207,7 @@ lgpfit <- setClass("lgpfit",
 #'   \item \code{observed} possible observed effect times
 #' }
 #' @seealso
-#' For plotting, see \code{\link{sim_plot}}.
+#' For visualizing, see \code{\link{plot_sim}}.
 lgpsim <- setClass("lgpsim",
   representation = representation(
     data = "data.frame",

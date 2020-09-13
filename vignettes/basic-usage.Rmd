@@ -40,7 +40,7 @@ sim
 ```
 
 ```{r plot_sim, fig.width=6.6, fig.height=4.7}
-sim_plot(sim)
+plot_sim(sim)
 ```
 
 ```{r components, fig.width=6.6, fig.height=5}

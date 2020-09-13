@@ -17,21 +17,6 @@ ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
   bayesplot::pp_check(y, y_rep, fun, ...)
 }
 
-#' Visualize parameter draws
-#'
-#' @param x an object of class \linkS4class{lgpfit}
-#' @param y not used
-#' @param ... keyword arguments passed to \code{\link{plot_draws}}
-#' @return a \code{ggplot} object
-#' @family model fit visualization functions
-setMethod(
-  f = "plot",
-  signature = signature(x = "lgpfit", y = "missing"),
-  definition = function(x, ...) {
-    plot_draws(x, ...)
-  }
-)
-
 #' Visualize a model fit against longitudinal data set
 #'
 #' @export
