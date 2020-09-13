@@ -121,3 +121,27 @@ optimize_model <- function(model, ...) {
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
 }
+
+#' Set the GP mean vector, taking TMM or other normalization
+#' into account
+#'
+#' @export
+#' @description Creates the \code{c_hat} input for \code{lgp},
+#' so that it accounts for normalization between data points in the
+#' \code{"poisson"} or \code{"nb"} observation model
+#' @param y response variable, vector of length \code{n}
+#' @param norm_factors normalization factors, vector of length \code{n}
+#' @return a vector of length \code{n}, which can be used as
+#' the \code{c_hat} input to the \code{lgp} function
+adjusted_c_hat <- function(y, norm_factors) {
+  L1 <- length(norm_factors)
+  L2 <- length(y)
+  if (L1 != L2) stop("inputs must have same length!")
+  if (sum(y < 0) > 0) stop("y cannot have negative values!")
+  if (sum(round(y) != y) > 0) stop("y must have only integer values!")
+  if (sum(norm_factors <= 0) > 0) stop("norm_factors must be all positive!")
+  c_hat <- log(mean(y))
+  c_hat <- rep(c_hat, length(y))
+  c_hat <- c_hat + log(norm_factors)
+  return(c_hat)
+}

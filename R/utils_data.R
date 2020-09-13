@@ -1,63 +1,3 @@
-#' Validate data array
-#'
-#' @param data a data frame
-#' @param id_name name of the id variable
-#' @return a data frame
-#' @name valid_data
-NULL
-
-#' @export
-#' @rdname valid_data
-validate_data <- function(data, id_name = "id") {
-  id <- dollar(data, id_name)
-  check_type(id, "factor")
-  D <- dim(data)[2]
-  for (j in seq_len(D)) {
-    x <- data[, j]
-    if (is.factor(x)) {
-      nam <- names(data)[j]
-      validate_factor(x, id, nam)
-    }
-  }
-  TRUE
-}
-
-#' @rdname valid_data
-#' @param x a factor
-#' @param id the id factor
-#' @param name factor name
-validate_factor <- function(x, id, name) {
-  check_type(x, "factor")
-  check_type(id, "factor")
-  check_lengths(x, id)
-  for (lev in levels(id)) {
-    inds <- which(id == lev)
-    nu <- length(unique(x[inds]))
-    msg <- paste0(
-      "measurements corresponding to <id> level ", lev, " do not",
-      " all have the same level for factor '", name, "'!"
-    )
-    if (nu > 1) stop(msg)
-  }
-  TRUE
-}
-
-#' @export
-#' @rdname valid_data
-validate_data <- function(data, id_name = "id") {
-  id <- dollar(data, id_name)
-  check_type(id, "factor")
-  D <- dim(data)[2]
-  for (j in seq_len(D)) {
-    x <- data[, j]
-    if (is.factor(x)) {
-      nam <- names(data)[j]
-      validate_factor(x, id, nam)
-    }
-  }
-  TRUE
-}
-
 #' Easily add a categorical covariate to a data frame
 #'
 #' @export
@@ -67,7 +7,7 @@ validate_data <- function(data, id_name = "id") {
 #' @param id_var name of the id variable in \code{data}
 #' @return A data frame with one column added. The new column will
 #' have same name as the variable passed as input \code{x}.
-#' @family user assist functions
+#' @family data utilities
 add_factor <- function(data, x, id_var = "id") {
   check_type(data, "data.frame")
   name <- deparse(substitute(x))
@@ -101,7 +41,7 @@ add_factor <- function(data, x, id_var = "id") {
 #' @param time_var name of the time variable in \code{data}
 #' @return A data frame with one column added. The new column will
 #' be called \code{dis_age}. For controls, its value will be \code{NaN}.
-#' @family user assist functions
+#' @family data utilities
 add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
   check_type(data, "data.frame")
   bad <- "dis_age" %in% colnames(data)
@@ -122,28 +62,50 @@ add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
   return(data)
 }
 
-#' Create the GP mean vector
+#' Validate data array
 #'
+#' @param data a data frame
+#' @param id_name name of the id variable
+#' @return a data frame
+#' @name valid_data
+#' @family data utilities
+NULL
+
 #' @export
-#' @description Creates the \code{c_hat} input for \code{lgp},
-#' so that it accounts for normalization between data points in the
-#' Poisson or NB observation model
-#' @param y response variable, vector of length \code{n}
-#' @param norm_factors normalization factors, vector of length \code{n}
-#' @return a vector of length \code{n}, which can be used as
-#' the \code{c_hat} input to the \code{lgp} function
-#' @family user assist functions
-adjusted_c_hat <- function(y, norm_factors) {
-  L1 <- length(norm_factors)
-  L2 <- length(y)
-  if (L1 != L2) stop("inputs must have same length!")
-  if (sum(y < 0) > 0) stop("y cannot have negative values!")
-  if (sum(round(y) != y) > 0) stop("y must have only integer values!")
-  if (sum(norm_factors <= 0) > 0) stop("norm_factors must be all positive!")
-  c_hat <- log(mean(y))
-  c_hat <- rep(c_hat, length(y))
-  c_hat <- c_hat + log(norm_factors)
-  return(c_hat)
+#' @rdname valid_data
+validate_data <- function(data, id_name = "id") {
+  check_type(data, "data.frame")
+  id <- dollar(data, id_name)
+  check_type(id, "factor")
+  D <- dim(data)[2]
+  for (j in seq_len(D)) {
+    x <- data[, j]
+    if (is.factor(x)) {
+      nam <- names(data)[j]
+      validate_factor(x, id, nam)
+    }
+  }
+  TRUE
+}
+
+#' @rdname valid_data
+#' @param x a factor
+#' @param id the id factor
+#' @param name factor name
+validate_factor <- function(x, id, name) {
+  check_type(x, "factor")
+  check_type(id, "factor")
+  check_lengths(x, id)
+  for (lev in levels(id)) {
+    inds <- which(id == lev)
+    nu <- length(unique(x[inds]))
+    msg <- paste0(
+      "measurements corresponding to <id> level ", lev, " do not",
+      " all have the same level for factor '", name, "'!"
+    )
+    if (nu > 1) stop(msg)
+  }
+  TRUE
 }
 
 
@@ -164,7 +126,7 @@ adjusted_c_hat <- function(y, norm_factors) {
 #' }
 #' @return a named list with names \code{train}, \code{test}, \code{i_train}
 #' and \code{i_test}
-#' @family user assist functions
+#' @family data utilities
 NULL
 
 #' @export
@@ -244,4 +206,104 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
     i_train = i_train,
     i_test = i_test
   )
+}
+
+#' Create prediction points
+#' 
+#' @description Replaces a continuous variable \code{x} in the data frame, and
+#' possibly another continuous variable \code{x_ns} derived from it, with new
+#' values, for each level of a grouping factor (usually id)
+#' @export
+#' @param data a data frame
+#' @param group_by name of the grouping varible, must be a factor
+#' in \code{data}
+#' @param x of the variable along which to extend,
+#' must be a numeric in \code{data}
+#' @param x_ns of a nonstationary variable derived from \code{x},
+#' must be a numeric in \code{data}
+#' @param x_values the values of \code{x} to set for each individual
+#' @return a data frame containing the following columns
+#' \itemize{
+#'  \item all factors in the original \code{data}
+#'  \item \code{x}
+#'  \item \code{x_ns} (unless it is NULL)
+#' }
+#' 
+#' @family data utilities
+new_data <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
+  check_type(data, "data.frame")
+  check_not_null(group_by)
+  check_not_null(x)
+  check_not_null(x_values)
+  check_in_data(group_by, data)
+  check_in_data(x, data)
+  df <- pick_one_row_each(data, group_by)
+  k <- length(x_values)
+  col_names <- if (is.null(x_ns)) x else c(x, x_ns)
+  df <- select_factors_and(df, col_names)
+  N <- nrow(df)
+  inds <- rep(seq_len(N), each = k)
+  df <- df[inds, ]
+  x_val_rep <- rep(x_values, times = N)
+  df[[x]] <- x_val_rep
+  if (!is.null(x_ns)) {
+    t0 <- get_teff_obs(data, group_by, x, x_ns)
+    t0 <- as.numeric(t0)
+    df[[x_ns]] <- x_val_rep - rep(t0, each = k)
+  }
+  rownames(df) <- NULL
+  return(df)
+}
+
+#' Get observed effect times from a data frame
+#'
+#' @export
+#' @inheritParams new_data
+#' @return a named vector, where the names are the levels of \code{group_by}
+#' @family data utilities
+get_teff_obs <- function(data, group_by = "id", x = "age", x_ns = "diseaseAge") {
+  check_type(data, "data.frame")
+  df <- pick_one_row_each(data, "id")
+  times <- dollar(df, x) - dollar(df, x_ns)
+  names(times) <- dollar(df, group_by)
+  return(times)
+}
+
+#' For each unique value of a factor, pick one row from data
+#'
+#' @param data a data frame
+#' @param fac name of a factor in \code{data}
+#' @return a data frame
+#' @family data utilities
+pick_one_row_each <- function(data, fac) {
+  check_type(data, "data.frame")
+  z <- dollar(data, fac)
+  check_type(z, "factor")
+  rows <- c()
+  for (lev in levels(z)) {
+    inds <- which(z == lev)
+    rows <- c(rows, inds[1])
+  }
+  data[rows, ]
+}
+
+#' Select data columns which are factors or have a certain name
+#'
+#' @param data a data frame
+#' @param valid names of variables that do not need to be factors
+#' @return a data frame
+#' @family data utilities
+select_factors_and <- function(data, valid) {
+  check_type(data, "data.frame")
+  col_inds <- c()
+  D <- ncol(data)
+  nams <- names(data)
+  for (j in seq_len(D)) {
+    a <- is.factor(data[, j])
+    b <- nams[j] %in% valid
+    if (a || b) {
+      col_inds <- c(col_inds, j)
+    }
+  }
+  data[, col_inds]
 }

@@ -13,10 +13,10 @@ dollar <- function(object, var_name) {
   if (!(var_name %in% nams)) {
     valid <- paste(nams, collapse = ", ")
     msg <- paste0(
-      "Element with name '", var_name,
+      "Variable with name '", var_name,
       "' not found in <", obj_name, ">!"
     )
-    msg <- paste0(msg, " Found elements: {", valid, "}")
+    msg <- paste0(msg, " Found: {", valid, "}")
     stop(msg)
   }
   object[[var_name, exact = TRUE]]
@@ -322,26 +322,6 @@ object_to_model <- function(object) {
     out <- object
   }
   return(out)
-}
-
-#' Compute observed effect times using other variables
-#'
-#' @param id id variable, a factor
-#' @param age age variable on original scale, a vector
-#' @param dis_age disease-related age variable on original scale,
-#' a vector
-#' @return a named vector with length equal to number of levels in id
-compute_teff_obs <- function(id, age, dis_age) {
-  check_type(id, "factor")
-  teff <- c()
-  for (val in levels(id)) {
-    suitability <- as.numeric(id == val) + as.numeric(dis_age == 0)
-    i0 <- which(suitability == 2)
-    t0 <- if (length(i0) > 0) age[i0[1]] else NaN
-    teff <- c(teff, t0)
-  }
-  names(teff) <- levels(id)
-  return(teff)
 }
 
 #' Integer encoding of likelihod function names

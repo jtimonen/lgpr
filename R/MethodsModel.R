@@ -342,21 +342,3 @@ get_covariate <- function(object, name) {
     stop("covariate not found!")
   }
 }
-
-#' Get observed disease effect times
-#'
-#' @export
-#' @inheritParams object_to_model
-#' @param dra name of the disease-related age variable
-#' @return a named vector, where the names are individual IDs
-get_teff_obs <- function(object, dra = "diseaseAge") {
-  model <- object_to_model(object)
-  df_data <- create_plot_df(model)
-  ns_names <- get_ns_covariates(model)
-  ok <- dra %in% ns_names
-  if (!ok) stop(dra, " is not a nonstationary covariate in the model!")
-  dis_ages <- select_row(get_x_cont(model), dra)
-  ids <- df_data[, 1]
-  ages <- df_data[, 2]
-  compute_teff_obs(ids, ages, dis_ages)
-}
