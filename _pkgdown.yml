@@ -23,8 +23,9 @@ reference:
   - plot_draws
   - plot_fit
   - get_f
-  
   - model_summary
+  
+  - new_data
   - add_factor
   - add_dis_age
   - adjusted_c_hat

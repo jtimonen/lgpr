@@ -11,7 +11,6 @@
 \alias{is_f_sampled}
 \alias{get_obs_model}
 \alias{get_y_name}
-\alias{get_ns_covariates}
 \alias{get_covariate_info_cont}
 \alias{get_covariate_info_cat}
 \title{Functions that access model properties}
@@ -33,8 +32,6 @@ is_f_sampled(object)
 get_obs_model(object)
 
 get_y_name(object)
-
-get_ns_covariates(object)
 
 get_covariate_info_cont(object)
 

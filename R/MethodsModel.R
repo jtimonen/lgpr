@@ -38,7 +38,7 @@ model_summary_brief <- function(object) {
   model <- object_to_model(object)
   stan_list <- get_stan_input(object)
   str1 <- as.character(model@model_formula)
-  str2 <- likelihood_as_str(stan_list$obs_model)
+  str2 <- likelihood_as_str(dollar(stan_list, "obs_model"))
   line1 <- paste0("Formula: ", str1)
   line2 <- paste0("Likelihood: ", str2)
   out <- paste0(line1, "\n", line2, "\n")
@@ -139,8 +139,8 @@ get_covariate_names <- function(object, type = "all") {
   model <- object_to_model(object)
   allowed <- c("continuous", "categorical", "all")
   idx <- check_allowed(arg = type, allowed = allowed)
-  nam1 <- model@var_names$x_cont
-  nam2 <- model@var_names$x_cat
+  nam1 <- dollar(model@var_names, "x_cont")
+  nam2 <- dollar(model@var_names, "x_cat")
   nam3 <- c(nam1, nam2)
   names <- list(nam1, nam2, nam3)
   out <- names[[idx]]
@@ -183,59 +183,46 @@ get_covariate_info <- function(object) {
 #' @export
 #' @rdname model_getters
 get_component_names <- function(object) {
-  comps <- get_stan_input(object)$components
+  comps <- dollar(get_stan_input(object), "components")
   rownames(comps)
 }
 
 #' @export
 #' @rdname model_getters
 get_num_obs <- function(object) {
-  get_stan_input(object)$num_obs
+  dollar(get_stan_input(object), "num_obs")
 }
 
 #' @export
 #' @rdname model_getters
 is_f_sampled <- function(object) {
-  val <- get_stan_input(object)$is_f_sampled
+  val <- dollar(get_stan_input(object), "is_f_sampled")
   as.logical(val)
 }
 
 #' @export
 #' @rdname model_getters
 get_obs_model <- function(object) {
-  lh <- get_stan_input(object)$obs_model
+  lh <- dollar(get_stan_input(object), "obs_model")
   likelihood_as_str(lh)
 }
 
 #' @rdname model_getters
 get_y_name <- function(object) {
   model <- object_to_model(object)
-  model@var_names$y
-}
-
-#' @rdname model_getters
-get_ns_covariates <- function(object) {
-  cinfo <- get_component_info(object)
-  x_cont <- get_stan_input(object)$x_cont
-  inds <- which(cinfo$ns == 1)
-  out <- NULL
-  for (idx in inds) {
-    icont <- as.numeric(cinfo$cont[idx])
-    name <- rownames(x_cont)[icont]
-    out <- c(out, name)
-  }
-  return(out)
+  dollar(model@var_names, "y")
 }
 
 #' @rdname model_getters
 get_covariate_info_cont <- function(object) {
   model <- object_to_model(object)
   vn <- model@var_names
-  nam <- vn$x_cont
+  nam <- dollar(vn, "x_cont")
   if (is.null(nam)) {
     return(NULL)
   }
-  num_nan <- rowSums(model@stan_input$x_cont_mask == 1)
+  mask <- dollar(model@stan_input, "x_cont_mask")
+  num_nan <- rowSums(mask == 1)
   df <- data.frame(nam, num_nan)
   colnames(df) <- c("Variable", "#Missing")
   rownames(df) <- seq_len(dim(df)[1])
@@ -246,12 +233,12 @@ get_covariate_info_cont <- function(object) {
 get_covariate_info_cat <- function(object) {
   model <- object_to_model(object)
   vn <- model@var_names
-  nam <- vn$x_cat
+  nam <- dollar(vn, "x_cat")
   if (is.null(nam)) {
     return(NULL)
   }
-  num_levels <- model@stan_input$x_cat_num_levels
-  levels <- model@var_info$x_cat_levels
+  num_levels <- dollar(model@stan_input, "x_cat_num_levels")
+  levels <- dollar(model@var_info, "x_cat_levels")
   level_names <- c()
   J <- length(nam)
   for (j in seq_len(J)) {
@@ -296,7 +283,7 @@ get_y <- function(object, original = TRUE) {
   is_gauss <- get_obs_model(model) == "gaussian"
   nam <- if (is_gauss) "y_cont" else "y_disc"
   y <- dollar(get_stan_input(model), nam)
-  scl <- model@var_scalings$y
+  scl <- dollar(model@var_scalings, "y")
   rescale <- original && is_gauss
   y <- if (rescale) scl@fun_inv(y) else y
   rownames(y) <- get_y_name(model)
