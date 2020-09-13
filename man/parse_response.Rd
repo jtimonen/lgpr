@@ -16,8 +16,7 @@ values.}
 
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-\code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.}
+binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 
 \item{model_formula}{An object of class \code{lgpformula}.}
 }

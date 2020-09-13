@@ -91,7 +91,7 @@ stan_data_covariates <- function(data, x_names) {
       X_NONAN[is_na] <- 0
       normalizer <- create_scaling(X_NONAN, name)
       x_cont_scalings[[num_cont]] <- normalizer
-      x_cont[[num_cont]] <- normalizer@fun(X_NONAN)
+      x_cont[[num_cont]] <- call_fun(normalizer@fun, X_NONAN)
       x_cont_unnorm[[num_cont]] <- X_NONAN
       x_cont_names[num_cont] <- name
     } else {

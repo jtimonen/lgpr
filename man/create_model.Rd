@@ -43,8 +43,7 @@ values.}
 
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-\code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.}
+binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 
 \item{prior}{A named list, defining the prior distribution of model
 (hyper)parameters.}
@@ -65,9 +64,9 @@ account for normalization between data points. With Gaussian likelihood
 though, do not modify this argument, normalize the data beforehand instead.}
 
 \item{num_trials}{This argument (number of trials) is only needed when
-likelihood is binomial. Must have length one or equal to number of data
-points. Setting \code{num_trials=1} corresponds to Bernoulli observation
-model.}
+likelihood is binomial or beta binomial. Must have length one or equal
+to number of data points. Setting \code{num_trials=1} and
+\code{likelihood="binomial"} corresponds to Bernoulli observation model.}
 
 \item{options}{A named list with the following possible fields:
 \itemize{

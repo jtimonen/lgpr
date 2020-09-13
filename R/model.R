@@ -264,8 +264,7 @@ map_caseid_to_row <- function(x_fac, map) {
 #' values.
 #' @param likelihood Determines the observation model. Must be either
 #' \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-#' binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-#' \code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.
+#' binomial), \code{"binomial"} or \code{"bb"} (beta binomial).
 #' @param model_formula An object of class \code{lgpformula}.
 #' @return a named list of parsed options
 parse_response <- function(data, likelihood, model_formula) {
@@ -292,7 +291,7 @@ parse_response <- function(data, likelihood, model_formula) {
   } else {
     normalizer <- create_scaling(Y_RAW, y_name) # create scaling and inverse
     y_disc <- array(Y_RAW, dim = c(0, num_obs))
-    Y_NORM <- normalizer@fun(Y_RAW) # standardize the response
+    Y_NORM <- call_fun(normalizer@fun, Y_RAW) # standardize the response
     y_cont <- array(Y_NORM, dim = c(1, num_obs))
   }
   to_stan <- list(
@@ -327,9 +326,9 @@ parse_response <- function(data, likelihood, model_formula) {
 #' account for normalization between data points. With Gaussian likelihood
 #' though, do not modify this argument, normalize the data beforehand instead.
 #' @param num_trials This argument (number of trials) is only needed when
-#' likelihood is binomial. Must have length one or equal to number of data
-#' points. Setting \code{num_trials=1} corresponds to Bernoulli observation
-#' model.
+#' likelihood is binomial or beta binomial. Must have length one or equal
+#' to number of data points. Setting \code{num_trials=1} and
+#' \code{likelihood="binomial"} corresponds to Bernoulli observation model.
 #' @param list_y a list field returned by \code{\link{parse_response}}
 #' @param sample_f Determines if the latent function values are be sampled
 #' (must be \code{TRUE} if likelihood is not \code{"gaussian"}).

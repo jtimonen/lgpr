@@ -44,7 +44,8 @@ test_that("common array utilities work correctly", {
   expect_error(squeeze_second_dim(a), "dimensions in <x> must be 3")
   b <- array(a, dim = c(2, 0, 3))
   expect_error(squeeze_second_dim(b), "Second dimension of <x> must be")
-  expect_error(array_to_arraylist(a, 2, c(1, 2, 3)), "must be a multiple of <L>")
+  reason <- "must be a multiple of <L>"
+  expect_error(array_to_arraylist(a, 2, c(1, 2, 3)), reason)
   expect_error(add_sum_arraylist(list()), "has length 0")
   x <- repvec(c(1, 2, 3), 4)
   expect_equal(reduce_rows(x), c(1, 2, 3))

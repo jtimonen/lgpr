@@ -19,7 +19,7 @@ the plot into panels}
 \item{...}{keyword arguments to \code{\link{plot_panel}}}
 }
 \value{
-a \code{ggplot object}
+a \code{ggplot} object
 }
 \description{
 Creates plots where each observation unit has a separate panel.

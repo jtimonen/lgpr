@@ -169,9 +169,8 @@ qinvgamma_stanlike <- function(p, alpha, beta) {
 #' Plot colors to use
 #'
 #' @export
-#' @description Plot commands which specify the \code{col} argument should
-#' mostly use colors that are obtained using this function.
-#' @param main Color name. Must be a valid \code{bayesplot} color name.
+#' @param main Color name. Must be a valid scheme name for
+#' \code{\link[bayesplot]{color_scheme_get}}.
 #' @param variant Must be one of {"light", "light_highlight", "mid",
 #' "mid_highlight", "dark", "dark_highlight"}.
 #' @return A hex value of the color.
@@ -229,6 +228,7 @@ plot_color_palette <- function(n) {
     axis.title = blank,
     axis.ticks = blank
   )
+  h <- h + ggplot2::theme(legend.position = "none")
   h <- h + ggplot2::ggtitle("Colors")
   return(h)
 }
@@ -243,4 +243,15 @@ plot_color_palette <- function(n) {
 line_alpha_fun <- function(num_lines) {
   alpha <- exp(-0.013 * num_lines)
   max(alpha, 0.01)
+}
+
+#' A linter-friendly way to call a function
+#'
+#' @description This exists just to allow calling a function which is a slot
+#' of an S4 object, without some linter warnings.
+#' @param fun a functionn which takes one argument
+#' @param arg the argument
+#' @return Literally just \code{fun(arg)}.
+call_fun <- function(fun, arg) {
+  fun(arg)
 }

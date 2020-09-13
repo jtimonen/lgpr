@@ -42,8 +42,8 @@ check_lgpformula <- function(object) {
 #' @rdname validate
 check_lgpscaling <- function(object) {
   a <- 1.2321
-  a_mapped <- object@fun(a)
-  b <- object@fun_inv(a_mapped)
+  a_mapped <- call_fun(object@fun, a)
+  b <- call_fun(object@fun_inv, a_mapped)
   diff <- abs(a - b)
   errors <- character()
   if (diff > 1e-6) {

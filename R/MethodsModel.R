@@ -285,7 +285,7 @@ get_y <- function(object, original = TRUE) {
   y <- dollar(get_stan_input(model), nam)
   scl <- dollar(model@var_scalings, "y")
   rescale <- original && is_gauss
-  y <- if (rescale) scl@fun_inv(y) else y
+  y <- if (rescale) call_fun(scl@fun_inv, y) else y
   rownames(y) <- get_y_name(model)
   return(y)
 }

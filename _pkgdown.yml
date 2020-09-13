@@ -30,7 +30,7 @@ reference:
   - add_dis_age
   - adjusted_c_hat
   - simulate_data
-  - sim_plot
+  - plot_sim
   
 - title: "Data"
 - contents:

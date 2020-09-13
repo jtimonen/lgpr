@@ -4,7 +4,7 @@
 #' @inheritParams get_draws
 #' @param data the original data frame
 #' @param fun \code{bayesplot} function name
-#' @param ... arguments passed to the default \code{pp_check} method in
+#' @param ... arguments passed to the default [bayesplot::pp_check()] method in
 #' \code{bayesplot}
 #' @return a \code{ggplot} object
 ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
@@ -25,7 +25,7 @@ ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
 #' @inheritParams create_plot_df
 #' @param draws see the \code{draws} argument of \code{\link{get_f}}
 #' @param ... keyword arguments to \code{\link{plot_panel}}
-#' @return a \code{ggplot object}
+#' @return a \code{ggplot} object
 #' @family model fit visualization functions
 plot_fit <- function(fit, x = "age", group_by = "id", draws = NULL, ...) {
   df_data <- create_plot_df(fit, x, group_by)
@@ -58,9 +58,11 @@ plot_fit <- function(fit, x = "age", group_by = "id", draws = NULL, ...) {
 #' @inheritParams get_draws
 #' @param type plot type
 #' @param regex_pars regex for parameter names to plot
-#' @param ... other arguments to bayesplot functions
+#' @param ... other arguments to \code{bayesplot} functions
 #' @return a \code{ggplot} object or list of them
 #' @name plot_draws
+#' @seealso See [bayesplot::mcmc_dens()], [bayesplot::mcmc_trace()],
+#' [bayesplot::mcmc_areas()] and [bayesplot::mcmc_intervals()].
 #' @family model fit visualization functions
 NULL
 
@@ -172,8 +174,8 @@ get_y_rng <- function(fit, original_scale = TRUE) {
   out <- get_draws(fit, pars = par_name)
   out <- squeeze_second_dim(out)
   if (obs_model == "gaussian" && original_scale) {
-    scl <- fit@model@var_scalings$y
-    out <- scl@fun_inv(out)
+    scl <- dollar(fit@model@var_scalings, "y")
+    out <- call_fun(scl@fun_inv, out)
   }
   colnames(out) <- NULL
   return(out)

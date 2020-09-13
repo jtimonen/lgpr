@@ -27,7 +27,7 @@ plot_effect_times(fit, type = "areas", ...)
 
 \item{regex_pars}{regex for parameter names to plot}
 
-\item{...}{other arguments to bayesplot functions}
+\item{...}{other arguments to \code{bayesplot} functions}
 
 \item{num_points}{number of plot points}
 
@@ -52,6 +52,9 @@ a \code{ggplot} object or list of them
 }
 }
 \seealso{
+See [bayesplot::mcmc_dens()], [bayesplot::mcmc_trace()],
+[bayesplot::mcmc_areas()] and [bayesplot::mcmc_intervals()].
+
 Other model fit visualization functions: 
 \code{\link{plot_fit}()}
 }

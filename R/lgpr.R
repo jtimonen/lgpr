@@ -65,10 +65,10 @@ NULL
 #'   \item The \code{\link{create_model}} function creates an object of class
 #'   \linkS4class{lgpmodel}.
 #'   \item The \code{sample_model} function takes an \linkS4class{lgpmodel}
-#'   object, fits the model using \code{rstan::sampling}, and returns an object
-#'   of class \linkS4class{lgpfit}.
+#'   object, fits the model using  \code{\link[rstan]{sampling}}, and
+#'   returns an object of class \linkS4class{lgpfit}.
 #'   \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
-#'   object and fits the model using \code{rstan::optimizing}.
+#'   object and fits the model using \code{\link[rstan]{optimizing}}.
 #' }
 #' @inheritParams create_model
 #' @inheritParams sample_model
@@ -100,9 +100,8 @@ lgp <- function(formula,
 #' @rdname lgp
 #' @export
 #' @param model An object of class \linkS4class{lgpmodel}.
-#' @param ... Optional arguments passed to \code{rstan::sampling}, for example
-#' \code{iter}, \code{chains} or \code{control}. See
-#' \code{\link[rstan]{sampling}} for the possible arguments.
+#' @param ... Optional arguments passed to
+#' \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.
 sample_model <- function(model, ...) {
   object <- stanmodels[[model@stan_model_name]]
   data <- model@stan_input
@@ -112,10 +111,6 @@ sample_model <- function(model, ...) {
 
 #' @rdname lgp
 #' @export
-#' @param model An object of class \linkS4class{lgpmodel}.
-#' @param ... Optional arguments passed to \code{rstan::optimizing}, such as
-#' \code{algorithm}. See \code{\link[rstan]{optimizing}} for the possible
-#' arguments.
 optimize_model <- function(model, ...) {
   object <- stanmodels[[model@stan_model_name]]
   data <- model@stan_input

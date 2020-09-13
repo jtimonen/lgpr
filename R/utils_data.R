@@ -261,7 +261,8 @@ new_data <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
 #' @inheritParams new_data
 #' @return a named vector, where the names are the levels of \code{group_by}
 #' @family data utilities
-get_teff_obs <- function(data, group_by = "id", x = "age", x_ns = "diseaseAge") {
+get_teff_obs <- function(data, group_by = "id", x = "age",
+                         x_ns = "diseaseAge") {
   check_type(data, "data.frame")
   df <- pick_one_row_each(data, "id")
   times <- dollar(df, x) - dollar(df, x_ns)

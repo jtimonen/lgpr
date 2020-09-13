@@ -13,7 +13,7 @@ ppc(fit, data, fun = bayesplot::ppc_dens_overlay, ...)
 
 \item{fun}{\code{bayesplot} function name}
 
-\item{...}{arguments passed to the default \code{pp_check} method in
+\item{...}{arguments passed to the default [bayesplot::pp_check()] method in
 \code{bayesplot}}
 }
 \value{

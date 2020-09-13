@@ -9,8 +9,7 @@ parse_likelihood(likelihood, c_hat, num_trials, list_y, sample_f)
 \arguments{
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-\code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.}
+binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 
 \item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
 a real number defining a constant GP mean. If \code{NULL}, this is set to
@@ -28,9 +27,9 @@ account for normalization between data points. With Gaussian likelihood
 though, do not modify this argument, normalize the data beforehand instead.}
 
 \item{num_trials}{This argument (number of trials) is only needed when
-likelihood is binomial. Must have length one or equal to number of data
-points. Setting \code{num_trials=1} corresponds to Bernoulli observation
-model.}
+likelihood is binomial or beta binomial. Must have length one or equal
+to number of data points. Setting \code{num_trials=1} and
+\code{likelihood="binomial"} corresponds to Bernoulli observation model.}
 
 \item{list_y}{a list field returned by \code{\link{parse_response}}}
 

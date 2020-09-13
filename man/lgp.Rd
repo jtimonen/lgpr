@@ -50,8 +50,7 @@ values.}
 
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
-binomial) or \code{"binomial"}. To use Bernoulli likelihood, use
-\code{likelihood="binomial"} and set \code{num_trials} as a vector of ones.}
+binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 
 \item{prior}{A named list, defining the prior distribution of model
 (hyper)parameters.}
@@ -72,9 +71,9 @@ account for normalization between data points. With Gaussian likelihood
 though, do not modify this argument, normalize the data beforehand instead.}
 
 \item{num_trials}{This argument (number of trials) is only needed when
-likelihood is binomial. Must have length one or equal to number of data
-points. Setting \code{num_trials=1} corresponds to Bernoulli observation
-model.}
+likelihood is binomial or beta binomial. Must have length one or equal
+to number of data points. Setting \code{num_trials=1} and
+\code{likelihood="binomial"} corresponds to Bernoulli observation model.}
 
 \item{options}{A named list with the following possible fields:
 \itemize{
@@ -92,9 +91,8 @@ where likelihood is ignored?}
 \item{sample_f}{Determines if the latent function values are be sampled
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}).}
 
-\item{...}{Optional arguments passed to \code{rstan::optimizing}, such as
-\code{algorithm}. See \code{\link[rstan]{optimizing}} for the possible
-arguments.}
+\item{...}{Optional arguments passed to
+\code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}
 
 \item{model}{An object of class \linkS4class{lgpmodel}.}
 }
@@ -106,9 +104,9 @@ arguments.}
   \item The \code{\link{create_model}} function creates an object of class
   \linkS4class{lgpmodel}.
   \item The \code{sample_model} function takes an \linkS4class{lgpmodel}
-  object, fits the model using \code{rstan::sampling}, and returns an object
-  of class \linkS4class{lgpfit}.
+  object, fits the model using  \code{\link[rstan]{sampling}}, and
+  returns an object of class \linkS4class{lgpfit}.
   \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
-  object and fits the model using \code{rstan::optimizing}.
+  object and fits the model using \code{\link[rstan]{optimizing}}.
 }
 }

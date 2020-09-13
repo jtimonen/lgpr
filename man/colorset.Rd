@@ -7,7 +7,8 @@
 colorset(main, variant = "mid")
 }
 \arguments{
-\item{main}{Color name. Must be a valid \code{bayesplot} color name.}
+\item{main}{Color name. Must be a valid scheme name for
+\code{\link[bayesplot]{color_scheme_get}}.}
 
 \item{variant}{Must be one of {"light", "light_highlight", "mid",
 "mid_highlight", "dark", "dark_highlight"}.}
@@ -16,8 +17,7 @@ colorset(main, variant = "mid")
 A hex value of the color.
 }
 \description{
-Plot commands which specify the \code{col} argument should
-mostly use colors that are obtained using this function.
+Plot colors to use
 }
 \seealso{
 Other color utilities: 
