@@ -140,10 +140,10 @@ plot_sim <- function(simdata, signal_name = "signal", signal_column = "f",
   df_lines <- df_points
   df_lines[[y_name]] <- simdata@components[[signal_column]]
   colnames(df_lines)[3] <- signal_name
-  
+
   teff_true <- null_if_all_nan(simdata@effect_times$true)
   teff_obs <- null_if_all_nan(simdata@effect_times$observed)
-  
+
   h <- plot_panel(
     df_data = df_points,
     df_signal = df_lines,
@@ -151,7 +151,7 @@ plot_sim <- function(simdata, signal_name = "signal", signal_column = "f",
     teff_obs = teff_obs,
     ...
   )
-  
+
   info <- paste0(
     "Vertical lines are the real effect time (solid) \n",
     "and observed disease onset / initiation time (dashed)."

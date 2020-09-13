@@ -76,3 +76,9 @@ log_normal(mu = 0, sigma = a / 2) # for continuous lengthscale
 student_t(nu = 4) # for interaction lengthscale
 igam(shape = 0.5, scale = 0.005, square = TRUE) # for sigma
 }
+\seealso{
+Other functions related to the inverse-gamma distribution: 
+\code{\link{dinvgamma_stanlike}()},
+\code{\link{plot_invgamma}()}
+}
+\concept{functions related to the inverse-gamma distribution}

@@ -81,6 +81,7 @@ gam <- function(shape, inv_scale, square = FALSE) {
 #' @rdname priors
 #' @param shape shape parameter (alpha)
 #' @param scale scale parameter (beta)
+#' @family functions related to the inverse-gamma distribution
 igam <- function(shape, scale, square = FALSE) {
   check_positive(shape)
   check_positive(scale)

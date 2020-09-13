@@ -96,7 +96,7 @@ test_that("print_stan_input prints output", {
 test_that("create_plot_df works correctly", {
   df <- create_plot_df(model)
   expect_equal(names(df), c("id", "age", "y"))
-  a <- c(1,2,3)
+  a <- c(1, 2, 3)
   b <- seq(1, 24, by = 1)
   expect_error(create_plot_df(model, x = a), "length should be")
   reason <- "group_by has invalid type 'numeric'. Allowed types are"

@@ -209,7 +209,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 }
 
 #' Create prediction points
-#' 
+#'
 #' @description Replaces a continuous variable \code{x} in the data frame, and
 #' possibly another continuous variable \code{x_ns} derived from it, with new
 #' values, for each level of a grouping factor (usually id)
@@ -228,7 +228,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #'  \item \code{x}
 #'  \item \code{x_ns} (unless it is NULL)
 #' }
-#' 
+#'
 #' @family data utilities
 new_data <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   check_type(data, "data.frame")
