@@ -23,11 +23,14 @@ plot_effect_times(fit, type = "areas", ...)
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
 
-\item{type}{plot type}
+\item{type}{plot type, allowed options are "intervals", "dens",
+"areas", and "trace"}
 
 \item{regex_pars}{regex for parameter names to plot}
 
-\item{...}{other arguments to \code{bayesplot} functions}
+\item{...}{additional arguments for the \code{bayesplot} function
+\code{\link[bayesplot]{mcmc_intervals}}, \code{\link[bayesplot]{mcmc_dens}},
+\code{\link[bayesplot]{mcmc_areas}} or \code{\link[bayesplot]{mcmc_trace}}}
 
 \item{num_points}{number of plot points}
 
@@ -48,13 +51,10 @@ a \code{ggplot} object or list of them
   \item \code{plot_effect_times} visualizes the input warping function for
   different parameter draws
   \item \code{plot_warp} visualizes the input warping function for
-  different parameter draws
+  different draws of the warping steepness parameter
 }
 }
 \seealso{
-See [bayesplot::mcmc_dens()], [bayesplot::mcmc_trace()],
-[bayesplot::mcmc_areas()] and [bayesplot::mcmc_intervals()].
-
 Other model fit visualization functions: 
 \code{\link{plot_fit}()}
 }

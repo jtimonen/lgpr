@@ -2,21 +2,31 @@
 % Please edit documentation in R/MethodsFit.R
 \name{get_draws}
 \alias{get_draws}
+\alias{get_draws_catch}
+\alias{get_num_draws}
 \title{Extract posterior draws}
 \usage{
-get_draws(fit, ...)
+get_draws(fit, stack_chains = FALSE, ...)
+
+get_draws_catch(fit, stack_chains = FALSE, ...)
+
+get_num_draws(fit)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
 
-\item{...}{other keyword arguments to \code{rstan::extract}}
+\item{stack_chains}{should this return a 2-dimensional array?}
+
+\item{...}{additional keyword arguments to \code{rstan::extract}}
 }
 \value{
-a named list
+a 3 or 2-dimensional array
 }
 \description{
-Uses \code{rstan::extract} with \code{permuted = FALSE} and
-\code{inc_warmup = FALSE}.
+These functions use \code{\link[rstan]{extract}} with
+\code{permuted = FALSE} and \code{inc_warmup = FALSE}.
+The \code{get_draws_catch} function calls \code{get_draws} but catches
+errors and returns NULL if an error occurs.
 }
 \seealso{
 Other fit postprocessing functions: 

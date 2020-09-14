@@ -53,16 +53,17 @@ plot_fit <- function(fit, x = "age", group_by = "id", draws = NULL, ...) {
 #'   \item \code{plot_effect_times} visualizes the input warping function for
 #'   different parameter draws
 #'   \item \code{plot_warp} visualizes the input warping function for
-#'   different parameter draws
+#'   different draws of the warping steepness parameter
 #' }
 #' @inheritParams get_draws
-#' @param type plot type
+#' @param type plot type, allowed options are "intervals", "dens",
+#' "areas", and "trace"
 #' @param regex_pars regex for parameter names to plot
-#' @param ... other arguments to \code{bayesplot} functions
+#' @param ... additional arguments for the \code{bayesplot} function
+#' \code{\link[bayesplot]{mcmc_intervals}}, \code{\link[bayesplot]{mcmc_dens}},
+#' \code{\link[bayesplot]{mcmc_areas}} or \code{\link[bayesplot]{mcmc_trace}}
 #' @return a \code{ggplot} object or list of them
 #' @name plot_draws
-#' @seealso See [bayesplot::mcmc_dens()], [bayesplot::mcmc_trace()],
-#' [bayesplot::mcmc_areas()] and [bayesplot::mcmc_intervals()].
 #' @family model fit visualization functions
 NULL
 
@@ -146,15 +147,45 @@ plot_effect_times <- function(fit, type = "areas", ...) {
 #' Extract posterior draws
 #'
 #' @export
-#' @description Uses \code{rstan::extract} with \code{permuted = FALSE} and
-#' \code{inc_warmup = FALSE}.
+#' @description These functions use \code{\link[rstan]{extract}} with
+#' \code{permuted = FALSE} and \code{inc_warmup = FALSE}.
+#' The \code{get_draws_catch} function calls \code{get_draws} but catches
+#' errors and returns NULL if an error occurs.
 #' @param fit an object of class \linkS4class{lgpfit}
-#' @param ... other keyword arguments to \code{rstan::extract}
-#' @return a named list
+#' @param stack_chains should this return a 2-dimensional array?
+#' @param ... additional keyword arguments to \code{rstan::extract}
+#' @return a 3 or 2-dimensional array
 #' @family fit postprocessing functions
-get_draws <- function(fit, ...) {
+#' @name get_draws
+NULL
+
+#' @export
+#' @rdname get_draws
+get_draws <- function(fit, stack_chains = FALSE, ...) {
   check_type(fit, "lgpfit")
-  rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
+  s <- rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
+  s <- if (stack_chains) squeeze_second_dim(s) else s
+  return(s)
+}
+
+#' @export
+#' @rdname get_draws
+get_draws_catch <- function(fit, stack_chains = FALSE, ...) {
+  tryCatch(
+    {
+      get_draws(fit, stack_chains, ...)
+    },
+    error = function(e) {
+      NULL
+    }
+  )
+}
+
+#' @export
+#' @rdname get_draws
+get_num_draws <- function(fit) {
+  draws <- get_draws(fit, stack_chains = TRUE, pars = "alpha")
+  nrow(draws)
 }
 
 #' Extract posterior or prior predictive distribution draws

@@ -230,7 +230,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #' }
 #'
 #' @family data utilities
-new_data <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
+new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   check_type(data, "data.frame")
   check_not_null(group_by)
   check_not_null(x)
@@ -258,7 +258,7 @@ new_data <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
 #' Get observed effect times from a data frame
 #'
 #' @export
-#' @inheritParams new_data
+#' @inheritParams new_x
 #' @return a named vector, where the names are the levels of \code{group_by}
 #' @family data utilities
 get_teff_obs <- function(data, group_by = "id", x = "age",

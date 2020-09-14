@@ -446,6 +446,7 @@ plot_fit_create_df_ribbon <- function(df, f_mean, f_std, M) {
 
 #' Plot the inverse gamma-distribution pdf
 #'
+#' @inheritParams dinvgamma_stanlike
 #' @param by grid size
 #' @param IQR inter-quantile range width
 #' @param return_quantiles should this return a list

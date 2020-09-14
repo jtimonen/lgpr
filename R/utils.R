@@ -249,9 +249,10 @@ line_alpha_fun <- function(num_lines) {
 #'
 #' @description This exists just to allow calling a function which is a slot
 #' of an S4 object, without some linter warnings.
-#' @param fun a functionn which takes one argument
+#' @param fun a function which takes one argument
 #' @param arg the argument
-#' @return Literally just \code{fun(arg)}.
+#' @return The value of \code{fun(arg)}.
 call_fun <- function(fun, arg) {
+  check_type(fun, "function")
   fun(arg)
 }

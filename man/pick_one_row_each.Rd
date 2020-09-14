@@ -22,7 +22,7 @@ Other data utilities:
 \code{\link{add_dis_age}()},
 \code{\link{add_factor}()},
 \code{\link{get_teff_obs}()},
-\code{\link{new_data}()},
+\code{\link{new_x}()},
 \code{\link{select_factors_and}()},
 \code{\link{split}()},
 \code{\link{valid_data}}

@@ -29,7 +29,7 @@ test_that("add_sum_arraylist works correctly", {
   r <- 2 * diag(2)
   x1 <- list(a, b)
   x2 <- list(a, b, r)
-  expect_error(add_sum_arraylist(x2), "non-conformable arrays")
+  expect_error(add_sum_arraylist(x2))
   x <- add_sum_arraylist(x1)
   expect_equal(length(x), 3)
   expect_equal(x[[3]][1, 1], 2.5)

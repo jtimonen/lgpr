@@ -57,12 +57,16 @@ STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_u
     .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__)
 }
 
-STAN_gp_posterior_helper <- function(Ly, K, v, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_gp_posterior_helper`, Ly, K, v, pstream__)
+STAN_matrix_array_sum <- function(K, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_matrix_array_sum`, K, pstream__)
 }
 
-STAN_gp_posterior <- function(KX, y, delta, sigma, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_gp_posterior`, KX, y, delta, sigma, pstream__)
+STAN_gp_posterior_helper <- function(Ly, K_s, K_ss, v, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_gp_posterior_helper`, Ly, K_s, K_ss, v, pstream__)
+}
+
+STAN_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_gp_posterior`, KX, KX_s, KX_ss, y, delta, sigma, pstream__)
 }
 
 STAN_log_prior <- function(x, types, p, pstream__ = 0L) {

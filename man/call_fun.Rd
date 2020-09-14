@@ -7,12 +7,12 @@
 call_fun(fun, arg)
 }
 \arguments{
-\item{fun}{a functionn which takes one argument}
+\item{fun}{a function which takes one argument}
 
 \item{arg}{the argument}
 }
 \value{
-Literally just \code{fun(arg)}.
+The value of \code{fun(arg)}.
 }
 \description{
 This exists just to allow calling a function which is a slot

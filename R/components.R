@@ -7,9 +7,7 @@ parse_covs_and_comps <- function(data, model_formula) {
   # Check that all covariates exist in data
   x_names <- rhs_variables(model_formula@terms)
   x_names <- unique(x_names)
-  for (name in x_names) {
-    check_in_data(name, data)
-  }
+  for (name in x_names) check_in_data(name, data)
 
   # Create the inputs to Stan
   covariates <- stan_data_covariates(data, x_names)

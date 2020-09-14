@@ -21,16 +21,16 @@ test_that("data validation works correctly", {
   expect_true(validate_data(testdata_001))
 })
 
-test_that("new_data works correctly without x_ns", {
+test_that("new_x works correctly without x_ns", {
   dat <- testdata_001
-  x_new <- new_data(dat, x_values = seq(-1, 1, by = 0.5))
+  x_new <- new_x(dat, x_values = seq(-1, 1, by = 0.5))
   expect_equal(dim(x_new), c(20, 3))
   expect_equal(colnames(x_new), c("id", "age", "sex"))
 })
 
-test_that("new_data works correctly with x_ns", {
+test_that("new_x works correctly with x_ns", {
   dat <- testdata_001
-  x_new <- new_data(dat, x_values = seq(-1, 1, by = 0.5), x_ns = "dis_age")
+  x_new <- new_x(dat, x_values = seq(-1, 1, by = 0.5), x_ns = "dis_age")
   expect_equal(dim(x_new), c(20, 4))
   expect_equal(colnames(x_new), c("id", "age", "dis_age", "sex"))
   num_nans <- sum(is.nan(x_new$dis_age))

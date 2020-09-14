@@ -152,7 +152,7 @@ test_that("kernel_all works correctly", {
 
 test_that("gp_posterior works correctly", {
   y <- testdata_001$y
-  fp <- gp_posterior(K, y, 1e-6, 1.0)
+  fp <- gp_posterior(K, K, K, y, 1e-6, 1.0)
   expect_equal(length(fp), 12)
 
   # test that component-wise means sum to total mean

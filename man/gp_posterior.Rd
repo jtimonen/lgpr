@@ -4,10 +4,14 @@
 \alias{gp_posterior}
 \title{Compute all componentwise GP posteriors of a model}
 \usage{
-gp_posterior(KX, y, delta, sigma, STREAM = get_stream())
+gp_posterior(KX, KX_s, KX_ss, y, delta, sigma, STREAM = get_stream())
 }
 \arguments{
-\item{KX}{list of kernel matrices}
+\item{KX}{list of kernel matrices fo size \code{num_obs} x \code{num_obs}}
+
+\item{KX_s}{list of kernel matrices fo size \code{num_out} x \code{num_obs}}
+
+\item{KX_ss}{list of kernel matrices fo size \code{num_out} x \code{num_out}}
 
 \item{y}{response vector}
 

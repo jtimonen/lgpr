@@ -76,14 +76,17 @@ kernel_all <- function(K_const, components, x1, x2, x1_unnorm, x2_unnorm,
 #' Compute all componentwise GP posteriors of a model
 #'
 #' @description This is a wrapper for \code{STAN_gp_posterior}
-#' @param KX list of kernel matrices
+#' @param KX list of kernel matrices fo size \code{num_obs} x \code{num_obs}
+#' @param KX_s list of kernel matrices fo size \code{num_out} x \code{num_obs}
+#' @param KX_ss list of kernel matrices fo size \code{num_out} x \code{num_out}
 #' @param y response vector
 #' @param delta jitter
 #' @param sigma Gaussian noise magnitude parameter
 #' @param STREAM an external pointer
 #' @return an array of kernel matrices
-gp_posterior <- function(KX, y, delta, sigma, STREAM = get_stream()) {
-  STAN_gp_posterior(KX, y, delta, sigma, STREAM)
+gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
+                         STREAM = get_stream()) {
+  STAN_gp_posterior(KX, KX_s, KX_ss, y, delta, sigma, STREAM)
 }
 
 #' Input warping function

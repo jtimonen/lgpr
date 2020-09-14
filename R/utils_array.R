@@ -85,6 +85,7 @@ squeeze_second_dim <- function(x) {
     b <- x[, j, ]
     a <- rbind(a, b)
   }
+  if (D[3] == 1) a <- t(a)
   return(a)
 }
 
@@ -119,11 +120,7 @@ array_to_arraylist <- function(x, L, draws) {
 add_sum_arraylist <- function(x) {
   L <- length(x)
   if (L == 0) stop("list has length 0!")
-  s <- x[[1]]
-  for (j in 2:L) {
-    s <- s + x[[j]]
-  }
-  x[[L + 1]] <- s
+  x[[L + 1]] <- STAN_matrix_array_sum(x, get_stream())
   return(x)
 }
 

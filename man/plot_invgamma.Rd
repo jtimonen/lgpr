@@ -16,7 +16,13 @@ plot_invgamma(
 )
 }
 \arguments{
+\item{alpha}{positive real number}
+
+\item{beta}{positive real number}
+
 \item{by}{grid size}
+
+\item{log}{is log-scale used?}
 
 \item{IQR}{inter-quantile range width}
 
