@@ -18,7 +18,7 @@ test_that("lgpexpr validation works correctly", {
 })
 
 test_that("lgpformula validation works correctly", {
-  a <- parse_formula(as.formula("y ~ gp(x) + zerosum(a)"))
+  a <- parse_formula(as.formula("y ~ gp(x) + zs(a)"))
   expect_true(check_lgpformula(a))
   b <- a
   b@y_name <- "x"
@@ -46,8 +46,8 @@ test_that("lgpscaling validation works correctly", {
 context("Methods for lgpmodel objects")
 
 et <- list(lower = 10, zero = 0, backwards = FALSE, upper = 20)
-model <- create_model(y ~ uncrt(id) * heter(id) * gp_warp(dis_age) +
-  zerosum(sex) * gp(age),
+model <- create_model(y ~ unc(id) * het(id) * gp_ns(dis_age) +
+  zs(sex) * gp(age),
 prior = list(effect_time_info = et),
 data = testdata_001
 )
@@ -159,7 +159,7 @@ data$y <- data$y + 5
 
 test_that("model fit can be visualized with data on original scale", {
   suppressWarnings({
-    fit <- lgp(y ~ gp(age) + zerosum(id) + gp_warp_vm(diseaseAge),
+    fit <- lgp(y ~ gp(age) + zs(id) + gp_vm(diseaseAge),
       data = data, chains = 1, iter = 300, refresh = 0
     )
     p1 <- plot_fit(fit)
@@ -175,7 +175,7 @@ test_that("model fit can be visualized with data on original scale", {
 
 test_that("fit summary prints output", {
   suppressWarnings({
-    fit <- lgp(y ~ gp(age) + zerosum(z) * gp(age),
+    fit <- lgp(y ~ gp(age) + zs(z) * gp(age),
       data = data, chains = 1, iter = 100, refresh = 0
     )
     expect_output(fit_summary(fit))

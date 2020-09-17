@@ -9,8 +9,6 @@ parse_options(options = NULL)
 \arguments{
 \item{options}{A named list with the following possible fields:
 \itemize{
-  \item \code{skip_generated} If this is true, the generated quantities
-  block of Stan is skipped.
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
 }}

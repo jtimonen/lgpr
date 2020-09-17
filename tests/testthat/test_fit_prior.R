@@ -5,14 +5,14 @@ library(lgpr)
 context("Prior sampling with different modeling options")
 
 test_that("a model with uncertain disease age needs prior specified", {
-  formula <- y ~ gp(age) + uncrt(id) * gp_warp_vm(dis_age)
+  formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
   data <- testdata_001
   reason <- "you must specify 'effect_time_info' in"
   expect_error(create_model(formula = formula, data = data), reason)
 })
 
 test_that("model with uncertain disease age can be created and fit", {
-  formula <- y ~ gp(age) + uncrt(id) * gp_warp_vm(dis_age)
+  formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
   data <- testdata_001
   et <- list(backwards = FALSE, lower = 15, upper = 30, zero = 0)
   prior <- list(effect_time_info = et)
@@ -44,7 +44,7 @@ test_that("model with uncertain disease age can be created and fit", {
 })
 
 test_that("model with heterogeneous disease effect can be created and fit", {
-  formula <- y ~ gp(age) + heter(id) * gp_warp(dis_age)
+  formula <- y ~ gp(age) + het(id) * gp_ns(dis_age)
   data <- testdata_001
   model <- create_model(
     formula = formula,

@@ -7,7 +7,7 @@
 parse_rhs(rhs)
 }
 \arguments{
-\item{rhs}{the formula right-hand side, e.g. \code{a + b*c}}
+\item{rhs}{The formula right-hand side in text format.}
 }
 \value{
 an object of class \linkS4class{lgprhs}
@@ -15,3 +15,16 @@ an object of class \linkS4class{lgprhs}
 \description{
 Parse a string representation of the right-hand side of a formula
 }
+\seealso{
+Other model formula functions: 
+\code{\link{formula_to_advanced}()},
+\code{\link{is_advanced_formula}()},
+\code{\link{parse_expr}()},
+\code{\link{parse_formula}()},
+\code{\link{parse_term}()},
+\code{\link{parse_whitespace}()},
+\code{\link{rhs_to_terms}()},
+\code{\link{rhs_variables}()},
+\code{\link{term_variables}()}
+}
+\concept{model formula functions}

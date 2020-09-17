@@ -15,3 +15,16 @@ a list of variable names
 \description{
 Get names of all variables appearing in a term
 }
+\seealso{
+Other model formula functions: 
+\code{\link{formula_to_advanced}()},
+\code{\link{is_advanced_formula}()},
+\code{\link{parse_expr}()},
+\code{\link{parse_formula}()},
+\code{\link{parse_rhs}()},
+\code{\link{parse_term}()},
+\code{\link{parse_whitespace}()},
+\code{\link{rhs_to_terms}()},
+\code{\link{rhs_variables}()}
+}
+\concept{model formula functions}

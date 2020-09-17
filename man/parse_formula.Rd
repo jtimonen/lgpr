@@ -7,21 +7,16 @@
 parse_formula(formula)
 }
 \arguments{
-\item{formula}{A formula specified using the common \code{formula}
-syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
+\item{formula}{The model formula, where
 \itemize{
-  \item The formula must contain exatly one tilde (\code{~}), with response
-  variable on the left-hand side and model terms on the right-hand side.
-  \item Terms are be separated by a plus (\code{+}) sign.
-  \item Terms can consits of a single variable name, such as \code{x}, or
-  an interaction of two variables, such as \code{x:z}.
-  \item In single-variable terms, the variable can be either continuous or
-  categorical, whereas in interaction terms the variable
-  on the left-hand side of the colon (\code{:}) has to be continuous and the
-  one on the right-hand side has to be categorical (a factor).
-  \item All variables appearing in \code{formula} must be
-  found in \code{data}.
-}}
+  \item it must contain exatly one tilde (\code{~}), with response
+  variable on the left-hand side and model terms on the right-hand side
+  \item terms are be separated by a plus (\code{+}) sign
+  \item all variables appearing in \code{formula} must be
+  found in \code{data}
+}
+See the ´Syntax for formula terms´ section in the documentation of
+\code{\link{lgp}} for instructions on how to specify the model terms.}
 }
 \value{
 an object of class \linkS4class{lgpformula}
@@ -29,3 +24,16 @@ an object of class \linkS4class{lgpformula}
 \description{
 Create a model formula
 }
+\seealso{
+Other model formula functions: 
+\code{\link{formula_to_advanced}()},
+\code{\link{is_advanced_formula}()},
+\code{\link{parse_expr}()},
+\code{\link{parse_rhs}()},
+\code{\link{parse_term}()},
+\code{\link{parse_whitespace}()},
+\code{\link{rhs_to_terms}()},
+\code{\link{rhs_variables}()},
+\code{\link{term_variables}()}
+}
+\concept{model formula functions}

@@ -54,26 +54,44 @@
 #'
 NULL
 
-#' Main functions of the package
+#' Main function of the lgpr package
 #'
 #' @export
 #' @description
-#' \itemize{
-#'   \item The \code{lgp} function is a wrapper for both \code{create_model}
-#'   and \code{sample_model}, and its returns an object of class
-#'   \linkS4class{lgpfit}.
-#'   \item The \code{\link{create_model}} function creates an object of class
-#'   \linkS4class{lgpmodel}.
-#'   \item The \code{sample_model} function takes an \linkS4class{lgpmodel}
-#'   object, fits the model using  \code{\link[rstan]{sampling}}, and
-#'   returns an object of class \linkS4class{lgpfit}.
-#'   \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
-#'   object and fits the model using \code{\link[rstan]{optimizing}}.
-#' }
+#' Creates a model by calling \code{\link{create_model}} and fits by calling
+#' \code{\link{sample_model}}.
 #' @inheritParams create_model
 #' @inheritParams sample_model
 #' @inheritParams optimize_model
+#'
+#' @section Syntax for formula terms:
+#' There are two ways to define formula terms:
+#' \enumerate{
+#'   \item Using the common \code{formula} syntax, like in \code{y ~ age +}
+#'   \code{age|id} \code{ + sex}. Terms can consits of a single variable
+#'   name, such as \code{x}, or an interaction of two variables, such as
+#'   \code{age|id}. In single-variable terms, the variable can be either
+#'   continuous or categorical, whereas in interaction terms the variable on
+#'   the left-hand side of the vertical bar (\code{|}) has to be continuous and
+#'   the one on the right-hand side has to be categorical (a factor).
+#'   \item Using the advanced syntax, like in \code{y ~ gp(age) +}
+#'   \code{gp(age)*zs(id) +} \code{het(id)*gp_vm(disAge)}.
+#'   This creates \linkS4class{lgprhs} objects, which consist of
+#'  \linkS4class{lgpterms}s, which consist of \linkS4class{lgpexpr}s.
+#'  This approach must be used if creating nonstationary, heterogeneous or
+#'  temporally uncertain components.
+#' }
+#' Formulas should use either one of the approaches and not mix them.
+#'
+#' @section Defining priors:
+#' The \code{priors} argument must be a named list.
+#' \enumerate{
+#'   \item Ok.
+#' }
+#'
 #' @name lgp
+#' @family main functions
+#' @return Returns an object of the S4 class \linkS4class{lgpfit}.
 NULL
 
 #' @rdname lgp
@@ -97,7 +115,21 @@ lgp <- function(formula,
   sample_model(model = model, ...)
 }
 
-#' @rdname lgp
+#' Fitting a model
+#'
+#' @description
+#' \itemize{
+#'   \item The \code{sample_model} function takes an \linkS4class{lgpmodel}
+#'   object, fits it using  \code{\link[rstan]{sampling}}, and
+#'   returns an object of class \linkS4class{lgpfit}.
+#'   \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
+#'   object and fits it using \code{\link[rstan]{optimizing}}.
+#' }
+#' @name sample_model
+#' @family main functions
+NULL
+
+#' @rdname sample_model
 #' @export
 #' @param model An object of class \linkS4class{lgpmodel}.
 #' @param ... Optional arguments passed to
@@ -109,7 +141,7 @@ sample_model <- function(model, ...) {
   new("lgpfit", model = model, stan_fit = sfit)
 }
 
-#' @rdname lgp
+#' @rdname sample_model
 #' @export
 optimize_model <- function(model, ...) {
   object <- stanmodels[[model@stan_model_name]]

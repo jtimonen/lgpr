@@ -9,6 +9,7 @@
 #' @param prior_only Should this run in prior sampling mode,
 #' where likelihood is ignored?
 #' @param verbose Should more verbose output be printed?
+#' @family main functions
 create_model <- function(formula,
                          data,
                          likelihood = "gaussian",
@@ -94,8 +95,6 @@ create_model <- function(formula,
 #'
 #' @param options A named list with the following possible fields:
 #' \itemize{
-#'   \item \code{skip_generated} If this is true, the generated quantities
-#'   block of Stan is skipped.
 #'   \item \code{delta} Amount of added jitter to ensure positive definite
 #'   covariance matrices.
 #' }
@@ -198,7 +197,7 @@ create_idx_expand_picker <- function(components, x_cat) {
     if (!all_same) {
       str <- paste(inds, collapse = ", ")
       msg <- paste0(
-        "The heter() and uncrt() expressions must have the same ",
+        "The het() and unc() expressions must have the same ",
         "categorical covariate in every term! ",
         "Found inds = {", str, "}"
       )

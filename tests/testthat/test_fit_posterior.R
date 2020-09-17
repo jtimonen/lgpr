@@ -103,7 +103,7 @@ test_that("f can be sampled with binomial likelihood", {
   dat$y <- round(exp(dat$y))
   suppressWarnings({
     fit <- lgp(
-      formula = y ~ gp(age) + zerosum(sex) * gp(age),
+      formula = y ~ gp(age) + zs(sex) * gp(age),
       likelihood = "binomial",
       data = dat,
       iter = 200,
@@ -120,7 +120,7 @@ test_that("f can be sampled with beta-binomial likelihood", {
   dat$y <- round(exp(dat$y))
   suppressWarnings({
     fit <- lgp(
-      formula = y ~ gp(age) + zerosum(sex) * gp(age),
+      formula = y ~ gp(age) + zs(sex) * gp(age),
       likelihood = "bb",
       data = dat,
       iter = 200,

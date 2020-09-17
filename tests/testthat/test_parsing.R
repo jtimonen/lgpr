@@ -31,25 +31,25 @@ test_that("parse_formula works with a single lgpterm", {
 })
 
 test_that("two lgpterms can be summed", {
-  f <- y ~ gp(x) * categ(z) + gp(x) * zerosum(z)
+  f <- y ~ gp(x) * categ(z) + gp(x) * zs(z)
   c <- .class2(parse_formula(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("lgpterm and lgpexpr can be summed", {
-  f <- y ~ gp(x) * zerosum(z) + categ("z")
+  f <- y ~ gp(x) * zs(z) + categ("z")
   c <- .class2(parse_formula(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("lgpexpr and lgpterm can be summed", {
-  f <- y ~ gp(x) + categ("z") * gp_warp(aa)
+  f <- y ~ gp(x) + categ("z") * gp_ns(aa)
   c <- .class2(parse_formula(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("parse_formula throws error when input is not a formula", {
-  reason <- "must have class formula"
+  reason <- "formula has invalid type 'character'. Allowed types are"
   expect_error(parse_formula("a + b "), reason)
 })
 
@@ -61,7 +61,7 @@ test_that("parse_formula throws error if invalid function or covariate", {
     "the response variable cannot be also a covariate"
   )
   expect_error(
-    parse_formula(y ~ x + a),
+    parse_formula(y ~ gp(x) + gp((a))),
     "expression must contain exactly one opening and closing parenthesis"
   )
   expect_error(
@@ -69,6 +69,13 @@ test_that("parse_formula throws error if invalid function or covariate", {
     "expression must contain exactly one opening and closing parenthesis"
   )
 })
+
+
+test_that("parse_formula throws informative error if mixing syntaxes", {
+  reason <- "Be sure not to mix the advanced and simple formula syntaxes"
+  expect_error(parse_formula(5 ~ koira + gp(r)), reason)
+})
+
 
 test_that("parse_options does not need arguments", {
   a <- parse_options()
@@ -104,7 +111,7 @@ test_that("parse_likelihood works correctly with binomial likelihood", {
 })
 
 test_that("y_scaling is created and and applied", {
-  f <- parse_formula(y ~ gp(age) + zerosum(id))
+  f <- parse_formula(y ~ gp(age) + zs(id))
   parsed <- parse_response(dat, "gaussian", f)
   yts <- parsed$to_stan
   expect_equal(names(parsed), c("to_stan", "scaling"))
@@ -122,7 +129,7 @@ test_that("y_scaling is created and and applied", {
 test_that("cannot have negative response with NB observation model", {
   newdat <- dat
   newdat$y <- c(-1, -9, 3, 2, 4, 1)
-  f <- parse_formula(y ~ gp(age) + zerosum(id))
+  f <- parse_formula(y ~ gp(age) + zs(id))
   reason <- "cannot be negative with this observation model"
   expect_error(parse_response(newdat, "nb", f), reason)
 })
@@ -130,7 +137,7 @@ test_that("cannot have negative response with NB observation model", {
 test_that("cannot have a response with zero variance (gaussian obs model)", {
   newdat <- dat
   newdat$y <- c(1, 1, 1, 1, 1, 1)
-  f <- parse_formula(y ~ gp(age) + zerosum(id))
+  f <- parse_formula(y ~ gp(age) + zs(id))
   reason <- "have zero variance"
   expect_error(parse_response(newdat, "gaussian", f), reason)
 })

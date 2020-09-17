@@ -2,9 +2,7 @@
 % Please edit documentation in R/lgpr.R
 \name{lgp}
 \alias{lgp}
-\alias{sample_model}
-\alias{optimize_model}
-\title{Main functions of the package}
+\title{Main function of the lgpr package}
 \usage{
 lgp(
   formula,
@@ -19,27 +17,18 @@ lgp(
   sample_f = !(likelihood == "gaussian"),
   ...
 )
-
-sample_model(model, ...)
-
-optimize_model(model, ...)
 }
 \arguments{
-\item{formula}{A formula specified using the common \code{formula}
-syntax, such as \code{y ~ x1 + x2:z1 + } \code{x2:z2 + z2}.
+\item{formula}{The model formula, where
 \itemize{
-  \item The formula must contain exatly one tilde (\code{~}), with response
-  variable on the left-hand side and model terms on the right-hand side.
-  \item Terms are be separated by a plus (\code{+}) sign.
-  \item Terms can consits of a single variable name, such as \code{x}, or
-  an interaction of two variables, such as \code{x:z}.
-  \item In single-variable terms, the variable can be either continuous or
-  categorical, whereas in interaction terms the variable
-  on the left-hand side of the colon (\code{:}) has to be continuous and the
-  one on the right-hand side has to be categorical (a factor).
-  \item All variables appearing in \code{formula} must be
-  found in \code{data}.
-}}
+  \item it must contain exatly one tilde (\code{~}), with response
+  variable on the left-hand side and model terms on the right-hand side
+  \item terms are be separated by a plus (\code{+}) sign
+  \item all variables appearing in \code{formula} must be
+  found in \code{data}
+}
+See the ´Syntax for formula terms´ section in the documentation of
+\code{\link{lgp}} for instructions on how to specify the model terms.}
 
 \item{data}{A \code{data.frame} where each column corresponds to one
 variable, and each row is one observation. Continuous covariates and the
@@ -77,8 +66,6 @@ to number of data points. Setting \code{num_trials=1} and
 
 \item{options}{A named list with the following possible fields:
 \itemize{
-  \item \code{skip_generated} If this is true, the generated quantities
-  block of Stan is skipped.
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
 }}
@@ -93,20 +80,46 @@ where likelihood is ignored?}
 
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}
-
-\item{model}{An object of class \linkS4class{lgpmodel}.}
+}
+\value{
+Returns an object of the S4 class \linkS4class{lgpfit}.
 }
 \description{
-\itemize{
-  \item The \code{lgp} function is a wrapper for both \code{create_model}
-  and \code{sample_model}, and its returns an object of class
-  \linkS4class{lgpfit}.
-  \item The \code{\link{create_model}} function creates an object of class
-  \linkS4class{lgpmodel}.
-  \item The \code{sample_model} function takes an \linkS4class{lgpmodel}
-  object, fits the model using  \code{\link[rstan]{sampling}}, and
-  returns an object of class \linkS4class{lgpfit}.
-  \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
-  object and fits the model using \code{\link[rstan]{optimizing}}.
+Creates a model by calling \code{\link{create_model}} and fits by calling
+\code{\link{sample_model}}.
+}
+\section{Syntax for formula terms}{
+
+There are two ways to define formula terms:
+\enumerate{
+  \item Using the common \code{formula} syntax, like in \code{y ~ age +}
+  \code{age|id} \code{ + sex}. Terms can consits of a single variable
+  name, such as \code{x}, or an interaction of two variables, such as
+  \code{age|id}. In single-variable terms, the variable can be either
+  continuous or categorical, whereas in interaction terms the variable on
+  the left-hand side of the vertical bar (\code{|}) has to be continuous and
+  the one on the right-hand side has to be categorical (a factor).
+  \item Using the advanced syntax, like in \code{y ~ gp(age) +}
+  \code{gp(age)*zs(id) +} \code{het(id)*gp_vm(disAge)}.
+  This creates \linkS4class{lgprhs} objects, which consist of
+ \linkS4class{lgpterms}s, which consist of \linkS4class{lgpexpr}s.
+ This approach must be used if creating nonstationary, heterogeneous or
+ temporally uncertain components.
+}
+Formulas should use either one of the approaches and not mix them.
+}
+
+\section{Defining priors}{
+
+The \code{priors} argument must be a named list.
+\enumerate{
+  \item Ok.
 }
 }
+
+\seealso{
+Other main functions: 
+\code{\link{create_model}()},
+\code{\link{sample_model}()}
+}
+\concept{main functions}

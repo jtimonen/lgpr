@@ -20,6 +20,7 @@ posterior_predict <- function(fit, X_pred, STREAM = get_stream()) {
 
   si <- get_stan_input(model)
   delta <- dollar(si, "delta")
+  y <- get_y(fit)
   compute_gp_posteriors(kernels, y, delta, sigma, STREAM)
 }
 

@@ -246,8 +246,8 @@ term_to_numeric <- function(term, covariates) {
 
   # Check kernel type
   if (is_cat) {
-    kernels <- c("zerosum", "categ")
-    idx <- check_allowed(dollar(parsed, "cat_kernel"), allowed = kernels)
+    ker <- dollar(parsed, "cat_kernel")
+    idx <- check_allowed(ker, allowed = c("zs", "categ"))
     ktype <- idx - 1
   } else {
     ktype <- 0
@@ -257,8 +257,8 @@ term_to_numeric <- function(term, covariates) {
   # Check nonstationary options
   gpk <- dollar(parsed, "gp_kernel")
   if (!is.null(gpk)) {
-    is_warped <- gpk %in% c("gp_warp", "gp_warp_vm")
-    is_vm <- gpk == "gp_warp_vm"
+    is_warped <- gpk %in% c("gp_ns", "gp_vm")
+    is_vm <- gpk == "gp_vm"
   } else {
     is_warped <- FALSE
     is_vm <- FALSE
@@ -301,7 +301,7 @@ check_term_covariates <- function(covariates, pf) {
   }
 
   out <- c(0, 0, 0, 0)
-  funs <- c("heter", "uncrt", "cat", "gp")
+  funs <- c("het", "unc", "cat", "gp")
   types <- c("categorical", "categorical", "categorical", "continuous")
   fields <- c("", "", "cat_kernel", "gp_kernel")
   for (j in 1:4) {
@@ -334,31 +334,31 @@ check_term_covariates <- function(covariates, pf) {
 #' @return a named list
 check_term_factors <- function(term) {
 
-  # Check for heter() expressions
+  # Check for het() expressions
   facs <- term@factors
-  reduced <- reduce_factors_expr(facs, "heter")
+  reduced <- reduce_factors_expr(facs, "het")
   facs <- dollar(reduced, "factors")
-  heter_covariate <- dollar(reduced, "covariate")
+  het_covariate <- dollar(reduced, "covariate")
 
-  # Check for uncrt() expressions
-  reduced <- reduce_factors_expr(facs, "uncrt")
+  # Check for unc() expressions
+  reduced <- reduce_factors_expr(facs, "unc")
   facs <- dollar(reduced, "factors")
-  uncrt_covariate <- dollar(reduced, "covariate")
+  unc_covariate <- dollar(reduced, "covariate")
 
   # Check compatibility
-  if (!is.null(uncrt_covariate) && !is.null(heter_covariate)) {
-    is_compatible <- (uncrt_covariate == heter_covariate)
+  if (!is.null(unc_covariate) && !is.null(het_covariate)) {
+    is_compatible <- (unc_covariate == het_covariate)
     if (!is_compatible) {
       msg <- paste0(
-        "Names of the covariates in uncrt() and heter() ",
+        "Names of the covariates in unc() and het() ",
         "expressions must match! Found = {",
-        uncrt_covariate, ", ", heter_covariate, "}."
+        unc_covariate, ", ", het_covariate, "}."
       )
       stop(msg)
     }
   }
 
-  # Check for gp, gp_warp and gp_warp_vm expressions
+  # Check for gp, gp_ns and gp_vm expressions
   reduced <- reduce_factors_gp(facs)
   facs <- dollar(reduced, "factors")
   gp_covariate <- dollar(reduced, "covariate")
@@ -376,7 +376,7 @@ check_term_factors <- function(term) {
     msg <- paste0(
       "Invalid term with expressions: ", as.character(term),
       ". Note that each term can contain at most one categ()",
-      " or zerosum() expression."
+      " or zs() expression."
     )
     stop(msg)
   }
@@ -387,8 +387,8 @@ check_term_factors <- function(term) {
     gp_kernel = gp_kernel,
     cat_covariate = cat_covariate,
     cat_kernel = cat_kernel,
-    uncrt_covariate = uncrt_covariate,
-    heter_covariate = heter_covariate
+    unc_covariate = unc_covariate,
+    het_covariate = het_covariate
   )
 }
 
@@ -419,7 +419,7 @@ reduce_factors_expr <- function(factors, expr) {
   }
   if (length(factors) < 1) {
     msg <- paste0(
-      "there must be one <gp>, <gp_warp> or <gp_warp_vm> expression",
+      "there must be one gp(), gp_ns() or gp_vm() expression",
       " in each term involving the '", expr, "' expression!"
     )
     stop(msg)
@@ -434,14 +434,14 @@ reduce_factors_expr <- function(factors, expr) {
 #' the covariate in the original \code{gp*} expression
 reduce_factors_gp <- function(factors) {
   fun <- function(x) {
-    gp_names <- c("gp", "gp_warp", "gp_warp_vm")
+    gp_names <- c("gp", "gp_ns", "gp_vm")
     x@fun %in% gp_names
   }
   idx <- which(sapply(factors, fun))
   H <- length(idx)
   if (H > 1) {
     msg <- paste0(
-      "cannot have more than one gp* expression ",
+      "cannot have more than one gp(), gp_ns() or gp_vm() expression ",
       "in one term! found = ", H
     )
     stop(msg)

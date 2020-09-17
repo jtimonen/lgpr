@@ -38,8 +38,8 @@ test_that("prior can be parsed from stan_input", {
   expect_equal(class(df), "data.frame")
 })
 
-test_that("quotes can be used in gp(), gp_warp() etc", {
-  f <- y ~ gp("age") + categ("id") + categ(id) * gp_warp("age")
+test_that("quotes can be used in gp(), gp_ns() etc", {
+  f <- y ~ gp("age") + categ("id") + categ(id) * gp_ns("age")
   m <- create_model(f, testdata_001)
   a <- m@model_formula
   c <- .class2(a)
@@ -48,7 +48,7 @@ test_that("quotes can be used in gp(), gp_warp() etc", {
 
 test_that("a heterogeneous component can be added", {
   dat <- testdata_001
-  m <- create_model(y ~ heter(id) * zerosum(sex) * gp(age) + categ(id), dat)
+  m <- create_model(y ~ het(id) * zs(sex) * gp(age) + categ(id), dat)
   si <- m@stan_input
   idx_heter <- si$components[1, 4]
   expect_equal(idx_heter, 1)
@@ -57,80 +57,80 @@ test_that("a heterogeneous component can be added", {
 test_that("a heterogeneity component must take a categorical covariate", {
   dat <- testdata_001
   expect_error(
-    create_model(y ~ heter(age) * zerosum(sex) + categ(id), dat),
-    "argument for <heter> must be a name of a categorical covariate"
+    create_model(y ~ het(age) * zs(sex) + categ(id), dat),
+    "argument for <het> must be a name of a categorical covariate"
   )
 })
 
 test_that("an uncertainty component must take a categorical covariate", {
   dat <- testdata_001
   expect_error(
-    create_model(y ~ uncrt(age) * zerosum(sex) + categ(id), dat),
-    "argument for <uncrt> must be a name of a categorical covariate"
+    create_model(y ~ unc(age) * zs(sex) + categ(id), dat),
+    "argument for <unc> must be a name of a categorical covariate"
   )
 })
 
-test_that("categ() and zerosum() must take a categorical covariate", {
+test_that("categ() and zs() must take a categorical covariate", {
   dat <- testdata_001
   expect_error(
-    create_model(y ~ gp(age) * zerosum(sex) + categ(age), dat),
+    create_model(y ~ gp(age) * zs(sex) + categ(age), dat),
     "argument for <categ> must be a name of a categorical covariate"
   )
   expect_error(
-    create_model(y ~ gp(age) * zerosum(sex) + zerosum(age), dat),
-    "argument for <zerosum> must be a name of a categorical covariate"
+    create_model(y ~ gp(age) * zs(sex) + zs(age), dat),
+    "argument for <zs> must be a name of a categorical covariate"
   )
 })
 
-test_that("gp(), gp_warp() and gp_warp_vm must take a continuous covariate", {
+test_that("gp(), gp_ns() and gp_vm() must take a continuous covariate", {
   expect_error(
     create_model(y ~ gp(id), testdata_001),
     "argument for <gp> must be a name of a continuous covariate"
   )
   expect_error(
-    create_model(y ~ gp_warp(id), testdata_001),
-    "argument for <gp_warp> must be a name of a continuous covariate"
+    create_model(y ~ gp_ns(id), testdata_001),
+    "argument for <gp_ns> must be a name of a continuous covariate"
   )
   expect_error(
-    create_model(y ~ gp_warp_vm(sex), testdata_001),
-    "argument for <gp_warp_vm> must be a name of a continuous covariate"
+    create_model(y ~ gp_vm(sex), testdata_001),
+    "argument for <gp_vm> must be a name of a continuous covariate"
   )
 })
 
 test_that("one term can contain at most one expression of each type", {
   expect_error(
-    create_model(y ~ gp(id) * gp_warp(age), testdata_001),
+    create_model(y ~ gp(id) * gp_ns(age), testdata_001),
     "cannot have more than one gp"
   )
   expect_error(
-    create_model(y ~ categ(id) * zerosum(sex), testdata_001),
+    create_model(y ~ categ(id) * zs(sex), testdata_001),
     "each term can contain at most one"
   )
   expect_error(
-    create_model(y ~ heter(id) * gp_warp(age) * heter(sex), testdata_001),
-    "cannot have more than one 'heter' expression in one term"
+    create_model(y ~ het(id) * gp_ns(age) * het(sex), testdata_001),
+    "cannot have more than one"
   )
 })
 
-test_that("terms with uncrt() or heter() must have other expressions", {
+test_that("terms with unc() or het() must have other expressions", {
   expect_error(
-    create_model(y ~ heter(id), testdata_001),
-    "there must be one <gp>, <gp_warp> or <gp_warp_vm> expression"
+    create_model(y ~ het(id), testdata_001),
+    "there must be one"
   )
   expect_error(
-    create_model(y ~ uncrt(id), testdata_001),
-    "there must be one <gp>, <gp_warp> or <gp_warp_vm> expression"
+    create_model(y ~ unc(id), testdata_001),
+    "there must be one"
   )
 })
 
-test_that("covariate must be same in uncrt() and heter() expression", {
+test_that("covariate must be same in unc() and het() expression", {
   dat <- testdata_001
   expect_error(
-    create_model(y ~ heter(id) * uncrt(sex) * gp(age) + gp(dis_age), dat),
+    create_model(y ~ het(id) * unc(sex) * gp(age) + gp(dis_age), dat),
     "Names of the covariates in"
   )
   expect_error(
-    create_model(y ~ heter(id) * gp(age) + uncrt(sex) * gp(dis_age), dat),
+    create_model(y ~ het(id) * gp(age) + unc(sex) * gp(dis_age), dat),
     "expressions must have the same categorical covariate in every term"
   )
 })
@@ -138,14 +138,14 @@ test_that("covariate must be same in uncrt() and heter() expression", {
 test_that("a formula term cannot have more than 4 expressions", {
   dat <- testdata_001
   expect_error(
-    create_model(y ~ gp(age) * gp(age) * gp(sex) * heter(id) * uncrt(id), dat),
+    create_model(y ~ gp(age) * gp(age) * gp(sex) * het(id) * unc(id), dat),
     "term can have at most four expressions! found = 5"
   )
 })
 
 test_that("an lgpmodel has correct list fields for stan input", {
   m <- create_model(
-    formula = y ~ gp(age) + zerosum(id),
+    formula = y ~ gp(age) + zs(id),
     data = testdata_001,
     options = list(delta = 1e-5)
   )
@@ -171,7 +171,7 @@ test_that("creating an lgpmodel errors with invalid data", {
 test_that("the num_trials argument works correctly", {
   dat <- testdata_001
   dat$y <- round(exp(dat$y))
-  m <- create_model(y ~ gp(age) + zerosum(id), dat,
+  m <- create_model(y ~ gp(age) + zs(id), dat,
     likelihood = "binomial",
     num_trials = 10
   )
@@ -179,7 +179,7 @@ test_that("the num_trials argument works correctly", {
   expect_equal(nt, rep(10, times = 24))
   reason <- "Invalid length of <num_trials>"
   expect_error(
-    create_model(y ~ gp(age) + zerosum(id), dat,
+    create_model(y ~ gp(age) + zs(id), dat,
       likelihood = "binomial",
       num_trials = c(10, 4, 6)
     ),
@@ -188,15 +188,15 @@ test_that("the num_trials argument works correctly", {
 })
 
 test_that("only the covariates required by the model go to stan data", {
-  m <- create_model(y ~ categ(sex) + zerosum(id), testdata_001)
+  m <- create_model(y ~ categ(sex) + zs(id), testdata_001)
   to_stan <- m@stan_input
   expect_equal(to_stan$num_cov_cat, 2)
   expect_equal(dim(to_stan$x_cont), c(0, 24))
 })
 
 test_that("covariate types are correctly parsed", {
-  m <- create_model(y ~ gp(age) + categ(id) * gp(age) + zerosum(sex) +
-    gp_warp(dis_age), testdata_001)
+  m <- create_model(y ~ gp(age) + categ(id) * gp(age) + zs(sex) +
+    gp_ns(dis_age), testdata_001)
   to_stan <- m@stan_input
   expect_equal(to_stan$num_cov_cat, 2)
   expect_equal(to_stan$num_cov_cont, 2)
@@ -210,7 +210,7 @@ test_that("cannot have a continuous covariate with zero variance", {
   newdat <- testdata_001
   newdat$age <- -1
   reason <- "have zero variance"
-  expect_error(create_model(y ~ gp(age) + zerosum(id), newdat), reason)
+  expect_error(create_model(y ~ gp(age) + zs(id), newdat), reason)
 })
 
 
@@ -223,7 +223,7 @@ test_that("cannot have NaNs on different rows", {
   )
   expect_error(
     create_model(
-      formula = y ~ heter(id) * gp(dis_age) + heter(id) * gp(new_x),
+      formula = y ~ het(id) * gp(dis_age) + het(id) * gp(new_x),
       data = newdat
     ),
     reason

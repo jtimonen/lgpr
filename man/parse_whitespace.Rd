@@ -7,7 +7,7 @@
 parse_whitespace(rhs)
 }
 \arguments{
-\item{rhs}{the formula right-hand side, e.g. \code{a + b*c}}
+\item{rhs}{The formula right-hand side in text format.}
 }
 \value{
 a character string
@@ -15,3 +15,16 @@ a character string
 \description{
 Remove quotes and whitespace from a formula
 }
+\seealso{
+Other model formula functions: 
+\code{\link{formula_to_advanced}()},
+\code{\link{is_advanced_formula}()},
+\code{\link{parse_expr}()},
+\code{\link{parse_formula}()},
+\code{\link{parse_rhs}()},
+\code{\link{parse_term}()},
+\code{\link{rhs_to_terms}()},
+\code{\link{rhs_variables}()},
+\code{\link{term_variables}()}
+}
+\concept{model formula functions}

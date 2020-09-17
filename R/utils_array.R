@@ -89,7 +89,7 @@ squeeze_second_dim <- function(x) {
   return(a)
 }
 
-#' Array reshaping
+#' Array transformation utility
 #'
 #' @param x an array of shape \code{n} x \code{m}
 #' @param L an integer

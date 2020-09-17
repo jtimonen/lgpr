@@ -106,7 +106,7 @@ test_that("variance mask kernel errors if <vm_params> is not valid", {
 context("Stan high-level functions")
 
 # Model
-m <- create_model(y ~ zerosum(id) * gp(age) + heter(id) * gp_warp_vm(dis_age) +
+m <- create_model(y ~ zs(id) * gp(age) + het(id) * gp_vm(dis_age) +
   categ(sex) + gp(age) + gp(blood),
 data = testdata_001
 )

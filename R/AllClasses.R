@@ -10,7 +10,7 @@ check_lgpexpr <- function(object) {
   errors <- character()
   v0 <- nchar(object@covariate) > 0
   valid_funs <- c(
-    "gp", "gp_warp", "gp_warp_vm", "categ", "zerosum", "heter", "uncrt"
+    "gp", "gp_ns", "gp_vm", "categ", "zs", "het", "unc"
   )
   v1 <- object@fun %in% valid_funs
   if (!v0) {

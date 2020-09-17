@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_array.R
 \name{array_to_arraylist}
 \alias{array_to_arraylist}
-\title{Array reshaping}
+\title{Array transformation utility}
 \usage{
 array_to_arraylist(x, L, draws)
 }
@@ -18,7 +18,7 @@ a list of length \code{L}, where each element is an array of
 shape \code{h} x (\code{m}/\code{L}), where \code{h = length(draws)}
 }
 \description{
-Array reshaping
+Array transformation utility
 }
 \seealso{
 Other array utilities: 
