@@ -12,9 +12,14 @@ call_fun(fun, arg)
 \item{arg}{the argument}
 }
 \value{
-The value of \code{fun(arg)}.
+The value of \code{fun(arg)}
 }
 \description{
 This exists just to allow calling a function which is a slot
 of an S4 object, without some linter warnings.
 }
+\seealso{
+Other function utilities: 
+\code{\link{enclose_fun}()}
+}
+\concept{function utilities}

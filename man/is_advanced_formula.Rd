@@ -4,27 +4,30 @@
 \alias{is_advanced_formula}
 \title{Check if formula is in advanced format.}
 \usage{
-is_advanced_formula(rhs)
+is_advanced_formula(formula)
 }
 \arguments{
-\item{rhs}{The formula right-hand side in text format.}
+\item{formula}{The model formula, where
+\itemize{
+  \item it must contain exatly one tilde (\code{~}), with response
+  variable on the left-hand side and model terms on the right-hand side
+  \item terms are be separated by a plus (\code{+}) sign
+  \item all variables appearing in \code{formula} must be
+  found in \code{data}
+}
+See the ´Syntax for formula terms´ section in the documentation of
+\code{\link{lgp}} for instructions on how to specify the model terms.}
 }
 \value{
 TRUE or FALSE
 }
 \description{
-Check if formula is in advanced format.
+Checks if right-hand side contains opening parentheses.
 }
 \seealso{
 Other model formula functions: 
 \code{\link{formula_to_advanced}()},
-\code{\link{parse_expr}()},
 \code{\link{parse_formula}()},
-\code{\link{parse_rhs}()},
-\code{\link{parse_term}()},
-\code{\link{parse_whitespace}()},
-\code{\link{rhs_to_terms}()},
-\code{\link{rhs_variables}()},
-\code{\link{term_variables}()}
+\code{\link{rhs_to_terms}()}
 }
 \concept{model formula functions}

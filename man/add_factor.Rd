@@ -24,6 +24,7 @@ Easily add a categorical covariate to a data frame
 \seealso{
 Other data utilities: 
 \code{\link{add_dis_age}()},
+\code{\link{data_types}()},
 \code{\link{get_teff_obs}()},
 \code{\link{new_x}()},
 \code{\link{pick_one_row_each}()},

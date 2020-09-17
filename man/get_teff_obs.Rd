@@ -28,6 +28,7 @@ Get observed effect times from a data frame
 Other data utilities: 
 \code{\link{add_dis_age}()},
 \code{\link{add_factor}()},
+\code{\link{data_types}()},
 \code{\link{new_x}()},
 \code{\link{pick_one_row_each}()},
 \code{\link{select_factors_and}()},

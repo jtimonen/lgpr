@@ -12,68 +12,68 @@ dat <- data.frame(id, age, dis_age, sex, y)
 
 context("Input parsing functions")
 
-test_that("parse_formula works with a single lgpexpr", {
+test_that("parse_formula_advanced works with a single lgpexpr", {
   f <- y ~ gp(x)
-  c <- .class2(parse_formula(f))
+  c <- .class2(parse_formula_advanced(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("response variable cannot be a covariate", {
   f <- y ~ gp(x) + categ(y) * gp(t)
   msg <- "the response variable cannot be also a covariate"
-  expect_error(parse_formula(f), msg)
+  expect_error(parse_formula_advanced(f), msg)
 })
 
-test_that("parse_formula works with a single lgpterm", {
+test_that("parse_formula_advanced works with a single lgpterm", {
   f <- y ~ gp(x) * categ(z)
-  c <- .class2(parse_formula(f))
+  c <- .class2(parse_formula_advanced(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("two lgpterms can be summed", {
   f <- y ~ gp(x) * categ(z) + gp(x) * zs(z)
-  c <- .class2(parse_formula(f))
+  c <- .class2(parse_formula_advanced(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("lgpterm and lgpexpr can be summed", {
   f <- y ~ gp(x) * zs(z) + categ("z")
-  c <- .class2(parse_formula(f))
+  c <- .class2(parse_formula_advanced(f))
   expect_equal(c, "lgpformula")
 })
 
 test_that("lgpexpr and lgpterm can be summed", {
   f <- y ~ gp(x) + categ("z") * gp_ns(aa)
-  c <- .class2(parse_formula(f))
+  c <- .class2(parse_formula_advanced(f))
   expect_equal(c, "lgpformula")
 })
 
-test_that("parse_formula throws error when input is not a formula", {
+test_that("parse_formula_advanced throws error when input is not a formula", {
   reason <- "formula has invalid type 'character'. Allowed types are"
-  expect_error(parse_formula("a + b "), reason)
+  expect_error(parse_formula_advanced("a + b "), reason)
 })
 
-test_that("parse_formula throws error if invalid function or covariate", {
-  expect_error(parse_formula(y ~ notafunction(x)), "<fun> must be one of")
-  expect_error(parse_formula(y ~ gp("")), "covariate name cannot be empty")
+test_that("parse_formula_advanced throws error if invalid function or covariate", {
+  expect_error(parse_formula_advanced(y ~ notafunction(x)), "<fun> must be one of")
+  expect_error(parse_formula_advanced(y ~ gp("")), "covariate name cannot be empty")
   expect_error(
-    parse_formula(y ~ gp(x) * gp(y) * gp(z)),
+    parse_formula_advanced(y ~ gp(x) * gp(y) * gp(z)),
     "the response variable cannot be also a covariate"
   )
   expect_error(
-    parse_formula(y ~ gp(x) + gp((a))),
+    parse_formula_advanced(y ~ gp(x) + gp((a))),
     "expression must contain exactly one opening and closing parenthesis"
   )
   expect_error(
-    parse_formula(y ~ gp(x)(y)),
+    parse_formula_advanced(y ~ gp(x)(y)),
     "expression must contain exactly one opening and closing parenthesis"
   )
 })
 
 
-test_that("parse_formula throws informative error if mixing syntaxes", {
+test_that("parse_formula_advanced throws informative error if mixing syntaxes", {
   reason <- "Be sure not to mix the advanced and simple formula syntaxes"
-  expect_error(parse_formula(5 ~ koira + gp(r)), reason)
+  expect_error(parse_formula_advanced(5 ~ koira + gp(r)), reason)
 })
 
 
@@ -111,7 +111,7 @@ test_that("parse_likelihood works correctly with binomial likelihood", {
 })
 
 test_that("y_scaling is created and and applied", {
-  f <- parse_formula(y ~ gp(age) + zs(id))
+  f <- parse_formula_advanced(y ~ gp(age) + zs(id))
   parsed <- parse_response(dat, "gaussian", f)
   yts <- parsed$to_stan
   expect_equal(names(parsed), c("to_stan", "scaling"))
@@ -129,7 +129,7 @@ test_that("y_scaling is created and and applied", {
 test_that("cannot have negative response with NB observation model", {
   newdat <- dat
   newdat$y <- c(-1, -9, 3, 2, 4, 1)
-  f <- parse_formula(y ~ gp(age) + zs(id))
+  f <- parse_formula_advanced(y ~ gp(age) + zs(id))
   reason <- "cannot be negative with this observation model"
   expect_error(parse_response(newdat, "nb", f), reason)
 })
@@ -137,7 +137,7 @@ test_that("cannot have negative response with NB observation model", {
 test_that("cannot have a response with zero variance (gaussian obs model)", {
   newdat <- dat
   newdat$y <- c(1, 1, 1, 1, 1, 1)
-  f <- parse_formula(y ~ gp(age) + zs(id))
+  f <- parse_formula_advanced(y ~ gp(age) + zs(id))
   reason <- "have zero variance"
   expect_error(parse_response(newdat, "gaussian", f), reason)
 })

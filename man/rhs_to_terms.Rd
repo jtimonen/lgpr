@@ -7,7 +7,7 @@
 rhs_to_terms(rhs)
 }
 \arguments{
-\item{rhs}{The formula right-hand side in text format.}
+\item{rhs}{the formula right-hand side in text format}
 }
 \value{
 a character vector
@@ -19,12 +19,6 @@ Split a formula to terms
 Other model formula functions: 
 \code{\link{formula_to_advanced}()},
 \code{\link{is_advanced_formula}()},
-\code{\link{parse_expr}()},
-\code{\link{parse_formula}()},
-\code{\link{parse_rhs}()},
-\code{\link{parse_term}()},
-\code{\link{parse_whitespace}()},
-\code{\link{rhs_variables}()},
-\code{\link{term_variables}()}
+\code{\link{parse_formula}()}
 }
 \concept{model formula functions}

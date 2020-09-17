@@ -28,6 +28,7 @@ disease initiation times and adds it to the data frame
 \seealso{
 Other data utilities: 
 \code{\link{add_factor}()},
+\code{\link{data_types}()},
 \code{\link{get_teff_obs}()},
 \code{\link{new_x}()},
 \code{\link{pick_one_row_each}()},

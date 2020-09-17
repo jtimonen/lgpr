@@ -4,10 +4,21 @@
 \alias{formula_to_advanced}
 \title{Parse a model formula that uses the common formula syntax}
 \usage{
-formula_to_advanced(rhs)
+formula_to_advanced(formula, data)
 }
 \arguments{
-\item{rhs}{The formula right-hand side in text format.}
+\item{formula}{The model formula, where
+\itemize{
+  \item it must contain exatly one tilde (\code{~}), with response
+  variable on the left-hand side and model terms on the right-hand side
+  \item terms are be separated by a plus (\code{+}) sign
+  \item all variables appearing in \code{formula} must be
+  found in \code{data}
+}
+See the ´Syntax for formula terms´ section in the documentation of
+\code{\link{lgp}} for instructions on how to specify the model terms.}
+
+\item{data}{A data frame.}
 
 \item{description}{Translates formula to advanced syntax format.}
 }
@@ -20,13 +31,7 @@ Parse a model formula that uses the common formula syntax
 \seealso{
 Other model formula functions: 
 \code{\link{is_advanced_formula}()},
-\code{\link{parse_expr}()},
 \code{\link{parse_formula}()},
-\code{\link{parse_rhs}()},
-\code{\link{parse_term}()},
-\code{\link{parse_whitespace}()},
-\code{\link{rhs_to_terms}()},
-\code{\link{rhs_variables}()},
-\code{\link{term_variables}()}
+\code{\link{rhs_to_terms}()}
 }
 \concept{model formula functions}

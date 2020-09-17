@@ -22,7 +22,7 @@ create_model <- function(formula,
                          sample_f = !(likelihood == "gaussian")) {
 
   # Parse formula and options
-  model_formula <- parse_formula(formula)
+  model_formula <- parse_formula(formula, data)
   list_opts <- parse_options(options)
 
   # Parse response and likelihood

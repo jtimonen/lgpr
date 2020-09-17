@@ -308,3 +308,21 @@ select_factors_and <- function(data, valid) {
   }
   data[, col_inds]
 }
+
+
+#' Get type of each data column
+#'
+#' @param data a data frame
+#' @return a named list
+#' @family data utilities
+data_types <- function(data) {
+  check_type(data, "data.frame")
+  D <- ncol(data)
+  nams <- names(data)
+  types <- c()
+  for (j in seq_len(D)) {
+    types <- c(types, class(data[, j]))
+  }
+  names(types) <- nams
+  as.list(types)
+}

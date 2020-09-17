@@ -251,8 +251,29 @@ line_alpha_fun <- function(num_lines) {
 #' of an S4 object, without some linter warnings.
 #' @param fun a function which takes one argument
 #' @param arg the argument
-#' @return The value of \code{fun(arg)}.
+#' @return The value of \code{fun(arg)}
+#' @family function utilities
 call_fun <- function(fun, arg) {
   check_type(fun, "function")
   fun(arg)
+}
+
+#' Paste function and argument enclosed in parentheses
+#'
+#' @param s argument name, a string
+#' @param fun function name, a string
+#' @return a string
+#' @family function utilities
+enclose_fun <- function(s, fun) {
+  paste0(fun, "(", s, ")")
+}
+
+#' Remove quotes and whitespace from a string
+#'
+#' @param s a string
+#' @return a string
+simplify_str <- function(s) {
+  x <- gsub("[[:space:]]", "", s) # remove whitespace
+  x <- gsub("[\",\']", "", x) # remove quotes
+  return(x)
 }
