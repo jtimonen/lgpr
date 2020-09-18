@@ -4,6 +4,7 @@
 ^\_config\.yml$
 ^dev-cpp\.R$
 ^dev-lint\.R$
+^dev-style\.R$
 tests/testthat/stan_files/.*\.o$
 tests/testthat/stan_files/.*\.cc$
 tests/testthat/stan_files/.*\.hpp$

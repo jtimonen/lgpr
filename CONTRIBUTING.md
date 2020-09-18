@@ -15,9 +15,9 @@
 
 ## Workflow
 - Document each new function with roxygen
-- After making changes to `.R` code, first run `styler::style_pkg` to
+- After making changes to `.R` code, first run `dev-style.R` to
   correct most style problems. Then run `dev-lint.R` to check for other
-  style problems (uses the `lintr` package) and correct them manually if found.
+  style problems and correct them manually if found.
 - After making changes to `.stan` code, run `dev-cpp.R` and rebuild the C++
   code (for example by `clean and rebuild` in Rstudio).
 - Before making new commits, make sure to also run `devtools::document()` and 
