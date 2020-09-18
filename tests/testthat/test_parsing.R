@@ -12,6 +12,16 @@ dat <- data.frame(id, age, dis_age, sex, y)
 
 context("Input parsing functions")
 
+test_that("parse_formula translated simple formulas", {
+  f <- parse_formula(y ~ age + sex, dat)
+  expect_equal(as.character(f), "y ~ gp(age) + gp(sex)")
+  f <- parse_formula(y ~ age + age | sex, dat)
+  expect_equal(as.character(f), "y ~ gp(age) + gp(age) * zs(sex)")
+  expect_output(show(f@terms))
+  reason <- "variable 'notvar' not found in <data>"
+  expect_error(parse_formula(y ~ age + notvar, dat), reason)
+})
+
 test_that("parse_formula_advanced works with a single lgpexpr", {
   f <- y ~ gp(x)
   c <- .class2(parse_formula_advanced(f))

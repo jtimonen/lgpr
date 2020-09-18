@@ -9,9 +9,9 @@
 #'   \item all variables appearing in \code{formula} must be
 #'   found in \code{data}
 #' }
-#' See the ´Syntax for formula terms´ section in the documentation of
-#' \code{\link{lgp}} for instructions on how to specify the model terms.
-#' @param data A data frame.
+#' See the "Model formula syntax" section below (\code{\link{lgp}}) for
+#' instructions on how to specify the model terms.
+#' @inheritParams parse_response
 #' @return an object of class \linkS4class{lgpformula}
 #' @family model formula functions
 parse_formula <- function(formula, data) {
@@ -46,14 +46,27 @@ split_formula <- function(formula) {
 
 #' Parse a model formula that uses the common formula syntax
 #'
-#' @param description Translates formula to advanced syntax format.
+#' @description Translates formula to advanced syntax format.
 #' @inheritParams is_advanced_formula
 #' @inheritParams parse_formula
 #' @return an object of class \linkS4class{lgpformula}
-#' @family model formula functions
+#' @name formula_to_advanced
+NULL
+
+#' @rdname formula_to_advanced
 formula_to_advanced <- function(formula, data) {
   f <- split_formula(formula)
   rhs <- dollar(f, "right")
+  y_name <- dollar(f, "left")
+  rhs <- rhs_to_advanced(rhs, data)
+  f_str <- paste(y_name, "~", rhs)
+  out <- stats::formula(f_str)
+  return(out)
+}
+
+#' @rdname formula_to_advanced
+#' @inheritParams rhs_to_terms
+rhs_to_advanced <- function(rhs, data) {
   types <- data_types(data)
   terms <- rhs_to_terms(rhs)
   rhs_adv <- ""
@@ -78,6 +91,7 @@ formula_to_advanced <- function(formula, data) {
   }
   return(rhs_adv)
 }
+
 
 #' Split a formula to terms
 #'

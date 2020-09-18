@@ -2,9 +2,12 @@
 % Please edit documentation in R/formula.R
 \name{formula_to_advanced}
 \alias{formula_to_advanced}
+\alias{rhs_to_advanced}
 \title{Parse a model formula that uses the common formula syntax}
 \usage{
 formula_to_advanced(formula, data)
+
+rhs_to_advanced(rhs, data)
 }
 \arguments{
 \item{formula}{The model formula, where
@@ -15,23 +18,21 @@ formula_to_advanced(formula, data)
   \item all variables appearing in \code{formula} must be
   found in \code{data}
 }
-See the ´Syntax for formula terms´ section in the documentation of
-\code{\link{lgp}} for instructions on how to specify the model terms.}
+See the "Model formula syntax" section below (\code{\link{lgp}}) for
+instructions on how to specify the model terms.}
 
-\item{data}{A data frame.}
+\item{data}{A \code{data.frame} where each column corresponds to one
+variable, and each row is one observation. Continuous covariates and the
+response variable must have type \code{"numeric"} and categorical covariates
+must have type \code{"factor"}. Missing values should be indicated with
+\code{NaN} or \code{NA}. The response variable cannot contain missing
+values.}
 
-\item{description}{Translates formula to advanced syntax format.}
+\item{rhs}{the formula right-hand side in text format}
 }
 \value{
 an object of class \linkS4class{lgpformula}
 }
 \description{
-Parse a model formula that uses the common formula syntax
+Translates formula to advanced syntax format.
 }
-\seealso{
-Other model formula functions: 
-\code{\link{is_advanced_formula}()},
-\code{\link{parse_formula}()},
-\code{\link{rhs_to_terms}()}
-}
-\concept{model formula functions}

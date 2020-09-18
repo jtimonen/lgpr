@@ -15,8 +15,8 @@ is_advanced_formula(formula)
   \item all variables appearing in \code{formula} must be
   found in \code{data}
 }
-See the ´Syntax for formula terms´ section in the documentation of
-\code{\link{lgp}} for instructions on how to specify the model terms.}
+See the "Model formula syntax" section below (\code{\link{lgp}}) for
+instructions on how to specify the model terms.}
 }
 \value{
 TRUE or FALSE
@@ -26,7 +26,6 @@ Checks if right-hand side contains opening parentheses.
 }
 \seealso{
 Other model formula functions: 
-\code{\link{formula_to_advanced}()},
 \code{\link{parse_formula}()},
 \code{\link{rhs_to_terms}()}
 }

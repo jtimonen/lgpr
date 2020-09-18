@@ -15,8 +15,8 @@ split_formula(formula)
   \item all variables appearing in \code{formula} must be
   found in \code{data}
 }
-See the ´Syntax for formula terms´ section in the documentation of
-\code{\link{lgp}} for instructions on how to specify the model terms.}
+See the "Model formula syntax" section below (\code{\link{lgp}}) for
+instructions on how to specify the model terms.}
 }
 \description{
 Split formula into left and right-hand side

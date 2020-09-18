@@ -128,7 +128,8 @@ bet <- function(a, b) {
 #' Parse given prior
 #'
 #' @param prior A named list, defining the prior distribution of model
-#' (hyper)parameters.
+#' (hyper)parameters. See the "Defining priors" section below
+#' (\code{\link{lgp}}).
 #' @param stan_input a list of stan input fields
 #' @param obs_model observation model as integer
 #' @return a named list of parsed options

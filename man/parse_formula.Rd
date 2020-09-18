@@ -15,10 +15,15 @@ parse_formula(formula, data)
   \item all variables appearing in \code{formula} must be
   found in \code{data}
 }
-See the ´Syntax for formula terms´ section in the documentation of
-\code{\link{lgp}} for instructions on how to specify the model terms.}
+See the "Model formula syntax" section below (\code{\link{lgp}}) for
+instructions on how to specify the model terms.}
 
-\item{data}{A data frame.}
+\item{data}{A \code{data.frame} where each column corresponds to one
+variable, and each row is one observation. Continuous covariates and the
+response variable must have type \code{"numeric"} and categorical covariates
+must have type \code{"factor"}. Missing values should be indicated with
+\code{NaN} or \code{NA}. The response variable cannot contain missing
+values.}
 }
 \value{
 an object of class \linkS4class{lgpformula}
@@ -28,7 +33,6 @@ Checks if formula is in advanced format and translates if not.
 }
 \seealso{
 Other model formula functions: 
-\code{\link{formula_to_advanced}()},
 \code{\link{is_advanced_formula}()},
 \code{\link{rhs_to_terms}()}
 }

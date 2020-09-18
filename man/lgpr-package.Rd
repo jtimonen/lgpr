@@ -7,21 +7,17 @@
 \title{The 'lgpr' package.}
 \description{
 Longitudinal Gaussian Process regression.
-The package features
-\itemize{
-  \item Additive Gaussian process modeling of longitudinal data
-  \item Posterior inference of the model (hyper)parameters using Stan
-  \item Computation of covariate relevances
-  \item Specialized modeling of a non-stationary disease effect
-  \item Functions for visualizing longitudinal data, posterior samples and
-  model predictions
-  \item Gaussian, Poisson, binomial or negative binomial observation models
-}
+The package features additive Gaussian process modeling of longitudinal
+data with with interpretable covariate effects and covariate relevance
+assesment. Models can include non-stationary, heterogeneous and temporally
+uncertain effects. Bayesian inference of the model (hyper)parameters using
+\code{\link[rstan]{rstan}}. Functions for visualizing longitudinal data,
+posterior draws and model predictions are also provided.
 }
 \section{Basic usage}{
 
 \itemize{
-\item See the main function documentation: \code{\link{lgp}}.
+\item See documentation of the main function \code{\link{lgp}}.
  \item See tutorials at
  \url{https://jtimonen.github.io/lgpr-usage/index.html}
 }
@@ -62,4 +58,4 @@ Juho Timonen (first.last at iki.fi)
 \keyword{longitudinal}
 \keyword{models}
 \keyword{processes,}
-\keyword{selection,}
+\keyword{relevances,}

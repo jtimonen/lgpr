@@ -17,7 +17,6 @@ Split a formula to terms
 }
 \seealso{
 Other model formula functions: 
-\code{\link{formula_to_advanced}()},
 \code{\link{is_advanced_formula}()},
 \code{\link{parse_formula}()}
 }

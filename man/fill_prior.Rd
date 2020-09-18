@@ -8,7 +8,8 @@ fill_prior(prior, num_uncrt)
 }
 \arguments{
 \item{prior}{A named list, defining the prior distribution of model
-(hyper)parameters.}
+(hyper)parameters. See the "Defining priors" section below
+(\code{\link{lgp}}).}
 
 \item{num_uncrt}{number of uncertain components}
 }

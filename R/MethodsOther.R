@@ -86,6 +86,26 @@ setMethod("show", "lgpformula", function(object) {
 })
 
 #' @rdname show
+setMethod("show", "lgprhs", function(object) {
+  s <- object@summands
+  L <- length(s)
+  cat("An object of class lgprhs.\n\n")
+  for (j in seq_len(L)) {
+    t <- as.character(s[[j]])
+    r <- paste0("Term ", j, ": ", t, "\n")
+    cat(r)
+  }
+  invisible(object)
+})
+
+#' @rdname show
+setMethod("show", "lgpterm", function(object) {
+  cat("lgpterm: ")
+  cat(as.character(object))
+  invisible(object)
+})
+
+#' @rdname show
 setMethod("show", "lgpsim", function(object) {
   msg <- class_info("lgpsim")
   cat(msg)
@@ -141,8 +161,10 @@ plot_sim <- function(simdata, signal_name = "signal", signal_column = "f",
   df_lines[[y_name]] <- simdata@components[[signal_column]]
   colnames(df_lines)[3] <- signal_name
 
-  teff_true <- null_if_all_nan(simdata@effect_times$true)
-  teff_obs <- null_if_all_nan(simdata@effect_times$observed)
+  teff_true <- dollar(simdata@effect_times, "true")
+  teff_true <- null_if_all_nan(teff_true)
+  teff_obs <- dollar(simdata@effect_times, "observed")
+  teff_obs <- null_if_all_nan(teff_obs)
 
   h <- plot_panel(
     df_data = df_points,

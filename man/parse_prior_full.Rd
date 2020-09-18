@@ -17,7 +17,8 @@ parse_prior_full_teff(prior, stan_input)
 }
 \arguments{
 \item{prior}{A named list, defining the prior distribution of model
-(hyper)parameters.}
+(hyper)parameters. See the "Defining priors" section below
+(\code{\link{lgp}}).}
 
 \item{stan_input}{a list of stan input fields}
 

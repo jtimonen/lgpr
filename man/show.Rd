@@ -3,12 +3,18 @@
 \name{show}
 \alias{show}
 \alias{show,lgpformula-method}
+\alias{show,lgprhs-method}
+\alias{show,lgpterm-method}
 \alias{show,lgpsim-method}
 \alias{show,lgpmodel-method}
 \alias{show,lgpfit-method}
 \title{Printing S4 object info using the show generic}
 \usage{
 \S4method{show}{lgpformula}(object)
+
+\S4method{show}{lgprhs}(object)
+
+\S4method{show}{lgpterm}(object)
 
 \S4method{show}{lgpsim}(object)
 

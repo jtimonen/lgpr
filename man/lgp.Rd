@@ -27,17 +27,23 @@ lgp(
   \item all variables appearing in \code{formula} must be
   found in \code{data}
 }
-See the ´Syntax for formula terms´ section in the documentation of
-\code{\link{lgp}} for instructions on how to specify the model terms.}
+See the "Model formula syntax" section below (\code{\link{lgp}}) for
+instructions on how to specify the model terms.}
 
-\item{data}{A data frame.}
+\item{data}{A \code{data.frame} where each column corresponds to one
+variable, and each row is one observation. Continuous covariates and the
+response variable must have type \code{"numeric"} and categorical covariates
+must have type \code{"factor"}. Missing values should be indicated with
+\code{NaN} or \code{NA}. The response variable cannot contain missing
+values.}
 
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
 binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 
 \item{prior}{A named list, defining the prior distribution of model
-(hyper)parameters.}
+(hyper)parameters. See the "Defining priors" section below
+(\code{\link{lgp}}).}
 
 \item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
 a real number defining a constant GP mean. If \code{NULL}, this is set to
@@ -83,25 +89,32 @@ Returns an object of the S4 class \linkS4class{lgpfit}.
 Creates a model by calling \code{\link{create_model}} and fits by calling
 \code{\link{sample_model}}.
 }
-\section{Syntax for formula terms}{
+\section{Model formula syntax}{
 
-There are two ways to define formula terms:
+There are two ways to define the model formula:
 \enumerate{
-  \item Using the common \code{formula} syntax, like in \code{y ~ age +}
-  \code{age|id} \code{ + sex}. Terms can consits of a single variable
-  name, such as \code{x}, or an interaction of two variables, such as
-  \code{age|id}. In single-variable terms, the variable can be either
-  continuous or categorical, whereas in interaction terms the variable on
-  the left-hand side of the vertical bar (\code{|}) has to be continuous and
-  the one on the right-hand side has to be categorical (a factor).
+  \item Using a common \code{\link[stats]{formula}}-like syntax, like in
+  \code{y ~ age +} \code{age|id} \code{ + sex}. Terms can consits of a
+  single variable, such as \code{age}, or an interaction of two variables,
+  such as \code{age|id}. In single-variable terms, the variable can be either
+  continuous (numeric) or categorical (factor), whereas in interaction terms
+  the variable on the left-hand side of the vertical bar (\code{|}) has to
+  be continuous and the one on the right-hand side has to be categorical.
+  Formulae specified using this syntax are translated to the advanced format
+  so that
+  \itemize{
+    \item single-variable terms become \code{gp(x)} if
+    variable \code{x} is numeric and \code{zs(x)} if \code{x} is a factor
+    \item interaction terms \code{x|z} become \code{gp(x)*zs(z)}
+  }
   \item Using the advanced syntax, like in \code{y ~ gp(age) +}
   \code{gp(age)*zs(id) +} \code{het(id)*gp_vm(disAge)}.
   This creates \linkS4class{lgprhs} objects, which consist of
- \linkS4class{lgpterms}s, which consist of \linkS4class{lgpexpr}s.
+ \linkS4class{lgpterm}s, which consist of \linkS4class{lgpexpr}s.
  This approach must be used if creating nonstationary, heterogeneous or
  temporally uncertain components.
 }
-Formulas should use either one of the approaches and not mix them.
+Either one of the approaches should be used and they should not be mixed.
 }
 
 \section{Defining priors}{

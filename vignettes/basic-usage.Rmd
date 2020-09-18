@@ -49,7 +49,7 @@ plot_sim(sim)
 
 ## Creating and fitting a model
 ``````{r fit}
-formula <- y ~ zerosum(id)*gp(age) + gp(age) + zerosum(sex)*gp(age) + zerosum(location)*gp(age)
+formula <- y ~ zs(id)*gp(age) + gp(age) + zs(sex)*gp(age) + zs(location)*gp(age)
 fit <- lgp(formula  = formula,
            data     = sim@data,
            iter     = 1000, 

@@ -1,23 +1,20 @@
 #' The 'lgpr' package.
 #'
 #' @description Longitudinal Gaussian Process regression.
-#' The package features
-#' \itemize{
-#'   \item Additive Gaussian process modeling of longitudinal data
-#'   \item Posterior inference of the model (hyper)parameters using Stan
-#'   \item Computation of covariate relevances
-#'   \item Specialized modeling of a non-stationary disease effect
-#'   \item Functions for visualizing longitudinal data, posterior samples and
-#'   model predictions
-#'   \item Gaussian, Poisson, binomial or negative binomial observation models
-#' }
+#' The package features additive Gaussian process modeling of longitudinal
+#' data with with interpretable covariate effects and covariate relevance
+#' assesment. Models can include non-stationary, heterogeneous and temporally
+#' uncertain effects. Bayesian inference of the model (hyper)parameters using
+#' \code{\link[rstan]{rstan}}. Functions for visualizing longitudinal data,
+#' posterior draws and model predictions are also provided.
+#'
 #' @author Juho Timonen (first.last at iki.fi)
-#' @keywords Gaussian processes, longitudinal data, Stan, covariate selection,
+#' @keywords Gaussian processes, longitudinal data, Stan, covariate relevances,
 #' interpretable models
 #'
 #' @section Basic usage:
 #' \itemize{
-#' \item See the main function documentation: \code{\link{lgp}}.
+#' \item See documentation of the main function \code{\link{lgp}}.
 #'  \item See tutorials at
 #'  \url{https://jtimonen.github.io/lgpr-usage/index.html}
 #' }
@@ -64,24 +61,31 @@ NULL
 #' @inheritParams sample_model
 #' @inheritParams optimize_model
 #'
-#' @section Syntax for formula terms:
-#' There are two ways to define formula terms:
+#' @section Model formula syntax:
+#' There are two ways to define the model formula:
 #' \enumerate{
-#'   \item Using the common \code{formula} syntax, like in \code{y ~ age +}
-#'   \code{age|id} \code{ + sex}. Terms can consits of a single variable
-#'   name, such as \code{x}, or an interaction of two variables, such as
-#'   \code{age|id}. In single-variable terms, the variable can be either
-#'   continuous or categorical, whereas in interaction terms the variable on
-#'   the left-hand side of the vertical bar (\code{|}) has to be continuous and
-#'   the one on the right-hand side has to be categorical (a factor).
+#'   \item Using a common \code{\link[stats]{formula}}-like syntax, like in
+#'   \code{y ~ age +} \code{age|id} \code{ + sex}. Terms can consits of a
+#'   single variable, such as \code{age}, or an interaction of two variables,
+#'   such as \code{age|id}. In single-variable terms, the variable can be either
+#'   continuous (numeric) or categorical (factor), whereas in interaction terms
+#'   the variable on the left-hand side of the vertical bar (\code{|}) has to
+#'   be continuous and the one on the right-hand side has to be categorical.
+#'   Formulae specified using this syntax are translated to the advanced format
+#'   so that
+#'   \itemize{
+#'     \item single-variable terms become \code{gp(x)} if
+#'     variable \code{x} is numeric and \code{zs(x)} if \code{x} is a factor
+#'     \item interaction terms \code{x|z} become \code{gp(x)*zs(z)}
+#'   }
 #'   \item Using the advanced syntax, like in \code{y ~ gp(age) +}
 #'   \code{gp(age)*zs(id) +} \code{het(id)*gp_vm(disAge)}.
 #'   This creates \linkS4class{lgprhs} objects, which consist of
-#'  \linkS4class{lgpterms}s, which consist of \linkS4class{lgpexpr}s.
+#'  \linkS4class{lgpterm}s, which consist of \linkS4class{lgpexpr}s.
 #'  This approach must be used if creating nonstationary, heterogeneous or
 #'  temporally uncertain components.
 #' }
-#' Formulas should use either one of the approaches and not mix them.
+#' Either one of the approaches should be used and they should not be mixed.
 #'
 #' @section Defining priors:
 #' The \code{priors} argument must be a named list.
