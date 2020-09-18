@@ -14,7 +14,7 @@ context("Input parsing functions")
 
 test_that("parse_formula translated simple formulas", {
   f <- parse_formula(y ~ age + sex, dat)
-  expect_equal(as.character(f), "y ~ gp(age) + gp(sex)")
+  expect_equal(as.character(f), "y ~ gp(age) + zs(sex)")
   f <- parse_formula(y ~ age + age | sex, dat)
   expect_equal(as.character(f), "y ~ gp(age) + gp(age) * zs(sex)")
   expect_output(show(f@terms))

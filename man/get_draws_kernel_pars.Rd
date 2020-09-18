@@ -20,8 +20,10 @@ Extract kernel parameter draws
 \seealso{
 Other GP posterior computation functions: 
 \code{\link{compute_gp_posteriors}()},
+\code{\link{compute_kernel_matrices_const}()},
 \code{\link{compute_kernel_matrices}()},
-\code{\link{format_X_pred}()},
+\code{\link{create_kernel_input}()},
+\code{\link{posterior_predict_kernels}()},
 \code{\link{posterior_predict}()}
 }
 \concept{GP posterior computation functions}

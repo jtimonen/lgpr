@@ -5,6 +5,8 @@
 \title{Compute all kernel matrices of a model}
 \usage{
 kernel_all(
+  n1,
+  n2,
   K_const,
   components,
   x1,
@@ -19,11 +21,15 @@ kernel_all(
   vm_params,
   idx1_expand,
   idx2_expand,
-  teff_obs,
+  teff_zero,
   STREAM = get_stream()
 )
 }
 \arguments{
+\item{n1}{integer}
+
+\item{n2}{integer}
+
 \item{K_const}{list of constant matrices}
 
 \item{components}{an integer array}
@@ -36,15 +42,15 @@ kernel_all(
 
 \item{x2_unnorm}{unnormalized versions of the continuous covariates}
 
-\item{alpha}{magnitude parameters}
+\item{alpha}{a vector of magnitude parameters}
 
-\item{ell}{lengthscale parameters}
+\item{ell}{a vector of lengthscale parameters or NaN}
 
-\item{wrp}{input warping parameters}
+\item{wrp}{the input warping parameter or NaN}
 
-\item{beta}{heterogeneity parameters}
+\item{beta}{a vector of heterogeneity parameters or NaN}
 
-\item{teff}{effect time parameters}
+\item{teff}{a vector of effect time parameters or NaN}
 
 \item{vm_params}{variance mask parameters}
 
@@ -52,7 +58,7 @@ kernel_all(
 
 \item{idx2_expand}{expansion of beta and/or teff}
 
-\item{teff_obs}{observed effect times}
+\item{teff_zero}{observed effect times}
 
 \item{STREAM}{an external pointer}
 }

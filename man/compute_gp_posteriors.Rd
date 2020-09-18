@@ -15,7 +15,8 @@ compute_gp_posteriors(kernels, y, delta, sigma, STREAM)
 
 \item{sigma}{a vector with length \code{num_draws}}
 
-\item{STREAM}{external pointer}
+\item{STREAM}{External pointer. By default obtained with
+\code{\link[rstan]{get_stream}}.}
 }
 \value{
 A list.
@@ -25,9 +26,11 @@ Compute GP posteriors
 }
 \seealso{
 Other GP posterior computation functions: 
+\code{\link{compute_kernel_matrices_const}()},
 \code{\link{compute_kernel_matrices}()},
-\code{\link{format_X_pred}()},
+\code{\link{create_kernel_input}()},
 \code{\link{get_draws_kernel_pars}()},
+\code{\link{posterior_predict_kernels}()},
 \code{\link{posterior_predict}()}
 }
 \concept{GP posterior computation functions}

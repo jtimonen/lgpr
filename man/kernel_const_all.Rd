@@ -5,6 +5,8 @@
 \title{Compute all constant kernel matrices of a model}
 \usage{
 kernel_const_all(
+  n1,
+  n2,
   x1_cat,
   x2_cat,
   x1_cont_mask,
@@ -15,6 +17,10 @@ kernel_const_all(
 )
 }
 \arguments{
+\item{n1}{integer}
+
+\item{n2}{integer}
+
 \item{x1_cat}{categorical covariates}
 
 \item{x2_cat}{categorical covariates}
