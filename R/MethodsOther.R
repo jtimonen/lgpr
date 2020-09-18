@@ -23,7 +23,6 @@ setMethod("as.character", "lgpformula", function(x) {
   return(x@call)
 })
 
-
 #' Operations on formula terms and expressions
 #'
 #' @description

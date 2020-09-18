@@ -18,6 +18,7 @@ test_that("parse_formula translated simple formulas", {
   f <- parse_formula(y ~ age + age | sex, dat)
   expect_equal(as.character(f), "y ~ gp(age) + gp(age) * zs(sex)")
   expect_output(show(f@terms))
+  expect_output(show(f@terms@summands[[1]]))
   reason <- "variable 'notvar' not found in <data>"
   expect_error(parse_formula(y ~ age + notvar, dat), reason)
 })
