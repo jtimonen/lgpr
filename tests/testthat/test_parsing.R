@@ -64,9 +64,9 @@ test_that("parse_formula_advanced throws error when input is not a formula", {
   expect_error(parse_formula_advanced("a + b "), reason)
 })
 
-test_that("parse_formula_advanced throws error if invalid function or covariate", {
-  expect_error(parse_formula_advanced(y ~ notafunction(x)), "<fun> must be one of")
-  expect_error(parse_formula_advanced(y ~ gp("")), "covariate name cannot be empty")
+test_that("parse_formula_advanced errors with invalid function or covariate", {
+  expect_error(parse_formula_advanced(y ~ notfun(x)), "<fun> must be one of")
+  expect_error(parse_formula_advanced(y ~ gp("")), "cannot be empty")
   expect_error(
     parse_formula_advanced(y ~ gp(x) * gp(y) * gp(z)),
     "the response variable cannot be also a covariate"
@@ -82,7 +82,7 @@ test_that("parse_formula_advanced throws error if invalid function or covariate"
 })
 
 
-test_that("parse_formula_advanced throws informative error if mixing syntaxes", {
+test_that("parse_formula_advanced throws error if mixing syntaxes", {
   reason <- "Be sure not to mix the advanced and simple formula syntaxes"
   expect_error(parse_formula_advanced(5 ~ koira + gp(r)), reason)
 })
@@ -103,10 +103,13 @@ test_that("parse_likelihood can be used", {
 
 test_that("parse_likelihood errors correctly", {
   list_y <- list(y_cont = c(1, 2))
-  expect_error(parse_likelihood("gaussian", 0, NULL, list_y))
-  expect_error(parse_likelihood("gaussian", NULL, 0, list_y))
+  reason <- "Only give the c_hat argument if observation model is not Gaussian"
+  expect_error(parse_likelihood("gaussian", 0, NULL, list_y, FALSE), reason)
+  reason <- "<num_trials> argument if likelihood is binomial or beta-binomial"
+  expect_error(parse_likelihood("gaussian", NULL, 0, list_y, FALSE), reason)
   list_y <- list(y_disc = c(1, 2))
-  expect_error(parse_likelihood("nb", c(1, 2, 3), NULL, list_y))
+  reason <- "Invalid length of <c_hat>"
+  expect_error(parse_likelihood("nb", c(1, 2, 3), NULL, list_y, FALSE), reason)
 })
 
 test_that("parse_likelihood works correctly with binomial likelihood", {
@@ -117,8 +120,16 @@ test_that("parse_likelihood works correctly with binomial likelihood", {
   expect_equal(length(a$y_num_trials), 2)
   diff <- abs(b$c_hat - (-1.609438))
   expect_lt(max(diff), 1e-6)
-  expect_error(parse_likelihood("binomial", NULL, c(1, 1, 1), c(1, 2), FALSE))
-  expect_error(parse_likelihood("binomial", c(1, 1, 1), NULL, c(1, 2), FALSE))
+  reason <- "Invalid length of <num_trials>"
+  expect_error(
+    parse_likelihood("binomial", NULL, c(1, 1, 1), list_y, FALSE),
+    reason
+  )
+  reason <- "Invalid length of <c_hat>"
+  expect_error(
+    parse_likelihood("binomial", c(1, 1, 1), NULL, list_y, FALSE),
+    reason
+  )
 })
 
 test_that("y_scaling is created and and applied", {

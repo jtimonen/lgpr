@@ -4,16 +4,17 @@
 \alias{compute_gp_posteriors}
 \title{Compute GP posteriors}
 \usage{
-compute_gp_posteriors(kernels, y, delta, sigma, STREAM)
+compute_gp_posteriors(kernels, y, sigma, delta, STREAM = get_stream())
 }
 \arguments{
-\item{kernels}{a list with length \code{num_draws}}
+\item{kernels}{a list of arrays returned by
+\code{\link{compute_kernel_matrices}}}
 
 \item{y}{response variable vector of length \code{num_obs}}
 
-\item{delta}{jitter to ensure positive definite matrices}
-
 \item{sigma}{a vector with length \code{num_draws}}
+
+\item{delta}{jitter to ensure positive definite matrices}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}

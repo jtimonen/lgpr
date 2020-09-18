@@ -14,11 +14,11 @@ posterior_predict <- function(fit, X_pred, STREAM = get_stream()) {
   if (obs_model != "gaussian") stop("observation model must be gaussian!")
   sigma <- get_draws(fit, pars = "sigma", stack_chains = TRUE)
   kernels <- posterior_predict_kernels(fit, X_pred, STREAM)
-
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   y <- get_y(fit)
-  compute_gp_posteriors(kernels, y, delta, sigma, STREAM)
+  y <- as.vector(get_y(fit))
+  compute_gp_posteriors(kernels, y, sigma, delta, STREAM)
 }
 
 #' Compute all kernel matrices required for computing the function
@@ -152,7 +152,7 @@ compute_kernel_matrices <- function(model, x1, x2, theta,
 
   # Loop through each posterior draw
   J <- nrow(components)
-  L <- length(theta)
+  L <- nrow(alpha)
   K_out <- array(0.0, dim = c(L, J, n1, n2))
   for (i in seq_len(L)) {
     K_i <- kernel_all(
@@ -171,14 +171,37 @@ compute_kernel_matrices <- function(model, x1, x2, theta,
 
 #' Compute GP posteriors
 #'
-#' @param kernels a list with length \code{num_draws}
+#' @export
+#' @param kernels a list of arrays returned by
+#' \code{\link{compute_kernel_matrices}}
 #' @param y response variable vector of length \code{num_obs}
-#' @param delta jitter to ensure positive definite matrices
 #' @param sigma a vector with length \code{num_draws}
+#' @param delta jitter to ensure positive definite matrices
 #' @inheritParams posterior_predict
 #' @return A list.
 #' @family GP posterior computation functions
-compute_gp_posteriors <- function(kernels, y, delta, sigma, STREAM) {
-  # gp_posterior(KX, KX_s, KX_ss, y, delta, sigma, STREAM)
-  "TODO"
+compute_gp_posteriors <- function(kernels, y, sigma, delta,
+                                  STREAM = get_stream()) {
+  sigma <- as.vector(sigma)
+  K <- dollar(kernels, "data_vs_data")
+  Ks <- dollar(kernels, "pred_vs_data")
+  Kss <- dollar(kernels, "pred_vs_pred")
+  L <- length(sigma)
+  arr3_to_list <- function(x) {
+    out <- list()
+    d <- dim(x)[1]
+    for (j in seq_len(d)) {
+      out[[j]] <- x[j, , ]
+    }
+    return(out)
+  }
+  out <- list()
+  for (i in seq_len(L)) {
+    k <- arr3_to_list(K[i, , , ])
+    ks <- arr3_to_list(Ks[i, , , ])
+    kss <- arr3_to_list(Kss[i, , , ])
+    post <- gp_posterior(k, ks, kss, y, delta, sigma[i], STREAM)
+    out[[i]] <- post
+  }
+  return(out)
 }
