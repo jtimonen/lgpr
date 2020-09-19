@@ -40,7 +40,7 @@ dat <- testdata_001
 
 test_that("adding a factor works correctly", {
   country <- c("FIN", "FIN", "EST", "EST")
-  expect_error(add_factor(dat, country), "<x> must be a named vector")
+  expect_error(add_factor(dat, country), "<x> must have names")
   names(country) <- c(1, 3, 2, 4)
   newdat <- add_factor(dat, country)
   expect_true("country" %in% names(newdat))

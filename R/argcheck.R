@@ -17,6 +17,10 @@
 #'   \item \code{check_all_leq} checks that argument has values less than equal
 #'   to given maximums, elementwise
 #'   \item \code{check_not_named} checks that \code{names(arg)} is NULL
+#'   \item \code{check_named} checks that length of \code{names(arg)} is
+#'   greater than zero
+#'   \item \code{check_dim} checks that \code{arg} has expected number of
+#'   dimensions
 #'   \item \code{check_null} checks that \code{arg} is NULL
 #' }
 #' @return \code{TRUE} if the check passes.
@@ -204,6 +208,32 @@ check_not_named <- function(arg) {
   if (!is.null(nams)) {
     str <- paste(nams, collapse = ", ")
     msg <- paste0("<", arg_name, "> should not have names! found = {", str, "}")
+    stop(msg)
+  }
+  TRUE
+}
+
+#' @rdname checks
+check_named <- function(arg) {
+  arg_name <- deparse(substitute(arg))
+  nams <- names(arg)
+  if (length(nams) < 1) {
+    msg <- paste0("<", arg_name, "> must have names!")
+    stop(msg)
+  }
+  TRUE
+}
+
+#' @rdname checks
+#' @param D expected number of dimensions
+check_dim <- function(arg, D) {
+  arg_name <- deparse(substitute(arg))
+  L <- length(dim(arg))
+  if (L != D) {
+    msg <- paste0(
+      "number of dimensions of <", arg_name, "> must be ", D,
+      "! found = ", L
+    )
     stop(msg)
   }
   TRUE

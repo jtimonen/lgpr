@@ -22,11 +22,10 @@ ensure_2dim <- function(v) {
   L <- length(dim(v))
   if (L == 2) {
     out <- v
-  } else if (L < 2) {
+  } else {
+    check_dim(v, 0)
     n <- length(v)
     out <- array(v, dim = c(1, n))
-  } else {
-    stop("<v> must have one or two dimensions!")
   }
   return(out)
 }
@@ -38,8 +37,7 @@ ensure_2dim <- function(v) {
 #' @family array utilities
 row_vars <- function(x) {
   check_not_null(x)
-  L <- length(dim(x))
-  if (L != 2) stop("<x> must be 2-dimensional")
+  check_dim(x, 2)
   apply(x, 1, stats::var)
 }
 
@@ -132,11 +130,8 @@ add_sum_arraylist <- function(x) {
 null_if_all_nan <- function(x) {
   L <- length(x)
   S <- sum(is.nan(x))
-  if (S < L) {
-    return(x)
-  } else {
-    return(NULL)
-  }
+  out <- if (S < L) x else NULL
+  return(out)
 }
 
 #' Check that each row of array is identical

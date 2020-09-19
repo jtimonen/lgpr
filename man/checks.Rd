@@ -15,6 +15,8 @@
 \alias{check_in_data}
 \alias{check_all_leq}
 \alias{check_not_named}
+\alias{check_named}
+\alias{check_dim}
 \title{Argument validation}
 \usage{
 check_type(arg, allowed)
@@ -42,6 +44,10 @@ check_in_data(var_name, data)
 check_all_leq(arg, maximums)
 
 check_not_named(arg)
+
+check_named(arg)
+
+check_dim(arg, D)
 }
 \arguments{
 \item{arg}{An argument to check.}
@@ -65,6 +71,8 @@ check_not_named(arg)
 \item{data}{a data frame}
 
 \item{maximums}{maximum allowed values for \code{arg}}
+
+\item{D}{expected number of dimensions}
 }
 \value{
 \code{TRUE} if the check passes.
@@ -84,6 +92,10 @@ check_not_named(arg)
   \item \code{check_all_leq} checks that argument has values less than equal
   to given maximums, elementwise
   \item \code{check_not_named} checks that \code{names(arg)} is NULL
+  \item \code{check_named} checks that length of \code{names(arg)} is
+  greater than zero
+  \item \code{check_dim} checks that \code{arg} has expected number of
+  dimensions
   \item \code{check_null} checks that \code{arg} is NULL
 }
 }

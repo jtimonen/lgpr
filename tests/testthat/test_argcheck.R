@@ -74,6 +74,14 @@ test_that("check_not_named works correctly", {
   expect_error(check_not_named(x), reason)
 })
 
+test_that("check_named works correctly", {
+  x <- c(4, 3, 4, 5)
+  expect_error(check_named(x), "<x> must have names")
+  names(x) <- c("hei", "hey", "ho", "jea")
+  expect_true(check_named(x))
+})
+
+
 test_that("check_numeric works correctly", {
   reason <- "must be numeric"
   expect_error(check_numeric("moi"), reason)
@@ -94,4 +102,11 @@ test_that("check_false works correctly", {
   expect_error(check_false(2), reason)
   expect_true(check_false(0))
   expect_true(check_false(!a))
+})
+
+test_that("check_dim works correctly", {
+  a <- array(0, c(2, 3, 4))
+  expect_true(check_dim(a, 3))
+  reason <- "number of dimensions of <a> must be 2! found = 3"
+  expect_error(check_dim(a, 2), reason)
 })

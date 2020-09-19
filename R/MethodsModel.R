@@ -243,11 +243,7 @@ get_covariate_info_cat <- function(object) {
   J <- length(nam)
   for (j in seq_len(J)) {
     a <- levels[[j]]
-    if (length(a) > 4) {
-      a <- "..."
-    } else {
-      a <- paste(a, collapse = ", ")
-    }
+    a <- if (length(a) > 4) "..." else paste(a, collapse = ", ")
     level_names[j] <- a
   }
   df <- data.frame(nam, num_levels, level_names)
