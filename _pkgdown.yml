@@ -10,12 +10,6 @@ reference:
   - sample_model
   - optimize_model
   - uniform
-  - normal
-  - student_t
-  - log_normal
-  - gam
-  - igam
-  - bet
   - fit_summary
   - relevances
   - ppc
@@ -24,6 +18,8 @@ reference:
   - plot_fit
   - get_f
   - model_summary
+  - gp_posterior
+  - kernel_matrices
   
   - new_data
   - add_factor

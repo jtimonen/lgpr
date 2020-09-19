@@ -339,11 +339,11 @@ plot_warp_helper <- function(par_summary,
   color_line <- dollar(scheme, "dark")
   color_inner <- dollar(scheme, "light_highlight")
   color_outer <- dollar(scheme, "light")
-  w_50 <- warp_input(dis_age, a = par_summary[6])
-  w_75 <- warp_input(dis_age, a = par_summary[7])
-  w_25 <- warp_input(dis_age, a = par_summary[5])
-  w_025 <- warp_input(dis_age, a = par_summary[4])
-  w_975 <- warp_input(dis_age, a = par_summary[8])
+  w_50 <- cpp_warp_input(dis_age, a = par_summary[6])
+  w_75 <- cpp_warp_input(dis_age, a = par_summary[7])
+  w_25 <- cpp_warp_input(dis_age, a = par_summary[5])
+  w_025 <- cpp_warp_input(dis_age, a = par_summary[4])
+  w_975 <- cpp_warp_input(dis_age, a = par_summary[8])
   DF <- data.frame(cbind(dis_age, w_50, w_75, w_25, w_025, w_975))
 
   # Create ggplot object

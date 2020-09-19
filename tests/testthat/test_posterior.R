@@ -33,7 +33,7 @@ test_that("kernel parameter samples can be extracted", {
 })
 
 test_that("posterior kernel computations work correctly", {
-  kers <- posterior_predict_kernels(fit, X_pred)
+  kers <- gp_kernels(fit, X_pred)
   expect_equal(names(kers), c("data_vs_data", "pred_vs_data", "pred_vs_pred"))
   expect_equal(dim(kers$data_vs_data), c(600, 2, 24, 24))
   expect_equal(dim(kers$pred_vs_data), c(600, 2, 44, 24))
@@ -41,7 +41,7 @@ test_that("posterior kernel computations work correctly", {
 })
 
 test_that("function posterior computations work correctly", {
-  out <- posterior_predict(fit, X_pred)
+  out <- gp_posteriors(fit, X_pred)
   expect_equal(length(out), 600)
   expect_equal(length(out[[1]]), 6)
 })

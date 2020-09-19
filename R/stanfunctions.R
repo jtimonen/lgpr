@@ -11,10 +11,10 @@
 #' @param components an integer array
 #' @param STREAM an external pointer
 #' @return an array of kernel matrices
-kernel_const_all <- function(n1, n2, x1_cat, x2_cat,
-                             x1_cont_mask, x2_cont_mask,
-                             x_cat_num_levels, components,
-                             STREAM = get_stream()) {
+cpp_kernel_const_all <- function(n1, n2, x1_cat, x2_cat,
+                                 x1_cont_mask, x2_cont_mask,
+                                 x_cat_num_levels, components,
+                                 STREAM = get_stream()) {
   x1_cat <- matrix_to_list(x1_cat)
   x2_cat <- matrix_to_list(x2_cat)
   x1_cont_mask <- matrix_to_list(x1_cont_mask)
@@ -31,7 +31,7 @@ kernel_const_all <- function(n1, n2, x1_cat, x2_cat,
 #' Compute all kernel matrices of a model
 #'
 #' @description This is a wrapper for \code{STAN_kernel_all}
-#' @inheritParams kernel_const_all
+#' @inheritParams cpp_kernel_const_all
 #' @param K_const list of constant matrices
 #' @param components an integer array
 #' @param x1 continuous covariates
@@ -49,11 +49,11 @@ kernel_const_all <- function(n1, n2, x1_cat, x2_cat,
 #' @param teff_zero observed effect times
 #' @param STREAM an external pointer
 #' @return an array of kernel matrices
-kernel_all <- function(n1, n2, K_const, components, x1, x2,
-                       x1_unnorm, x2_unnorm,
-                       alpha, ell, wrp, beta, teff,
-                       vm_params, idx1_expand, idx2_expand, teff_zero,
-                       STREAM = get_stream()) {
+cpp_kernel_all <- function(n1, n2, K_const, components, x1, x2,
+                           x1_unnorm, x2_unnorm,
+                           alpha, ell, wrp, beta, teff,
+                           vm_params, idx1_expand, idx2_expand, teff_zero,
+                           STREAM = get_stream()) {
 
   # List format
   x1 <- matrix_to_list(x1)
@@ -86,8 +86,8 @@ kernel_all <- function(n1, n2, K_const, components, x1, x2,
 #' @param sigma Gaussian noise magnitude parameter
 #' @param STREAM an external pointer
 #' @return an array of kernel matrices
-gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
-                         STREAM = get_stream()) {
+cpp_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
+                             STREAM = get_stream()) {
   STAN_gp_posterior(KX, KX_s, KX_ss, y, delta, sigma, STREAM)
 }
 
@@ -98,7 +98,7 @@ gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
 #' @param a steepness parameter
 #' @param STREAM an external pointer
 #' @return a vector
-warp_input <- function(x, a, STREAM = get_stream()) {
+cpp_warp_input <- function(x, a, STREAM = get_stream()) {
   STAN_warp_input(x, a, STREAM)
 }
 
@@ -109,6 +109,6 @@ warp_input <- function(x, a, STREAM = get_stream()) {
 #' @param a steepness parameter
 #' @param STREAM an external pointer
 #' @return a vector
-var_mask <- function(x, a, STREAM = get_stream()) {
+cpp_var_mask <- function(x, a, STREAM = get_stream()) {
   STAN_var_mask(x, a, STREAM)
 }

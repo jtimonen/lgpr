@@ -101,12 +101,13 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
                       color_scheme = "brightblue") {
   check_type(fit, "lgpfit")
   R <- window_size
-  num_ns <- fit@model@stan_input$num_ns
+  num_ns <- dollar(fit@model@stan_input, "num_ns")
   dis_age <- seq(-R / 2, R / 2, length.out = num_points)
   out <- list()
   for (j in seq_len(num_ns)) {
     par_name <- paste0("wrp[", j, "]")
-    par_summary <- rstan::summary(fit@stan_fit, pars = c(par_name))$summary
+    summary <- rstan::summary(fit@stan_fit, pars = c(par_name))
+    par_summary <- dollar(summary, "summary")
     out[[j]] <- plot_warp_helper(par_summary, dis_age, color_scheme)
   }
 
@@ -276,7 +277,8 @@ scale_f_total <- function(fit, f_total) {
   check_not_null(f_total)
   f_sampled <- is_f_sampled(fit)
   check_false(f_sampled)
-  fun_inv <- fit@model@var_scalings$y@fun_inv
+  y_scl <- dollar(fit@model@var_scalings, "y")
+  fun_inv <- y_scl@fun_inv
   f_total$mean <- scale_f_helper(fun_inv, f_total$mean)
   f_total$std <- scale_f_helper(fun_inv, f_total$std)
   return(f_total)

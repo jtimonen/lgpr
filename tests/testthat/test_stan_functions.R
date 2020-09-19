@@ -9,60 +9,6 @@ test_that("rstan::get_stream is in namespace", {
   expect_true(class(STREAM) == "externalptr")
 })
 
-test_that("STAN_warp_input works for scalar input", {
-  w <- warp_input(-1, 1.32)
-  expect_equal(w, -0.5783634)
-})
-
-test_that("STAN_warp_input works for vector input", {
-  w <- warp_input(c(-1, 0, 1), 1.32)
-  w_correct <- c(-0.5783634, 0.0, 0.5783634)
-  expect_equal(w, w_correct)
-})
-
-test_that("STAN_warp_input errors with invalid steepness input", {
-  expect_error(warp_input(1, -1))
-  expect_error(warp_input(1, 0.0))
-  expect_error(warp_input(1, NaN))
-  expect_error(warp_input(1, Inf))
-})
-
-test_that("STAN_warp_input works similarly as reference", {
-  a <- exp(stats::rnorm(1)) # random steepness
-  x <- seq(-3, 3, by = 1.33)
-  expect_equal(
-    warp_input(x, a),
-    sim_warp_input(x, a, 0, 1)
-  )
-})
-
-test_that("STAN_var_mask works for scalar input", {
-  m <- var_mask(-1, 1.32)
-  expect_equal(m, 0.2108183)
-})
-
-test_that("STAN_var_mask works for vector input", {
-  m <- var_mask(c(-1, 0, 1), 1.32)
-  m_correct <- c(0.2108183, 0.5, 0.7891817)
-  expect_equal(m, m_correct)
-})
-
-test_that("STAN_var_mask errors with invalid steepness input", {
-  expect_error(var_mask(1, -1))
-  expect_error(var_mask(1, 0.0))
-  expect_error(var_mask(1, NaN))
-  expect_error(var_mask(1, Inf))
-})
-
-test_that("STAN_var_mask works similarly as reference", {
-  a <- 0.6
-  x <- c(-5, 0, 5)
-  expect_equal(
-    var_mask(x, a),
-    sim_var_mask(x, a)
-  )
-})
-
 test_that("STAN_expand works for valid input", {
   p <- c(0.1, 0.2)
   v <- STAN_expand(p, c(2, 3, 2, 3), STREAM)
