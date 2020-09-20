@@ -8,6 +8,7 @@
 #' exists.
 #' @family list utilities
 dollar <- function(object, var_name) {
+  check_not_null(var_name)
   obj_name <- deparse(substitute(object))
   nams <- names(object)
   if (!(var_name %in% nams)) {

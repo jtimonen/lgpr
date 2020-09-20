@@ -24,12 +24,14 @@ Easily add a categorical covariate to a data frame
 \seealso{
 Other data utilities: 
 \code{\link{add_dis_age}()},
+\code{\link{add_factor_crossing}()},
 \code{\link{data_types}()},
 \code{\link{get_teff_obs}()},
 \code{\link{new_x}()},
 \code{\link{pick_one_row_each}()},
 \code{\link{select_factors_and}()},
 \code{\link{split}()},
+\code{\link{to_long_format}()},
 \code{\link{valid_data}}
 }
 \concept{data utilities}

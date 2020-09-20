@@ -99,7 +99,7 @@ test_that("create_plot_df works correctly", {
   a <- c(1, 2, 3)
   b <- seq(1, 24, by = 1)
   expect_error(create_plot_df(model, x = a), "length should be")
-  reason <- "group_by has invalid type 'numeric'. Allowed types are"
+  reason <- "Allowed classes are"
   expect_error(create_plot_df(model, x = b, group_by = b), reason)
   ID <- as.factor(paste0("M", rep(c(1:4), each = 6)))
   df <- create_plot_df(model, x = b, group_by = ID)
@@ -118,8 +118,12 @@ test_that("simulated data can be plotted", {
     t_data = seq(6, 36, by = 6),
     covariates = c(1, 2)
   )
-  p <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4)
-  expect_s3_class(p, "ggplot")
+  p1 <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4)
+  p2 <- plot_sim_component(dat, 2) # not colored
+  p3 <- plot_sim_component(dat, 3, color_by = "z") # colored
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
 })
 
 test_that("simulated data with disease effect can be plotted", {
@@ -129,8 +133,12 @@ test_that("simulated data with disease effect can be plotted", {
     covariates = c(0, 2),
     t_observed = "after_1"
   )
-  p <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4)
-  expect_s3_class(p, "ggplot")
+  p1 <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4) # has vert lines
+  p2 <- plot_sim_component(dat, 1)
+  p3 <- plot_sim_component(dat, 3, color_by = "diseaseAge")
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
 })
 
 test_that("show method for simualated data prints output", {

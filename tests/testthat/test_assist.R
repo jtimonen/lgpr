@@ -66,6 +66,6 @@ test_that("adjusted_c_hat works correctly", {
   reason <- "must have only integer values"
   expect_error(adjusted_c_hat(c(1, 1.2, 0), norm_factors = c(1, 2, 3)), reason)
   c_hat <- adjusted_c_hat(c(1, 1, 1), norm_factors = c(1, 2, 3))
-  diff <- abs(c_hat - c(0.0000000, 0.6931472, 1.0986123))
+  diff <- abs(c_hat - c(0.0, 0.6931472, 1.0986123))
   expect_lt(max(diff), 1e-6)
 })

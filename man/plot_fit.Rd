@@ -4,7 +4,14 @@
 \alias{plot_fit}
 \title{Visualize a model fit against longitudinal data set}
 \usage{
-plot_fit(fit, x = "age", group_by = "id", draws = NULL, ...)
+plot_fit(
+  fit,
+  x = "age",
+  group_by = "id",
+  draws = NULL,
+  componentwise = FALSE,
+  ...
+)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
@@ -16,7 +23,7 @@ the plot into panels}
 
 \item{draws}{see the \code{draws} argument of \code{\link{get_f}}}
 
-\item{...}{keyword arguments to \code{\link{plot_panel}}}
+\item{...}{additional keyword arguments to \code{rstan::extract}}
 }
 \value{
 a \code{ggplot} object

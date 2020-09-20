@@ -30,15 +30,14 @@ NULL
 #' @rdname checks
 #' @param allowed Allowed class names.
 check_type <- function(arg, allowed) {
-  check_length(class(arg), 1)
-  type <- class(arg)
+  type <- class(arg)[1]
   ok <- (type %in% allowed)
   if (!ok) {
     arg_name <- deparse(substitute(arg))
     str <- paste(allowed, collapse = ", ")
     msg <- paste0(
-      arg_name, " has invalid type '", type,
-      "'. Allowed types are {", str, "}."
+      "class(", arg_name, ")[1] is '", type,
+      "'. Allowed classes are {", str, "}."
     )
     stop(msg)
   }

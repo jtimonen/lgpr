@@ -13,7 +13,10 @@ have to be numeric.
   [bayesplot](http://mc-stan.org/bayesplot/).
 * Covariate relevance assessment is now separated from model fitting.
 functionality into the `relevances()` function.
-* More general visualization options with `plot_data()` and`plot_panel()`.
+* More general visualization options with `plot_data()`, `plot_fit()`, 
+ `plot_fit_components()`
+* Unified API for model fit and component plots using 
+  `plot_api_g()` (grouped) and `plot_api_c()` (componentwise).
 
 # lgpr 0.33
 

@@ -7,7 +7,7 @@
 \usage{
 gp_posteriors(fit, x, STREAM = get_stream())
 
-gp_kernels(fit, X_pred, STREAM = get_stream())
+gp_kernels(fit, x, STREAM = get_stream())
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}

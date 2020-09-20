@@ -140,43 +140,26 @@ class_info <- function(class_name) {
 }
 
 
-#' Visualize an artificial longitudinal data set
+#' Get simulated components from an lgpsim object
 #'
 #' @export
-#' @description Creates plots where each observation unit has a separate panel.
 #' @param simdata an object of class \linkS4class{lgpsim}
-#' @param signal_name signal label to show in legend
-#' @param signal_column name of the signal column in \code{simdata$components}
-#' @param x_name name of x-axis variable
-#' @param y_name name of y-axis variable
-#' @param group_by grouping variable
-#' @param ... keyword arguments to \code{\link{plot_panel}}
-#' @return a \code{ggplot object}
-plot_sim <- function(simdata, signal_name = "signal", signal_column = "f",
-                     x_name = "age", y_name = "y", group_by = "id", ...) {
-  data <- simdata@data
-  df_points <- data[c(group_by, x_name, y_name)]
-  df_lines <- df_points
-  df_lines[[y_name]] <- simdata@components[[signal_column]]
-  colnames(df_lines)[3] <- signal_name
-
-  teff_true <- dollar(simdata@effect_times, "true")
-  teff_true <- null_if_all_nan(teff_true)
-  teff_obs <- dollar(simdata@effect_times, "observed")
-  teff_obs <- null_if_all_nan(teff_obs)
-
-  h <- plot_panel(
-    df_data = df_points,
-    df_signal = df_lines,
-    teff_true = teff_true,
-    teff_obs = teff_obs,
-    ...
-  )
-
-  info <- paste0(
-    "Vertical lines are the real effect time (solid) \n",
-    "and observed disease onset / initiation time (dashed)."
-  )
-  h <- h + ggplot2::ggtitle("Simulated data", subtitle = info)
-  return(h)
+#' @return a data frame
+get_sim_components <- function(simdata) {
+  df <- simdata@components
+  nams <- colnames(df)
+  idx <- which(nams == "f")
+  df <- df[, 1:(idx - 1)]
+  nams <- colnames(df)
+  prettify <- function(str, i) {
+    str <- gsub(str, pattern = ".", replacement = ", ", fixed = TRUE)
+    str <- paste0("f[", i, "](", str, ")")
+    return(str)
+  }
+  J <- length(nams)
+  for (j in seq_len(J)) {
+    nams[j] <- prettify(nams[j], j)
+  }
+  colnames(df) <- nams
+  return(df)
 }

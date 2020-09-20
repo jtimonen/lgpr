@@ -21,7 +21,7 @@ test_that("check_type works correctly", {
   out2 <- check_type(3.4, c("numeric", "character"))
   expect_true(out1)
   expect_true(out2)
-  reason <- "has invalid type 'numeric'"
+  reason <- "Allowed classes are"
   expect_error(check_type(3.4, "list"), reason)
 })
 

@@ -60,7 +60,7 @@ test_that("lgpexpr and lgpterm can be summed", {
 })
 
 test_that("parse_formula_advanced throws error when input is not a formula", {
-  reason <- "formula has invalid type 'character'. Allowed types are"
+  reason <- "Allowed classes are"
   expect_error(parse_formula_advanced("a + b "), reason)
 })
 

@@ -19,10 +19,10 @@ get_draws_kernel_pars(fit)
 \item{model}{An object of class \linkS4class{lgpmodel}.}
 
 \item{x1}{A list defining the first input argument. Can be
-created by \code{\link{kernels_matrices_create_input}}.}
+created by \code{\link{kernel_matrices_create_input}}.}
 
 \item{x2}{A list defining the second input argument. Can be
-created by \code{\link{kernels_matrices_create_input}}.}
+created by \code{\link{kernel_matrices_create_input}}.}
 
 \item{theta}{A list of kernel parameter draws with length \code{num_draws}.}
 
@@ -44,7 +44,7 @@ The function \code{\link{new_x}} provides an easy way to create it.}
   can be computed using \code{kernel_matrices_const}. It returns a list
   of kernel matrices with length equal to number of model components.
   \item Input information can be translated from a data frame to the
-  needed format using \code{kernels_matrices_create_input}.
+  needed format using \code{kernel_matrices_create_input}.
   \item Kernel parameter draws can be extracted using
   \code{get_draws_kernel_params}. It returns a list with names
   "alpha", "ell", "wrp", "beta" and "teff", where each element is an

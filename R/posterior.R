@@ -40,10 +40,10 @@ gp_posteriors <- function(fit, x, STREAM = get_stream()) {
 
 #' @export
 #' @rdname gp_posteriors
-gp_kernels <- function(fit, X_pred, STREAM = get_stream()) {
+gp_kernels <- function(fit, x, STREAM = get_stream()) {
   model <- object_to_model(fit)
   x_data <- model@stan_input
-  x_pred <- kernel_matrices_create_input(model, X_pred)
+  x_pred <- kernel_matrices_create_input(model, x)
   theta <- get_draws_kernel_pars(fit)
 
   # Computation
@@ -107,7 +107,7 @@ gp_posteriors_compute <- function(kernels, y, sigma, delta,
 #'   can be computed using \code{kernel_matrices_const}. It returns a list
 #'   of kernel matrices with length equal to number of model components.
 #'   \item Input information can be translated from a data frame to the
-#'   needed format using \code{kernels_matrices_create_input}.
+#'   needed format using \code{kernel_matrices_create_input}.
 #'   \item Kernel parameter draws can be extracted using
 #'   \code{get_draws_kernel_params}. It returns a list with names
 #'   "alpha", "ell", "wrp", "beta" and "teff", where each element is an
@@ -115,9 +115,9 @@ gp_posteriors_compute <- function(kernels, y, sigma, delta,
 #' }
 #' @param model An object of class \linkS4class{lgpmodel}.
 #' @param x1 A list defining the first input argument. Can be
-#' created by \code{\link{kernels_matrices_create_input}}.
+#' created by \code{\link{kernel_matrices_create_input}}.
 #' @param x2 A list defining the second input argument. Can be
-#' created by \code{\link{kernels_matrices_create_input}}.
+#' created by \code{\link{kernel_matrices_create_input}}.
 #' @inheritParams gp_posteriors
 #' @name kernel_matrices
 NULL
