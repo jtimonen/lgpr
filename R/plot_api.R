@@ -350,7 +350,7 @@ add_g_layer_signal <- function(h, df, x_name, group_by, color) {
 
 #' @rdname add_layer
 #' @param facet_by factor to use for faceting
-#' @inheritParams plot_api_c
+#' @inheritParams plot_api_g
 add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
   f <- stats::as.formula(paste("~", facet_by))
   labfun <- ggplot2::label_both

@@ -213,8 +213,7 @@ test_that("cannot have a continuous covariate with zero variance", {
   expect_error(create_model(y ~ gp(age) + zs(id), newdat), reason)
 })
 
-
-test_that("cannot have NaNs on different rows", {
+test_that("cannot have NaNs on differing rows", {
   newdat <- testdata_001
   newdat$new_x <- rev(newdat$dis_age)
   reason <- paste0(
@@ -227,5 +226,14 @@ test_that("cannot have NaNs on different rows", {
       data = newdat
     ),
     reason
+  )
+})
+
+test_that("cannot have missing values for a factor", {
+  newdat <- testdata_001
+  newdat$sex[3:5] <- NA
+  expect_error(
+    create_model(formula = y ~ age + sex, data = newdat),
+    "missing values for factor 'sex'"
   )
 })

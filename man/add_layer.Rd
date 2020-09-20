@@ -38,6 +38,12 @@ add_g_layer_faceting(h, facet_by, nrow, ncol)
 \item{color}{color}
 
 \item{facet_by}{factor to use for faceting}
+
+\item{nrow}{number of rows, an argument for
+\code{\link[ggplot2]{facet_wrap}}}
+
+\item{ncol}{number of columns, an argument for
+\code{\link[ggplot2]{facet_wrap}}}
 }
 \value{
 a modified ggplot object

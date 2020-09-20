@@ -44,6 +44,7 @@ Vizualizing longitudinal data
 }
 \seealso{
 Other main plot functions: 
+\code{\link{plot_fit}()},
 \code{\link{plot_sim}()}
 }
 \concept{main plot functions}

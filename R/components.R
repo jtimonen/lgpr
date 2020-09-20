@@ -79,7 +79,7 @@ stan_data_covariates <- function(data, x_names) {
       x_cat_num_levels[num_cat] <- length(levels(X_RAW))
       x_cat_levels[[num_cat]] <- levels(X_RAW)
       x_cat_names[num_cat] <- name
-    } else if (c_x == "numeric") {
+    } else {
 
       # A continuous covariate
       num_cont <- num_cont + 1
@@ -92,12 +92,6 @@ stan_data_covariates <- function(data, x_names) {
       x_cont[[num_cont]] <- call_fun(normalizer@fun, X_NONAN)
       x_cont_unnorm[[num_cont]] <- X_NONAN
       x_cont_names[num_cont] <- name
-    } else {
-      msg <- paste0(
-        "Covariate '", name, "' has invalid type '", c_x,
-        "'! Must be one of {'factor', 'numeric'}"
-      )
-      stop(msg)
     }
   }
 

@@ -8,10 +8,10 @@
 \usage{
 plot_sim(
   simdata,
-  f_name = "f",
-  x_name = "age",
-  y_name = "y",
   group_by = "id",
+  x_name = "age",
+  f_name = "f",
+  y_name = "y",
   ...
 )
 
@@ -19,10 +19,10 @@ plot_sim_component(
   simdata,
   component_idx,
   color_by = NA,
-  f_name = "f",
   x_name = "age",
-  y_name = "y",
   group_by = "id",
+  f_name = "f",
+  y_name = "y",
   ...
 )
 
@@ -31,13 +31,13 @@ plot_sim_component_df(simdata, x_name, group_by, color_by, component_idx)
 \arguments{
 \item{simdata}{an object of class \linkS4class{lgpsim}}
 
-\item{f_name}{name of the signal in \code{simdata$components}}
+\item{group_by}{grouping factor}
 
 \item{x_name}{name of x-axis variable}
 
-\item{y_name}{name of response variable}
+\item{f_name}{name of the signal in \code{simdata$components}}
 
-\item{group_by}{grouping factor}
+\item{y_name}{name of response variable}
 
 \item{...}{additional arguments to \code{\link{plot_api_g}} or
 \code{\link{plot_api_c}}}
@@ -59,6 +59,7 @@ a \code{\link[ggplot2]{ggplot}} object
 }
 \seealso{
 Other main plot functions: 
-\code{\link{plot_data}()}
+\code{\link{plot_data}()},
+\code{\link{plot_fit}()}
 }
 \concept{main plot functions}

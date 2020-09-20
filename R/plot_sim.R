@@ -1,6 +1,5 @@
 #' Visualize an lgpsim object (simulated data)
 #'
-#' @export
 #' @description
 #' \itemize{
 #'   \item In \code{plot_sim}, the data and generating signal are plotted for
@@ -23,12 +22,13 @@
 #' @name plot_sim
 NULL
 
+#' @export
 #' @rdname plot_sim
 plot_sim <- function(simdata,
-                     f_name = "f",
-                     x_name = "age",
-                     y_name = "y",
                      group_by = "id",
+                     x_name = "age",
+                     f_name = "f",
+                     y_name = "y",
                      ...) {
   check_type(simdata, "lgpsim")
   data <- simdata@data
@@ -60,14 +60,15 @@ plot_sim <- function(simdata,
   return(h)
 }
 
+#' @export
 #' @rdname plot_sim
 plot_sim_component <- function(simdata,
                                component_idx,
                                color_by = NA,
-                               f_name = "f",
                                x_name = "age",
-                               y_name = "y",
                                group_by = "id",
+                               f_name = "f",
+                               y_name = "y",
                                ...) {
   check_type(simdata, "lgpsim")
   check_not_null(component_idx)
@@ -87,6 +88,7 @@ plot_sim_component_df <- function(simdata, x_name, group_by, color_by,
   data <- simdata@data
   df_comp <- get_sim_components(simdata)
   J <- ncol(df_comp)
+  check_interval(component_idx, 1, J)
   f <- as.vector(df_comp[, component_idx])
   name <- colnames(df_comp)[component_idx]
   group <- dollar(data, group_by)

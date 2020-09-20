@@ -54,8 +54,4 @@ a \code{ggplot} object or list of them
   different draws of the warping steepness parameter
 }
 }
-\seealso{
-Other model fit visualization functions: 
-\code{\link{plot_fit}()}
-}
 \concept{model fit visualization functions}

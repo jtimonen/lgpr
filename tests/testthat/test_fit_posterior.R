@@ -129,5 +129,6 @@ test_that("f can be sampled with beta-binomial likelihood", {
       num_trials = 10
     )
     expect_s4_class(fit, "lgpfit")
+    expect_error(gp_posteriors(fit, dat), "observation model must be gaussian")
   })
 })
