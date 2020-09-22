@@ -13,8 +13,31 @@ ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
   check_type(fun, "function")
   y_name <- get_y_name(fit)
   y <- dollar(data, y_name)
-  y_rep <- get_y_rng(fit, original_scale = TRUE)
+  y_rep <- ppc.get_y_rng(fit, original_scale = TRUE)
   bayesplot::pp_check(y, y_rep, fun, ...)
+}
+
+#' Extract posterior or prior predictive distribution draws
+#'
+#' @export
+#' @inheritParams get_draws
+#' @param original_scale should the draws be scaled back to original y scale
+#' (only has effect if likelihood is "gaussian", when data has been normalized
+#' to zero mean and unit variance)
+#' @return an array of shape \code{num_draws} x \code{num_obs}
+#' @family fit postprocessing functions
+ppc.get_y_rng <- function(fit, original_scale = TRUE) {
+  f_sampled <- is_f_sampled(fit)
+  if (!f_sampled) stop("f was not sampled!")
+  obs_model <- get_obs_model(fit)
+  par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
+  out <- get_draws(fit, pars = par_name)
+  if (obs_model == "gaussian" && original_scale) {
+    scl <- dollar(fit@model@var_scalings, "y")
+    out <- call_fun(scl@fun_inv, out)
+  }
+  colnames(out) <- NULL
+  return(out)
 }
 
 #' Visualize the distribution of the obtained parameter draws
@@ -125,32 +148,45 @@ plot_effect_times <- function(fit, type = "areas", ...) {
 #'
 #' @export
 #' @description These functions use \code{\link[rstan]{extract}} with
-#' \code{permuted = FALSE} and \code{inc_warmup = FALSE}.
+#' \code{permuted = FALSE} and \code{inc_warmup = FALSE}. Chains are stacked
+#' so that the return value is always a 2-dimensional array.
 #' The \code{get_draws_catch} function calls \code{get_draws} but catches
 #' errors and returns NULL if an error occurs.
 #' @param fit an object of class \linkS4class{lgpfit}
-#' @param stack_chains should this return a 2-dimensional array?
+#' @param draws Indices of parameter draws to return use. All post-warmup
+#' draws are returned if this is \code{NULL}.
+#' @param reduce Function used to reduce all parameter draws into
+#' one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
+#' \code{NULL}.
 #' @param ... additional keyword arguments to \code{rstan::extract}
-#' @return a 3 or 2-dimensional array
+#' @return an array of shape \code{num_param_sets} x \code{num_params}
 #' @family fit postprocessing functions
 #' @name get_draws
 NULL
 
 #' @export
 #' @rdname get_draws
-get_draws <- function(fit, stack_chains = FALSE, ...) {
+get_draws <- function(fit, draws = NULL, reduce = NULL, ...) {
   check_type(fit, "lgpfit")
   s <- rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
-  s <- if (stack_chains) squeeze_second_dim(s) else s
+  s <- squeeze_second_dim(s) # squeeze the 'chains' dimension
+  param_names <- colnames(s)
+  if (!is.null(draws)) {
+    s <- ensure_2dim(s[draws, ])
+    if (length(param_names) == 1) s <- t(s)
+  } else {
+    s <- apply_reduce(s, reduce)
+  }
+  colnames(s) <- param_names
   return(s)
 }
 
 #' @export
 #' @rdname get_draws
-get_draws_catch <- function(fit, stack_chains = FALSE, ...) {
+get_draws_catch <- function(fit, draws = NULL, reduce = NULL, ...) {
   tryCatch(
     {
-      get_draws(fit, stack_chains, ...)
+      get_draws(fit, draws, reduce, ...)
     },
     error = function(e) {
       NULL
@@ -161,103 +197,8 @@ get_draws_catch <- function(fit, stack_chains = FALSE, ...) {
 #' @export
 #' @rdname get_draws
 get_num_draws <- function(fit) {
-  draws <- get_draws(fit, stack_chains = TRUE, pars = "alpha")
+  draws <- get_draws(fit, draws = NULL, reduce = NULL, pars = "alpha")
   nrow(draws)
-}
-
-#' Extract posterior or prior predictive distribution draws
-#'
-#' @export
-#' @inheritParams get_draws
-#' @param original_scale should the draws be scaled back to original y scale
-#' (only has effect if likelihood is "gaussian", when data has been normalized
-#' to zero mean and unit variance)
-#' @return an array of shape \code{num_draws} x \code{num_obs}
-#' @family fit postprocessing functions
-get_y_rng <- function(fit, original_scale = TRUE) {
-  f_sampled <- is_f_sampled(fit)
-  if (!f_sampled) stop("f was not sampled!")
-  obs_model <- get_obs_model(fit)
-  par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
-  out <- get_draws(fit, pars = par_name)
-  out <- squeeze_second_dim(out)
-  if (obs_model == "gaussian" && original_scale) {
-    scl <- dollar(fit@model@var_scalings, "y")
-    out <- call_fun(scl@fun_inv, out)
-  }
-  colnames(out) <- NULL
-  return(out)
-}
-
-#' Extract draws of the function f and its components
-#'
-#' @export
-#' @inheritParams get_draws
-#' @param draws Indices of posterior draws for which to get \code{f}. This can
-#' be a single integer, a vector of indices, or \code{NULL} (default). In the
-#' latter case all draws are obtained.
-#' @return Returns a list with names \code{num_draws} and \code{f}.
-#' The latter is a named list of which has length equal to the number of
-#' components plus one. Let \code{S = length(draws)}. Each list element is
-#' \itemize{
-#'   \item Array of size \code{S} x \code{num_obs}, where each row is one
-#'   posterior draw of the function f, \code{is_sampled(model)} is \code{TRUE}.
-#'   \item A list with fields \code{mean} and \code{std}, if
-#'   \code{is_sampled(model)} is \code{FALSE}. Both fields are arrays of size
-#'   \code{S} x \code{num_obs}. These are the analytically computed means and
-#'   standard deviations for each posterior draw.
-#' }
-#' @family fit postprocessing functions
-get_f <- function(fit, draws = NULL) {
-  check_type(fit, "lgpfit")
-  f_sampled <- is_f_sampled(fit)
-  names <- get_component_names(fit)
-  D <- length(names)
-  R <- D + 1
-  all_names <- c(names, "total")
-  pars <- if (f_sampled) "f_latent" else "f_post"
-  fp <- get_draws(fit, pars = pars)
-  fp <- squeeze_second_dim(fp)
-  S <- dim(fp)[1]
-  if (is.null(draws)) {
-    draws <- c(1:S)
-  }
-  if (!f_sampled) {
-    alist <- array_to_arraylist(fp, 2 * R, draws)
-    mean <- alist[1:R] # means
-    std <- alist[(R + 1):(2 * R)] # stds
-    f_out <- zip_lists(mean, std)
-  } else {
-    f_out <- array_to_arraylist(fp, D, draws)
-    f_out <- add_sum_arraylist(f_out)
-  }
-  names(f_out) <- all_names
-
-  # Return
-  list(
-    f = f_out,
-    num_draws = length(draws)
-  )
-}
-
-#' Scale the function f posterior to original unnormalized scale
-#'
-#' @export
-#' @description Can only be used with Gaussian observation model.
-#' @inheritParams get_draws
-#' @param f_total a list with fields \code{mean} and \code{std}
-#' @return a similar object as \code{f_total}
-#' @family fit postprocessing functions
-scale_f_total <- function(fit, f_total) {
-  check_type(fit, "lgpfit")
-  check_not_null(f_total)
-  f_sampled <- is_f_sampled(fit)
-  check_false(f_sampled)
-  y_scl <- dollar(fit@model@var_scalings, "y")
-  fun_inv <- y_scl@fun_inv
-  f_total$mean <- scale_f_helper(fun_inv, f_total$mean)
-  f_total$std <- scale_f_helper(fun_inv, f_total$std)
-  return(f_total)
 }
 
 #' Posterior summary
@@ -274,71 +215,4 @@ fit_summary <- function(fit,
                         )) {
   check_type(fit, "lgpfit")
   print(fit@stan_fit, pars = ignore_pars, include = FALSE)
-}
-
-#' Helper function
-#'
-#' @param fun a function
-#' @param arr an array of shape \code{S} x \code{n}
-#' @return an array with same shape as \code{arr}
-scale_f_helper <- function(fun, arr) {
-  check_type(fun, "function")
-  DIM <- dim(arr)
-  a <- as.numeric(t(arr))
-  a <- fun(a)
-  matrix(a, DIM[1], DIM[2], byrow = TRUE)
-}
-
-#' Extract modeled signal or its components
-#'
-#' @description
-#' \itemize{
-#'   \item \code{get_f_total} gets total signal for each sample
-#'   \item \code{get_f_components} gets signal components for each sample
-#'   \item \code{get_g} gets total signal, mapped through
-#'   the inverse link function, for each sample
-#' }
-#' @param field Should be \code{"mean"}, \code{"std"}, or \code{NULL}.
-#' @inheritParams get_draws
-#' @return an array of shape \code{num_samples} x \code{num_obs} (or a list of
-#' them for \code{get_f_components})
-#' @name signal
-NULL
-
-#' @rdname signal
-get_f_total <- function(fit, field = "mean") {
-  f <- dollar(get_f(fit), "f")
-  f <- dollar(f, "total")
-  if (is_f_sampled(fit)) {
-    check_null(field, "f was sampled in this model")
-  } else {
-    allowed <- c("mean", "std")
-    check_allowed(field, allowed)
-    f <- dollar(f, field)
-  }
-  colnames(f) <- NULL
-  return(f)
-}
-
-#' @rdname signal
-get_f_components <- function(fit, field = "mean") {
-  f <- dollar(get_f(fit), "f")
-  f[["total"]] <- NULL
-  if (is_f_sampled(fit)) {
-    check_null(field, "f was sampled in this model")
-  } else {
-    allowed <- c("mean", "std")
-    check_allowed(field, allowed)
-    f <- lapply(f, "[[", field)
-  }
-  return(f)
-}
-
-#' @rdname signal
-get_g <- function(fit) {
-  flag <- is_f_sampled(fit)
-  field <- if (flag) NULL else "mean"
-  f <- get_f_total(fit, field)
-  likelihood <- get_obs_model(fit)
-  link_inv(f, likelihood)
 }

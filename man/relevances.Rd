@@ -3,18 +3,25 @@
 \name{relevances}
 \alias{relevances}
 \alias{relevances.default}
+\alias{relevances.default.all}
 \title{Assess component relevances}
 \usage{
-relevances(fit)
+relevances(fit, ...)
 
-relevances.default(fit)
+relevances.default(fit, ...)
+
+relevances.default.all(fit)
 }
 \arguments{
 \item{fit}{an object of class \code{lgpfit}}
+
+\item{...}{currently has no effect}
 }
 \description{
 \itemize{
-  \item \code{relevances} assesses covariate relevances
-  \item \code{relevances.default} is the only currently implemented method
+  \item \code{relevances} returns a named vector with length equal to
+  number of components plus one
+  \item \code{relevances.default} is the default method
+  \item \code{relevances.default.all} is a helper function
 }
 }

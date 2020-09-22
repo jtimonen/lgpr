@@ -315,7 +315,7 @@ add_g_layer_fit <- function(h, df, x_name, group_by, color, alpha) {
     aes_fit <- ggplot2::aes_string(
       x = x_name,
       y = "y",
-      group = "group_x_draw"
+      group = group_by
     )
     h <- h + ggplot2::geom_line(
       data = df,

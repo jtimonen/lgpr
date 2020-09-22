@@ -127,6 +127,25 @@ setMethod("show", "lgpfit", function(object) {
   fit_summary(object)
 })
 
+#' @rdname show
+setMethod("show", "GaussianPrediction", function(object) {
+  fm <- object@f_comp_mean
+  num_comps <- length(fm)
+  D <- dim(fm[[1]])
+  desc <- class_info_pred("GaussianPrediction", num_comps, D)
+  cat(desc)
+})
+
+#' @rdname show
+setMethod("show", "Prediction", function(object) {
+  fm <- object@f_comp
+  num_comps <- length(fm)
+  D <- dim(fm[[1]])
+  desc <- class_info_pred("Prediction", num_comps, D)
+  cat(desc)
+})
+
+
 #' Class info for show methods
 #'
 #' @param class_name class name
@@ -139,6 +158,19 @@ class_info <- function(class_name) {
   return(str)
 }
 
+#' Class info for show methods
+#'
+#' @param class_name class name
+#' @param num_comps number of components
+#' @param D dimensions
+#' @return a string
+class_info_pred <- function(class_name, num_comps, D) {
+  desc <- paste0("An object of S4 class '", class_name, "'. ")
+  desc <- paste0(desc, "\n - ", num_comps, " components")
+  desc <- paste0(desc, "\n - ", D[1], " parameter sets")
+  desc <- paste0(desc, "\n - ", D[2], " prediction points")
+  return(desc)
+}
 
 #' Get simulated components from an lgpsim object
 #'

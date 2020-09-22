@@ -60,6 +60,6 @@ a \code{\link[ggplot2]{ggplot}} object
 \seealso{
 Other main plot functions: 
 \code{\link{plot_data}()},
-\code{\link{plot_fit}()}
+\code{\link{plot_pred}()}
 }
 \concept{main plot functions}

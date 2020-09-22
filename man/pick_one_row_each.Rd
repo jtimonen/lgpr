@@ -25,6 +25,7 @@ Other data utilities:
 \code{\link{data_types}()},
 \code{\link{get_teff_obs}()},
 \code{\link{new_x}()},
+\code{\link{rep_df}()},
 \code{\link{select_factors_and}()},
 \code{\link{split}()},
 \code{\link{to_long_format}()},

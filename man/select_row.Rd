@@ -19,9 +19,11 @@ Select named row of an array
 }
 \seealso{
 Other array utilities: 
-\code{\link{add_sum_arraylist}()},
+\code{\link{add_to_columns}()},
+\code{\link{apply_reduce}()},
 \code{\link{array_to_arraylist}()},
 \code{\link{ensure_2dim}()},
+\code{\link{make_draw_df}()},
 \code{\link{normalize_rows}()},
 \code{\link{null_if_all_nan}()},
 \code{\link{reduce_rows}()},

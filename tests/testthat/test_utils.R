@@ -23,18 +23,6 @@ test_that("get_stan_model returns a stanmodel", {
   expect_equal(as.character(class(sm)), "stanmodel")
 })
 
-test_that("add_sum_arraylist works correctly", {
-  a <- 2 * diag(3)
-  b <- 0.5 * diag(3)
-  r <- 2 * diag(2)
-  x1 <- list(a, b)
-  x2 <- list(a, b, r)
-  expect_error(add_sum_arraylist(x2))
-  x <- add_sum_arraylist(x1)
-  expect_equal(length(x), 3)
-  expect_equal(x[[3]][1, 1], 2.5)
-})
-
 test_that("common array utilities work correctly", {
   a <- matrix(c(1, 2, 3, 10, 20, 30), 2, 3, byrow = TRUE)
   expect_equal(row_vars(a), c(1.0, 100.0))
@@ -45,11 +33,26 @@ test_that("common array utilities work correctly", {
   b <- array(a, dim = c(2, 0, 3))
   expect_error(squeeze_second_dim(b), "Second dimension of <x> must be")
   reason <- "must be a multiple of <L>"
-  expect_error(array_to_arraylist(a, 2, c(1, 2, 3)), reason)
-  expect_error(add_sum_arraylist(list()), "has length 0")
+  expect_error(array_to_arraylist(a, 2), reason)
   x <- repvec(c(1, 2, 3), 4)
   expect_equal(reduce_rows(x), c(1, 2, 3))
 })
+
+test_that("add_to_columns works correctly", {
+  x <- array(0, c(3, 2))
+  a <- add_to_columns(x, c(1.1, 1.2, 1.3))
+  expect_equal(dim(a), c(3, 2))
+  reason <- "has length 1, but its length should be 3"
+  expect_error(add_to_columns(x, 1.2), reason)
+})
+
+test_that("check_dimension_list works correctly", {
+  x <- list(c(3, 2), c(3, 2), c(3, 2))
+  expect_null(check_dimension_list(x))
+  x <- list(c(11, 2), c(3, 9), c(3, 2))
+  expect_equal(length(check_dimension_list(x)), 3)
+})
+
 
 test_that("link_inv functions are inverses of the link functions", {
   x <- c(1.2, -1, 0, 2)

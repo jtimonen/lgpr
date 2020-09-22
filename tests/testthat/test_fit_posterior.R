@@ -27,8 +27,6 @@ test_that("sample_model can do posterior sampling", {
   p2 <- plot_draws(fit, type = "trace")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
-  r <- relevances(fit)
-  expect_equal(sum(r$Relevance), 1.0)
 })
 
 test_that("optimize_model can optimize MAP parameters", {
@@ -90,11 +88,6 @@ test_that("f can be sampled with nb likelihood", {
     p2 <- plot_draws(fit, regex_pars = "f_latent")
     expect_s3_class(p1, "ggplot")
     expect_s3_class(p2, "ggplot")
-
-    a <- get_f(fit)
-    expect_equal(dim(a$f$`gp(age)`), c(100, 24))
-    r <- relevances(fit)
-    expect_equal(dim(r), c(3, 2))
   })
 })
 
@@ -129,6 +122,5 @@ test_that("f can be sampled with beta-binomial likelihood", {
       num_trials = 10
     )
     expect_s4_class(fit, "lgpfit")
-    expect_error(gp_posteriors(fit, dat), "observation model must be gaussian")
   })
 })

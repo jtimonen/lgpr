@@ -83,7 +83,10 @@ squeeze_second_dim <- function(x) {
     b <- x[, j, ]
     a <- rbind(a, b)
   }
-  if (D[3] == 1) a <- t(a)
+  if (D[3] == 1) {
+    a <- t(a)
+    colnames(a) <- dimnames(x)[3]
+  }
   return(a)
 }
 
@@ -91,34 +94,47 @@ squeeze_second_dim <- function(x) {
 #'
 #' @param x an array of shape \code{n} x \code{m}
 #' @param L an integer
-#' @param draws see the \code{draws} argument of \code{\link{get_f}}
 #' @return a list of length \code{L}, where each element is an array of
-#' shape \code{h} x (\code{m}/\code{L}), where \code{h = length(draws)}
+#' shape \code{h} x (\code{m}/\code{L}), where \code{h = nrow(x)}
 #' @family array utilities
-array_to_arraylist <- function(x, L, draws) {
+array_to_arraylist <- function(x, L) {
   m <- dim(x)[2]
-  if (m %% L) {
-    stop("Second dimension of <x> must be a multiple of <L>!")
-  }
+  if (m %% L) stop("Second dimension of <x> must be a multiple of <L>!")
   out <- list()
   for (k in seq_len(L)) {
     inds <- seq(k, m, by = L)
-    out[[k]] <- ensure_2dim(x[draws, inds])
+    out[[k]] <- ensure_2dim(x[, inds])
   }
   return(out)
 }
 
-#' Add the sum of all arrays in a list to the list
+#' Add a vector to each column of an array
 #'
-#' @param x  a list of arrays of shape \code{n} x \code{m}, with
-#' length \code{L}
-#' @return a list of arrays of shape \code{n} x \code{m},
-#' with length \code{L + 1}
+#' @param x an array of shape \code{n} x \code{m}
+#' @param v a vector of length \code{n}
+#' @return an array of shape \code{n} x \code{m}
 #' @family array utilities
-add_sum_arraylist <- function(x) {
-  L <- length(x)
-  if (L == 0) stop("list has length 0!")
-  x[[L + 1]] <- STAN_matrix_array_sum(x, get_stream())
+add_to_columns <- function(x, v) {
+  check_dim(x, 2)
+  check_length(v, nrow(x))
+  D <- ncol(x)
+  for (j in seq_len(D)) x[, j] <- x[, j] + v
+  return(x)
+}
+
+#' Apply possible reduction to rows of an array
+#'
+#' @param x an array of shape \code{n} x \code{m}
+#' @param reduce a function or \code{NULL}
+#' @return an array of shape \code{1} x \code{m} if \code{reduce} is not
+#' \code{NULL}, otherwise the original array \code{x}
+#' @family array utilities
+apply_reduce <- function(x, reduce) {
+  if (!is.null(reduce)) {
+    check_type(reduce, "function")
+    x <- apply(x, 2, reduce)
+    x <- ensure_2dim(x)
+  }
   return(x)
 }
 
@@ -163,4 +179,17 @@ reduce_rows <- function(rows) {
     }
   }
   return(r1)
+}
+
+#' Helper function for creating plot data frames from prediction objects
+#'
+#' @param x an array with \code{num_draws} rows
+#' @return a data frame with \code{num_draws} columns
+#' @family array utilities
+make_draw_df <- function(x) {
+  num_draws <- nrow(x)
+  x <- data.frame(t(x))
+  colnames(x) <- paste("draw", seq_len(num_draws), sep = "_")
+  rownames(x) <- NULL
+  return(x)
 }

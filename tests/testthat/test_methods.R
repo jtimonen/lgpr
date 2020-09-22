@@ -18,7 +18,7 @@ test_that("lgpexpr validation works correctly", {
 })
 
 test_that("lgpformula validation works correctly", {
-  a <- parse_formula(as.formula("y ~ gp(x) + zs(a)"))
+  a <- parse_formula(as.formula("y ~ gp(x) + zs(a)"), NULL)
   expect_true(check_lgpformula(a))
   b <- a
   b@y_name <- "x"
@@ -149,44 +149,4 @@ test_that("show method for simualated data prints output", {
     t_observed = "after_1"
   )
   expect_output(show(dat))
-})
-
-
-# -------------------------------------------------------------------------
-
-context("Methods for lgpfit objects")
-
-sim <- simulate_data(
-  N = 4,
-  t_data = seq(6, 36, by = 6),
-  covariates = c(0, 2),
-  t_observed = "after_1"
-)
-data <- sim@data
-data$y <- data$y + 5
-
-test_that("model fit can be visualized with data on original scale", {
-  suppressWarnings({
-    fit <- lgp(y ~ gp(age) + zs(id) + gp_vm(diseaseAge),
-      data = data, chains = 1, iter = 300, refresh = 0
-    )
-    p1 <- plot_fit(fit)
-    p2 <- plot_fit(fit, draws = c(2, 3))
-    p3 <- plot_fit(fit, draws = 3)
-    expect_s3_class(p1, "ggplot")
-    expect_s3_class(p2, "ggplot")
-    expect_s3_class(p3, "ggplot")
-    rel <- relevances(fit)
-    expect_equal(dim(rel), c(4, 2))
-  })
-})
-
-test_that("fit summary prints output", {
-  suppressWarnings({
-    fit <- lgp(y ~ gp(age) + zs(z) * gp(age),
-      data = data, chains = 1, iter = 100, refresh = 0
-    )
-    expect_output(fit_summary(fit))
-    expect_output(show(fit))
-  })
 })

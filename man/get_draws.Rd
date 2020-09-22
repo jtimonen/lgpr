@@ -6,33 +6,37 @@
 \alias{get_num_draws}
 \title{Extract posterior draws}
 \usage{
-get_draws(fit, stack_chains = FALSE, ...)
+get_draws(fit, draws = NULL, reduce = NULL, ...)
 
-get_draws_catch(fit, stack_chains = FALSE, ...)
+get_draws_catch(fit, draws = NULL, reduce = NULL, ...)
 
 get_num_draws(fit)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
 
-\item{stack_chains}{should this return a 2-dimensional array?}
+\item{draws}{Indices of parameter draws to return use. All post-warmup
+draws are returned if this is \code{NULL}.}
+
+\item{reduce}{Function used to reduce all parameter draws into
+one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
+\code{NULL}.}
 
 \item{...}{additional keyword arguments to \code{rstan::extract}}
 }
 \value{
-a 3 or 2-dimensional array
+an array of shape \code{num_param_sets} x \code{num_params}
 }
 \description{
 These functions use \code{\link[rstan]{extract}} with
-\code{permuted = FALSE} and \code{inc_warmup = FALSE}.
+\code{permuted = FALSE} and \code{inc_warmup = FALSE}. Chains are stacked
+so that the return value is always a 2-dimensional array.
 The \code{get_draws_catch} function calls \code{get_draws} but catches
 errors and returns NULL if an error occurs.
 }
 \seealso{
 Other fit postprocessing functions: 
 \code{\link{fit_summary}()},
-\code{\link{get_f}()},
-\code{\link{get_y_rng}()},
-\code{\link{scale_f_total}()}
+\code{\link{ppc.get_y_rng}()}
 }
 \concept{fit postprocessing functions}

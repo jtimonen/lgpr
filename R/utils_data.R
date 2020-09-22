@@ -358,7 +358,19 @@ to_long_format <- function(df) {
   for (j in seq_len(J)) {
     x <- c(x, as.vector(df[, j]))
   }
-  fac <- rep(nam, each = N)
+  fac <- as.factor(rep(nam, each = N))
   out <- data.frame(fac, x)
+  return(out)
+}
+
+#' Repeat a data frame vertically
+#'
+#' @param df a data frame
+#' @param times number of times to repeat
+#' @return a data frame
+#' @family data utilities
+rep_df <- function(df, times) {
+  out <- c()
+  for (j in seq_len(times)) out <- rbind(out, df)
   return(out)
 }

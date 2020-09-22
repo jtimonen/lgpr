@@ -58,6 +58,44 @@ check_lgpscaling <- function(object) {
   return(out)
 }
 
+#' @rdname validate
+check_GaussianPrediction <- function(object) {
+  L1 <- length(object@f_comp_mean)
+  L2 <- length(object@f_comp_std)
+  errors <- c()
+  if (L1 != L2) {
+    errors <- c(errors, "lengths of slots f_comp_mean and f_comp_std differ")
+  }
+  D1 <- dim(object@f_mean)
+  D2 <- dim(object@f_std)
+  D3 <- dim(object@y_mean)
+  D4 <- dim(object@y_std)
+  D <- list(D1, D2, D3, D4)
+  for (j in seq_len(L1)) {
+    m <- object@f_comp_mean[[j]]
+    s <- object@f_comp_std[[j]]
+    D <- c(D, list(dim(m), dim(s)))
+  }
+  errors <- c(errors, check_dimension_list(D))
+  out <- if (length(errors) > 0) errors else TRUE
+  return(out)
+}
+
+#' @rdname validate
+check_Prediction <- function(object) {
+  L <- length(object@f_comp)
+  errors <- c()
+  D1 <- dim(object@f)
+  D2 <- dim(object@h)
+  D <- list(D1, D2)
+  for (j in seq_len(L)) {
+    fj <- object@f_comp[[j]]
+    D <- c(D, list(dim(fj)))
+  }
+  errors <- c(errors, check_dimension_list(D))
+  out <- if (length(errors) > 0) errors else TRUE
+  return(out)
+}
 
 #' An S4 class to represent an lgp expression
 #'
@@ -217,4 +255,42 @@ lgpsim <- setClass("lgpsim",
     effect_times = "list",
     info = "list"
   )
+)
+
+#' An S4 class to represent an analytically computed posterior or prior
+#' predictive distribution (Gaussian) of an additive GP model
+#'
+#' @slot f_comp_mean component means
+#' @slot f_comp_std component standard deviations
+#' @slot f_mean signal mean (on normalized scale)
+#' @slot f_std signal standard deviation (on normalized scale)
+#' @slot y_mean predictive mean (on original data scale)
+#' @slot y_std predictive standard deviation (on original data scale)
+#' @seealso \linkS4class{Prediction}
+GaussianPrediction <- setClass("GaussianPrediction",
+  representation = representation(
+    f_comp_mean = "list",
+    f_comp_std = "list",
+    f_mean = "matrix",
+    f_std = "matrix",
+    y_mean = "matrix",
+    y_std = "matrix"
+  ),
+  validity = check_GaussianPrediction
+)
+
+#' An S4 class to represent general additive model predictions
+#'
+#' @slot f_comp component predictions
+#' @slot f signal prediction
+#' @slot h prediction (signal prediction transformed through inverse link
+#' function)
+#' @seealso \linkS4class{GaussianPrediction}
+Prediction <- setClass("Prediction",
+  representation = representation(
+    f_comp = "list",
+    f = "matrix",
+    h = "matrix"
+  ),
+  validity = check_Prediction
 )

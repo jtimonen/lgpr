@@ -2,81 +2,81 @@
 #'
 #' @description
 #' \itemize{
-#'   \item \code{relevances} assesses covariate relevances
-#'   \item \code{relevances.default} is the only currently implemented method
+#'   \item \code{relevances} returns a named vector with length equal to
+#'   number of components plus one
+#'   \item \code{relevances.default} is the default method
+#'   \item \code{relevances.default.all} is a helper function
 #' }
 #' @param fit an object of class \code{lgpfit}
+#' @param ... currently has no effect
 #' @name relevances
 NULL
 
 #' @export
 #' @rdname relevances
-relevances <- function(fit) {
+relevances <- function(fit, ...) {
   check_type(fit, "lgpfit")
-  relevances.default(fit)
+  relevances.default(fit, ...)
 }
 
 #' @rdname relevances
-relevances.default <- function(fit) {
-  p_noise <- p_explained_noise(fit)
-  p_noise <- mean(p_noise)
-  p_comps <- p_explained_components(fit)
-  p_comps <- (1 - p_noise) * p_comps
-  Component <- c(names(p_comps), "noise")
-  Relevance <- c(as.numeric(p_comps), p_noise)
-  data.frame(Component, Relevance)
+relevances.default <- function(fit, ...) {
+  rels <- relevances.default.all(fit)
+  colMeans(rels)
 }
 
-#' Determining the variance explained by noise and the signal components
+#' @rdname relevances
+relevances.default.all <- function(fit) {
+  pred <- get_pred(fit)
+  p_noise <- relevances.default.noise(fit, pred)
+  p_comps <- relevances.default.comp(fit, pred)
+  num_comps <- ncol(p_comps)
+  mult <- t(repvec(1 - p_noise, num_comps))
+  p_comps <- mult * p_comps
+  df <- cbind(p_comps, p_noise)
+  colnames(df) <- c(names(p_comps), "noise")
+  return(df)
+}
+
+#' Helper functions for relevances.default
 #'
 #' @description
 #' \itemize{
-#'   \item \code{residuals} computes the residuals in each sample
-#'   \item \code{p_explained_noise} computes the noise proportion in each sample
-#'   \item \code{p_explained_components} divides the signal proportion for
-#'   each component
-#'   \item \code{component_variances} computes variances in each
-#'   sample for each component and returns a \code{data.frame}
+#'   \item \code{relevances.default.noise} computes the noise proportion
+#'   in each draws, and returns a vector with length \code{num_draws}
+#'   \item \code{relevances.default.comp} divides the signal proportion for
+#'   each component in each draw, and returns a data frame with
+#'   \code{num_draws} rows and \code{num_comps} colums
 #' }
+#' @param pred an object of class \linkS4class{Prediction} or
+#' \linkS4class{GaussianPrediction}
 #' @inheritParams relevances
-#' @name p_explained
+#' @name relevances_default
 #' @return an array or vector
 NULL
 
-#' @rdname p_explained
-residuals <- function(fit) {
-  y <- get_y(fit, original = FALSE)
-  g_total <- get_g(fit)
-  num_draws <- nrow(g_total)
-  g_total - repvec(y, num_draws)
-}
-
-#' @rdname p_explained
-p_explained_noise <- function(fit) {
-  g_total <- get_g(fit)
-  num_obs <- ncol(g_total)
-  resid <- residuals(fit)
-  signal_var <- row_vars(g_total)
+#' @rdname relevances_default
+relevances.default.noise <- function(fit, pred) {
+  typ <- class(pred)
+  h <- if (typ == "Prediction") pred@h else pred@y_mean
+  num_obs <- ncol(h)
+  num_draws <- nrow(h)
+  y <- get_y(fit, original = TRUE)
+  resid <- h - repvec(y, num_draws)
+  signal_var <- row_vars(h)
   error_var <- rowSums(resid^2) / (num_obs - 1)
   p_signal <- signal_var / (signal_var + error_var)
   return(1 - p_signal)
 }
 
-#' @rdname p_explained
-p_explained_components <- function(fit) {
-  df <- component_variances(fit)
-  r <- colMeans(df)
-  r / sum(r)
-}
-
-#' @rdname p_explained
-component_variances <- function(fit) {
-  flag <- is_f_sampled(fit)
-  field <- if (flag) NULL else "mean"
-  f_comps <- get_f_components(fit, field)
-  v_list <- lapply(f_comps, row_vars)
+#' @rdname relevances_default
+relevances.default.comp <- function(fit, pred) {
+  typ <- class(pred)
+  f_comp <- if (typ == "Prediction") pred@f_comp else pred@f_comp_mean
+  v_list <- lapply(f_comp, row_vars)
   nam <- names(v_list)
   df <- data.frame(v_list)
   colnames(df) <- nam
+  df <- normalize_rows(df)
   return(df)
 }

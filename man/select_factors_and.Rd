@@ -26,6 +26,7 @@ Other data utilities:
 \code{\link{get_teff_obs}()},
 \code{\link{new_x}()},
 \code{\link{pick_one_row_each}()},
+\code{\link{rep_df}()},
 \code{\link{split}()},
 \code{\link{to_long_format}()},
 \code{\link{valid_data}}

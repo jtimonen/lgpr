@@ -277,3 +277,24 @@ simplify_str <- function(s) {
   x <- gsub("[\",\']", "", x) # remove quotes
   return(x)
 }
+
+#' Check that all listed dimensions are equal
+#'
+#' @param dims a list of dimensions
+#' @return list of errors
+check_dimension_list <- function(dims) {
+  errors <- c()
+  L <- length(dims)
+  d1 <- dims[[1]]
+  K <- length(d1)
+  for (j in seq_len(L)) {
+    dj <- dims[[j]]
+    for (k in seq_len(K)) {
+      if (dj[k] != d1[k]) {
+        msg <- paste0(k, "th dimensions of elements 1 and ", j, " differ!")
+        errors <- c(errors, msg)
+      }
+    }
+  }
+  return(errors)
+}
