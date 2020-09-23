@@ -64,28 +64,6 @@ print_list <- function(input) {
   invisible(input)
 }
 
-#' Zip two lists into a list of lists of length 2
-#'
-#' @param a a list of length \code{L}
-#' @param b a list of length \code{L}
-#' @return a list of length \code{L}
-#' @family list utilities
-zip_lists <- function(a, b) {
-  check_type(a, "list")
-  check_type(b, "list")
-  check_lengths(a, b)
-  a_name <- deparse(substitute(a))
-  b_name <- deparse(substitute(b))
-  out <- list()
-  L <- length(a)
-  for (j in seq_len(L)) {
-    list_j <- list(a[[j]], b[[j]])
-    names(list_j) <- c(a_name, b_name)
-    out[[j]] <- list_j
-  }
-  return(out)
-}
-
 #' Wrap list into a list of length 1 if the original list is named
 #'
 #' @param x a list

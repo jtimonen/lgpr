@@ -17,7 +17,7 @@
 #' @param group_by name of the grouping variable
 #' @param draws only has effect if \code{pred} is \code{NULL}
 #' @param reduce only has effect if \code{pred} is \code{NULL}
-#' @param MULT a multiplier for standard deviation
+#' @param MULT_STD a multiplier for standard deviation
 #' @param ... additional arguments to \code{\link{plot_api_g}} or
 #' \code{\link{plot_api_c}}
 #' @return a \code{\link[ggplot2]{ggplot}} object

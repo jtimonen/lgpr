@@ -20,10 +20,8 @@ An S4 class to represent the output of the \code{lgp} function
 All methods that work on \linkS4class{lgpmodel}
 objects work also on \linkS4class{lgpfit} objects.
 
-For complete info on
-accessing the properties of the \code{stan_fit} slot, see
+For complete info on accessing the properties of the
+\code{stan_fit} slot, see
 \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
-
-For plotting, see \code{\link{plot_fit}}.
 }
 \concept{model fit vizualization functions}

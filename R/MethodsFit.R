@@ -172,8 +172,7 @@ get_draws <- function(fit, draws = NULL, reduce = NULL, ...) {
   s <- squeeze_second_dim(s) # squeeze the 'chains' dimension
   param_names <- colnames(s)
   if (!is.null(draws)) {
-    s <- ensure_2dim(s[draws, ])
-    if (length(param_names) == 1) s <- t(s)
+    s <- s[draws, , drop = FALSE]
   } else {
     s <- apply_reduce(s, reduce)
   }

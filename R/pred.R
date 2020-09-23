@@ -27,53 +27,65 @@
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
 #' @family prediction functions
-#' @name predict
+#' @name pred
 NULL
 
 #' @export
-#' @rdname predict
-predict <- function(fit, x, reduce = mean, draws = NULL,
-                    STREAM = get_stream()) {
+#' @rdname pred
+pred <- function(fit, x, reduce = mean, draws = NULL,
+                 STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
-  if (!f_sampled) {
-    out <- predict.gaussian(fit, x, reduce, draws, STREAM)
+  if (f_sampled) {
+    out <- pred.kr(fit, x, reduce, draws, STREAM)
   } else {
-    out <- predict.kr(fit, x, reduce, draws, STREAM)
+    out <- pred.gaussian(fit, x, reduce, draws, STREAM)
   }
+  return(out)
 }
 
-#' @rdname predict
-predict.gaussian <- function(fit, x, reduce, draws, STREAM = get_stream()) {
+#' @rdname pred
+pred.gaussian <- function(fit, x, reduce, draws, STREAM = get_stream()) {
   sigma <- get_draws(fit, draws = draws, reduce = reduce, pars = "sigma")
-  kernels <- predict_kernels(fit, x, reduce, draws, STREAM)
+  kernels <- pred_kernels(fit, x, reduce, draws, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   y_norm <- as.vector(get_y(fit, original = FALSE))
-  post <- predict.gaussian_compute(kernels, y_norm, sigma, delta, STREAM)
-  return(post)
-  # new('GaussianPrediction',
-  #    f = 1,)
+  post <- pred.gaussian_compute(kernels, y_norm, sigma, delta, STREAM)
+
+  f_mean <- dollar(post, "f_mean")
+  f_std <- dollar(post, "f_std")
+  y_scl <- dollar(fit@model@var_scalings, "y")
+  y_pred <- pred.gaussian.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
+
+  new("GaussianPrediction",
+    f_comp_mean = arr3_to_list(dollar(post, "f_comp_mean")),
+    f_comp_std = arr3_to_list(dollar(post, "f_comp_std")),
+    f_mean = f_mean,
+    f_std = f_std,
+    y_mean = dollar(y_pred, "mean"),
+    y_std = dollar(y_pred, "std")
+  )
 }
 
-#' @rdname predict
-predict.kr <- function(fit, x, reduce, draws, STREAM = get_stream()) {
-  kernels <- predict_kernels(fit, x, STREAM)
+#' @rdname pred
+pred.kr <- function(fit, x, reduce, draws, STREAM = get_stream()) {
+  kernels <- pred_kernels(fit, x, reduce, draws, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
-  f <- get_f(fit)
-  predict.kr_compute(kernels, f, delta, STREAM)
+  pred <- get_pred(fit, draws = draws, reduce = reduce)
+  pred.kr_compute(kernels, pred, delta, STREAM)
 }
 
 #' Compute all kernel matrices required for computing predictions
 #'
 #' @export
-#' @inheritParams predict
+#' @inheritParams pred
 #' @return Returns a list with fields named \code{data_vs_data},
 #' \code{pred_vs_data} and \code{pred_vs_pred}. Each of them is a list with
 #' length equal to the number of parameter sets.
 #' @family prediction functions
-predict_kernels <- function(fit, x, reduce, draws, STREAM = get_stream()) {
+pred_kernels <- function(fit, x, reduce, draws, STREAM = get_stream()) {
   model <- object_to_model(fit)
   x_data <- model@stan_input
   x_pred <- kernel_matrices_create_input(model, x)
@@ -100,40 +112,43 @@ predict_kernels <- function(fit, x, reduce, draws, STREAM = get_stream()) {
 #' @param delta jitter to ensure positive definite matrices
 #' @return A list.
 #' @family prediction functions
-predict.gaussian_compute <- function(kernels, y, sigma, delta,
-                                     STREAM = get_stream()) {
+pred.gaussian_compute <- function(kernels, y, sigma, delta,
+                                  STREAM = get_stream()) {
   sigma <- as.vector(sigma)
   K <- dollar(kernels, "data_vs_data")
   Ks <- dollar(kernels, "pred_vs_data")
   Kss <- dollar(kernels, "pred_vs_pred")
-  L <- length(sigma)
-  arr3_to_list <- function(x) {
-    out <- list()
-    d <- dim(x)[1]
-    for (j in seq_len(d)) {
-      out[[j]] <- x[j, , ]
-    }
-    return(out)
-  }
-  out <- list()
-  for (i in seq_len(L)) {
+  num_draws <- dim(Kss)[1]
+  D <- dim(Kss)[2]
+  R <- D + 1
+  num_pred <- dim(Kss)[3]
+  out <- array(0, dim = c(2 * R, num_pred, num_draws))
+  for (i in seq_len(num_draws)) {
     k <- arr3_to_list(K[i, , , ])
     ks <- arr3_to_list(Ks[i, , , ])
     kss <- arr3_to_list(Kss[i, , , ])
     post <- cpp_gp_posterior(k, ks, kss, y, delta, sigma[i], STREAM)
-    out[[i]] <- post
+    post <- list_to_matrix(post, num_pred)
+    out[, , i] <- post
   }
-  return(out)
+  out <- aperm(out, c(1, 3, 2))
+  # Return
+  list(
+    f_comp_mean = out[1:D, , , drop = FALSE],
+    f_comp_std = out[(R + 1):(R + D), , , drop = FALSE],
+    f_mean = arr3_select(out, R),
+    f_std = arr3_select(out, 2 * R)
+  )
 }
 
 #' Compute out-of-sample predictions using kernel regression on
 #' sampled function values
 #'
-#' @param f A list returned by \code{\link{get_f}}.
-#' @param inheritParams predict.gaussian_compute
+#' @param pred An object of class \linkS4class{Prediction}.
+#' @inheritParams pred.gaussian_compute
 #' @return An object of class \linkS4class{Prediction}.
 #' @family prediction functions
-predict.kr_compute <- function(kernels, f, delta, STREAM = get_stream()) {
+pred.kr_compute <- function(kernels, pred, delta, STREAM = get_stream()) {
   K <- dollar(kernels, "data_vs_data")
   Ks <- dollar(kernels, "pred_vs_data")
   Kss <- dollar(kernels, "pred_vs_pred")
@@ -159,7 +174,7 @@ predict.kr_compute <- function(kernels, f, delta, STREAM = get_stream()) {
 #' created by \code{\link{kernel_matrices_create_input}}.
 #' @param x2 A list defining the second input argument. Can be
 #' created by \code{\link{kernel_matrices_create_input}}.
-#' @inheritParams predict
+#' @inheritParams pred
 #' @name kernel_matrices
 #' @family prediction functions
 NULL
@@ -253,7 +268,7 @@ kernel_matrices_create_input <- function(model, x) {
 #' where each element is an array with number of rows equal to number of
 #' parameter sets
 #' @rdname kernel_matrices
-#' @inheritParams predict
+#' @inheritParams pred
 get_kernel_pars <- function(fit, reduce = NULL, draws = NULL) {
   num_draws <- get_num_draws(fit)
   na_array <- array(NaN, dim = c(num_draws, 1))

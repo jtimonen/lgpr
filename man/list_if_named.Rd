@@ -20,7 +20,6 @@ Other list utilities:
 \code{\link{dollar}()},
 \code{\link{list_to_matrix}()},
 \code{\link{matrix_to_list}()},
-\code{\link{print_list}()},
-\code{\link{zip_lists}()}
+\code{\link{print_list}()}
 }
 \concept{list utilities}

@@ -22,6 +22,8 @@ Array transformation utility
 Other array utilities: 
 \code{\link{add_to_columns}()},
 \code{\link{apply_reduce}()},
+\code{\link{arr3_select}()},
+\code{\link{arr3_to_list}()},
 \code{\link{ensure_2dim}()},
 \code{\link{make_draw_df}()},
 \code{\link{normalize_rows}()},

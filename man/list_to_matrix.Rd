@@ -23,7 +23,6 @@ Other list utilities:
 \code{\link{dollar}()},
 \code{\link{list_if_named}()},
 \code{\link{matrix_to_list}()},
-\code{\link{print_list}()},
-\code{\link{zip_lists}()}
+\code{\link{print_list}()}
 }
 \concept{list utilities}

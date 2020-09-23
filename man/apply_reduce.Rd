@@ -21,6 +21,8 @@ Apply possible reduction to rows of an array
 \seealso{
 Other array utilities: 
 \code{\link{add_to_columns}()},
+\code{\link{arr3_select}()},
+\code{\link{arr3_to_list}()},
 \code{\link{array_to_arraylist}()},
 \code{\link{ensure_2dim}()},
 \code{\link{make_draw_df}()},

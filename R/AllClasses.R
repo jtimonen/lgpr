@@ -212,11 +212,9 @@ lgpmodel <- setClass("lgpmodel",
 #' @family model fit vizualization functions
 #' @seealso  All methods that work on \linkS4class{lgpmodel}
 #' objects work also on \linkS4class{lgpfit} objects.
-#' @seealso For complete info on
-#' accessing the properties of the \code{stan_fit} slot, see
+#' @seealso For complete info on accessing the properties of the
+#' \code{stan_fit} slot, see
 #' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
-#' @seealso
-#' For plotting, see \code{\link{plot_fit}}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",

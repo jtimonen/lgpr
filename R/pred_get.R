@@ -108,21 +108,39 @@ get_pred.gaussian.y <- function(fit, draws, reduce) {
   sigma <- as.vector(sigma)
 
   # Add sigma to get y_pred
-  y_mean <- dollar(f, "mean")
-  fstd <- dollar(f, "std")
-  y_var <- add_to_columns(fstd^2, sigma^2)
-  y_std <- sqrt(y_var)
-
-  # Scale y_pred to original scale
+  f_mean <- dollar(f, "mean")
+  f_std <- dollar(f, "std")
   y_scl <- dollar(fit@model@var_scalings, "y")
-  y_mean <- call_fun(y_scl@fun_inv, y_mean)
-  y_std <- call_fun(y_scl@fun_inv, y_std)
+  y_pred <- pred.gaussian.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
 
   # Apply reduce and return
   list(
-    mean = apply_reduce(y_mean, reduce),
-    std = apply_reduce(y_std, reduce)
+    mean = apply_reduce(dollar(y_pred, "mean"), reduce),
+    std = apply_reduce(dollar(y_pred, "std"), reduce)
   )
+}
+
+#' Tranform distribution of f to distribution of y
+#'
+#' @param f_mean an array of shape \code{num_draws} x \code{num_points}
+#' @param f_std an array of shape \code{num_draws} x \code{num_points}
+#' @param sigma a vector of length \code{num_draws}
+#' @param y_norm_inv inverse normalization function for y
+#' @return a list with names \code{mean} and \code{std}, both of which are
+#' arrays of shape \code{num_draws} x \code{num_points}
+pred.gaussian.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
+  y_mean <- f_mean
+  y_var <- add_to_columns(f_std^2, sigma^2)
+  y_std <- sqrt(y_var)
+  y_upper <- y_mean + y_std
+
+  # Scale y_pred to original scale
+  y_mean <- call_fun(y_norm_inv, y_mean)
+  y_upper <- call_fun(y_norm_inv, y_upper)
+  y_std <- y_upper - y_mean
+
+  # Return
+  list(mean = y_mean, std = y_std)
 }
 
 #' Get predictions for a model where the latent function f was sampled

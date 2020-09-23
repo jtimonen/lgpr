@@ -44,10 +44,10 @@ plot_f(
 
 \item{reduce}{only has effect if \code{pred} is \code{NULL}}
 
+\item{MULT_STD}{a multiplier for standard deviation}
+
 \item{...}{additional arguments to \code{\link{plot_api_g}} or
 \code{\link{plot_api_c}}}
-
-\item{MULT}{a multiplier for standard deviation}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object

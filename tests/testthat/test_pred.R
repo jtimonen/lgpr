@@ -123,7 +123,7 @@ t <- seq(0, 50, by = 5)
 x1_pred <- new_x(data1, t, x_ns = "diseaseAge")
 
 test_that("prediction kernel computations work correctly", {
-  kers <- predict_kernels(fit1, x1_pred, NULL, NULL)
+  kers <- pred_kernels(fit1, x1_pred, NULL, NULL)
   expect_equal(names(kers), c("data_vs_data", "pred_vs_data", "pred_vs_pred"))
   expect_equal(dim(kers$data_vs_data), c(50, 3, 24, 24))
   expect_equal(dim(kers$pred_vs_data), c(50, 3, 44, 24))
@@ -131,7 +131,11 @@ test_that("prediction kernel computations work correctly", {
 })
 
 test_that("predict.gaussian works correctly", {
-  out <- predict(fit1, x1_pred)
-  expect_equal(length(out), 1)
-  expect_equal(length(out[[1]]), 8)
+  out <- pred(fit1, x1_pred)
+  expect_s4_class(out, "GaussianPrediction")
+  out <- pred(fit1, x1_pred, draws = c(3:43))
+  expect_s4_class(out, "GaussianPrediction")
+  out <- pred(fit1, x1_pred, reduce = mean)
+  expect_s4_class(out, "GaussianPrediction")
+  expect_equal(dim(out@y_mean), c(1, 44))
 })

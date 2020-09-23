@@ -193,3 +193,29 @@ make_draw_df <- function(x) {
   rownames(x) <- NULL
   return(x)
 }
+
+#' Format a 3-dimensional array into a list of 2-dimensional arrays
+#'
+#' @param x an array
+#' @return a list of arrays
+#' @family array utilities
+arr3_to_list <- function(x) {
+  out <- list()
+  d <- dim(x)[1]
+  for (j in seq_len(d)) {
+    out[[j]] <- arr3_select(x, j)
+  }
+  return(out)
+}
+
+#' Select an element along the first dimension of an array, and only drop
+#' the first dimension
+#'
+#' @param x an array of shape\code{d1} x \code{d2} x \code{d3}
+#' @param idx the index to select
+#' @return an array of shape \code{d2} x \code{d3}
+#' @family array utilities
+arr3_select <- function(x, j) {
+  DIM <- dim(x)
+  array(x[j, , ], dim = DIM[2:3])
+}

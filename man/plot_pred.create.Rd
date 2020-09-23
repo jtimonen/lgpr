@@ -19,6 +19,8 @@ plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD)
 \linkS4class{Prediction}.}
 
 \item{df_base}{a data frame with two columns}
+
+\item{MULT_STD}{a multiplier for standard deviation}
 }
 \value{
 a list

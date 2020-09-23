@@ -19,6 +19,8 @@ Ensure that v is 2-dimensional
 Other array utilities: 
 \code{\link{add_to_columns}()},
 \code{\link{apply_reduce}()},
+\code{\link{arr3_select}()},
+\code{\link{arr3_to_list}()},
 \code{\link{array_to_arraylist}()},
 \code{\link{make_draw_df}()},
 \code{\link{normalize_rows}()},
