@@ -8,11 +8,14 @@ sampled function values}
 pred.kr_compute(kernels, pred, delta, STREAM = get_stream())
 }
 \arguments{
-\item{kernels}{A list returned by \code{\link{predict_kernels}}.}
+\item{kernels}{A list returned by \code{\link{pred_kernels}}.}
 
 \item{pred}{An object of class \linkS4class{Prediction}.}
 
 \item{delta}{jitter to ensure positive definite matrices}
+
+\item{STREAM}{External pointer. By default obtained with
+\code{\link[rstan]{get_stream}}.}
 }
 \value{
 An object of class \linkS4class{Prediction}.

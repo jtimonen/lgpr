@@ -52,6 +52,11 @@ plot_f(
 
 \item{...}{additional arguments to \code{\link{plot_api_g}} or
 \code{\link{plot_api_c}}}
+
+\item{comp_idx}{Index of component to plot. The total sum is plotted
+if this is \code{NULL}.}
+
+\item{color_by}{name of coloring factor}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object

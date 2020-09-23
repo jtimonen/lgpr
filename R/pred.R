@@ -2,13 +2,13 @@
 #'
 #' @description
 #' \itemize{
-#'   \item \code{predict} calls either \code{predict.gaussian} or
-#'   \code{predict.kr} depending on whether \code{fit} is for a model
+#'   \item \code{pred} calls either \code{pred.gaussian} or
+#'   \code{pred.kr} depending on whether \code{fit} is for a model
 #'   that marginalized or sampled the latent signal \code{f}
-#'   \item \code{predict.gaussian} computes analytic posterior or prior
+#'   \item \code{pred.gaussian} computes analytic posterior or prior
 #'   predictive distribution and returns an object of class
 #'   \linkS4class{GaussianPrediction}
-#'   \item \code{predict.kr} computes predictions using kernel regression for
+#'   \item \code{pred.kr} computes predictions using kernel regression for
 #'   the samples of \code{f} and returns an object of class
 #'   \linkS4class{Prediction}
 #' }
@@ -106,10 +106,11 @@ pred_kernels <- function(fit, x, reduce, draws, STREAM = get_stream()) {
 
 #' Compute analytic out-of-sample predictions
 #'
-#' @param kernels A list returned by \code{\link{predict_kernels}}.
+#' @param kernels A list returned by \code{\link{pred_kernels}}.
 #' @param y response variable vector of length \code{num_obs}
 #' @param sigma a vector with length equal to number of parameter sets
 #' @param delta jitter to ensure positive definite matrices
+#' @inheritParams pred
 #' @return A list.
 #' @family prediction functions
 pred.gaussian_compute <- function(kernels, y, sigma, delta,

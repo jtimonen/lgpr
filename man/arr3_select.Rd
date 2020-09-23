@@ -5,7 +5,7 @@
 \title{Select an element along the first dimension of an array, and only drop
 the first dimension}
 \usage{
-arr3_select(x, j)
+arr3_select(x, idx)
 }
 \arguments{
 \item{x}{an array of shape\code{d1} x \code{d2} x \code{d3}}

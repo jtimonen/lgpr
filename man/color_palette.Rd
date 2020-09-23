@@ -18,7 +18,6 @@ A color palette function
 \seealso{
 Other color utilities: 
 \code{\link{colorset}()},
-\code{\link{line_alpha_fun}()},
 \code{\link{plot_color_palette}()}
 }
 \concept{color utilities}

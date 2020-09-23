@@ -22,7 +22,6 @@ Plot colors to use
 \seealso{
 Other color utilities: 
 \code{\link{color_palette}()},
-\code{\link{line_alpha_fun}()},
 \code{\link{plot_color_palette}()}
 }
 \concept{color utilities}

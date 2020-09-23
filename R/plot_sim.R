@@ -16,7 +16,7 @@
 #' @param color_by coloring factor
 #' @param ... additional arguments to \code{\link{plot_api_g}} or
 #' \code{\link{plot_api_c}}
-#' @param component_idx index of the component to be shown
+#' @param comp_idx index of the component to be shown
 #' @return a \code{\link[ggplot2]{ggplot}} object
 #' @family main plot functions
 #' @name plot_sim
@@ -63,7 +63,7 @@ plot_sim <- function(simdata,
 #' @export
 #' @rdname plot_sim
 plot_sim_component <- function(simdata,
-                               component_idx,
+                               comp_idx,
                                color_by = NA,
                                x_name = "age",
                                group_by = "id",
@@ -71,10 +71,10 @@ plot_sim_component <- function(simdata,
                                y_name = "y",
                                ...) {
   check_type(simdata, "lgpsim")
-  check_not_null(component_idx)
+  check_not_null(comp_idx)
   out <- plot_sim_component.df(
     simdata, x_name, group_by, color_by,
-    component_idx
+    comp_idx
   )
   title <- dollar(out, "name")
   h <- plot_api_c(df = dollar(out, "df"), ...)
@@ -84,13 +84,13 @@ plot_sim_component <- function(simdata,
 
 #' @rdname plot_sim
 plot_sim_component.df <- function(simdata, x_name, group_by, color_by,
-                                  component_idx) {
+                                  comp_idx) {
   data <- simdata@data
   df_comp <- get_sim_components(simdata)
   J <- ncol(df_comp)
-  check_interval(component_idx, 1, J)
-  f <- as.vector(df_comp[, component_idx])
-  name <- colnames(df_comp)[component_idx]
+  check_interval(comp_idx, 1, J)
+  f <- as.vector(df_comp[, comp_idx])
+  name <- colnames(df_comp)[comp_idx]
   group <- dollar(data, group_by)
   if (is.na(color_by)) {
     color <- as.factor(rep(1, nrow(data)))

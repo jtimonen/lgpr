@@ -14,6 +14,8 @@ plot_f.get_color_fac(fit, pred, x, color_by)
 
 \item{x}{A data frame of prediction points. Must be specified if
 \code{pred} is not \code{NULL}.}
+
+\item{color_by}{name of coloring factor}
 }
 \value{
 a factor

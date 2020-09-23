@@ -128,9 +128,7 @@ parse_options <- function(options = NULL) {
 #' @param name variable name
 #' @return an object of class \linkS4class{lgpscaling}
 create_scaling <- function(y, name) {
-  if (length(y) < 2) {
-    stop("length of <y> must be at least 2!")
-  }
+  if (length(y) < 2) stop("length of <y> must be at least 2!")
   m <- mean(y)
   std <- stats::sd(y)
   if (std == 0) {
@@ -436,27 +434,20 @@ set_num_trials <- function(num_trials, num_obs, LH) {
 #' @param obs_model observation model (integer encoding)
 check_response <- function(y, obs_model) {
 
-  # Check that y is numeric
-  c_y <- class(y)
-  if (c_y != "numeric") {
-    stop("the response variable must be numeric! found = ", c_y)
-  }
-
   # Check compatibility with observation model
+  check_type(y, "numeric")
   if (obs_model != 1) {
     diff <- max(abs(y - round(y)))
-    if (diff > 0) {
-      stop(
-        "the response variable should contain only integers ",
-        "with this observation model"
-      )
-    }
-    if (any(y < 0)) {
-      stop(
-        "the response variable measurements cannot be negative ",
-        "with this observation model!"
-      )
-    }
+    msg_int <- paste0(
+      "the response variable should contain only integers ",
+      "with this observation model"
+    )
+    if (diff > 0) stop(msg_int)
+    msg_neg <- paste0(
+      "the response variable measurements cannot be negative ",
+      "with this observation model!"
+    )
+    if (any(y < 0)) stop(msg_neg)
   }
   return(TRUE)
 }

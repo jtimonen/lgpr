@@ -7,13 +7,16 @@
 pred.gaussian_compute(kernels, y, sigma, delta, STREAM = get_stream())
 }
 \arguments{
-\item{kernels}{A list returned by \code{\link{predict_kernels}}.}
+\item{kernels}{A list returned by \code{\link{pred_kernels}}.}
 
 \item{y}{response variable vector of length \code{num_obs}}
 
 \item{sigma}{a vector with length equal to number of parameter sets}
 
 \item{delta}{jitter to ensure positive definite matrices}
+
+\item{STREAM}{External pointer. By default obtained with
+\code{\link[rstan]{get_stream}}.}
 }
 \value{
 A list.

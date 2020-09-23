@@ -17,7 +17,7 @@ plot_sim(
 
 plot_sim_component(
   simdata,
-  component_idx,
+  comp_idx,
   color_by = NA,
   x_name = "age",
   group_by = "id",
@@ -26,7 +26,7 @@ plot_sim_component(
   ...
 )
 
-plot_sim_component.df(simdata, x_name, group_by, color_by, component_idx)
+plot_sim_component.df(simdata, x_name, group_by, color_by, comp_idx)
 }
 \arguments{
 \item{simdata}{an object of class \linkS4class{lgpsim}}
@@ -42,7 +42,7 @@ plot_sim_component.df(simdata, x_name, group_by, color_by, component_idx)
 \item{...}{additional arguments to \code{\link{plot_api_g}} or
 \code{\link{plot_api_c}}}
 
-\item{component_idx}{index of the component to be shown}
+\item{comp_idx}{index of the component to be shown}
 
 \item{color_by}{coloring factor}
 }

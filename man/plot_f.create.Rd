@@ -21,6 +21,9 @@ plot_f.create.line_arr(fit, pred, comp_idx)
 
 \item{df_base}{a data frame with two columns}
 
+\item{comp_idx}{Index of component to plot. The total sum is plotted
+if this is \code{NULL}.}
+
 \item{MULT_STD}{a multiplier for standard deviation}
 }
 \value{

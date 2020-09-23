@@ -107,6 +107,9 @@ plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
 
 
 #' @export
+#' @param comp_idx Index of component to plot. The total sum is plotted
+#' if this is \code{NULL}.
+#' @param color_by name of coloring factor
 #' @rdname plot_pred
 plot_f <- function(fit,
                    pred = NULL,

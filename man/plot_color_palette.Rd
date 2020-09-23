@@ -18,7 +18,6 @@ Visualize a color palette
 \seealso{
 Other color utilities: 
 \code{\link{color_palette}()},
-\code{\link{colorset}()},
-\code{\link{line_alpha_fun}()}
+\code{\link{colorset}()}
 }
 \concept{color utilities}

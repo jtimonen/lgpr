@@ -31,13 +31,13 @@ An object of class \linkS4class{GaussianPrediction} or
 }
 \description{
 \itemize{
-  \item \code{predict} calls either \code{predict.gaussian} or
-  \code{predict.kr} depending on whether \code{fit} is for a model
+  \item \code{pred} calls either \code{pred.gaussian} or
+  \code{pred.kr} depending on whether \code{fit} is for a model
   that marginalized or sampled the latent signal \code{f}
-  \item \code{predict.gaussian} computes analytic posterior or prior
+  \item \code{pred.gaussian} computes analytic posterior or prior
   predictive distribution and returns an object of class
   \linkS4class{GaussianPrediction}
-  \item \code{predict.kr} computes predictions using kernel regression for
+  \item \code{pred.kr} computes predictions using kernel regression for
   the samples of \code{f} and returns an object of class
   \linkS4class{Prediction}
 }

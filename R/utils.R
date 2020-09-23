@@ -233,18 +233,6 @@ plot_color_palette <- function(n) {
   return(h)
 }
 
-#' Line alpha decider function
-#'
-#' @description A function that takes as parameter the number of lines and
-#' returns a line alpha value (between 0 and 1).
-#' @param num_lines number of lines to draw
-#' @return a value between 0 and 1
-#' @family color utilities
-line_alpha_fun <- function(num_lines) {
-  alpha <- exp(-0.013 * num_lines)
-  max(alpha, 0.01)
-}
-
 #' A linter-friendly way to call a function
 #'
 #' @description This exists just to allow calling a function which is a slot

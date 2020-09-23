@@ -215,7 +215,7 @@ arr3_to_list <- function(x) {
 #' @param idx the index to select
 #' @return an array of shape \code{d2} x \code{d3}
 #' @family array utilities
-arr3_select <- function(x, j) {
+arr3_select <- function(x, idx) {
   DIM <- dim(x)
-  array(x[j, , ], dim = DIM[2:3])
+  array(x[idx, , ], dim = DIM[2:3])
 }
