@@ -12,24 +12,25 @@ data with with interpretable covariate effects and covariate relevance
 assesment. Models can include non-stationary, heterogeneous and temporally
 uncertain effects. Bayesian inference of the model (hyper)parameters using
 \code{\link[rstan]{rstan}}. Functions for visualizing longitudinal data,
-posterior draws and model predictions are also provided.
+posterior draws, model predictions and inferred covariate effects are
+also provided.
 }
-\section{Basic usage}{
+\section{Overview}{
 
+See
 \itemize{
-\item See documentation of the main function \code{\link{lgp}}.
- \item See tutorials at
- \url{https://jtimonen.github.io/lgpr-usage/index.html}
+ \item \code{\link{lgp}} for info on how to specify and fit models
+ \item \code{\link{ppc}} for prior and posterior predictive checks
+ \item \code{\link{relevances}} for component/covariate relevance assessment
+ \item \code{\link{select}} for component/covariate selection
+ \item \code{\link{get_pred}} for model predictions and inferred components
+ at data points
+ \item \code{\link{pred}} for computing out-of-sample predictions and
+ inferred components
+ \item \code{\link{plot_pred}} and \code{\link{plot_f}} for visualizing
+ predictions and inferred components
+ \item tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}
 }
-}
-
-\section{Citation}{
-
-
-\emph{An interpretable probabilistic machine learning method for
-heterogeneous longitudinal studies}. Juho Timonen, Henrik Mannerstrom,
-Aki Vehtari and Harri Lahdesmaki, 2019.
-\url{https://arxiv.org/abs/1912.03549}
 }
 
 \references{

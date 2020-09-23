@@ -6,24 +6,28 @@
 #' assesment. Models can include non-stationary, heterogeneous and temporally
 #' uncertain effects. Bayesian inference of the model (hyper)parameters using
 #' \code{\link[rstan]{rstan}}. Functions for visualizing longitudinal data,
-#' posterior draws and model predictions are also provided.
+#' posterior draws, model predictions and inferred covariate effects are
+#' also provided.
 #'
 #' @author Juho Timonen (first.last at iki.fi)
 #' @keywords Gaussian processes, longitudinal data, Stan, covariate relevances,
 #' interpretable models
 #'
-#' @section Basic usage:
+#' @section Overview:
+#' See
 #' \itemize{
-#' \item See documentation of the main function \code{\link{lgp}}.
-#'  \item See tutorials at
-#'  \url{https://jtimonen.github.io/lgpr-usage/index.html}
+#'  \item \code{\link{lgp}} for info on how to specify and fit models
+#'  \item \code{\link{ppc}} for prior and posterior predictive checks
+#'  \item \code{\link{relevances}} for component/covariate relevance assessment
+#'  \item \code{\link{select}} for component/covariate selection
+#'  \item \code{\link{get_pred}} for model predictions and inferred components
+#'  at data points
+#'  \item \code{\link{pred}} for computing out-of-sample predictions and
+#'  inferred components
+#'  \item \code{\link{plot_pred}} and \code{\link{plot_f}} for visualizing
+#'  predictions and inferred components
+#'  \item tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}
 #' }
-#' @section Citation:
-#'
-#' \emph{An interpretable probabilistic machine learning method for
-#' heterogeneous longitudinal studies}. Juho Timonen, Henrik Mannerstrom,
-#' Aki Vehtari and Harri Lahdesmaki, 2019.
-#' \url{https://arxiv.org/abs/1912.03549}
 #'
 #' @docType package
 #' @name lgpr-package
@@ -88,10 +92,21 @@ NULL
 #' Either one of the approaches should be used and they should not be mixed.
 #'
 #' @section Defining priors:
-#' The \code{priors} argument must be a named list.
-#' \enumerate{
-#'   \item Ok.
+#' The \code{priors} argument must be a named list. Possible allowed names are
+#' \itemize{
+#'  \item \code{"alpha"} = component magnitude parameters
+#'  \item \code{"ell"} = component lengthscale parameters
+#'  \item \code{"wrp"} = input warping steepness parameters
+#'  \item \code{"sigma"} = noise magnitude (Gaussian obs. model)
+#'  \item \code{"phi"} = inverse overdispersion (NB obs. model)
+#'  \item \code{"gamma"} = overdispersion (Beta-binomial obs. model)
+#'  \item \code{"beta"} = heterogeneity parameters
+#'  \item \code{"effect_time"} = uncertain effect time parameters
+#'  \item \code{"effect_time_info"} = additional options for the above
 #' }
+#' It is recommended to use the \code{\link{priors}} functions to define
+#' the list elements. If a parameter of a model is not given in this list,
+#' a default prior will be used for it. See examples in tutorials.
 #'
 #' @name lgp
 #' @family main functions

@@ -3,7 +3,7 @@
 \docType{data}
 \name{testdata_001}
 \alias{testdata_001}
-\title{A very small artificial test data set}
+\title{A very small artificial test data, used mostly for unit tests}
 \format{
 A data frame with 24 rows and 6 variables:
 \describe{
@@ -19,6 +19,6 @@ A data frame with 24 rows and 6 variables:
 testdata_001
 }
 \description{
-A very small artificial test data set
+A very small artificial test data, used mostly for unit tests
 }
 \keyword{datasets}

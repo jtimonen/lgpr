@@ -10,15 +10,16 @@ reference:
   - sample_model
   - optimize_model
   - uniform
+  - model_summary
   - fit_summary
+  - pred
+  - get_pred
   - relevances
   - ppc
   - plot_data
   - plot_draws
-  - plot_fit
-  - get_f
-  - model_summary
-  - gp_posterior
+  - plot_pred
+  - plot_f
   - kernel_matrices
   
   - new_data
@@ -44,7 +45,7 @@ development:
 
 navbar:
   structure:
-    left:  [home, reference, articles, news]
+    left:  [home, overview, reference, articles, news]
     
   components:
     articles:
@@ -52,10 +53,11 @@ navbar:
       menu:
       - text: Basic usage
         href: articles/basic-usage.html
-      - text: Priors
-        href: articles/prior-specifications.html
       - text: Vignettes
         href: articles/index.html
+    overview:
+      text: Overview
+      href: reference/lgpr-package.html
     reference:
       text: Documentation
       href: reference/index.html

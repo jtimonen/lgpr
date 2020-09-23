@@ -119,10 +119,21 @@ Either one of the approaches should be used and they should not be mixed.
 
 \section{Defining priors}{
 
-The \code{priors} argument must be a named list.
-\enumerate{
-  \item Ok.
+The \code{priors} argument must be a named list. Possible allowed names are
+\itemize{
+ \item \code{"alpha"} = component magnitude parameters
+ \item \code{"ell"} = component lengthscale parameters
+ \item \code{"wrp"} = input warping steepness parameters
+ \item \code{"sigma"} = noise magnitude (Gaussian obs. model)
+ \item \code{"phi"} = inverse overdispersion (NB obs. model)
+ \item \code{"gamma"} = overdispersion (Beta-binomial obs. model)
+ \item \code{"beta"} = heterogeneity parameters
+ \item \code{"effect_time"} = uncertain effect time parameters
+ \item \code{"effect_time_info"} = additional options for the above
 }
+It is recommended to use the \code{\link{priors}} functions to define
+the list elements. If a parameter of a model is not given in this list,
+a default prior will be used for it. See examples in tutorials.
 }
 
 \seealso{
