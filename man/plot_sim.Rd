@@ -3,7 +3,7 @@
 \name{plot_sim}
 \alias{plot_sim}
 \alias{plot_sim_component}
-\alias{plot_sim_component_df}
+\alias{plot_sim_component.df}
 \title{Visualize an lgpsim object (simulated data)}
 \usage{
 plot_sim(
@@ -26,7 +26,7 @@ plot_sim_component(
   ...
 )
 
-plot_sim_component_df(simdata, x_name, group_by, color_by, component_idx)
+plot_sim_component.df(simdata, x_name, group_by, color_by, component_idx)
 }
 \arguments{
 \item{simdata}{an object of class \linkS4class{lgpsim}}

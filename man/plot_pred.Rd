@@ -19,11 +19,15 @@ plot_pred(
 
 plot_f(
   fit,
-  component_idx,
-  color_by = NA,
-  x_name = "age",
+  pred = NULL,
+  x = NULL,
   group_by = "id",
+  t_name = "age",
   draws = NULL,
+  reduce = NULL,
+  MULT_STD = 2,
+  comp_idx = NULL,
+  color_by = NA,
   ...
 )
 }

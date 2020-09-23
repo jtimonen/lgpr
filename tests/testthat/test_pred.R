@@ -95,7 +95,7 @@ test_that("relevances can be computed", {
   expect_equal(length(r2), 4)
 })
 
-test_that("model fit can be visualized with data on original scale", {
+test_that("predictions can be visualized with data on original scale", {
   p1 <- plot_pred(fit1)
   p2 <- plot_pred(fit1, draws = c(2, 3))
   p3 <- plot_pred(fit1, draws = 3)
@@ -114,6 +114,23 @@ test_that("model fit can be visualized with data on original scale", {
   expect_s3_class(p4, "ggplot")
 })
 
+test_that("inferred components can be visualized", {
+  p1 <- plot_f(fit1)
+  p2 <- plot_f(fit1, comp_idx = 3, draws = c(3, 4), color_by = "diseaseAge")
+  p3 <- plot_f(fit1,
+    reduce = stats::median, color_by = "diseaseAge",
+    alpha_err = 0.3, comp_idx = 2, MULT_STD = 0.03
+  )
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
+  p1 <- plot_f(fit2)
+  p2 <- plot_f(fit2, comp_idx = 1, reduce = mean)
+  p3 <- plot_f(fit2, comp_idx = 3, draws = 10, color_by = "diseaseAge")
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
+})
 
 # -------------------------------------------------------------------------
 
@@ -138,4 +155,26 @@ test_that("predict.gaussian works correctly", {
   out <- pred(fit1, x1_pred, reduce = mean)
   expect_s4_class(out, "GaussianPrediction")
   expect_equal(dim(out@y_mean), c(1, 44))
+})
+
+
+test_that("out-of-sample predictions can be visualized", {
+  os1 <- pred(fit1, x1_pred)
+  os2 <- pred(fit1, x1_pred, draws = c(8:10))
+  p1 <- plot_pred(fit1, pred = os1, x = x1_pred)
+  p2 <- plot_pred(fit1, pred = os2, x = x1_pred)
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+})
+
+test_that("out-of-sample inferred components can be visualized", {
+  os1 <- pred(fit1, x1_pred)
+  os2 <- pred(fit1, x1_pred, draws = c(8:10))
+  p1 <- plot_f(fit1, pred = os1, x = x1_pred)
+  p2 <- plot_f(fit1,
+    pred = os2, x = x1_pred, comp_idx = 3,
+    color_by = "diseaseAge"
+  )
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
 })

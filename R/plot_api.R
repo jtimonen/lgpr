@@ -252,7 +252,8 @@ add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
       data = df,
       mapping = aes_rib,
       inherit.aes = FALSE,
-      alpha = alpha
+      alpha = alpha,
+      color = NA
     )
   }
   return(h)
@@ -296,7 +297,7 @@ add_g_layer_ribbon <- function(h, df, x_name, group_by, color, alpha) {
       data = df,
       mapping = aes_rib,
       inherit.aes = FALSE,
-      color = color,
+      color = NA,
       fill = color,
       alpha = alpha
     )

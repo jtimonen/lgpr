@@ -72,7 +72,7 @@ plot_sim_component <- function(simdata,
                                ...) {
   check_type(simdata, "lgpsim")
   check_not_null(component_idx)
-  out <- plot_sim_component_df(
+  out <- plot_sim_component.df(
     simdata, x_name, group_by, color_by,
     component_idx
   )
@@ -83,7 +83,7 @@ plot_sim_component <- function(simdata,
 }
 
 #' @rdname plot_sim
-plot_sim_component_df <- function(simdata, x_name, group_by, color_by,
+plot_sim_component.df <- function(simdata, x_name, group_by, color_by,
                                   component_idx) {
   data <- simdata@data
   df_comp <- get_sim_components(simdata)

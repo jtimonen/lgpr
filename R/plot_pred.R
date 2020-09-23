@@ -38,6 +38,25 @@ plot_pred <- function(fit,
                       ...) {
   check_type(fit, "lgpfit")
   df_data <- create_plot_df(fit, t_name, group_by)
+  input <- plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
+  pred <- dollar(input, "pred")
+  df_base <- dollar(input, "df_base")
+
+  # Create plot
+  plot_api_g(
+    df_data = df_data,
+    df_fit = plot_pred.create.df_line(fit, pred, df_base),
+    df_fit_err = plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD),
+    ...
+  )
+}
+
+#' Helper function for plot_pred and plot_f
+#'
+#' @inheritParams plot_pred
+#' @return a list with names \code{pred} and \code{df_base}
+plot_pred.create_input <- function(fit, pred, x, draws, reduce,
+                                   group_by, t_name) {
   if (is.null(pred)) {
     pred <- get_pred(fit, draws, reduce)
     df_base <- create_plot_df(fit, t_name, group_by)[, 1:2]
@@ -45,50 +64,17 @@ plot_pred <- function(fit,
     df_base <- data.frame(dollar(x, group_by), dollar(x, t_name))
     colnames(df_base) <- c(group_by, t_name)
   }
-  PRED <- plot_pred.create(fit, pred, df_base, MULT_STD)
-  h <- plot_api_g(
-    df_data = df_data,
-    df_fit =  dollar(PRED, "df_line"),
-    df_fit_err = dollar(PRED, "df_ribbon"),
-    ...
-  )
-  return(h)
-}
-
-#' @export
-#' @rdname plot_pred
-plot_f <- function(fit,
-                   component_idx,
-                   color_by = NA,
-                   x_name = "age",
-                   group_by = "id",
-                   draws = NULL,
-                   ...) {
-  check_type(fit, "lgpfit")
-  h <- 0
-  return(h)
+  list(pred = pred, df_base = df_base)
 }
 
 
-#' Helper function for plot_pred
+#' Helper functions for plot_pred
 #'
 #' @inheritParams plot_pred
 #' @param df_base a data frame with two columns
-#' @return a list
-plot_pred.create <- function(fit, pred, df_base, MULT_STD) {
-
-  # Create fit line(s)
-  df_line <- plot_pred.create.df_line(fit, pred, df_base)
-  df_ribbon <- plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD)
-  info <- NULL
-
-  # Return
-  list(
-    df_line = df_line,
-    df_ribbon = df_ribbon,
-    info = info
-  )
-}
+#' @return a data frame
+#' @name plot_pred.create
+NULL
 
 #' @rdname plot_pred.create
 plot_pred.create.df_line <- function(fit, pred, df_base) {
@@ -117,4 +103,111 @@ plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
   lower <- m - MULT_STD * std
   df <- data.frame(upper, lower)
   cbind(df_base, df)
+}
+
+
+#' @export
+#' @rdname plot_pred
+plot_f <- function(fit,
+                   pred = NULL,
+                   x = NULL,
+                   group_by = "id",
+                   t_name = "age",
+                   draws = NULL,
+                   reduce = NULL,
+                   MULT_STD = 2.0,
+                   comp_idx = NULL,
+                   color_by = NA,
+                   ...) {
+  check_type(fit, "lgpfit")
+  color_fac <- plot_f.get_color_fac(fit, pred, x, color_by)
+  input <- plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
+  pred <- dollar(input, "pred")
+  df_base <- dollar(input, "df_base")
+  bn <- colnames(df_base)
+  df_base <- cbind(df_base, color_fac)
+  colnames(df_base) <- c(bn, color_by)
+  ylab <- if (is.null(comp_idx)) "f" else paste0("f[", comp_idx, "]")
+
+  # Create plot
+  h <- plot_api_c(
+    df = plot_f.create.df_line(fit, pred, df_base, comp_idx),
+    df_err = plot_f.create.df_ribbon(fit, pred, df_base, comp_idx, MULT_STD),
+    ...
+  )
+  h + ggplot2::ylab(ylab)
+}
+
+#' Helper function for plot_f
+#'
+#' @inheritParams plot_f
+#' @return a factor
+plot_f.get_color_fac <- function(fit, pred, x, color_by) {
+  n <- if (is.null(pred)) get_stan_input(fit)$num_obs else nrow(x)
+  if (is.na(color_by)) {
+    color_fac <- as.factor(rep(1, n))
+    return(color_fac)
+  }
+  if (is.null(pred)) {
+    color_fac <- get_covariate(fit, color_by)
+  } else {
+    color_fac <- dollar(x, color_by)
+  }
+  if (!is.factor(color_fac)) {
+    # Color by whether or not the coloring variable is NA or NaN
+    color_fac <- as.numeric(!is.na(color_fac))
+    color_fac <- as.factor(c("NA/NaN", "available")[color_fac + 1])
+  }
+  return(color_fac)
+}
+
+
+#' Helper functions for plot_f
+#'
+#' @inheritParams plot_f
+#' @param df_base a data frame with two columns
+#' @return a data frame
+#' @name plot_f.create
+NULL
+
+#' @rdname plot_f.create
+plot_f.create.df_line <- function(fit, pred, df_base, comp_idx) {
+  line_arr <- plot_f.create.line_arr(fit, pred, comp_idx)
+  num_draws <- nrow(line_arr)
+  df_wide <- make_draw_df(line_arr)
+  df_long <- to_long_format(df_wide)
+  colnames(df_long) <- c("_draw_", "y")
+  df_base <- rep_df(df_base, times = num_draws)
+  out <- cbind(df_base, df_long)
+  if (num_draws == 1) out[["_draw_"]] <- NULL
+  return(out)
+}
+
+#' @rdname plot_f.create
+plot_f.create.df_ribbon <- function(fit, pred, df_base, comp_idx,
+                                    MULT_STD) {
+  check_positive(MULT_STD)
+  line_arr <- plot_f.create.line_arr(fit, pred, comp_idx)
+  num_draws <- nrow(line_arr)
+  if (num_draws > 1 || is_f_sampled(fit)) {
+    return(NULL)
+  }
+  m <- as.vector(line_arr)
+  f_std <- if (is.null(comp_idx)) pred@f_std else pred@f_comp_std[[comp_idx]]
+  std <- as.vector(f_std)
+  upper <- m + MULT_STD * std
+  lower <- m - MULT_STD * std
+  df <- data.frame(upper, lower)
+  cbind(df_base, df)
+}
+
+#' @rdname plot_f.create
+plot_f.create.line_arr <- function(fit, pred, comp_idx) {
+  if (is.null(comp_idx)) {
+    line_arr <- if (is_f_sampled(fit)) pred@f else pred@f_mean
+  } else {
+    f_cmp <- if (is_f_sampled(fit)) pred@f_comp else pred@f_comp_mean
+    line_arr <- f_cmp[[comp_idx]]
+  }
+  return(line_arr)
 }
