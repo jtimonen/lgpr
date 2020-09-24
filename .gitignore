@@ -13,5 +13,7 @@ inst/doc
 *.so
 *.o
 *.dll
-docs
 vignettes/tutorials
+pkgdown/*.png
+^docs$
+

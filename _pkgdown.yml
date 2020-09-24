@@ -22,7 +22,7 @@ reference:
   - plot_f
   - kernel_matrices
   
-  - new_data
+  - new_x
   - add_factor
   - add_dis_age
   - adjusted_c_hat
@@ -42,10 +42,15 @@ development:
   mode: auto
   version_label: info
   version_tooltip: "Development version"
-
+  
+home:
+  links:
+  - text: Link text
+    href: http://website.com
+    
 navbar:
   structure:
-    left:  [home, overview, reference, articles, news]
+    left:  [home, overview, articles, reference, news]
     
   components:
     articles:
@@ -58,9 +63,6 @@ navbar:
     overview:
       text: Overview
       href: reference/lgpr-package.html
-    installation:
-      text: Installation
-      href: installation.html
     reference:
       text: Documentation
       href: reference/index.html

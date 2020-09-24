@@ -4,11 +4,12 @@
 
 R package for **L**ongitudinal **G**aussian **P**rocess **R**egression. 
 
+![Overview figure](figure.png)
+
 ## Getting started
 See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usage/index.html. 
 
 ## Requirements
-
 * Linux is the preferred operating system. However, the package works also on
   Mac and Windows. We dont have pre-compiled binaries distributed yet, so 
   currently *lgpr* needs to be installed from source. 

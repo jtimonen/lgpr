@@ -14,7 +14,7 @@
 #' interpretable models
 #'
 #' @section Overview:
-#' See
+#' See the documentation of
 #' \itemize{
 #'  \item \code{\link{lgp}} for info on how to specify and fit models
 #'  \item \code{\link{ppc}} for prior and posterior predictive checks
@@ -26,8 +26,10 @@
 #'  inferred components
 #'  \item \code{\link{plot_pred}} and \code{\link{plot_f}} for visualizing
 #'  predictions and inferred components
-#'  \item tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}
 #' }
+#'
+#' @section Tutorials:
+#' See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}.
 #'
 #' @docType package
 #' @name lgpr-package
