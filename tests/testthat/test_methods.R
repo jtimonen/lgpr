@@ -71,12 +71,29 @@ test_that("get_y works", {
   expect_gt(stats::sd(y1), stats::sd(y2))
 })
 
+test_that("get_covariate works", {
+  x <- get_covariate(model, "id")
+  expect_equal(length(x), 24)
+  reason <- "covariate not found!"
+  expect_error(get_covariate(model, "asdf"), reason)
+})
+
 test_that("get_x_cat and get_x_cont work", {
   x <- get_x_cat(model)
   expect_equal(rownames(x), c("id", "sex"))
   x <- get_x_cont(model)
   expect_equal(sum(is.nan(x)), 12)
 })
+
+test_that("getters work correctly for one-component models", {
+  model <- create_model(y ~ age, data = testdata_001)
+  expect_null(get_x_cat(model))
+  expect_null(get_covariate_info_cat(model))
+  model <- create_model(y ~ id, data = testdata_001)
+  expect_null(get_x_cont(model))
+  expect_null(get_covariate_info_cont(model))
+})
+
 
 test_that("prior summary works", {
   ps <- prior_summary(model, digits = 4)

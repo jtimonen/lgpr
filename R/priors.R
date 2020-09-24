@@ -228,8 +228,8 @@ prior_to_df <- function(stan_input, digits = 3) {
   # Gamma
   obs_model <- dollar(stan_input, "obs_model")
   if (obs_model == 5) {
-    df_bet <- prior_to_df_unit(stan_input, "gamma", 1, digits)
-    df <- rbind(df, df_bet)
+    df_gam <- prior_to_df_unit(stan_input, "gamma", 1, digits)
+    df <- rbind(df, df_gam)
   }
 
   # Effect time

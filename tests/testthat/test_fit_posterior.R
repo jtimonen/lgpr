@@ -121,6 +121,7 @@ test_that("f can be sampled with beta-binomial likelihood", {
       refresh = 0,
       num_trials = 10
     )
-    expect_s4_class(fit, "lgpfit")
   })
+  expect_s4_class(fit, "lgpfit")
+  expect_output(show(fit@model))
 })

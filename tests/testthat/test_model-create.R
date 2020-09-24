@@ -237,3 +237,15 @@ test_that("cannot have missing values for a factor", {
     "missing values for factor 'sex'"
   )
 })
+
+test_that("cannot have wrong length of prior list", {
+  prior_alpha <- list(log_normal(1, 1), normal(0, 1))
+  reason <- "should have length 1 or 3! found = 2"
+  expect_error(
+    create_model(y ~ id + age + sex,
+      data = testdata_001,
+      prior = list(alpha = prior_alpha)
+    ),
+    reason
+  )
+})
