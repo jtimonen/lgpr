@@ -9,7 +9,7 @@ cpp_var_mask(x, a, STREAM = get_stream())
 \arguments{
 \item{x}{a numeric vector}
 
-\item{a}{steepness parameter}
+\item{a}{positive steepness parameter}
 
 \item{STREAM}{an external pointer}
 }
@@ -17,5 +17,6 @@ cpp_var_mask(x, a, STREAM = get_stream())
 a vector
 }
 \description{
-This is a wrapper for \code{STAN_var_mask}
+This is a wrapper for \code{STAN_var_mask}, with some input
+validation added.
 }

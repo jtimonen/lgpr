@@ -4,25 +4,14 @@
 \alias{plot_api_c}
 \title{Plot a generated/fit model component}
 \usage{
-plot_api_c(
-  df,
-  df_err = NULL,
-  color_line = color_palette(2)[2],
-  color_err = colorset("red", "light_highlight"),
-  alpha_line = 1,
-  alpha_err = 1
-)
+plot_api_c(df, df_err = NULL, alpha = 1, alpha_err = 0.5)
 }
 \arguments{
 \item{df}{a data frame}
 
 \item{df_err}{a data frame}
 
-\item{color_line}{line color}
-
-\item{color_err}{ribbon color}
-
-\item{alpha_line}{line opacity}
+\item{alpha}{line opacity}
 
 \item{alpha_err}{ribbon opacity}
 }

@@ -5,14 +5,6 @@ STAN_vectorsum <- function(vecs, L, pstream__ = 0L) {
     .Call(`_lgpr_STAN_vectorsum`, vecs, L, pstream__)
 }
 
-STAN_check_real_positive <- function(a, pstream__ = 0L) {
-    invisible(.Call(`_lgpr_STAN_check_real_positive`, a, pstream__))
-}
-
-STAN_check_prob_positive <- function(a, pstream__ = 0L) {
-    invisible(.Call(`_lgpr_STAN_check_prob_positive`, a, pstream__))
-}
-
 STAN_warp_input <- function(x, a, pstream__ = 0L) {
     .Call(`_lgpr_STAN_warp_input`, x, a, pstream__)
 }

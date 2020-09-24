@@ -19,24 +19,24 @@
 #' @param df_data A data frame containing the observations.
 #' @param df_signal A data frame containing the true signal. Omitted if
 #' \code{NULL}.
-#' @param df_fit A data frame containing the model fit, or a list of data
+#' @param df A data frame containing the model fit, or a list of data
 #' frames. The list version can be used for example so that each list element
 #' corresponds to the fit computed using one parameter draw. Omitted if
 #' \code{NULL}.
-#' @param df_fit_err A data frame containing error bars. Omitted if \code{NULL}.
+#' @param df_err A data frame containing error bars. Omitted if \code{NULL}.
 #' Must be \code{NULL} if \code{df_fit} is a list.
 #' @param teff_signal A named vector containing true effect times used to
 #' generate the signal. Omitted if \code{NULL}.
 #' @param teff_obs A named vector containing observed effect times. Omitted if
 #' \code{NULL}.
 #' @param i_test Indices of test points.
-#' @param signal_color Line color for true signal.
-#' @param fit_color Line color for model fit.
-#' @param fit_err_color Color of the error ribbon.
-#' @param vline_colors Two line colors for vertical lines
+#' @param color_signal Line color for true signal.
+#' @param color Line color for model fit.
+#' @param color_err Color of the error ribbon.
+#' @param color_vlines Two line colors for vertical lines
 #' (true and obs. effect time).
-#' @param fit_alpha Line opacity for model fit.
-#' @param fit_err_alpha Opacity of the error ribbon.
+#' @param alpha Line opacity for model fit.
+#' @param alpha_err Opacity of the error ribbon.
 #' @param nrow number of rows, an argument for
 #' \code{\link[ggplot2]{facet_wrap}}
 #' @param ncol number of columns, an argument for
@@ -46,17 +46,17 @@
 #' @family plot APIs
 plot_api_g <- function(df_data,
                        df_signal = NULL,
-                       df_fit = NULL,
-                       df_fit_err = NULL,
+                       df = NULL,
+                       df_err = NULL,
                        teff_signal = NULL,
                        teff_obs = NULL,
                        i_test = NULL,
-                       signal_color = color_palette(2)[1],
-                       fit_color = color_palette(2)[2],
-                       fit_err_color = colorset("red", "light_highlight"),
+                       color_signal = color_palette(2)[1],
+                       color = color_palette(2)[2],
+                       color_err = colorset("red", "light_highlight"),
                        vline_colors = colorset("gray", "mid_highlight"),
-                       fit_alpha = 1.0,
-                       fit_err_alpha = 1.0,
+                       alpha = 1.0,
+                       alpha_err = 0.5,
                        nrow = NULL,
                        ncol = NULL,
                        y_transform = function(x) x) {
@@ -75,11 +75,11 @@ plot_api_g <- function(df_data,
 
   # Add other layers
   h <- add_g_layer_ribbon(
-    h, df_fit_err, x_name, group_by,
-    fit_err_color, fit_err_alpha
+    h, df_err, x_name, group_by,
+    color_err, alpha_err
   )
-  h <- add_g_layer_fit(h, df_fit, x_name, group_by, fit_color, fit_alpha)
-  h <- add_g_layer_signal(h, df_signal, x_name, group_by, signal_color)
+  h <- add_g_layer_fit(h, df, x_name, group_by, color, alpha)
+  h <- add_g_layer_signal(h, df_signal, x_name, group_by, color_signal)
 
   # Add data and return
   h <- h + ggplot2::geom_point()
@@ -105,18 +105,14 @@ plot_api_g <- function(df_data,
 #' }
 #' @param df a data frame
 #' @param df_err a data frame
-#' @param color_line line color
-#' @param color_err ribbon color
-#' @param alpha_line line opacity
+#' @param alpha line opacity
 #' @param alpha_err ribbon opacity
 #' @return A \code{\link[ggplot2]{ggplot}} object.
 #' @family plot APIs
 plot_api_c <- function(df,
                        df_err = NULL,
-                       color_line = color_palette(2)[2],
-                       color_err = colorset("red", "light_highlight"),
-                       alpha_line = 1.0,
-                       alpha_err = 1.0) {
+                       alpha = 1.0,
+                       alpha_err = 0.5) {
 
   # Create the plot
   group_by <- colnames(df)[1]
@@ -128,7 +124,7 @@ plot_api_c <- function(df,
 
   # Add layers
   h <- add_c_layer_ribbon(h, df_err, x_name, group_by, color_by, alpha_err)
-  h <- add_c_layer_line(h, df, x_name, group_by, color_by, alpha_line)
+  h <- add_c_layer_line(h, df, x_name, group_by, color_by, alpha)
   return(h)
 }
 

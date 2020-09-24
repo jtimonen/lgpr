@@ -96,17 +96,17 @@ test_that("relevances can be computed", {
 })
 
 test_that("predictions can be visualized with data on original scale", {
-  p1 <- plot_pred(fit1)
-  p2 <- plot_pred(fit1, draws = c(2, 3))
-  p3 <- plot_pred(fit1, draws = 3)
+  p1 <- plot_pred(fit1, reduce = NULL)
+  p2 <- plot_pred(fit1, reduce = NULL, draws = c(2, 3))
+  p3 <- plot_pred(fit1, reduce = NULL, draws = 3)
   p4 <- plot_pred(fit1, reduce = mean)
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
   expect_s3_class(p4, "ggplot")
-  p1 <- plot_pred(fit2)
-  p2 <- plot_pred(fit2, draws = c(2, 3))
-  p3 <- plot_pred(fit2, draws = 3)
+  p1 <- plot_pred(fit2, reduce = NULL)
+  p2 <- plot_pred(fit2, reduce = NULL, draws = c(2, 3))
+  p3 <- plot_pred(fit2, reduce = NULL, draws = 3)
   p4 <- plot_pred(fit2, reduce = mean)
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
@@ -115,8 +115,11 @@ test_that("predictions can be visualized with data on original scale", {
 })
 
 test_that("inferred components can be visualized", {
-  p1 <- plot_f(fit1)
-  p2 <- plot_f(fit1, comp_idx = 3, draws = c(3, 4), color_by = "diseaseAge")
+  p1 <- plot_f(fit1, reduce = NULL)
+  p2 <- plot_f(fit1,
+    comp_idx = 3, reduce = NULL,
+    draws = c(3, 4), color_by = "diseaseAge"
+  )
   p3 <- plot_f(fit1,
     reduce = stats::median, color_by = "diseaseAge",
     alpha_err = 0.3, comp_idx = 2, MULT_STD = 0.03
@@ -125,8 +128,11 @@ test_that("inferred components can be visualized", {
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
   p1 <- plot_f(fit2)
-  p2 <- plot_f(fit2, comp_idx = 1, reduce = mean)
-  p3 <- plot_f(fit2, comp_idx = 3, draws = 10, color_by = "diseaseAge")
+  p2 <- plot_f(fit2, comp_idx = 1, reduce = NULL)
+  p3 <- plot_f(fit2,
+    comp_idx = 3, reduce = NULL,
+    draws = 10, color_by = "diseaseAge"
+  )
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
@@ -160,7 +166,7 @@ test_that("predict.gaussian works correctly", {
 
 test_that("out-of-sample predictions can be visualized", {
   os1 <- pred(fit1, x1_pred)
-  os2 <- pred(fit1, x1_pred, draws = c(8:10))
+  os2 <- pred(fit1, x1_pred, reduce = NULL, draws = c(8:10))
   p1 <- plot_pred(fit1, pred = os1, x = x1_pred)
   p2 <- plot_pred(fit1, pred = os2, x = x1_pred)
   expect_s3_class(p1, "ggplot")
@@ -169,7 +175,7 @@ test_that("out-of-sample predictions can be visualized", {
 
 test_that("out-of-sample inferred components can be visualized", {
   os1 <- pred(fit1, x1_pred)
-  os2 <- pred(fit1, x1_pred, draws = c(8:10))
+  os2 <- pred(fit1, x1_pred, reduce = NULL, draws = c(8:10))
   p1 <- plot_f(fit1, pred = os1, x = x1_pred)
   p2 <- plot_f(fit1,
     pred = os2, x = x1_pred, comp_idx = 3,

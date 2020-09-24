@@ -19,7 +19,6 @@ test_that("cpp_warp_input errors with invalid steepness input", {
   expect_error(cpp_warp_input(1, -1))
   expect_error(cpp_warp_input(1, 0.0))
   expect_error(cpp_warp_input(1, NaN))
-  expect_error(cpp_warp_input(1, Inf))
 })
 
 test_that("cpp_warp_input works similarly as reference", {
@@ -46,7 +45,6 @@ test_that("cpp_var_mask errors with invalid steepness input", {
   expect_error(cpp_var_mask(1, -1))
   expect_error(cpp_var_mask(1, 0.0))
   expect_error(cpp_var_mask(1, NaN))
-  expect_error(cpp_var_mask(1, Inf))
 })
 
 test_that("cpp_var_mask works similarly as reference", {

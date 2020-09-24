@@ -42,11 +42,6 @@ development:
   mode: auto
   version_label: info
   version_tooltip: "Development version"
-  
-home:
-  links:
-  - text: Installation
-    href: index.html
     
 navbar:
   structure:

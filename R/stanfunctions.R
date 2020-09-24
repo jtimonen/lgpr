@@ -93,22 +93,26 @@ cpp_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
 
 #' Input warping function
 #'
-#' @description This is a wrapper for \code{STAN_warp_input}
+#' @description This is a wrapper for \code{STAN_warp_input}, with some
+#' input validation added
 #' @param x a numeric vector
-#' @param a steepness parameter
+#' @param a positive steepness parameter
 #' @param STREAM an external pointer
 #' @return a vector
 cpp_warp_input <- function(x, a, STREAM = get_stream()) {
+  check_positive(a)
   STAN_warp_input(x, a, STREAM)
 }
 
 #' Variance masking function
 #'
-#' @description This is a wrapper for \code{STAN_var_mask}
+#' @description This is a wrapper for \code{STAN_var_mask}, with some input
+#' validation added.
 #' @param x a numeric vector
-#' @param a steepness parameter
+#' @param a positive steepness parameter
 #' @param STREAM an external pointer
 #' @return a vector
 cpp_var_mask <- function(x, a, STREAM = get_stream()) {
+  check_positive(a)
   STAN_var_mask(x, a, STREAM)
 }

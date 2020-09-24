@@ -8,17 +8,17 @@ their own panel}
 plot_api_g(
   df_data,
   df_signal = NULL,
-  df_fit = NULL,
-  df_fit_err = NULL,
+  df = NULL,
+  df_err = NULL,
   teff_signal = NULL,
   teff_obs = NULL,
   i_test = NULL,
-  signal_color = color_palette(2)[1],
-  fit_color = color_palette(2)[2],
-  fit_err_color = colorset("red", "light_highlight"),
+  color_signal = color_palette(2)[1],
+  color = color_palette(2)[2],
+  color_err = colorset("red", "light_highlight"),
   vline_colors = colorset("gray", "mid_highlight"),
-  fit_alpha = 1,
-  fit_err_alpha = 1,
+  alpha = 1,
+  alpha_err = 0.5,
   nrow = NULL,
   ncol = NULL,
   y_transform = function(x) x
@@ -30,12 +30,12 @@ plot_api_g(
 \item{df_signal}{A data frame containing the true signal. Omitted if
 \code{NULL}.}
 
-\item{df_fit}{A data frame containing the model fit, or a list of data
+\item{df}{A data frame containing the model fit, or a list of data
 frames. The list version can be used for example so that each list element
 corresponds to the fit computed using one parameter draw. Omitted if
 \code{NULL}.}
 
-\item{df_fit_err}{A data frame containing error bars. Omitted if \code{NULL}.
+\item{df_err}{A data frame containing error bars. Omitted if \code{NULL}.
 Must be \code{NULL} if \code{df_fit} is a list.}
 
 \item{teff_signal}{A named vector containing true effect times used to
@@ -46,18 +46,15 @@ generate the signal. Omitted if \code{NULL}.}
 
 \item{i_test}{Indices of test points.}
 
-\item{signal_color}{Line color for true signal.}
+\item{color_signal}{Line color for true signal.}
 
-\item{fit_color}{Line color for model fit.}
+\item{color}{Line color for model fit.}
 
-\item{fit_err_color}{Color of the error ribbon.}
+\item{color_err}{Color of the error ribbon.}
 
-\item{vline_colors}{Two line colors for vertical lines
-(true and obs. effect time).}
+\item{alpha}{Line opacity for model fit.}
 
-\item{fit_alpha}{Line opacity for model fit.}
-
-\item{fit_err_alpha}{Opacity of the error ribbon.}
+\item{alpha_err}{Opacity of the error ribbon.}
 
 \item{nrow}{number of rows, an argument for
 \code{\link[ggplot2]{facet_wrap}}}
@@ -66,6 +63,9 @@ generate the signal. Omitted if \code{NULL}.}
 \code{\link[ggplot2]{facet_wrap}}}
 
 \item{y_transform}{A function.}
+
+\item{color_vlines}{Two line colors for vertical lines
+(true and obs. effect time).}
 }
 \value{
 A \code{\link[ggplot2]{ggplot}} object.

@@ -12,7 +12,7 @@ plot_pred(
   group_by = "id",
   t_name = "age",
   draws = NULL,
-  reduce = NULL,
+  reduce = mean,
   MULT_STD = 2,
   ...
 )
@@ -24,7 +24,7 @@ plot_f(
   group_by = "id",
   t_name = "age",
   draws = NULL,
-  reduce = NULL,
+  reduce = mean,
   MULT_STD = 2,
   comp_idx = NULL,
   color_by = NA,

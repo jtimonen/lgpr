@@ -167,8 +167,8 @@ NULL
 get_draws <- function(fit, draws = NULL, reduce = NULL, ...) {
   check_type(fit, "lgpfit")
   s <- rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
+  param_names <- dimnames(s)[[3]]
   s <- squeeze_second_dim(s) # squeeze the 'chains' dimension
-  param_names <- colnames(s)
   if (!is.null(draws)) {
     s <- s[draws, , drop = FALSE]
   } else {

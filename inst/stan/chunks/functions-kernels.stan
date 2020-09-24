@@ -12,9 +12,6 @@ matrix STAN_kernel_base_var_mask(
   matrix[n1, 1] s1 = to_matrix(STAN_var_mask(x1 - r, a));
   matrix[n2, 1] s2 = to_matrix(STAN_var_mask(x2 - r, a));
   matrix[n1, n2] K = s1 * transpose(s2);
-  STAN_check_real_positive(steepness);
-  STAN_check_real_positive(vm_params[2]);
-  STAN_check_prob_positive(vm_params[1]);
   return(K);
 }
 
@@ -86,15 +83,15 @@ matrix[] STAN_kernel_all(
         X2 = STAN_edit_x_cont(X2, idx2_expand, teff_zero[1], teff[1]);
       }
       
-      // 4.2 Input warping
+      // 4.2 Variance masking
       s = wrp[idx_wrp];
-      X1 = STAN_warp_input(X1, s);
-      X2 = STAN_warp_input(X2, s);
-      
-      // 4.3 Variance masking
       if(is_var_masked){
         K = K .* STAN_kernel_base_var_mask(X1, X2, s, vm_params[idx_wrp]);
       }
+      
+      // 4.3 Input warping
+      X1 = STAN_warp_input(X1, s);
+      X2 = STAN_warp_input(X2, s);
     }
     
     // Compute the kernel matrix

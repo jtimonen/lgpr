@@ -68,26 +68,24 @@ select_row <- function(x, name) {
 #' @return an array of shape \code{n1*n2} x \code{n3}
 #' @family array utilities
 squeeze_second_dim <- function(x) {
-  D <- dim(x)
-  L <- length(D)
+  D_in <- dim(x)
+  L <- length(D_in)
   if (L != 3) {
     msg <- paste0("Number of dimensions in <x> must be 3! found = ", L)
     stop(msg)
   }
-  if (D[2] < 1) {
-    msg <- paste0("Second dimension of <x> must be at least 1! found = ", D[2])
+  if (D_in[2] < 1) {
+    msg <- paste0("2nd dimension of <x> must be at least 1! found = ", D_in[2])
     stop(msg)
   }
-  a <- c()
-  for (j in seq_len(D[2])) {
-    b <- x[, j, ]
-    a <- rbind(a, b)
+  D_out <- c(D_in[1] * D_in[2], D_in[3])
+  out <- array(0, dim = D_out)
+  for (j in seq_len(D_in[2])) {
+    i1 <- (j - 1) * D_in[1] + 1
+    i2 <- j * D_in[1]
+    out[i1:i2, ] <- x[, j, ]
   }
-  if (D[3] == 1) {
-    a <- t(a)
-    colnames(a) <- dimnames(x)[3]
-  }
-  return(a)
+  return(out)
 }
 
 #' Array transformation utility

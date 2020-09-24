@@ -8,28 +8,13 @@ vector STAN_vectorsum(vector[] vecs, data int L){
   return(s);
 }
 
-// Check that number is a positive real number
-void STAN_check_real_positive(real a){
-  if(a<=0){ reject("argument must be positive!"); }
-  if(is_nan(a)){ reject("argument must not be NaN!"); }
-  if(is_inf(a)){ reject("argument must be finite!"); }
-}
-
-// Check that number is a non-zero probability
-void STAN_check_prob_positive(real a){
-  if(a<=0 || a > 1){ reject("argument must be on the interval (0, 1]!"); }
-  if(is_nan(a)){ reject("argument must not be NaN!"); }
-}
-
 // Input warping function
 vector STAN_warp_input(vector x, real a){
-  STAN_check_real_positive(a);
   return( -1 + 2*inv(1+exp(-a*x)) );
 }
 
 // Variance masking function
 vector STAN_var_mask(vector x, real a){
-  STAN_check_real_positive(a);
   return( inv(1+exp(-a*x)) );
 }
 

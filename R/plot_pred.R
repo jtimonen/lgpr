@@ -33,7 +33,7 @@ plot_pred <- function(fit,
                       group_by = "id",
                       t_name = "age",
                       draws = NULL,
-                      reduce = NULL,
+                      reduce = mean,
                       MULT_STD = 2.0,
                       ...) {
   check_type(fit, "lgpfit")
@@ -45,8 +45,8 @@ plot_pred <- function(fit,
   # Create plot
   plot_api_g(
     df_data = df_data,
-    df_fit = plot_pred.create.df_line(fit, pred, df_base),
-    df_fit_err = plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD),
+    df = plot_pred.create.df_line(fit, pred, df_base),
+    df_err = plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD),
     ...
   )
 }
@@ -117,7 +117,7 @@ plot_f <- function(fit,
                    group_by = "id",
                    t_name = "age",
                    draws = NULL,
-                   reduce = NULL,
+                   reduce = mean,
                    MULT_STD = 2.0,
                    comp_idx = NULL,
                    color_by = NA,

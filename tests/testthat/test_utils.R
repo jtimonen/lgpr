@@ -29,14 +29,29 @@ test_that("common array utilities work correctly", {
   expect_equal(rowSums(normalize_rows(a)), c(1.0, 1.0))
   rownames(a) <- c("jaa", "hei")
   expect_equal(select_row(a, "hei"), c(10, 20, 30))
-  expect_error(squeeze_second_dim(a), "dimensions in <x> must be 3")
-  b <- array(a, dim = c(2, 0, 3))
-  expect_error(squeeze_second_dim(b), "Second dimension of <x> must be")
   reason <- "must be a multiple of <L>"
   expect_error(array_to_arraylist(a, 2), reason)
   x <- repvec(c(1, 2, 3), 4)
   expect_equal(reduce_rows(x), c(1, 2, 3))
 })
+
+test_that("squeeze_second_dim works correctly", {
+  a <- matrix(c(1, 2, 3, 10, 20, 30), 2, 3, byrow = TRUE)
+  expect_error(squeeze_second_dim(a), "dimensions in <x> must be 3")
+  b <- array(a, dim = c(2, 0, 3))
+  expect_error(squeeze_second_dim(b), "2nd dimension of <x> must be")
+  a <- array(0, dim = c(4, 2, 3))
+  a[, 2, ] <- a[, 2, ] + 1
+  b <- squeeze_second_dim(a)
+  expect_equal(dim(b), c(8, 3))
+  a <- array(0, dim = c(4, 1, 3))
+  b <- squeeze_second_dim(a)
+  expect_equal(dim(b), c(4, 3))
+  a <- array(0, dim = c(4, 1, 1))
+  b <- squeeze_second_dim(a)
+  expect_equal(dim(b), c(4, 1))
+})
+
 
 test_that("add_to_columns works correctly", {
   x <- array(0, c(3, 2))

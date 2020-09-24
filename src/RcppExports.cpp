@@ -20,28 +20,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_check_real_positive
-void STAN_check_real_positive(const double& a, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_check_real_positive(SEXP aSEXP, SEXP pstream__SEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
-    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    STAN_check_real_positive(a, pstream__);
-    return R_NilValue;
-END_RCPP
-}
-// STAN_check_prob_positive
-void STAN_check_prob_positive(const double& a, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_check_prob_positive(SEXP aSEXP, SEXP pstream__SEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
-    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    STAN_check_prob_positive(a, pstream__);
-    return R_NilValue;
-END_RCPP
-}
 // STAN_warp_input
 Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_warp_input(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x, const double& a, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_warp_input(SEXP xSEXP, SEXP aSEXP, SEXP pstream__SEXP) {
@@ -276,8 +254,6 @@ RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
-    {"_lgpr_STAN_check_real_positive", (DL_FUNC) &_lgpr_STAN_check_real_positive, 2},
-    {"_lgpr_STAN_check_prob_positive", (DL_FUNC) &_lgpr_STAN_check_prob_positive, 2},
     {"_lgpr_STAN_warp_input", (DL_FUNC) &_lgpr_STAN_warp_input, 3},
     {"_lgpr_STAN_var_mask", (DL_FUNC) &_lgpr_STAN_var_mask, 3},
     {"_lgpr_STAN_expand", (DL_FUNC) &_lgpr_STAN_expand, 3},
