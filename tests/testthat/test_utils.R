@@ -61,13 +61,6 @@ test_that("add_to_columns works correctly", {
   expect_error(add_to_columns(x, 1.2), reason)
 })
 
-test_that("check_dimension_list works correctly", {
-  x <- list(c(3, 2), c(3, 2), c(3, 2))
-  expect_null(check_dimension_list(x))
-  x <- list(c(11, 2), c(3, 9), c(3, 2))
-  expect_equal(length(check_dimension_list(x)), 3)
-})
-
 
 test_that("link_inv functions are inverses of the link functions", {
   x <- c(1.2, -1, 0, 2)
@@ -75,4 +68,25 @@ test_that("link_inv functions are inverses of the link functions", {
     y <- link_inv(x, likelihood)
     expect_equal(x, link(y, !!likelihood))
   }
+})
+
+test_that("validate_dimension_list works correctly", {
+  x <- list(c(3, 2), c(3, 2), c(3, 2))
+  expect_null(validate_dimension_list(x))
+  x <- list(c(11, 2), c(3, 9), c(3, 2))
+  expect_equal(length(validate_dimension_list(x)), 3)
+})
+
+test_that("validate_lengths works correctly", {
+  a <- c(100, 200)
+  b <- c(9, 9, 9, 9)
+  expect_equal(validate_lengths(a, b), "lengths do not agree!")
+  expect_null(validate_lengths(a, a))
+})
+
+test_that("map_factor_to_caseid works correctly", {
+  x_fac <- as.factor(c("F", "F", "F", "M", "M", "M"))
+  x_cont_mask <- c(1, 1, 1, 1, 0, 0)
+  reason <- "inconsistent x_cont_mask values for x_fac = M"
+  expect_error(map_factor_to_caseid(x_fac, x_cont_mask, "joo"), reason)
 })

@@ -60,23 +60,22 @@ check_lgpscaling <- function(object) {
 
 #' @rdname validate
 check_GaussianPrediction <- function(object) {
-  L1 <- length(object@f_comp_mean)
-  L2 <- length(object@f_comp_std)
   errors <- c()
-  if (L1 != L2) {
-    errors <- c(errors, "lengths of slots f_comp_mean and f_comp_std differ")
-  }
+  f_comp_mean <- object@f_comp_mean
+  f_comp_std <- object@f_comp_std
+  errors <- c(errors, validate_lengths(f_comp_mean, f_comp_std))
   D1 <- dim(object@f_mean)
   D2 <- dim(object@f_std)
   D3 <- dim(object@y_mean)
   D4 <- dim(object@y_std)
   D <- list(D1, D2, D3, D4)
-  for (j in seq_len(L1)) {
+  L <- length(f_comp_mean)
+  for (j in seq_len(L)) {
     m <- object@f_comp_mean[[j]]
     s <- object@f_comp_std[[j]]
     D <- c(D, list(dim(m), dim(s)))
   }
-  errors <- c(errors, check_dimension_list(D))
+  errors <- c(errors, validate_dimension_list(D))
   out <- if (length(errors) > 0) errors else TRUE
   return(out)
 }
@@ -92,7 +91,7 @@ check_Prediction <- function(object) {
     fj <- object@f_comp[[j]]
     D <- c(D, list(dim(fj)))
   }
-  errors <- c(errors, check_dimension_list(D))
+  errors <- c(errors, validate_dimension_list(D))
   out <- if (length(errors) > 0) errors else TRUE
   return(out)
 }
@@ -292,3 +291,42 @@ Prediction <- setClass("Prediction",
   ),
   validity = check_Prediction
 )
+
+
+#' Check that all listed dimensions are equal
+#'
+#' @param dims a list of dimensions
+#' @return list of errors or NULL
+validate_dimension_list <- function(dims) {
+  errors <- c()
+  L <- length(dims)
+  d1 <- dims[[1]]
+  K <- length(d1)
+  for (j in seq_len(L)) {
+    dj <- dims[[j]]
+    for (k in seq_len(K)) {
+      if (dj[k] != d1[k]) {
+        msg <- paste0(k, "th dimensions of elements 1 and ", j, " differ!")
+        errors <- c(errors, msg)
+      }
+    }
+  }
+  return(errors)
+}
+
+
+#' Check that arguments have equal lengths
+#'
+#' @param a first argument
+#' @param b second argument
+#' @return list of errors or NULL
+validate_lengths <- function(a, b) {
+  errors <- c()
+  L1 <- length(a)
+  L2 <- length(b)
+  if (L1 != L2) {
+    msg <- "lengths do not agree!"
+    errors <- c(errors, msg)
+  }
+  return(errors)
+}

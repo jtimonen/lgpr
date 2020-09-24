@@ -39,17 +39,11 @@ test_that("STAN_edit_x_cont works properly", {
   expect_equal(t_edit, t_expect)
 })
 
-test_that("STAN_check_prob_positive works properly", {
-  expect_error(STAN_check_prob_positive(1.1, STREAM))
-  expect_error(STAN_check_prob_positive(-0.1, STREAM))
-  expect_error(STAN_check_prob_positive(0, STREAM))
+test_that("STAN_vectorsum works properly", {
+  vecs <- list(c(1, 10, 1), c(2, 1, 4))
+  s <- STAN_vectorsum(vecs, 3, STREAM)
+  expect_equal(s, c(3, 11, 5))
 })
-
-test_that("STAN_check_real_positive works properly", {
-  expect_error(STAN_check_real_positive(-12, STREAM))
-  expect_error(STAN_check_real_positive(0, STREAM))
-})
-
 
 # 2. STAN PRIORS ----------------------------------------------------------
 
