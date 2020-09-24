@@ -152,7 +152,7 @@ test_that("cannot have negative response with NB observation model", {
   newdat <- dat
   newdat$y <- c(-1, -9, 3, 2, 4, 1)
   f <- parse_formula_advanced(y ~ gp(age) + zs(id))
-  reason <- "cannot be negative with this observation model"
+  reason <- "<y> must have only non-negative values"
   expect_error(parse_response(newdat, "nb", f), reason)
 })
 

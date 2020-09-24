@@ -6,10 +6,14 @@
 \alias{check_numeric}
 \alias{check_positive}
 \alias{check_non_negative}
+\alias{check_positive_all}
+\alias{check_non_negative_all}
+\alias{check_integer_all}
 \alias{check_interval}
-\alias{check_length}
 \alias{check_not_null}
 \alias{check_null}
+\alias{check_length}
+\alias{check_length_geq}
 \alias{check_lengths}
 \alias{check_false}
 \alias{check_in_data}
@@ -27,13 +31,21 @@ check_positive(arg)
 
 check_non_negative(arg)
 
-check_interval(arg, lower, upper)
+check_positive_all(arg)
 
-check_length(arg, expected)
+check_non_negative_all(arg)
+
+check_integer_all(arg)
+
+check_interval(arg, lower, upper)
 
 check_not_null(arg)
 
 check_null(arg, reason = NULL)
+
+check_length(arg, expected)
+
+check_length_geq(arg, min_length)
 
 check_lengths(a, b)
 
@@ -58,9 +70,11 @@ check_dim(arg, D)
 
 \item{upper}{interval maximum}
 
+\item{reason}{explanation why the argument should be NULL}
+
 \item{expected}{Expected length.}
 
-\item{reason}{explanation why the argument should be NULL}
+\item{min_length}{Minimum allowed length.}
 
 \item{a}{An argument to check.}
 
@@ -83,11 +97,19 @@ check_dim(arg, D)
   \item \code{check_numeric} checks if argument is numeric
   \item \code{check_positive} checks if argument is positive
   \item \code{check_non_negative} checks if argument is non-negative
+  \item \code{check_positive_all} checks if argument has only positive
+  values
+  \item \code{check_non_negative_all} checks if argument has only
+  non-negative values
+  \item \code{check_integer_all} checks if argument has only
+  integer values
   \item \code{check_interval} checks if argument is inside a given interval
   \item \code{check_not_null} checks if argument is not null
   \item \code{check_false} checks if argument is false or zero
   \item \code{check_length} checks if argument has correct length
-  \item \code{check_lengths} checks if two argument have equal length
+  \item \code{check_lengths} checks if two arguments have equal length
+  \item \code{check_length_geq} checks if argument has at least a
+  given length
   \item \code{check_in_data} checks that variable exists in a data frame
   \item \code{check_all_leq} checks that argument has values less than equal
   to given maximums, elementwise

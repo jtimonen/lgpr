@@ -37,11 +37,10 @@ likelihood_list <- function() {
 #' @rdname likelihood_encoding
 likelihood_as_str <- function(index) {
   names <- likelihood_list()
+  L <- length(names)
+  check_interval(index, 1, L)
   name <- names[index]
-  if (is.na(name)) {
-    stop("invalid likelihood index")
-  }
-  name
+  return(name)
 }
 
 #' @rdname likelihood_encoding

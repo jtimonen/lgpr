@@ -8,11 +8,19 @@
 #'   \item \code{check_numeric} checks if argument is numeric
 #'   \item \code{check_positive} checks if argument is positive
 #'   \item \code{check_non_negative} checks if argument is non-negative
+#'   \item \code{check_positive_all} checks if argument has only positive
+#'   values
+#'   \item \code{check_non_negative_all} checks if argument has only
+#'   non-negative values
+#'   \item \code{check_integer_all} checks if argument has only
+#'   integer values
 #'   \item \code{check_interval} checks if argument is inside a given interval
 #'   \item \code{check_not_null} checks if argument is not null
 #'   \item \code{check_false} checks if argument is false or zero
 #'   \item \code{check_length} checks if argument has correct length
-#'   \item \code{check_lengths} checks if two argument have equal length
+#'   \item \code{check_lengths} checks if two arguments have equal length
+#'   \item \code{check_length_geq} checks if argument has at least a
+#'   given length
 #'   \item \code{check_in_data} checks that variable exists in a data frame
 #'   \item \code{check_all_leq} checks that argument has values less than equal
 #'   to given maximums, elementwise
@@ -77,6 +85,39 @@ check_non_negative <- function(arg) {
 }
 
 #' @rdname checks
+check_positive_all <- function(arg) {
+  check_numeric(arg)
+  if (any(arg <= 0)) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0("<", arg_name, "> must have only positive values")
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+check_non_negative_all <- function(arg) {
+  check_numeric(arg)
+  if (any(arg < 0)) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0("<", arg_name, "> must have only non-negative values")
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+check_integer_all <- function(arg) {
+  check_numeric(arg)
+  if (sum(round(arg) != arg) > 0) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0("<", arg_name, "> must have only integer values")
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
 #' @param lower interval minimum
 #' @param upper interval maximum
 check_interval <- function(arg, lower, upper) {
@@ -86,22 +127,6 @@ check_interval <- function(arg, lower, upper) {
     msg <- paste0(
       "<", arg_name, "> must be on the interval [",
       lower, ", ", upper, "]! found = ", arg
-    )
-    stop(msg)
-  }
-  return(TRUE)
-}
-
-#' @rdname checks
-#' @param expected Expected length.
-check_length <- function(arg, expected) {
-  L <- length(arg)
-  ok <- (L == expected)
-  if (!ok) {
-    arg_name <- deparse(substitute(arg))
-    msg <- paste0(
-      arg_name, " has length ", L, ", but its length should be ",
-      expected, "!"
     )
     stop(msg)
   }
@@ -126,6 +151,38 @@ check_null <- function(arg, reason = NULL) {
     if (!is.null(reason)) {
       msg <- paste0(msg, " Reason: ", reason)
     }
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param expected Expected length.
+check_length <- function(arg, expected) {
+  L <- length(arg)
+  ok <- (L == expected)
+  if (!ok) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0(
+      arg_name, " has length ", L, ", but its length should be ",
+      expected, "!"
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param min_length Minimum allowed length.
+check_length_geq <- function(arg, min_length) {
+  L <- length(arg)
+  bad <- (L < min_length)
+  if (bad) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0(
+      arg_name, " has length ", L, ", but its length should be at least ",
+      min_length, "!"
+    )
     stop(msg)
   }
   return(TRUE)

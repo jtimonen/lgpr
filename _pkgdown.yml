@@ -58,6 +58,9 @@ navbar:
     overview:
       text: Overview
       href: reference/lgpr-package.html
+    installation:
+      text: Installation
+      href: installation.html
     reference:
       text: Documentation
       href: reference/index.html

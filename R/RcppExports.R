@@ -2,73 +2,74 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 STAN_vectorsum <- function(vecs, L, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_vectorsum`, vecs, L, pstream__)
+    .Call(`_lgpr_STAN_vectorsum`, vecs, L, pstream__)
 }
 
 STAN_check_real_positive <- function(a, pstream__ = 0L) {
-  invisible(.Call(`_lgpr_STAN_check_real_positive`, a, pstream__))
+    invisible(.Call(`_lgpr_STAN_check_real_positive`, a, pstream__))
 }
 
 STAN_check_prob_positive <- function(a, pstream__ = 0L) {
-  invisible(.Call(`_lgpr_STAN_check_prob_positive`, a, pstream__))
+    invisible(.Call(`_lgpr_STAN_check_prob_positive`, a, pstream__))
 }
 
 STAN_warp_input <- function(x, a, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_warp_input`, x, a, pstream__)
+    .Call(`_lgpr_STAN_warp_input`, x, a, pstream__)
 }
 
 STAN_var_mask <- function(x, a, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_var_mask`, x, a, pstream__)
+    .Call(`_lgpr_STAN_var_mask`, x, a, pstream__)
 }
 
 STAN_expand <- function(v, idx_expand, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_expand`, v, idx_expand, pstream__)
+    .Call(`_lgpr_STAN_expand`, v, idx_expand, pstream__)
 }
 
 STAN_edit_x_cont <- function(x_cont, idx_expand, teff_obs, teff, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_edit_x_cont`, x_cont, idx_expand, teff_obs, teff, pstream__)
+    .Call(`_lgpr_STAN_edit_x_cont`, x_cont, idx_expand, teff_obs, teff, pstream__)
 }
 
 STAN_kernel_base_zerosum <- function(x1, x2, num_cat, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_base_zerosum`, x1, x2, num_cat, pstream__)
+    .Call(`_lgpr_STAN_kernel_base_zerosum`, x1, x2, num_cat, pstream__)
 }
 
 STAN_kernel_base_cat <- function(x1, x2, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_base_cat`, x1, x2, pstream__)
+    .Call(`_lgpr_STAN_kernel_base_cat`, x1, x2, pstream__)
 }
 
 STAN_kernel_base_bin_mask <- function(x1, x2, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_base_bin_mask`, x1, x2, pstream__)
+    .Call(`_lgpr_STAN_kernel_base_bin_mask`, x1, x2, pstream__)
 }
 
 STAN_kernel_const <- function(x1, x2, kernel_type, num_cat, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_const`, x1, x2, kernel_type, num_cat, pstream__)
+    .Call(`_lgpr_STAN_kernel_const`, x1, x2, kernel_type, num_cat, pstream__)
 }
 
 STAN_kernel_const_all <- function(n1, n2, x1, x2, x1_mask, x2_mask, num_levels, components, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_const_all`, n1, n2, x1, x2, x1_mask, x2_mask, num_levels, components, pstream__)
+    .Call(`_lgpr_STAN_kernel_const_all`, n1, n2, x1, x2, x1_mask, x2_mask, num_levels, components, pstream__)
 }
 
 STAN_kernel_base_var_mask <- function(x1, x2, steepness, vm_params, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_base_var_mask`, x1, x2, steepness, vm_params, pstream__)
+    .Call(`_lgpr_STAN_kernel_base_var_mask`, x1, x2, steepness, vm_params, pstream__)
 }
 
 STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__)
+    .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__)
 }
 
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_matrix_array_sum`, K, pstream__)
+    .Call(`_lgpr_STAN_matrix_array_sum`, K, pstream__)
 }
 
 STAN_gp_posterior_helper <- function(Ly, K_s, K_ss, v, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_gp_posterior_helper`, Ly, K_s, K_ss, v, pstream__)
+    .Call(`_lgpr_STAN_gp_posterior_helper`, Ly, K_s, K_ss, v, pstream__)
 }
 
 STAN_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_gp_posterior`, KX, KX_s, KX_ss, y, delta, sigma, pstream__)
+    .Call(`_lgpr_STAN_gp_posterior`, KX, KX_s, KX_ss, y, delta, sigma, pstream__)
 }
 
 STAN_log_prior <- function(x, types, p, pstream__ = 0L) {
-  .Call(`_lgpr_STAN_log_prior`, x, types, p, pstream__)
+    .Call(`_lgpr_STAN_log_prior`, x, types, p, pstream__)
 }
+

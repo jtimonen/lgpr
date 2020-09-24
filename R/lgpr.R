@@ -180,12 +180,10 @@ optimize_model <- function(model, ...) {
 #' @return a vector of length \code{n}, which can be used as
 #' the \code{c_hat} input to the \code{lgp} function
 adjusted_c_hat <- function(y, norm_factors) {
-  L1 <- length(norm_factors)
-  L2 <- length(y)
-  if (L1 != L2) stop("inputs must have same length!")
-  if (sum(y < 0) > 0) stop("y cannot have negative values!")
-  if (sum(round(y) != y) > 0) stop("y must have only integer values!")
-  if (sum(norm_factors <= 0) > 0) stop("norm_factors must be all positive!")
+  check_lengths(y, norm_factors)
+  check_non_negative_all(y)
+  check_integer_all(y)
+  check_positive_all(norm_factors)
   c_hat <- log(mean(y))
   c_hat <- rep(c_hat, length(y))
   c_hat <- c_hat + log(norm_factors)

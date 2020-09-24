@@ -59,11 +59,11 @@ test_that("adding disease age works correctly", {
 })
 
 test_that("adjusted_c_hat works correctly", {
-  reason <- "inputs must have same length"
+  reason <- "lengths of y and norm_factors must match"
   expect_error(adjusted_c_hat(c(1, 1), norm_factors = c(1, 2, 3)), reason)
-  reason <- "must be all positive"
+  reason <- "<norm_factors> must have only positive values"
   expect_error(adjusted_c_hat(c(1, 1, 0), norm_factors = c(1, 2, 0)), reason)
-  reason <- "must have only integer values"
+  reason <- "<y> must have only integer values"
   expect_error(adjusted_c_hat(c(1, 1.2, 0), norm_factors = c(1, 2, 3)), reason)
   c_hat <- adjusted_c_hat(c(1, 1, 1), norm_factors = c(1, 2, 3))
   diff <- abs(c_hat - c(0.0, 0.6931472, 1.0986123))

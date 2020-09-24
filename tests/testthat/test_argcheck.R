@@ -110,3 +110,19 @@ test_that("check_dim works correctly", {
   reason <- "number of dimensions of <a> must be 2! found = 3"
   expect_error(check_dim(a, 2), reason)
 })
+
+test_that("check_length_leq works correctly", {
+  a <- c(2, 3, 4, 5)
+  expect_true(check_length_geq(a, 1))
+  expect_true(check_length_geq(a, 4))
+  reason <- "has length 4, but its length should be at least 5!"
+  expect_error(check_length_geq(a, 5), reason)
+})
+
+test_that("check_integer_all works correctly", {
+  a <- c(2, 3, 4, 5)
+  expect_true(check_integer_all(a))
+  a[2] <- 2.99999
+  reason <- "<a> must have only integer values"
+  expect_error(check_integer_all(a), reason)
+})
