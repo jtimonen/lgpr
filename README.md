@@ -27,7 +27,7 @@ install.packages('devtools') # if you don't have devtools already
 devtools::install_github('jtimonen/lgpr', dependencies = TRUE)
 ```
 
-**Note:** In some cases, the exact version 2.0.0 of *rstantools* is required due
+* **Note:** In some cases, the exact version 2.0.0 of *rstantools* is required due
 to problems with some recently updated versions of *StanHeaders* or *rstantools* (see [this thread](https://github.com/stan-dev/rstantools/issues/76)). You can remove possible incompatible version of *rstantools* and install version 2.0.0 by
 ```r
 remove.packages('rstantools')

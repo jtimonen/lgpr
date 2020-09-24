@@ -45,8 +45,8 @@ development:
   
 home:
   links:
-  - text: Link text
-    href: http://website.com
+  - text: Installation
+    href: index.html
     
 navbar:
   structure:
