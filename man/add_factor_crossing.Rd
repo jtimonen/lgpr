@@ -25,6 +25,7 @@ Add a crossing of two factors to a data frame
 Other data utilities: 
 \code{\link{add_dis_age}()},
 \code{\link{add_factor}()},
+\code{\link{data_info}()},
 \code{\link{data_types}()},
 \code{\link{get_teff_obs}()},
 \code{\link{new_x}()},

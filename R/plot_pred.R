@@ -9,10 +9,11 @@
 #'   additive components can be plotted using \code{plot_f}.
 #' }
 #' @param fit An object of class \linkS4class{lgpfit}.
+#' @param x A data frame of prediction points, containing at least the
+#' variables used as covariates in the model. This must be specified if
+#' \code{pred} is not \code{NULL}.
 #' @param pred An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
-#' @param x A data frame of prediction points. Must be specified if
-#' \code{pred} is not \code{NULL}.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable
 #' @param draws only has effect if \code{pred} is \code{NULL}
@@ -28,8 +29,8 @@ NULL
 #' @export
 #' @rdname plot_pred
 plot_pred <- function(fit,
-                      pred = NULL,
                       x = NULL,
+                      pred = NULL,
                       group_by = "id",
                       t_name = "age",
                       draws = NULL,
@@ -112,8 +113,8 @@ plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
 #' @param color_by name of coloring factor
 #' @rdname plot_pred
 plot_f <- function(fit,
-                   pred = NULL,
                    x = NULL,
+                   pred = NULL,
                    group_by = "id",
                    t_name = "age",
                    draws = NULL,
@@ -152,7 +153,8 @@ plot_f.get_color_fac <- function(fit, pred, x, color_by) {
     return(color_fac)
   }
   if (is.null(pred)) {
-    color_fac <- get_covariate(fit, color_by)
+    dat <- get_data(fit)
+    color_fac <- dollar(dat, color_by)
   } else {
     color_fac <- dollar(x, color_by)
   }

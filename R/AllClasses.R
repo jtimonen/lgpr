@@ -171,6 +171,7 @@ lgpscaling <- setClass("lgpscaling",
 #' An S4 class to represent an lgp model
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
+#' @slot data The original unmodified data.
 #' @slot stan_dat The data to be given as input to \code{rstan::sampling}
 #' @slot var_names List of variable names grouped by type.
 #' @slot var_scalings A named list with fields
@@ -194,6 +195,7 @@ lgpscaling <- setClass("lgpscaling",
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
+    data = "data.frame",
     stan_input = "list",
     var_names = "list",
     var_scalings = "list",

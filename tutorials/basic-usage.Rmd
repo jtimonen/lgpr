@@ -1,0 +1,83 @@
+---
+title: "Basic usage of the lgpr package"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Basic usage of the lgpr package}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+This vignette demonstrates how to model a longitudinal data set and perform covariate relevance assessment using the `lgpr` package.
+
+```{r load}
+require("lgpr")
+require("ggplot2")
+```
+
+```{r simulate, include = FALSE}
+#set.seed(2432)
+#sim <- simulate_data(N            = 12,
+#                     t_data       = seq(12, 96, by = 12),
+#                     covariates   = c(    0,2), # covariate types (2 = categorical)
+#                     lengthscales = c(16,24,1,16), # true effect lengthscales
+#                     relevances   = c(0,1,1,1), # true covariate relevances
+#                     names        = c("diseaseAge", "sex"),
+#                     t_jitter     = 0,  # jitter in time points
+#                     snr          = 3)    # signal-to-noise ratio
+#dat <- sim@data
+#a <- as.numeric(dat$id)
+#dat$id <- as.factor(formatC(a, width = 2, flag = "0"))
+#dat$group <- as.factor(as.numeric(!is.nan(dat$diseaseAge)))
+#dat$sex <- as.factor(c("Male", "Female")[as.numeric(dat$sex)])
+#dat$group <- as.factor(c("Control", "Case")[as.numeric(dat$group)])
+#plot_sim(sim)
+#plot_sim_component(sim, comp_idx = 2)
+```
+
+## Visualizing longitudinal data
+In this tutorial we use simulated `testdata_002`, which consists of 12 individuals and 8 time points for each. 
+
+``````{r head, fig.width=7.0, fig.height=5.3}
+data_info(testdata_002)
+```
+
+The `plot_data` function
+can be used to visualize the data in many ways.
+
+``````{r pd1, fig.width=7.0, fig.height=5.3}
+plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab('Age (months)')
+```
+
+Coloring according to the disease-related age (`diseaseage`) shows that individuals 01-06 are cases and 07-12 are controls. The observed disease onset is at around 60
+months for each case individual.
+``````{r pd2, fig.width=7.0, fig.height=5.3}
+plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
+  scale_color_gradient2() + xlab('Age (months)')
+```
+
+
+## Creating and fitting a model
+We fit a simple model
+``````{r fit}
+fit1 <- lgp(formula  = y ~ age + age | sex + group,
+           data     = testdata_002,
+           iter     = 1000,
+           chains   = 4,
+           refresh  = 200)
+# TODO: fix get_covariate(fit, color_by) : covariate not found! 
+```
+
+## Visualizing inferred components and predictions
+```{r vis, fig.width=6.6, fig.height=5}
+#plot_f(fit, comp_idx = 4)
+```
+

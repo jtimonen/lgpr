@@ -1,13 +1,5 @@
 #' Visualize an lgpsim object (simulated data)
 #'
-#' @description
-#' \itemize{
-#'   \item In \code{plot_sim}, the data and generating signal are plotted for
-#'   each individual separately using \code{\link{plot_api_g}}
-#'   \item In \code{plot_sim_component}, one component of the generating signal
-#'   is plotted using \code{\link{plot_api_c}}
-#' }
-#'
 #' @param simdata an object of class \linkS4class{lgpsim}
 #' @param f_name name of the signal in \code{simdata$components}
 #' @param x_name name of x-axis variable
@@ -16,7 +8,8 @@
 #' @param color_by coloring factor
 #' @param ... additional arguments to \code{\link{plot_api_g}} or
 #' \code{\link{plot_api_c}}
-#' @param comp_idx index of the component to be shown
+#' @param comp_idx Possible index of a component to be shown.
+#' If this is NULL, the data and total signal are shown.
 #' @return a \code{\link[ggplot2]{ggplot}} object
 #' @family main plot functions
 #' @name plot_sim
@@ -29,7 +22,25 @@ plot_sim <- function(simdata,
                      x_name = "age",
                      f_name = "f",
                      y_name = "y",
+                     comp_idx = NULL,
+                     color_by = NA,
                      ...) {
+  if (is.null(comp_idx)) {
+    p <- plot_sim.data(simdata, group_by, x_name, f_name, y_name, ...)
+    return(p)
+  }
+  p <- plot_sim.component(
+    simdata, comp_idx, group_by, x_name, f_name, y_name, color_by, ...
+  )
+}
+
+#' @rdname plot_sim
+plot_sim.data <- function(simdata,
+                          group_by = "id",
+                          x_name = "age",
+                          f_name = "f",
+                          y_name = "y",
+                          ...) {
   check_type(simdata, "lgpsim")
   data <- simdata@data
   df_points <- data[c(group_by, x_name, y_name)]
@@ -60,19 +71,18 @@ plot_sim <- function(simdata,
   return(h)
 }
 
-#' @export
 #' @rdname plot_sim
-plot_sim_component <- function(simdata,
+plot_sim.component <- function(simdata,
                                comp_idx,
-                               color_by = NA,
-                               x_name = "age",
                                group_by = "id",
+                               x_name = "age",
                                f_name = "f",
                                y_name = "y",
+                               color_by = NA,
                                ...) {
   check_type(simdata, "lgpsim")
   check_not_null(comp_idx)
-  out <- plot_sim_component.df(
+  out <- plot_sim.component.df(
     simdata, x_name, group_by, color_by,
     comp_idx
   )
@@ -83,7 +93,7 @@ plot_sim_component <- function(simdata,
 }
 
 #' @rdname plot_sim
-plot_sim_component.df <- function(simdata, x_name, group_by, color_by,
+plot_sim.component.df <- function(simdata, x_name, group_by, color_by,
                                   comp_idx) {
   data <- simdata@data
   df_comp <- get_sim_components(simdata)

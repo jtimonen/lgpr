@@ -10,10 +10,9 @@ create_plot_df(object, x = "age", group_by = "id")
 \item{object}{an object of class \linkS4class{lgpmodel} or
 \linkS4class{lgpfit}}
 
-\item{x}{x-axis variable name or a vector to be used as x-axis values}
+\item{x}{x-axis variable name}
 
-\item{group_by}{grouping variable name or a factor to be used for grouping
-the plot into panels}
+\item{group_by}{grouping variable name}
 }
 \value{
 a data frame

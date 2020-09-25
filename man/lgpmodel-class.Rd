@@ -13,6 +13,8 @@ An S4 class to represent an lgp model
 \describe{
 \item{\code{formula}}{An object of class \linkS4class{lgpformula}}
 
+\item{\code{data}}{The original unmodified data.}
+
 \item{\code{stan_dat}}{The data to be given as input to \code{rstan::sampling}}
 
 \item{\code{var_names}}{List of variable names grouped by type.}

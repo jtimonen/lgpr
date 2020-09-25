@@ -319,8 +319,8 @@ prior_to_df_teff <- function(stan_input, digits) {
   for (j in seq_len(num_bt)) {
     par <- paste0("teff[", j, "]")
     tpar <- par
-    if (zero[j] != 0) tpar <- paste0(tpar, " - ", zero[j])
-    if (backwards == 1) tpar <- paste0(" - (", tpar, ")")
+    tpar <- minus.append(tpar, zero[j])
+    tpar <- minus.prepend(tpar, backwards)
     out <- prior_to_str(par, c(type, 0), hyper, digits)
     pnames[j] <- par
     dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
@@ -329,6 +329,25 @@ prior_to_df_teff <- function(stan_input, digits) {
   df <- data.frame(pnames, bounds, dnames)
   colnames(df) <- c("Parameter", "Bounds", "Prior")
   return(df)
+}
+
+#' Add minus to a string depending on options
+#'
+#' @param val a value to append with minus (will not be appended if value
+#' is zero)
+#' @param prepend should a minus be prepended (true if this is not zero)
+#' @name minus
+
+#' @rdname minus
+minus.append <- function(str, val) {
+  if (val != 0) str <- paste0(str, " - ", val)
+  return(str)
+}
+
+#' @rdname minus
+minus.prepend <- function(str, prepend) {
+  if (prepend != 0) str <- paste0(" - (", str, ")")
+  return(str)
 }
 
 #' Human-readable prior statement

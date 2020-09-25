@@ -13,6 +13,5 @@ inst/doc
 *.so
 *.o
 *.dll
-vignettes/tutorials
 docs
 

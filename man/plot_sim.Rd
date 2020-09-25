@@ -2,8 +2,9 @@
 % Please edit documentation in R/plot_sim.R
 \name{plot_sim}
 \alias{plot_sim}
-\alias{plot_sim_component}
-\alias{plot_sim_component.df}
+\alias{plot_sim.data}
+\alias{plot_sim.component}
+\alias{plot_sim.component.df}
 \title{Visualize an lgpsim object (simulated data)}
 \usage{
 plot_sim(
@@ -12,21 +13,32 @@ plot_sim(
   x_name = "age",
   f_name = "f",
   y_name = "y",
+  comp_idx = NULL,
+  color_by = NA,
   ...
 )
 
-plot_sim_component(
+plot_sim.data(
   simdata,
-  comp_idx,
-  color_by = NA,
-  x_name = "age",
   group_by = "id",
+  x_name = "age",
   f_name = "f",
   y_name = "y",
   ...
 )
 
-plot_sim_component.df(simdata, x_name, group_by, color_by, comp_idx)
+plot_sim.component(
+  simdata,
+  comp_idx,
+  group_by = "id",
+  x_name = "age",
+  f_name = "f",
+  y_name = "y",
+  color_by = NA,
+  ...
+)
+
+plot_sim.component.df(simdata, x_name, group_by, color_by, comp_idx)
 }
 \arguments{
 \item{simdata}{an object of class \linkS4class{lgpsim}}
@@ -39,23 +51,19 @@ plot_sim_component.df(simdata, x_name, group_by, color_by, comp_idx)
 
 \item{y_name}{name of response variable}
 
-\item{...}{additional arguments to \code{\link{plot_api_g}} or
-\code{\link{plot_api_c}}}
-
-\item{comp_idx}{index of the component to be shown}
+\item{comp_idx}{Possible index of a component to be shown.
+If this is NULL, the data and total signal are shown.}
 
 \item{color_by}{coloring factor}
+
+\item{...}{additional arguments to \code{\link{plot_api_g}} or
+\code{\link{plot_api_c}}}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object
 }
 \description{
-\itemize{
-  \item In \code{plot_sim}, the data and generating signal are plotted for
-  each individual separately using \code{\link{plot_api_g}}
-  \item In \code{plot_sim_component}, one component of the generating signal
-  is plotted using \code{\link{plot_api_c}}
-}
+Visualize an lgpsim object (simulated data)
 }
 \seealso{
 Other main plot functions: 

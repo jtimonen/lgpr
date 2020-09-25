@@ -3,14 +3,11 @@
 \name{model_summary}
 \alias{model_summary}
 \alias{model_summary_brief}
-\alias{print_stan_input}
 \title{Print a model summary}
 \usage{
 model_summary(object)
 
 model_summary_brief(object)
-
-print_stan_input(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
@@ -21,7 +18,6 @@ print_stan_input(object)
   \item \code{\link{model_summary_brief}} returns a string
   \item \code{\link{model_summary}} prints the summary and
 returns \code{object} invisibly
-  \item \code{\link{print_stan_input}} prints the stan input
   and returns \code{object} invisibly
 }
 }

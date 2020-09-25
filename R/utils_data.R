@@ -1,3 +1,78 @@
+#' Information a about data frame
+#'
+#' @export
+#' @param data a data frame
+#' @param var a numeric vector or a factor
+#' @param digits number of digits to show for floats
+#' @family data utilities
+#' @name data_info
+#' @return a named list
+
+#' @rdname data_info
+data_info <- function(data, digits = 2) {
+  check_type(data, "data.frame")
+  N <- nrow(data)
+  J <- ncol(data)
+  list(
+    num_obs = N,
+    num_vars = J,
+    categorical = data_info.fac(data),
+    continuous = data_info.num(data, digits)
+  )
+}
+
+#' @rdname data_info
+data_info.fac <- function(data) {
+  nams <- colnames(data)
+  J <- ncol(data)
+  out <- c()
+  for (j in seq_len(J)) {
+    s <- data_info.var(data[, j], 3)
+    if (s[1] == "factor") {
+      r <- c(nams[j], s[4])
+      out <- rbind(out, r)
+    }
+  }
+  out <- data.frame(out)
+  rownames(out) <- NULL
+  colnames(out) <- c("Name", "Levels")
+  return(out)
+}
+
+#' @rdname data_info
+data_info.num <- function(data, digits) {
+  nams <- colnames(data)
+  J <- ncol(data)
+  out <- c()
+  for (j in seq_len(J)) {
+    s <- data_info.var(data[, j], digits)
+    if (s[1] == "numeric") {
+      r <- c(nams[j], s[2], s[3])
+      out <- rbind(out, r)
+    }
+  }
+  out <- data.frame(out)
+  rownames(out) <- NULL
+  colnames(out) <- c("Name", "Range", "#Missing")
+  return(out)
+}
+
+#' @rdname data_info
+data_info.var <- function(var, digits) {
+  type <- class(var)
+  if (type == "factor") {
+    levs <- paste(as.character(levels(var)), collapse = ", ")
+    range <- ""
+  } else {
+    levs <- ""
+    range <- range(var, na.rm = TRUE)
+    range <- round(range, digits = digits)
+    range <- paste0("[", range[1], ", ", range[2], "]")
+  }
+  miss <- as.character(sum(is.nan(var)))
+  c(type, range, miss, levs)
+}
+
 #' Easily add a categorical covariate to a data frame
 #'
 #' @export

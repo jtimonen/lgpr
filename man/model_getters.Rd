@@ -2,68 +2,37 @@
 % Please edit documentation in R/MethodsModel.R
 \name{model_getters}
 \alias{model_getters}
-\alias{get_covariate_names}
 \alias{get_stan_input}
-\alias{get_component_info}
-\alias{get_covariate_info}
-\alias{get_component_names}
+\alias{get_data}
 \alias{get_num_obs}
 \alias{is_f_sampled}
 \alias{get_obs_model}
-\alias{get_y_name}
-\alias{get_covariate_info_cont}
-\alias{get_covariate_info_cat}
 \title{Functions that access model properties}
 \usage{
-get_covariate_names(object, type = "all")
-
 get_stan_input(object)
 
-get_component_info(object)
-
-get_covariate_info(object)
-
-get_component_names(object)
+get_data(object)
 
 get_num_obs(object)
 
 is_f_sampled(object)
 
 get_obs_model(object)
-
-get_y_name(object)
-
-get_covariate_info_cont(object)
-
-get_covariate_info_cat(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
 \linkS4class{lgpfit}}
-
-\item{type}{What types of covariates to include. Must be either
-"all", "categorical" or "continuous".}
 }
 \value{
 \itemize{
-  \item \code{get_covariate_names} returns a string where names
-  are separated by a comma
   \item \code{get_stan_input} returns a list
-  \item \code{get_component_info} returns a data frame
-  \item \code{get_covariate_info} returns a list
-  \item \code{get_component_names} returns an array of names
   \item \code{get_num_obs} returns an integer
-  \item \code{is_f_sampled} returns a boolean value
   \item \code{get_obs_model} returns a character string
-  \item \code{get_ns_covariates} returns a character vector
   \item \code{get_y_name} returns the response variable name
+  \item \code{get_data} returns the original unmodified data frame
+  \item \code{is_f_sampled} returns a boolean value
 }
 }
 \description{
 Functions that access model properties
 }
-\seealso{
-Other lgpmodel accessors: 
-\code{\link{data_getters}}
-}
-\concept{lgpmodel accessors}

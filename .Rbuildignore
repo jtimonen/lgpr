@@ -12,4 +12,4 @@ tests/testthat/stan_files/.*\.hpp$
 pkgdown
 dev
 docs
-vignettes/tutorials
+tutorials

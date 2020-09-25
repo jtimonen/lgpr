@@ -4,6 +4,14 @@ library(lgpr)
 
 context("Data utility functions")
 
+test_that("data_info works correctly", {
+  d1 <- data_info(testdata_001)
+  d2 <- data_info(testdata_001, digits = 4)
+  expect_equal(d1$num_obs, 24)
+  expect_equal(d2$num_vars, 6)
+})
+
+
 test_that("computing observed effect times from data works correctly", {
   age <- c(10, 20, 30, 10, 20, 30)
   dage <- c(-10, 0, 10, NaN, NaN, NaN)

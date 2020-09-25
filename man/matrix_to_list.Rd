@@ -20,7 +20,6 @@ Matrix rows to a list
 Other list utilities: 
 \code{\link{dollar}()},
 \code{\link{list_if_named}()},
-\code{\link{list_to_matrix}()},
-\code{\link{print_list}()}
+\code{\link{list_to_matrix}()}
 }
 \concept{list utilities}

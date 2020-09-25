@@ -29,24 +29,33 @@ default_prior <- function(name, num_uncrt = NULL) {
 
 #' @rdname defaults
 default_prior_common <- function(name) {
-  if (name == "alpha") {
-    prior <- student_t(nu = 20)
-  } else if (name == "ell") {
-    prior <- log_normal(mu = 0, sigma = 1)
-  } else if (name == "sigma") {
-    prior <- igam(shape = 2, scale = 1, square = TRUE)
-  } else if (name == "phi") {
-    prior <- log_normal(mu = 1, sigma = 1, square = TRUE)
-  } else if (name == "wrp") {
-    prior <- igam(shape = 14, scale = 5)
-  } else if (name == "beta") {
-    prior <- bet(a = 0.2, b = 0.2)
-  } else if (name == "gamma") {
-    prior <- bet(a = 3, b = 3)
-  } else if (name == "effect_time") {
-    prior <- uniform()
+  allowed <- c(
+    "alpha", # 1
+    "ell", # 2
+    "sigma", # 3
+    "phi", # 4
+    "wrp", # 5
+    "beta", # 6
+    "gamma", # 7
+    "effect_time" # 8
+  )
+  idx <- check_allowed(name, allowed)
+  if (idx == 1) {
+    prior <- student_t(nu = 20) # alpha
+  } else if (idx == 2) {
+    prior <- log_normal(mu = 0, sigma = 1) # ell
+  } else if (idx == 3) {
+    prior <- igam(shape = 2, scale = 1, square = TRUE) # sigma
+  } else if (idx == 4) {
+    prior <- log_normal(mu = 1, sigma = 1, square = TRUE) # phi
+  } else if (idx == 5) {
+    prior <- igam(shape = 14, scale = 5) # wrp
+  } else if (idx == 6) {
+    prior <- bet(a = 0.2, b = 0.2) # beta
+  } else if (idx == 7) {
+    prior <- bet(a = 3, b = 3) # gamma
   } else {
-    stop("invalid parameter name '", name, "'")
+    prior <- uniform() # effect_time
   }
   return(prior)
 }

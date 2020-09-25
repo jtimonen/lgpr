@@ -54,12 +54,10 @@ data = testdata_001
 
 test_that("lgpmodel getters work", {
   n <- get_num_obs(model)
-  df <- get_component_info(model)
-  nams <- get_covariate_names(model)
+  df <- component_info(model)
   om <- get_obs_model(model)
   expect_equal(n, 24)
   expect_equal(dim(df), c(2, 9))
-  expect_equal(nams, "dis_age, age, id, sex")
   expect_equal(om, "gaussian")
 })
 
@@ -71,29 +69,12 @@ test_that("get_y works", {
   expect_gt(stats::sd(y1), stats::sd(y2))
 })
 
-test_that("get_covariate works", {
-  x <- get_covariate(model, "id")
-  expect_equal(length(x), 24)
-  reason <- "covariate not found!"
-  expect_error(get_covariate(model, "asdf"), reason)
-})
-
-test_that("get_x_cat and get_x_cont work", {
-  x <- get_x_cat(model)
-  expect_equal(rownames(x), c("id", "sex"))
-  x <- get_x_cont(model)
-  expect_equal(sum(is.nan(x)), 12)
-})
-
 test_that("getters work correctly for one-component models", {
   model <- create_model(y ~ age, data = testdata_001)
-  expect_null(get_x_cat(model))
-  expect_null(get_covariate_info_cat(model))
+  expect_null(covariate_info.cat(model))
   model <- create_model(y ~ id, data = testdata_001)
-  expect_null(get_x_cont(model))
-  expect_null(get_covariate_info_cont(model))
+  expect_null(covariate_info.cont(model))
 })
-
 
 test_that("prior summary works", {
   ps <- prior_summary(model, digits = 4)
@@ -105,24 +86,6 @@ test_that("model summary prints output", {
   expect_output(show(model))
   expect_output(show(model@model_formula))
 })
-
-test_that("print_stan_input prints output", {
-  expect_output(print_stan_input(model))
-})
-
-test_that("create_plot_df works correctly", {
-  df <- create_plot_df(model)
-  expect_equal(names(df), c("id", "age", "y"))
-  a <- c(1, 2, 3)
-  b <- seq(1, 24, by = 1)
-  expect_error(create_plot_df(model, x = a), "length should be")
-  reason <- "Allowed classes are"
-  expect_error(create_plot_df(model, x = b, group_by = b), reason)
-  ID <- as.factor(paste0("M", rep(c(1:4), each = 6)))
-  df <- create_plot_df(model, x = b, group_by = ID)
-  expect_equal(names(df), c("ID", "b", "y"))
-})
-
 
 # -------------------------------------------------------------------------
 
@@ -136,8 +99,8 @@ test_that("simulated data can be plotted", {
     covariates = c(1, 2)
   )
   p1 <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4)
-  p2 <- plot_sim_component(dat, 2) # not colored
-  p3 <- plot_sim_component(dat, 3, color_by = "z") # colored
+  p2 <- plot_sim(dat, comp_idx = 2) # not colored
+  p3 <- plot_sim(dat, comp_idx = 3, color_by = "z") # colored
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
@@ -151,8 +114,8 @@ test_that("simulated data with disease effect can be plotted", {
     t_observed = "after_1"
   )
   p1 <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4) # has vert lines
-  p2 <- plot_sim_component(dat, 1)
-  p3 <- plot_sim_component(dat, 3, color_by = "diseaseAge")
+  p2 <- plot_sim.component(dat, 1)
+  p3 <- plot_sim.component(dat, 3, color_by = "diseaseAge")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")

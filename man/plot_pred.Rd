@@ -7,8 +7,8 @@
 \usage{
 plot_pred(
   fit,
-  pred = NULL,
   x = NULL,
+  pred = NULL,
   group_by = "id",
   t_name = "age",
   draws = NULL,
@@ -19,8 +19,8 @@ plot_pred(
 
 plot_f(
   fit,
-  pred = NULL,
   x = NULL,
+  pred = NULL,
   group_by = "id",
   t_name = "age",
   draws = NULL,
@@ -34,11 +34,12 @@ plot_f(
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
+\item{x}{A data frame of prediction points, containing at least the
+variables used as covariates in the model. This must be specified if
+\code{pred} is not \code{NULL}.}
+
 \item{pred}{An object of class \linkS4class{GaussianPrediction} or
 \linkS4class{Prediction}.}
-
-\item{x}{A data frame of prediction points. Must be specified if
-\code{pred} is not \code{NULL}.}
 
 \item{group_by}{name of the grouping variable}
 

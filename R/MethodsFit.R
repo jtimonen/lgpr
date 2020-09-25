@@ -11,7 +11,7 @@ ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
   check_type(fit, "lgpfit")
   check_type(data, "data.frame")
   check_type(fun, "function")
-  y_name <- get_y_name(fit)
+  y_name <- get_y.name(fit)
   y <- dollar(data, y_name)
   y_rep <- ppc.get_y_rng(fit, original_scale = TRUE)
   bayesplot::pp_check(y, y_rep, fun, ...)
@@ -123,6 +123,11 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
 #' @export
 #' @rdname plot_draws
 plot_beta <- function(fit, type = "dens", ...) {
+  check_type(fit, "lgpfit")
+  num_heter <- fit@model@stan_input$num_heter
+  if (num_heter == 0) {
+    stop("there are no heterogeneous effects in the model")
+  }
   h <- plot_draws(fit, type, regex_pars = "beta", ...)
   ptitle <- paste0(
     "Distribution of individual-specific ",

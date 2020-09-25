@@ -80,6 +80,7 @@ create_model <- function(formula,
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",
     model_formula = model_formula,
+    data = data,
     var_names = var_names,
     var_info = var_info,
     var_scalings = var_scalings,

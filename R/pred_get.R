@@ -67,7 +67,7 @@ NULL
 
 #' @rdname get_pred_gaussian
 get_pred.gaussian.f_comp <- function(fit, draws, reduce) {
-  nams <- c(get_component_names(fit), "total")
+  nams <- c(component_names(fit), "total")
   R <- length(nams)
   fp <- get_draws(fit, pars = "f_post", draws = draws, reduce = reduce)
   alist <- array_to_arraylist(fp, 2 * R)
@@ -85,7 +85,7 @@ get_pred.gaussian.f_comp <- function(fit, draws, reduce) {
 
 #' @rdname get_pred_gaussian
 get_pred.gaussian.f <- function(fit, draws, reduce) {
-  nams <- c(get_component_names(fit), "total")
+  nams <- c(component_names(fit), "total")
   R <- length(nams)
   fp <- get_draws(fit, pars = "f_post", draws = draws, reduce)
   alist <- array_to_arraylist(fp, 2 * R)
@@ -164,7 +164,7 @@ NULL
 
 #' @rdname get_pred_sampled
 get_pred.sampled.f_comp <- function(fit, draws, reduce) {
-  nams <- get_component_names(fit)
+  nams <- component_names(fit)
   D <- length(nams)
   fp <- get_draws(fit, pars = "f_latent", draws = draws, reduce = reduce)
   fp <- array_to_arraylist(fp, D)

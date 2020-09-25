@@ -23,47 +23,6 @@ dollar <- function(object, var_name) {
   object[[var_name, exact = TRUE]]
 }
 
-#' Printing a list in a more compact format
-#'
-#' @param input a named list
-#' @family list utilities
-print_list <- function(input) {
-
-  # Helper function
-  is_printable <- function(object) {
-    d <- dim(object)
-    if (is.null(d)) {
-      return(TRUE)
-    } else if (prod(d) == 0) {
-      return(FALSE)
-    }
-    TRUE
-  }
-
-  # Choose which fields to print
-  nam <- names(input)
-  printed <- c()
-  skipped <- c()
-  for (name in nam) {
-    f <- input[[name]]
-    if (is_printable(f)) {
-      printed <- c(printed, name)
-    } else {
-      skipped <- c(skipped, name)
-    }
-  }
-
-  # Print
-  print(input[printed])
-  str <- paste(skipped, collapse = ", ")
-  msg <- paste0(
-    "Did not print fields with at least one zero dimension:\n    ",
-    str, "\n"
-  )
-  cat(msg)
-  invisible(input)
-}
-
 #' Wrap list into a list of length 1 if the original list is named
 #'
 #' @param x a list
