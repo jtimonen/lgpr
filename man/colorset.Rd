@@ -22,6 +22,7 @@ Plot colors to use
 \seealso{
 Other color utilities: 
 \code{\link{color_palette}()},
-\code{\link{plot_color_palette}()}
+\code{\link{plot_color_palette}()},
+\code{\link{scale_color}()}
 }
 \concept{color utilities}

@@ -13,5 +13,5 @@ inst/doc
 *.so
 *.o
 *.dll
-docs
+docs/
 

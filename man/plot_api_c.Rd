@@ -4,7 +4,14 @@
 \alias{plot_api_c}
 \title{Plot a generated/fit model component}
 \usage{
-plot_api_c(df, df_err = NULL, alpha = 1, alpha_err = 0.5)
+plot_api_c(
+  df,
+  df_err = NULL,
+  alpha = 1,
+  alpha_err = 0.2,
+  no_err = FALSE,
+  no_line = FALSE
+)
 }
 \arguments{
 \item{df}{a data frame}
@@ -14,6 +21,10 @@ plot_api_c(df, df_err = NULL, alpha = 1, alpha_err = 0.5)
 \item{alpha}{line opacity}
 
 \item{alpha_err}{ribbon opacity}
+
+\item{no_err}{hide error bar even when it would normally be plotted?}
+
+\item{no_line}{hide line even when it would normally be plotted?}
 }
 \value{
 A \code{\link[ggplot2]{ggplot}} object.

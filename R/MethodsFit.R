@@ -116,7 +116,7 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
     return(out[[1]])
   } else {
     if (L == 0) stop("the model does not have warping parameters")
-    return(out)
+    return(out) # if there are multiple warping parameters
   }
 }
 

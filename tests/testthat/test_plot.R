@@ -16,10 +16,8 @@ test_that("color_set works", {
 test_that("plot_color_palette works", {
   p1 <- plot_color_palette(1)
   p2 <- plot_color_palette(5)
-  p3 <- plot_color_palette(6)
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
-  expect_s3_class(p3, "ggplot")
   expect_error(plot_color_palette(7))
 })
 

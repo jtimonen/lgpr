@@ -1,0 +1,117 @@
+---
+title: "Basic usage of the lgpr package"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Basic usage of the lgpr package}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+This vignette demonstrates how to model a longitudinal data set and perform covariate relevance assessment using the `lgpr` package.
+
+```{r load}
+require("lgpr")
+require("ggplot2")
+```
+
+```{r simulate, include = FALSE}
+set.seed(932)
+sim <- simulate_data(N            = 12,                     
+                     t_data       = seq(12, 96, by = 12),
+                     covariates   = c(    0,2), # covariate types (2 = cat)
+                     lengthscales = c(16,24,1,16), # true effect lengthscales
+                     relevances   = c(0,1,1,1), # true covariate relevances
+                     names        = c("diseaseAge", "sex"),
+                     t_jitter     = 0,  # jitter in time points
+                     snr          = 3)    # signal-to-noise ratio
+dat <- sim@data
+dat$y <- 100*(dat$y + 5)
+a <- as.numeric(dat$id)
+dat$id <- as.factor(formatC(a, width = 2, flag = "0"))
+dat$group <- as.factor(as.numeric(!is.nan(dat$diseaseAge)))
+dat$sex <- as.factor(c("Male", "Female")[as.numeric(dat$sex)])
+dat$group <- as.factor(c("Control", "Case")[as.numeric(dat$group)])
+plot_sim(sim)
+plot_sim(sim, comp_idx = 2)
+```
+
+## Visualizing longitudinal data
+In this tutorial we use simulated `testdata_002`, which consists of 12 individuals and 8 time points for each. 
+
+``````{r head}
+data_info(testdata_002)
+```
+
+The `plot_data` function
+can be used to visualize the data in many ways.
+
+``````{r pd1, fig.width=7.2, fig.height=4.8}
+plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab('Age (months)')
+```
+
+Coloring according to the disease-related age (`diseaseage`) shows that individuals 01-06 are cases and 07-12 are controls. The observed disease onset is at around 60
+months for each case individual.
+``````{r pd2, fig.width=7.2, fig.height=4.8}
+plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
+  scale_color_gradient2() + xlab('Age (months)')
+```
+
+
+## Creating and fitting a model
+We define a model with four components and fit it. The `gp(age)` component
+is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
+`gp_vm(diseaseAge)` is a non-stationary variance-masked disease effect, and
+`zs(group)` is a static offset component between the two groups (Case/Control).
+
+```{r fit, cache=TRUE}
+fit <- lgp(formula = y ~ gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
+           data     = testdata_002,
+           iter     = 1000,
+           chains   = 4,
+           refresh  = 250)
+```
+
+## Studying the fit object
+Printing the model object gives info about the model components, variables
+and parameter priors. In this example we did not specify the `prior` argument when
+calling `lgp()` so default priors were used.
+```{r study1}
+fit@model
+```
+
+Printing the fit object gives info about the posterior distribution of the
+parameters, MCMC settings and convergence diagnostics.
+```{r study2}
+fit
+```
+
+Distribution of the parameter draws can be visualized. There are four magnitude
+parameters (alpha), one for each component, and three lengthscale parameters
+(ell), since the `zs(group)`component does not have a lengthscale parameter.
+```{r study3, fig.width = 6, fig.height = 3.5}
+plot_draws(fit, type = 'dens')
+```
+
+## Visualizing inferred components
+```{r vis1, fig.width=3.5, fig.height=2}
+plot_f(fit, comp_idx = 1, alpha_err = 0.1) + ylim(-1.8,1.8)
+plot_f(fit, comp_idx = 2, color_by = "sex") + ylim(-1.8,1.8)
+plot_f(fit, comp_idx = 3, color_by = "diseaseAge") + ylim(-1.8,1.8)
+plot_f(fit, comp_idx = 4, color_by = "group") + ylim(-1.8,1.8)
+```
+
+```{r vis2, fig.width=5, fig.height=3}
+plot_pred(fit)
+```
+
+## Out-of-sample predictions
+

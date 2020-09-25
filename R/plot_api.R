@@ -107,12 +107,16 @@ plot_api_g <- function(df_data,
 #' @param df_err a data frame
 #' @param alpha line opacity
 #' @param alpha_err ribbon opacity
+#' @param no_err hide error bar even when it would normally be plotted?
+#' @param no_line hide line even when it would normally be plotted?
 #' @return A \code{\link[ggplot2]{ggplot}} object.
 #' @family plot APIs
 plot_api_c <- function(df,
                        df_err = NULL,
                        alpha = 1.0,
-                       alpha_err = 0.5) {
+                       alpha_err = 0.2,
+                       no_err = FALSE,
+                       no_line = FALSE) {
 
   # Create the plot
   group_by <- colnames(df)[1]
@@ -123,8 +127,12 @@ plot_api_c <- function(df,
   h <- ggplot2::ggplot(data = df, mapping = aes)
 
   # Add layers
-  h <- add_c_layer_ribbon(h, df_err, x_name, group_by, color_by, alpha_err)
-  h <- add_c_layer_line(h, df, x_name, group_by, color_by, alpha)
+  if (!no_err) {
+    h <- add_c_layer_ribbon(h, df_err, x_name, group_by, color_by, alpha_err)
+  }
+  if (!no_line) {
+    h <- add_c_layer_line(h, df, x_name, group_by, color_by, alpha)
+  }
   return(h)
 }
 
@@ -251,6 +259,9 @@ add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
       alpha = alpha,
       color = NA
     )
+    if (!is.null(color_by)) {
+      h <- h + scale_fill(5)
+    }
   }
   return(h)
 }
@@ -275,6 +286,9 @@ add_c_layer_line <- function(h, df, x_name, group_by, color_by, alpha) {
       inherit.aes = FALSE,
       alpha = alpha
     )
+    if (!is.null(color_by)) {
+      h <- h + scale_color(5)
+    }
   }
   return(h)
 }

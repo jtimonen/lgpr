@@ -29,7 +29,7 @@ plot_sim <- function(simdata,
     p <- plot_sim.data(simdata, group_by, x_name, f_name, y_name, ...)
     return(p)
   }
-  p <- plot_sim.component(
+  plot_sim.component(
     simdata, comp_idx, group_by, x_name, f_name, y_name, color_by, ...
   )
 }

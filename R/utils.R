@@ -183,25 +183,41 @@ colorset <- function(main, variant = "mid") {
   return(col)
 }
 
-#' A color palette function
+#' A color palettes
 #'
-#' @param n an integer from 1 to 6
+#' @param n an integer from 1 to 5
 #' @return an array of \code{n} hex values
 #' @family color utilities
+#' @name color_palette
+
+#' @rdname color_palette
 color_palette <- function(n) {
   c1 <- colorset("brightblue", "mid_highlight")
   c2 <- colorset("red", "mid_highlight")
-  c3 <- colorset("orange", "mid")
+  c3 <- colorset("orange", "mid_highlight")
   c4 <- colorset("green", "mid_highlight")
+  c5 <- colorset("gray", "dark_highlight")
+  palette <- c(c1, c2, c3, c4, c5)
+  if (n <= 5) {
+    out <- palette[1:n]
+  } else {
+    stop("number of colors can be at most 5")
+  }
+  return(out)
+}
+
+#' @rdname color_palette
+fill_palette <- function(n) {
+  c1 <- colorset("brightblue", "mid")
+  c2 <- colorset("red", "mid")
+  c3 <- colorset("orange", "mid")
+  c4 <- colorset("green", "mid")
   c5 <- colorset("gray", "dark")
   palette <- c(c1, c2, c3, c4, c5)
   if (n <= 5) {
     out <- palette[1:n]
-  } else if (n <= 6) {
-    palette <- unlist(bayesplot::color_scheme_get(scheme = "brightblue"))
-    out <- as.character(palette)
   } else {
-    stop("number of colors can be at most 6")
+    stop("number of colors can be at most 5")
   }
   return(out)
 }
@@ -231,6 +247,26 @@ plot_color_palette <- function(n) {
   h <- h + ggplot2::ggtitle("Colors")
   return(h)
 }
+
+#' A color scales
+#'
+#' @inheritParams color_palette
+#' @return a ggplot object
+#' @family color utilities
+#' @name scale_color
+
+#' @rdname scale_color
+scale_color <- function(n) {
+  values <- color_palette(n)
+  ggplot2::scale_color_manual(values = values)
+}
+
+#' @rdname scale_color
+scale_fill <- function(n) {
+  values <- fill_palette(n)
+  ggplot2::scale_fill_manual(values = values)
+}
+
 
 #' A linter-friendly way to call a function
 #'

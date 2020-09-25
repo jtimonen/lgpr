@@ -69,7 +69,7 @@ data_info.var <- function(var, digits) {
     range <- round(range, digits = digits)
     range <- paste0("[", range[1], ", ", range[2], "]")
   }
-  miss <- as.character(sum(is.nan(var)))
+  miss <- as.character(sum(is.na(var)))
   c(type, range, miss, levs)
 }
 
