@@ -9,7 +9,7 @@ large_data_msg(num_obs, threshold)
 \arguments{
 \item{num_obs}{number of observations}
 
-\item{thereshold}{threshold for number of observations}
+\item{threshold}{threshold for number of observations}
 }
 \value{
 nothing

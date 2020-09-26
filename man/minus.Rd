@@ -11,6 +11,8 @@ minus.append(str, val)
 minus.prepend(str, prepend)
 }
 \arguments{
+\item{str}{a string}
+
 \item{val}{a value to append with minus (will not be appended if value
 is zero)}
 

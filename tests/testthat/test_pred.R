@@ -128,7 +128,7 @@ test_that("inferred components can be visualized", {
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
   a <- plot_components(fit2,
-    color_by = "diseaseAge",
+    color_by = "diseaseAge", draw = FALSE,
     ylim = c(-3, 3), ncol = 2, nrow = 2
   )
   expect_s3_class(a[[1]], "ggplot")

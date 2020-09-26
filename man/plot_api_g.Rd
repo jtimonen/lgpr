@@ -16,7 +16,7 @@ plot_api_g(
   color_signal = color_palette(2)[1],
   color = color_palette(2)[2],
   color_err = colorset("red", "light_highlight"),
-  vline_colors = colorset("gray", "mid_highlight"),
+  color_vlines = colorset("gray", "mid_highlight"),
   alpha = 1,
   alpha_err = 0.5,
   nrow = NULL,
@@ -52,6 +52,9 @@ generate the signal. Omitted if \code{NULL}.}
 
 \item{color_err}{Color of the error ribbon.}
 
+\item{color_vlines}{Two line colors for vertical lines
+(true and obs. effect time).}
+
 \item{alpha}{Line opacity for model fit.}
 
 \item{alpha_err}{Opacity of the error ribbon.}
@@ -63,9 +66,6 @@ generate the signal. Omitted if \code{NULL}.}
 \code{\link[ggplot2]{facet_wrap}}}
 
 \item{y_transform}{A function.}
-
-\item{color_vlines}{Two line colors for vertical lines
-(true and obs. effect time).}
 }
 \value{
 A \code{\link[ggplot2]{ggplot}} object.

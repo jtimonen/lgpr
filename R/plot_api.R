@@ -54,7 +54,7 @@ plot_api_g <- function(df_data,
                        color_signal = color_palette(2)[1],
                        color = color_palette(2)[2],
                        color_err = colorset("red", "light_highlight"),
-                       vline_colors = colorset("gray", "mid_highlight"),
+                       color_vlines = colorset("gray", "mid_highlight"),
                        alpha = 1.0,
                        alpha_err = 0.5,
                        nrow = NULL,
@@ -69,7 +69,7 @@ plot_api_g <- function(df_data,
   x_name <- colnames(df_data)[2]
 
   # Add true and observed effect times
-  col <- vline_colors
+  col <- color_vlines
   h <- plot_api_g_add_effect_times(h, teff_signal, group_by, col, 1, 0.7)
   h <- plot_api_g_add_effect_times(h, teff_obs, group_by, col, 2, 0.7)
 

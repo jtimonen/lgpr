@@ -304,7 +304,7 @@ simplify_str <- function(s) {
 #' Display a runtime estimation message if starting to analyse a large data set
 #'
 #' @param num_obs number of observations
-#' @param thereshold threshold for number of observations
+#' @param threshold threshold for number of observations
 #' @return nothing
 large_data_msg <- function(num_obs, threshold) {
   msg <- paste0(

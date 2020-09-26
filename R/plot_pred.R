@@ -138,13 +138,7 @@ plot_components <- function(fit,
   }
 
   # Draw
-  if (draw) {
-    gridExtra::grid.arrange(
-      grobs = out,
-      nrow = nrow,
-      ncol = ncol
-    )
-  }
+  if (draw) gridExtra::grid.arrange(grobs = out, nrow = nrow, ncol = ncol)
   invisible(out)
 }
 

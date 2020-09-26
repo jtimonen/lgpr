@@ -333,6 +333,7 @@ prior_to_df_teff <- function(stan_input, digits) {
 
 #' Add minus to a string depending on options
 #'
+#' @param str a string
 #' @param val a value to append with minus (will not be appended if value
 #' is zero)
 #' @param prepend should a minus be prepended (true if this is not zero)
