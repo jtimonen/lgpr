@@ -90,3 +90,7 @@ test_that("map_factor_to_caseid works correctly", {
   reason <- "inconsistent x_cont_mask values for x_fac = M"
   expect_error(map_factor_to_caseid(x_fac, x_cont_mask, "joo"), reason)
 })
+
+test_that("large_data_msg works correctly", {
+  expect_output(large_data_msg(1000, 300))
+})

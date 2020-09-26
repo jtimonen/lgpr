@@ -67,6 +67,7 @@ Visualize an lgpsim object (simulated data)
 }
 \seealso{
 Other main plot functions: 
+\code{\link{plot_components}()},
 \code{\link{plot_data}()},
 \code{\link{plot_pred}()}
 }

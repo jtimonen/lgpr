@@ -17,10 +17,12 @@
 #'   \item \code{check_interval} checks if argument is inside a given interval
 #'   \item \code{check_not_null} checks if argument is not null
 #'   \item \code{check_false} checks if argument is false or zero
-#'   \item \code{check_length} checks if argument has correct length
-#'   \item \code{check_lengths} checks if two arguments have equal length
+#'   \item \code{check_length} checks if argument has given length
+#'   \item \code{check_length_1_or} checks if argument has given length or
+#'   length 1
 #'   \item \code{check_length_geq} checks if argument has at least a
 #'   given length
+#'   \item \code{check_lengths} checks if two arguments have equal length
 #'   \item \code{check_in_data} checks that variable exists in a data frame
 #'   \item \code{check_all_leq} checks that argument has values less than equal
 #'   to given maximums, elementwise
@@ -166,6 +168,22 @@ check_length <- function(arg, expected) {
     msg <- paste0(
       arg_name, " has length ", L, ", but its length should be ",
       expected, "!"
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param expected Expected length.
+check_length_1_or <- function(arg, expected) {
+  L <- length(arg)
+  ok <- (L == expected) || (L == 1)
+  if (!ok) {
+    arg_name <- deparse(substitute(arg))
+    msg <- paste0(
+      arg_name, " has length ", L, ", but its length should be ",
+      expected, " or one!"
     )
     stop(msg)
   }

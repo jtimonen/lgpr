@@ -44,6 +44,7 @@ Vizualizing longitudinal data
 }
 \seealso{
 Other main plot functions: 
+\code{\link{plot_components}()},
 \code{\link{plot_pred}()},
 \code{\link{plot_sim}()}
 }

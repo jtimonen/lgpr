@@ -36,7 +36,8 @@ Imports:
     bayesplot (>= 1.7.0),
     MASS (>= 7.3-50),
     stats (>= 3.4),
-    ggplot2 (>= 3.1.0)
+    ggplot2 (>= 3.1.0),
+    gridExtra (>= 0.3.0)
 LinkingTo: 
     BH (>= 1.72.0-2),
     Rcpp (>= 0.12.0),

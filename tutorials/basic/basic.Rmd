@@ -23,8 +23,8 @@ require("lgpr")
 require("ggplot2")
 ```
 
-```{r simulate, include = FALSE}
-set.seed(932)
+```{r simulate, include = FALSE, eval = FALSE}
+set.seed(1932)
 sim <- simulate_data(N            = 12,                     
                      t_data       = seq(12, 96, by = 12),
                      covariates   = c(    0,2), # covariate types (2 = cat)
@@ -73,7 +73,7 @@ is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
 `zs(group)` is a static offset component between the two groups (Case/Control).
 
 ```{r fit, cache=TRUE}
-fit <- lgp(formula = y ~ gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
+fit <- lgp(formula = y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
            data     = testdata_002,
            iter     = 1000,
            chains   = 4,
@@ -102,15 +102,15 @@ plot_draws(fit, type = 'dens')
 ```
 
 ## Visualizing inferred components
-```{r vis1, fig.width=3.5, fig.height=2}
-plot_f(fit, comp_idx = 1, alpha_err = 0.1) + ylim(-1.8,1.8)
-plot_f(fit, comp_idx = 2, color_by = "sex") + ylim(-1.8,1.8)
-plot_f(fit, comp_idx = 3, color_by = "diseaseAge") + ylim(-1.8,1.8)
-plot_f(fit, comp_idx = 4, color_by = "group") + ylim(-1.8,1.8)
+```{r vis1, fig.width=5, fig.height=10}
+plot_components(fit)
 ```
 
-```{r vis2, fig.width=5, fig.height=3}
-plot_pred(fit)
+Also, the posterior predictive mean ($\pm 2 \times$ standard deviation) can
+be visualized against the data. Here, the posterior predictive mean and
+standard deviation are computed using each parameter draw and then averaged.
+```{r vis2, fig.width=7, fig.height=4}
+plot_pred(fit, reduce = mean)
 ```
 
 ## Out-of-sample predictions

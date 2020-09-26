@@ -300,3 +300,18 @@ simplify_str <- function(s) {
   x <- gsub("[\",\']", "", x) # remove quotes
   return(x)
 }
+
+#' Display a runtime estimation message if starting to analyse a large data set
+#'
+#' @param num_obs number of observations
+#' @param thereshold threshold for number of observations
+#' @return nothing
+large_data_msg <- function(num_obs, threshold) {
+  msg <- paste0(
+    "WARNING: Number of observations is >= ", threshold,
+    ", so sampling can take a long time. See the",
+    " 'gradient computation took X seconds' information show by",
+    " Stan to estimate total runtime."
+  )
+  msg <- if (num_obs >= threshold) cat(msg)
+}

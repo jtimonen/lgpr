@@ -52,6 +52,102 @@ plot_pred <- function(fit,
   )
 }
 
+
+#' @export
+#' @param comp_idx Index of component to plot. The total sum is plotted
+#' if this is \code{NULL}.
+#' @param color_by name of coloring factor
+#' @rdname plot_pred
+plot_f <- function(fit,
+                   x = NULL,
+                   pred = NULL,
+                   group_by = "id",
+                   t_name = "age",
+                   draws = NULL,
+                   reduce = mean,
+                   MULT_STD = 2.0,
+                   comp_idx = NULL,
+                   color_by = NA,
+                   ...) {
+  check_type(fit, "lgpfit")
+  color_fac <- plot_f.get_color_fac(fit, pred, x, color_by)
+  input <- plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
+  pred <- dollar(input, "pred")
+  df_base <- dollar(input, "df_base")
+  bn <- colnames(df_base)
+  df_base <- cbind(df_base, color_fac)
+  colnames(df_base) <- c(bn, color_by)
+  ylab <- if (is.null(comp_idx)) "f" else paste0("f[", comp_idx, "]")
+
+  # Create plot
+  h <- plot_api_c(
+    df = plot_f.create.df_line(fit, pred, df_base, comp_idx),
+    df_err = plot_f.create.df_ribbon(fit, pred, df_base, comp_idx, MULT_STD),
+    ...
+  )
+  h + ggplot2::ylab(ylab)
+}
+
+#' Visualize all model components
+#'
+#' @export
+#' @description
+#' This calls \code{\link{plot_f}} for all model components.
+#' @inheritParams plot_f
+#' @param color_by Names of coloring factors. Can have length 1 or equal to
+#' the number of components. See the \code{color_by} argument of
+#' \code{\link{plot_f}}.
+#' @param ylim a vector of length 2 (upper and lower y-axis limits), or NULL
+#' @param ... additional arguments to \code{\link{plot_api_c}}
+#' @param draw if this is TRUE, the plot grid is drawn using
+#' \code{\link[gridExtra]{arrangeGrob}}
+#' @param nrow number of grid rows
+#' @param ncol number of grid columns
+#' @param gg_add additional ggplot obejct to add to each plot
+#' @return a list of ggplot objects invisibly
+#' @family main plot functions
+plot_components <- function(fit,
+                            x = NULL,
+                            pred = NULL,
+                            group_by = "id",
+                            t_name = "age",
+                            draws = NULL,
+                            reduce = mean,
+                            MULT_STD = 2.0,
+                            color_by = NA,
+                            ylim = NULL,
+                            draw = TRUE,
+                            nrow = NULL,
+                            ncol = NULL,
+                            gg_add = NULL,
+                            ...) {
+  check_type(fit, "lgpfit")
+  cn <- component_names(fit)
+  J <- length(cn)
+  out <- list()
+  check_length_1_or(color_by, J)
+  for (j in seq_len(J)) {
+    cb <- if (length(color_by) == 1) color_by else color_by[j]
+    p <- plot_f(
+      fit, x, pred, group_by, t_name,
+      draws, reduce, MULT_STD, j, cb, ...
+    )
+    p <- if (is.null(ylim)) p else p + ggplot2::ylim(ylim[1], ylim[2])
+    p <- p + ggplot2::ggtitle(cn[j]) + gg_add
+    out[[j]] <- p
+  }
+
+  # Draw
+  if (draw) {
+    gridExtra::grid.arrange(
+      grobs = out,
+      nrow = nrow,
+      ncol = ncol
+    )
+  }
+  invisible(out)
+}
+
 #' Helper function for plot_pred and plot_f
 #'
 #' @inheritParams plot_pred
@@ -67,7 +163,6 @@ plot_pred.create_input <- function(fit, pred, x, draws, reduce,
   }
   list(pred = pred, df_base = df_base)
 }
-
 
 #' Helper functions for plot_pred
 #'
@@ -104,42 +199,6 @@ plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
   lower <- m - MULT_STD * std
   df <- data.frame(upper, lower)
   cbind(df_base, df)
-}
-
-
-#' @export
-#' @param comp_idx Index of component to plot. The total sum is plotted
-#' if this is \code{NULL}.
-#' @param color_by name of coloring factor
-#' @rdname plot_pred
-plot_f <- function(fit,
-                   x = NULL,
-                   pred = NULL,
-                   group_by = "id",
-                   t_name = "age",
-                   draws = NULL,
-                   reduce = mean,
-                   MULT_STD = 2.0,
-                   comp_idx = NULL,
-                   color_by = NA,
-                   ...) {
-  check_type(fit, "lgpfit")
-  color_fac <- plot_f.get_color_fac(fit, pred, x, color_by)
-  input <- plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
-  pred <- dollar(input, "pred")
-  df_base <- dollar(input, "df_base")
-  bn <- colnames(df_base)
-  df_base <- cbind(df_base, color_fac)
-  colnames(df_base) <- c(bn, color_by)
-  ylab <- if (is.null(comp_idx)) "f" else paste0("f[", comp_idx, "]")
-
-  # Create plot
-  h <- plot_api_c(
-    df = plot_f.create.df_line(fit, pred, df_base, comp_idx),
-    df_err = plot_f.create.df_ribbon(fit, pred, df_base, comp_idx, MULT_STD),
-    ...
-  )
-  h + ggplot2::ylab(ylab)
 }
 
 #' Helper function for plot_f

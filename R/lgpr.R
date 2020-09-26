@@ -156,6 +156,8 @@ NULL
 #' @param ... Optional arguments passed to
 #' \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.
 sample_model <- function(model, ...) {
+  num_obs <- get_num_obs(model)
+  large_data_msg(num_obs, 300)
   object <- stanmodels[[model@stan_model_name]]
   data <- model@stan_input
   sfit <- rstan::sampling(object = object, data = data, check_data = TRUE, ...)

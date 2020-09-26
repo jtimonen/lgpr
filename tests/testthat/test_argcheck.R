@@ -119,6 +119,16 @@ test_that("check_length_leq works correctly", {
   expect_error(check_length_geq(a, 5), reason)
 })
 
+test_that("check_length_1_or works correctly", {
+  a <- c(2, 3, 4, 5)
+  expect_true(check_length_1_or(a, 4))
+  reason <- "has length 4, but its length should be 3 or one"
+  expect_error(check_length_1_or(a, 3), reason)
+  a <- c(2)
+  expect_true(check_length_1_or(a, 4))
+})
+
+
 test_that("check_integer_all works correctly", {
   a <- c(2, 3, 4, 5)
   expect_true(check_integer_all(a))

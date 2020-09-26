@@ -14,4 +14,7 @@ inst/doc
 *.o
 *.dll
 docs/
+*.html
+*_cache/
+*_files/
 
