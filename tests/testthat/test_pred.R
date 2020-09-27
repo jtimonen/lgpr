@@ -88,11 +88,20 @@ test_that("get_pred.sampled works correctly", {
   expect_output(show(a))
 })
 
-test_that("relevances can be computed", {
+test_that("relevances can be computed and sum to 1", {
   r1 <- relevances(fit1)
   r2 <- relevances(fit2)
   expect_equal(length(r1), 4)
   expect_equal(length(r2), 4)
+  expect_equal(sum(r1), 1.0)
+  expect_equal(sum(r2), 1.0)
+})
+
+test_that("selection works", {
+  s1 <- select(fit1, reduce = mean)
+  expect_equal(dim(s1), c(1, 4))
+  s2 <- select(fit2, reduce = NULL, threshold = 0.8)
+  expect_equal(dim(s2), c(50, 4))
 })
 
 test_that("predictions can be visualized with data on original scale", {
@@ -132,7 +141,7 @@ test_that("inferred components can be visualized", {
     ylim = c(-3, 3), ncol = 2, nrow = 2
   )
   expect_s3_class(a[[1]], "ggplot")
-  expect_equal(length(a), 3)
+  expect_equal(length(a), 4)
 })
 
 # -------------------------------------------------------------------------

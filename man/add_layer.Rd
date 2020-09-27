@@ -2,17 +2,17 @@
 % Please edit documentation in R/plot_api.R
 \name{add_layer}
 \alias{add_layer}
-\alias{add_c_layer_ribbon}
 \alias{add_c_layer_line}
+\alias{add_c_layer_ribbon}
 \alias{add_g_layer_ribbon}
 \alias{add_g_layer_fit}
 \alias{add_g_layer_signal}
 \alias{add_g_layer_faceting}
 \title{Add layers to a grouped or componentwise plot}
 \usage{
-add_c_layer_ribbon(h, df, x_name, group_by, color_by, alpha)
-
 add_c_layer_line(h, df, x_name, group_by, color_by, alpha)
+
+add_c_layer_ribbon(h, df, x_name, group_by, color_by, alpha)
 
 add_g_layer_ribbon(h, df, x_name, group_by, color, alpha)
 

@@ -3,26 +3,35 @@
 #' @description
 #' \itemize{
 #'   \item \code{relevances} returns a named vector with length equal to
-#'   number of components plus one
+#'   \code{num_comps + 1}
 #'   \item \code{relevances.default} is the default method
-#'   \item \code{relevances.default.all} is a helper function
+#'   \item \code{relevances.default_all} returns a dataframe of size
+#'   \code{num_draws} x \code{num_comps + 1}
 #' }
 #' @param fit an object of class \code{lgpfit}
+#' @param reduce a function to apply to reduce the relevances in each
+#' draw into one value
 #' @param ... currently has no effect
 #' @name relevances
 NULL
 
 #' @export
 #' @rdname relevances
-relevances <- function(fit, ...) {
+relevances <- function(fit, reduce = mean, ...) {
   check_type(fit, "lgpfit")
-  relevances.default(fit, ...)
+  relevances.default(fit, reduce, ...)
 }
 
 #' @rdname relevances
-relevances.default <- function(fit, ...) {
-  rels <- relevances.default.all(fit)
-  colMeans(rels)
+relevances.default <- function(fit, reduce, ...) {
+  df <- relevances.default.all(fit)
+  if (is.null(reduce)) {
+    return(df)
+  } else {
+    check_type(reduce, "function")
+    df <- apply(df, 2, reduce)
+  }
+  return(df)
 }
 
 #' @rdname relevances

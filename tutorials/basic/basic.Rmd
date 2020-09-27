@@ -100,10 +100,15 @@ parameters (alpha), one for each component, and three lengthscale parameters
 ```{r study3, fig.width = 6, fig.height = 3.5}
 plot_draws(fit, type = 'dens')
 ```
+Nothe that ell are on normalized scale! Inference is on normalized scale!
 
 ## Visualizing inferred components
-```{r vis1, fig.width=5, fig.height=10}
-plot_components(fit)
+```{r vis1, fig.width=7, fig.height=7}
+plot_components(fit, 
+                no_err = c(F, T, F, F, F, T), 
+                color_by = c(NA, NA, "sex", "group", "group", "group"),
+                ylim = c(-2,2),
+                ncol = 2)
 ```
 
 Also, the posterior predictive mean ($\pm 2 \times$ standard deviation) can

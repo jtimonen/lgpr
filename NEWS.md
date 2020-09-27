@@ -1,5 +1,7 @@
 # lgpr 1.0
 
+## 1.0.0
+
 ### New features
 
 * More general modeling options, allowing more mixing of different

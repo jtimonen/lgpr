@@ -6,22 +6,26 @@
 \alias{relevances.default.all}
 \title{Assess component relevances}
 \usage{
-relevances(fit, ...)
+relevances(fit, reduce = mean, ...)
 
-relevances.default(fit, ...)
+relevances.default(fit, reduce, ...)
 
 relevances.default.all(fit)
 }
 \arguments{
 \item{fit}{an object of class \code{lgpfit}}
 
+\item{reduce}{a function to apply to reduce the relevances in each
+draw into one value}
+
 \item{...}{currently has no effect}
 }
 \description{
 \itemize{
   \item \code{relevances} returns a named vector with length equal to
-  number of components plus one
+  \code{num_comps + 1}
   \item \code{relevances.default} is the default method
-  \item \code{relevances.default.all} is a helper function
+  \item \code{relevances.default_all} returns a dataframe of size
+  \code{num_draws} x \code{num_comps + 1}
 }
 }

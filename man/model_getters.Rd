@@ -5,6 +5,7 @@
 \alias{get_stan_input}
 \alias{get_data}
 \alias{get_num_obs}
+\alias{get_num_comps}
 \alias{is_f_sampled}
 \alias{get_obs_model}
 \title{Functions that access model properties}
@@ -14,6 +15,8 @@ get_stan_input(object)
 get_data(object)
 
 get_num_obs(object)
+
+get_num_comps(object)
 
 is_f_sampled(object)
 
@@ -26,8 +29,9 @@ get_obs_model(object)
 \value{
 \itemize{
   \item \code{get_stan_input} returns a list
-  \item \code{get_num_obs} returns an integer
-  \item \code{get_obs_model} returns a character string
+  \item \code{get_num_obs} returns the number of observations
+  \item \code{get_num_comps} returns the number of model components
+  \item \code{get_obs_model} returns the obs. model as a string
   \item \code{get_y_name} returns the response variable name
   \item \code{get_data} returns the original unmodified data frame
   \item \code{is_f_sampled} returns a boolean value

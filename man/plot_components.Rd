@@ -14,6 +14,7 @@ plot_components(
   reduce = mean,
   MULT_STD = 2,
   color_by = NA,
+  no_err = FALSE,
   ylim = NULL,
   draw = TRUE,
   nrow = NULL,
@@ -45,6 +46,10 @@ variables used as covariates in the model. This must be specified if
 \item{color_by}{Names of coloring factors. Can have length 1 or equal to
 the number of components. See the \code{color_by} argument of
 \code{\link{plot_f}}.}
+
+\item{no_err}{Should the error ribbons be skipped even though they
+otherwise would be shown? Can have length 1 or equal to number of
+components + 1. See the \code{no_err} argument of \code{\link{plot_api_c}}.}
 
 \item{ylim}{a vector of length 2 (upper and lower y-axis limits), or NULL}
 

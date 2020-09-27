@@ -97,6 +97,9 @@ plot_f <- function(fit,
 #' @param color_by Names of coloring factors. Can have length 1 or equal to
 #' the number of components. See the \code{color_by} argument of
 #' \code{\link{plot_f}}.
+#' @param no_err Should the error ribbons be skipped even though they
+#' otherwise would be shown? Can have length 1 or equal to number of
+#' components + 1. See the \code{no_err} argument of \code{\link{plot_api_c}}.
 #' @param ylim a vector of length 2 (upper and lower y-axis limits), or NULL
 #' @param ... additional arguments to \code{\link{plot_api_c}}
 #' @param draw if this is TRUE, the plot grid is drawn using
@@ -115,6 +118,7 @@ plot_components <- function(fit,
                             reduce = mean,
                             MULT_STD = 2.0,
                             color_by = NA,
+                            no_err = FALSE,
                             ylim = NULL,
                             draw = TRUE,
                             nrow = NULL,
@@ -125,15 +129,29 @@ plot_components <- function(fit,
   cn <- component_names(fit)
   J <- length(cn)
   out <- list()
-  check_length_1_or(color_by, J)
-  for (j in seq_len(J)) {
+  check_length_1_or(color_by, J + 1)
+  check_length_1_or(no_err, J + 1)
+  for (j in seq_len(J + 1)) {
     cb <- if (length(color_by) == 1) color_by else color_by[j]
+    ne <- if (length(no_err) == 1) no_err else no_err[j]
+    comp_idx <- if (j > J) NULL else j
+    title <- if (j > J) "sum" else cn[j]
     p <- plot_f(
-      fit, x, pred, group_by, t_name,
-      draws, reduce, MULT_STD, j, cb, ...
+      fit = fit,
+      x = x,
+      pred = pred,
+      group_by = group_by,
+      t_name = t_name,
+      draws = draws,
+      reduce = reduce,
+      MULT_STD = MULT_STD,
+      comp_idx = comp_idx,
+      color_by = cb,
+      no_err = ne,
+      ...
     )
     p <- if (is.null(ylim)) p else p + ggplot2::ylim(ylim[1], ylim[2])
-    p <- p + ggplot2::ggtitle(cn[j]) + gg_add
+    p <- p + ggplot2::ggtitle(title) + gg_add
     out[[j]] <- p
   }
 
@@ -214,7 +232,7 @@ plot_f.get_color_fac <- function(fit, pred, x, color_by) {
   if (!is.factor(color_fac)) {
     # Color by whether or not the coloring variable is NA or NaN
     color_fac <- as.numeric(!is.na(color_fac))
-    color_fac <- as.factor(c("NA/NaN", "available")[color_fac + 1])
+    color_fac <- as.factor(c("N/A", "available")[color_fac + 1])
   }
   return(color_fac)
 }

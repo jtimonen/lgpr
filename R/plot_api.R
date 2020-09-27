@@ -240,31 +240,6 @@ plot_api_g_add_effect_times <- function(h, teff, group_by,
 #' @name add_layer
 NULL
 
-#' @rdname add_layer
-add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
-  if (!is.null(df)) {
-    check_type(df, "data.frame")
-    aes_rib <- ggplot2::aes_string(
-      x = x_name,
-      ymin = "lower",
-      ymax = "upper",
-      group = group_by,
-      color = color_by,
-      fill = color_by
-    )
-    h <- h + ggplot2::geom_ribbon(
-      data = df,
-      mapping = aes_rib,
-      inherit.aes = FALSE,
-      alpha = alpha,
-      color = NA
-    )
-    if (!is.null(color_by)) {
-      h <- h + scale_fill(5)
-    }
-  }
-  return(h)
-}
 
 #' @rdname add_layer
 add_c_layer_line <- function(h, df, x_name, group_by, color_by, alpha) {
@@ -288,6 +263,32 @@ add_c_layer_line <- function(h, df, x_name, group_by, color_by, alpha) {
     )
     if (!is.null(color_by)) {
       h <- h + scale_color(5)
+    }
+  }
+  return(h)
+}
+
+#' @rdname add_layer
+add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
+  if (!is.null(df)) {
+    check_type(df, "data.frame")
+    aes_rib <- ggplot2::aes_string(
+      x = x_name,
+      ymin = "lower",
+      ymax = "upper",
+      group = group_by,
+      color = color_by,
+      fill = color_by
+    )
+    h <- h + ggplot2::geom_ribbon(
+      data = df,
+      mapping = aes_rib,
+      inherit.aes = FALSE,
+      alpha = alpha,
+      color = NA # no ribbon edge
+    )
+    if (!is.null(color_by)) {
+      h <- h + scale_fill(5)
     }
   }
   return(h)
