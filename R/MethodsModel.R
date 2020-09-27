@@ -38,9 +38,13 @@ model_summary_brief <- function(object) {
   stan_list <- get_stan_input(object)
   str1 <- as.character(model@model_formula)
   str2 <- likelihood_as_str(dollar(stan_list, "obs_model"))
+  dat <- get_data(object)
+  N <- nrow(dat)
+  D <- ncol(dat)
   line1 <- paste0("Formula: ", str1)
   line2 <- paste0("Likelihood: ", str2)
-  out <- paste0(line1, "\n", line2, "\n")
+  line3 <- paste("Data:", N, "observations,", D, " variables")
+  out <- paste0(line1, "\n", line2, "\n", line3, "\n")
   return(out)
 }
 
@@ -212,7 +216,6 @@ get_y.name <- function(object) {
 #' \itemize{
 #'   \item \code{get_stan_input} returns a list
 #'   \item \code{get_num_obs} returns the number of observations
-#'   \item \code{get_num_comps} returns the number of model components
 #'   \item \code{get_obs_model} returns the obs. model as a string
 #'   \item \code{get_y_name} returns the response variable name
 #'   \item \code{get_data} returns the original unmodified data frame
@@ -238,12 +241,6 @@ get_data <- function(object) {
 #' @rdname model_getters
 get_num_obs <- function(object) {
   dollar(get_stan_input(object), "num_obs")
-}
-
-#' @export
-#' @rdname model_getters
-get_num_comps <- function(object) {
-  length(component_names(object))
 }
 
 #' @export

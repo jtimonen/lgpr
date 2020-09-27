@@ -2,9 +2,31 @@
 % Please edit documentation in R/select.R
 \name{select}
 \alias{select}
+\alias{select_freq}
+\alias{select.prob}
+\alias{select_freq.prob}
 \title{Select relevant components}
 \usage{
 select(fit, reduce = mean, threshold = 0.95, ...)
+
+select_freq(fit, threshold = 0.95, ...)
+
+select.prob(
+  fit,
+  reduce = mean,
+  p = function(x) {     stats::dbeta(x, 100, 5) },
+  h = 0.001,
+  show_progbar = TRUE,
+  ...
+)
+
+select_freq.prob(
+  fit,
+  p = function(x) {     stats::dbeta(x, 100, 5) },
+  h = 0.001,
+  show_progbar = TRUE,
+  ...
+)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -15,12 +37,28 @@ select(fit, reduce = mean, threshold = 0.95, ...)
 Must be a value between 0 and 1.}
 
 \item{...}{Additional arguments to \code{\link{relevances}}.}
+
+\item{p}{A threshold density over interval [0,1].}
+
+\item{h}{A discretization parameter for computing a quadrature.}
+
+\item{show_progbar}{Should this show a progress bar?}
 }
 \value{
-A binary array of shape \code{S} x \code{num_comps+1},
-where 1 denotes selected components and 0 not selected. \code{S} is
-equal to \code{num_draws} if \code{reduce} is NULL and otherwise one.
+See description.
 }
 \description{
-Select relevant components
+\itemize{
+  \item \code{select} performs strict selection, returning a binary
+  value (0 = not selected, 1 = selected) for each component.
+  \item \code{select.prob} is like \code{select}, but instead of
+  a fixed threshold, computes probabilistic selection by integrating over
+  a threshold density.
+  \item \code{select_freq} performs the selection separately using
+  each parameter draw and returns the frequency at which each
+  component was selected.
+  \item \code{select_freq.prob} is like \code{select_freq}, but instead of
+  a fixed threshold, computes probabilistic selection frequencies
+  probabilities by integrating over a threshold density.
+}
 }

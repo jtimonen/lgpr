@@ -3,7 +3,8 @@ template:
     bootswatch: lumen
 
 reference:
-- title: "Main"
+- title: "Public API"
+- desc: "Functions that are exported from the package namespace."
 - contents: 
   - lgp
   - create_model
@@ -30,8 +31,10 @@ reference:
   - plot_sim
   
 - title: "Data"
+- desc: ~
 - contents:
   - testdata_001
+  - testdata_002
 
 - title: "Full documentation"
   desc: ~

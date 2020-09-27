@@ -97,23 +97,20 @@ test_that("relevances can be computed and sum to 1", {
   expect_equal(sum(r2), 1.0)
 })
 
-test_that("selection works", {
-  s1 <- select(fit1, reduce = mean)
-  expect_equal(dim(s1), c(1, 4))
-  s2 <- select(fit2, reduce = NULL, threshold = 0.8)
-  expect_equal(dim(s2), c(50, 4))
+test_that("select and select_freq work", {
+  s1a <- select(fit1, reduce = mean)
+  s1b <- select_freq(fit1)
+  expect_equal(length(s1a), 4)
+  expect_equal(length(s1b), 4)
+  s2 <- select(fit2, threshold = 0.8)
+  expect_equal(length(s2), 4)
 })
 
 test_that("probabilistic selection works", {
-  expect_output(select_integrate(fit1, h = 0.1, show_progbar = TRUE))
-  a <- select_integrate(fit1, show_progbar = FALSE)
-  b <- select_integrate(fit2, h = 0.1, show_progbar = FALSE)
-  expect_equal(names(a), c("freqs", "expected_freqs", "threshold_dens"))
-  expect_equal(names(b), c("freqs", "expected_freqs", "threshold_dens"))
-  expect_equal(dim(a$freqs), c(101, 4))
-  expect_equal(dim(b$freqs), c(11, 4))
-  expect_equal(length(a$threshold_dens), 101)
-  expect_equal(length(b$threshold_dens), 11)
+  b <- select.prob(fit1, reduce = stats::median, show_progbar = FALSE)
+  expect_equal(dim(b$selected), c(1001, 4))
+  b <- select_freq.prob(fit2, show_progbar = FALSE, h = 0.1)
+  expect_equal(dim(b$freq), c(11, 4))
 })
 
 test_that("predictions can be visualized with data on original scale", {

@@ -198,12 +198,7 @@ color_palette <- function(n) {
   c4 <- colorset("green", "mid_highlight")
   c5 <- colorset("gray", "dark_highlight")
   palette <- c(c1, c2, c3, c4, c5)
-  if (n <= 5) {
-    out <- palette[1:n]
-  } else {
-    stop("number of colors can be at most 5")
-  }
-  return(out)
+  palette[1:n]
 }
 
 #' @rdname color_palette
@@ -214,12 +209,7 @@ fill_palette <- function(n) {
   c4 <- colorset("green", "mid")
   c5 <- colorset("gray", "dark")
   palette <- c(c1, c2, c3, c4, c5)
-  if (n <= 5) {
-    out <- palette[1:n]
-  } else {
-    stop("number of colors can be at most 5")
-  }
-  return(out)
+  palette[1:n]
 }
 
 #' Visualize a color palette
