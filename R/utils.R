@@ -315,3 +315,21 @@ large_data_msg <- function(num_obs, threshold) {
   )
   msg <- if (num_obs >= threshold) cat(msg)
 }
+
+#' Create header for a progress bar
+#'
+#' @param L length
+#' @param width width of one block
+#' @return s string
+progbar_header <- function(L, width = 4) {
+  str <- paste0(seq(10, 100, by = 10))
+  a <- formatC(str, width = 3)
+  str <- paste0("|  ", a, "%")
+  top <- paste(formatC(str, width = width), collapse = "")
+  top <- paste0(top, "|")
+  barlen <- nchar(top) - 1
+  list(
+    header = top,
+    idx_print = ceiling(seq(1, L, length.out = barlen))
+  )
+}

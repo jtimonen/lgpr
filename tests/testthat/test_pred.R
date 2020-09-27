@@ -104,6 +104,18 @@ test_that("selection works", {
   expect_equal(dim(s2), c(50, 4))
 })
 
+test_that("probabilistic selection works", {
+  expect_output(select_integrate(fit1, h = 0.1, show_progbar = TRUE))
+  a <- select_integrate(fit1, show_progbar = FALSE)
+  b <- select_integrate(fit2, h = 0.1, show_progbar = FALSE)
+  expect_equal(names(a), c("freqs", "expected_freqs", "threshold_dens"))
+  expect_equal(names(b), c("freqs", "expected_freqs", "threshold_dens"))
+  expect_equal(dim(a$freqs), c(101, 4))
+  expect_equal(dim(b$freqs), c(11, 4))
+  expect_equal(length(a$threshold_dens), 101)
+  expect_equal(length(b$threshold_dens), 11)
+})
+
 test_that("predictions can be visualized with data on original scale", {
   p1 <- plot_pred(fit1, reduce = NULL)
   p2 <- plot_pred(fit1, reduce = NULL, draws = c(2, 3))

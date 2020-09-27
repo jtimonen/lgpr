@@ -69,3 +69,85 @@ select.one_draw <- function(rel, threshold) {
   return(1:J)
 }
 
+#' Compute expected selection frequencies by integrating the threshold
+#' over [0,1]
+#' @export
+#' @param object An object of class \code{lgpfit}.
+#' @param p The threshold density over interval [0,1].
+#' @param h A discretization parameter for computing a quadrature.
+#' @param show_progbar Should this show a progress bar?
+#' @param ... additional arguments to \code{\link{relevances}}
+#' @return A named list
+#' @name select_integrate
+NULL
+
+#' @rdname select_integrate
+select_integrate <- function(fit,
+                        p = function(x) {
+                          stats::dbeta(x, 100, 5)
+                        },
+                        h = 0.01,
+                        show_progbar = TRUE,
+                        ...) {
+  check_type(fit, "lgpfit")
+  check_type(p, "function")
+  check_interval(h, 0, 1)
+  check_positive(h)
+
+  # Compute selection frequencies for all threshold values
+  freqs <- select_integrate.all(fit, p, h, show_progbar, ...)
+
+  # Compute integral and return
+  ef <- select_integrate.integrate(freqs, p)
+  list(
+    freqs = freqs,
+    expected_freqs = dollar(ef, "expectations"),
+    threshold_dens = dollar(ef, "threshold_dens")
+  )
+}
+
+#' @rdname select_integrate
+select_integrate.all <- function(fit, p, h, show_progbar, ...) {
+  check_type(fit, "lgpfit")
+  check_type(p, "function")
+  check_interval(h, 0, 1)
+  check_positive(h)
+
+  # Get relevances
+  rel <- relevances(fit, reduce = NULL, ...)
+  D <- ncol(rel)
+
+  # Setup
+  H <- seq(0, 1, by = h)
+  L <- length(H)
+  freqs <- array(0, dim = c(L, D))
+  colnames(freqs) <- colnames(rel)
+  pb <- progbar_header(L, width = 4)
+  hdr <- dollar(pb, "header")
+  idx_print <- dollar(pb, "idx_print")
+  if (show_progbar) cat(hdr, "\n")
+
+  # Loop
+  for (i in 1:L) {
+    sel <- select(fit, reduce = NULL, threshold = H[i])
+    freqs[i, ] <- colMeans(sel)
+    if (show_progbar) {
+      if (i %in% idx_print) cat("=")
+      if (i == L) cat("\n")
+    }
+  }
+  return(freqs)
+}
+
+#' @rdname select_integrate
+#' @param freqs an object returned by \code{select_integrate.all}
+select_integrate.integrate <- function(freqs, p) {
+  L <- nrow(freqs)
+  D <- ncol(freqs)
+  H <- seq(0, 1, length.out = L)
+  P <- p(H)
+  list(
+    threshold_dens = P,
+    expectations = H
+  )
+}
