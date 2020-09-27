@@ -11,9 +11,9 @@ ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
   check_type(fit, "lgpfit")
   check_type(data, "data.frame")
   check_type(fun, "function")
-  y_name <- get_y.name(fit)
+  y_name <- get_y_name(fit)
   y <- dollar(data, y_name)
-  y_rep <- ppc.get_y_rng(fit, original_scale = TRUE)
+  y_rep <- get_y_rng(fit, original_scale = TRUE)
   bayesplot::pp_check(y, y_rep, fun, ...)
 }
 
@@ -26,7 +26,7 @@ ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
 #' to zero mean and unit variance)
 #' @return an array of shape \code{num_draws} x \code{num_obs}
 #' @family fit postprocessing functions
-ppc.get_y_rng <- function(fit, original_scale = TRUE) {
+get_y_rng <- function(fit, original_scale = TRUE) {
   f_sampled <- is_f_sampled(fit)
   if (!f_sampled) stop("f was not sampled!")
   obs_model <- get_obs_model(fit)
@@ -153,7 +153,7 @@ plot_effect_times <- function(fit, type = "areas", ...) {
 #' @description These functions use \code{\link[rstan]{extract}} with
 #' \code{permuted = FALSE} and \code{inc_warmup = FALSE}. Chains are stacked
 #' so that the return value is always a 2-dimensional array.
-#' The \code{get_draws_catch} function calls \code{get_draws} but catches
+#' The \code{get_draws.catch} function calls \code{get_draws} but catches
 #' errors and returns NULL if an error occurs.
 #' @param fit an object of class \linkS4class{lgpfit}
 #' @param draws Indices of parameter draws to return use. All post-warmup
@@ -183,9 +183,8 @@ get_draws <- function(fit, draws = NULL, reduce = NULL, ...) {
   return(s)
 }
 
-#' @export
 #' @rdname get_draws
-get_draws_catch <- function(fit, draws = NULL, reduce = NULL, ...) {
+get_draws.catch <- function(fit, draws = NULL, reduce = NULL, ...) {
   tryCatch(
     {
       get_draws(fit, draws, reduce, ...)
@@ -196,7 +195,6 @@ get_draws_catch <- function(fit, draws = NULL, reduce = NULL, ...) {
   )
 }
 
-#' @export
 #' @rdname get_draws
 get_num_draws <- function(fit) {
   draws <- get_draws(fit, draws = NULL, reduce = NULL, pars = "alpha")

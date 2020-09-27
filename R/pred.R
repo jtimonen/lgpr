@@ -79,7 +79,6 @@ pred.kr <- function(fit, x, reduce, draws, STREAM = get_stream()) {
 
 #' Compute all kernel matrices required for computing predictions
 #'
-#' @export
 #' @inheritParams pred
 #' @return Returns a list with fields named \code{data_vs_data},
 #' \code{pred_vs_data} and \code{pred_vs_pred}. Each of them is a list with
@@ -180,7 +179,6 @@ pred.kr_compute <- function(kernels, pred, delta, STREAM = get_stream()) {
 #' @family prediction functions
 NULL
 
-#' @export
 #' @rdname kernel_matrices
 #' @param theta A list of kernel parameter sets.
 kernel_matrices <- function(model, x1, x2, theta, STREAM = get_stream()) {
@@ -268,7 +266,6 @@ kernel_matrices_create_input <- function(model, x) {
 #' @return a list with names "alpha", "ell", "wrp", "beta" and "teff",
 #' where each element is an array with number of rows equal to number of
 #' parameter sets
-#' @rdname kernel_matrices
 #' @inheritParams pred
 get_kernel_pars <- function(fit, reduce = NULL, draws = NULL) {
   num_draws <- get_num_draws(fit)
@@ -276,7 +273,7 @@ get_kernel_pars <- function(fit, reduce = NULL, draws = NULL) {
   par_names <- c("alpha", "ell", "wrp", "beta", "teff")
   out <- list()
   for (pn in par_names) {
-    s <- get_draws_catch(fit, draws = draws, reduce = reduce, pars = pn)
+    s <- get_draws.catch(fit, draws = draws, reduce = reduce, pars = pn)
     out[[pn]] <- if (is.null(s)) na_array else s
   }
   return(out)

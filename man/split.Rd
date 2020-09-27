@@ -28,7 +28,8 @@ split_data(data, i_test, sort_ids = TRUE)
 
 \item{idx_test}{indices point indices with the factor}
 
-\item{k_test}{desired number of test data points per each level of the factor}
+\item{k_test}{desired number of test data points per each level of the
+factor}
 
 \item{p_test}{desired proportion of test data}
 

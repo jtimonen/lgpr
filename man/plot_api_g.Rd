@@ -87,7 +87,7 @@ where
 }
 }
 \seealso{
-Other plot APIs: 
+Other internal plot API functions: 
 \code{\link{plot_api_c}()}
 }
-\concept{plot APIs}
+\concept{internal plot API functions}

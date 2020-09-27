@@ -2,12 +2,12 @@
 % Please edit documentation in R/MethodsModel.R
 \name{model_summary}
 \alias{model_summary}
-\alias{model_summary_brief}
+\alias{model_summary.brief}
 \title{Print a model summary}
 \usage{
 model_summary(object)
 
-model_summary_brief(object)
+model_summary.brief(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
@@ -15,7 +15,7 @@ model_summary_brief(object)
 }
 \value{
 \itemize{
-  \item \code{\link{model_summary_brief}} returns a string
+  \item \code{\link{model_summary.brief}} returns a string
   \item \code{\link{model_summary}} prints the summary and
 returns \code{object} invisibly
   and returns \code{object} invisibly

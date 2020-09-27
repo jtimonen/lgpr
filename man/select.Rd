@@ -59,6 +59,6 @@ See description.
   component was selected.
   \item \code{select_freq.prob} is like \code{select_freq}, but instead of
   a fixed threshold, computes probabilistic selection frequencies
-  probabilities by integrating over a threshold density.
+  by integrating over a threshold density.
 }
 }

@@ -4,14 +4,14 @@
 #' @inheritParams object_to_model
 #' @return
 #' \itemize{
-#'   \item \code{\link{model_summary_brief}} returns a string
+#'   \item \code{\link{model_summary.brief}} returns a string
 #'   \item \code{\link{model_summary}} prints the summary and
 #' returns \code{object} invisibly
 #'   and returns \code{object} invisibly
 #' }
 model_summary <- function(object) {
   model <- object_to_model(object)
-  brief <- model_summary_brief(object)
+  brief <- model_summary.brief(object)
   cat(brief)
   cat("\n")
   print(component_info(object))
@@ -31,9 +31,8 @@ model_summary <- function(object) {
   invisible(object)
 }
 
-#' @export
 #' @rdname model_summary
-model_summary_brief <- function(object) {
+model_summary.brief <- function(object) {
   model <- object_to_model(object)
   stan_list <- get_stan_input(object)
   str1 <- as.character(model@model_formula)
@@ -86,7 +85,7 @@ create_plot_df <- function(object, x = "age", group_by = "id") {
 
   # Get response
   y <- get_y(object, original = TRUE)
-  y_name <- get_y.name(object)
+  y_name <- get_y_name(object)
   df <- data.frame(group_by, x, y)
   colnames(df) <- c(g_name, x_name, y_name)
   return(df)
@@ -189,7 +188,7 @@ NULL
 #' @rdname get_y
 get_y <- function(object, original = TRUE) {
   if (original) {
-    y_name <- get_y.name(object)
+    y_name <- get_y_name(object)
     dat <- get_data(object)
     return(dollar(dat, y_name))
   }
@@ -202,7 +201,7 @@ get_y <- function(object, original = TRUE) {
 }
 
 #' @rdname get_y
-get_y.name <- function(object) {
+get_y_name <- function(object) {
   model <- object_to_model(object)
   dollar(model@var_names, "y")
 }
@@ -223,34 +222,29 @@ get_y.name <- function(object) {
 #' }
 NULL
 
-#' @export
 #' @rdname model_getters
 get_stan_input <- function(object) {
   model <- object_to_model(object)
   return(model@stan_input)
 }
 
-#' @export
 #' @rdname model_getters
 get_data <- function(object) {
   model <- object_to_model(object)
   return(model@data)
 }
 
-#' @export
 #' @rdname model_getters
 get_num_obs <- function(object) {
   dollar(get_stan_input(object), "num_obs")
 }
 
-#' @export
 #' @rdname model_getters
 is_f_sampled <- function(object) {
   val <- dollar(get_stan_input(object), "is_f_sampled")
   as.logical(val)
 }
 
-#' @export
 #' @rdname model_getters
 get_obs_model <- function(object) {
   lh <- dollar(get_stan_input(object), "obs_model")

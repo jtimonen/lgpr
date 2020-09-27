@@ -13,7 +13,7 @@
 #'   component was selected.
 #'   \item \code{select_freq.prob} is like \code{select_freq}, but instead of
 #'   a fixed threshold, computes probabilistic selection frequencies
-#'   probabilities by integrating over a threshold density.
+#'   by integrating over a threshold density.
 #' }
 #' @param fit An object of class \code{lgpfit}.
 #' @param reduce The \code{reduce} argument for \code{\link{relevances}}.
@@ -95,6 +95,7 @@ select_freq.prob <- function(fit,
 #' Helper functions for component selection
 #'
 #' @inheritParams select
+#' @param rel an array of relevances
 #' @name select.helper
 NULL
 

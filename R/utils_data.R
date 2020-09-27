@@ -202,7 +202,6 @@ validate_factor <- function(x, id, name) {
 #' @family data utilities
 NULL
 
-#' @export
 #' @rdname split
 #' @param test the levels of the factor that will be used as test data
 split_by_factor <- function(data, test, var_name = "id") {
@@ -213,7 +212,6 @@ split_by_factor <- function(data, test, var_name = "id") {
   split_data(data, i_test)
 }
 
-#' @export
 #' @rdname split
 #' @param idx_test indices point indices with the factor
 split_within_factor <- function(data, idx_test, var_name = "id") {
@@ -229,9 +227,9 @@ split_within_factor <- function(data, idx_test, var_name = "id") {
   split_data(data, i_test)
 }
 
-#' @export
 #' @rdname split
-#' @param k_test desired number of test data points per each level of the factor
+#' @param k_test desired number of test data points per each level of the
+#' factor
 split_within_factor_random <- function(data, k_test = 1, var_name = "id") {
   check_type(data, "data.frame")
   id <- dollar(data, var_name)
@@ -247,7 +245,6 @@ split_within_factor_random <- function(data, k_test = 1, var_name = "id") {
   split_data(data, i_test)
 }
 
-#' @export
 #' @rdname split
 #' @param p_test desired proportion of test data
 #' @param n_test desired number of test data points (if NULL, \code{p_test}
@@ -262,7 +259,6 @@ split_random <- function(data, p_test = 0.2, n_test = NULL) {
   split_data(data, i_test)
 }
 
-#' @export
 #' @rdname split
 #' @param i_test test data row indices
 #' @param sort_ids should the test indices be sorted into increasing order
@@ -330,7 +326,6 @@ new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
 
 #' Get observed effect times from a data frame
 #'
-#' @export
 #' @inheritParams new_x
 #' @return a named vector, where the names are the levels of \code{group_by}
 #' @family data utilities

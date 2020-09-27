@@ -1,7 +1,6 @@
 #' Plot longitudinal data and/or model fit so that each subject/group has
 #' their own panel
 #'
-#' @export
 #' @description Data frames specified in arguments \code{df_data},
 #' \code{df_signal}, \code{df_fit}, and \code{df_fit_err} must have a format
 #' where
@@ -43,7 +42,7 @@
 #' \code{\link[ggplot2]{facet_wrap}}
 #' @param y_transform A function.
 #' @return A \code{\link[ggplot2]{ggplot}} object.
-#' @family plot APIs
+#' @family internal plot API functions
 plot_api_g <- function(df_data,
                        df_signal = NULL,
                        df = NULL,
@@ -88,7 +87,6 @@ plot_api_g <- function(df_data,
 
 #' Plot a generated/fit model component
 #'
-#' @export
 #' @description Data frames specified in arguments \code{df},
 #' and \code{df_err} must have a format where
 #' \itemize{
@@ -110,7 +108,7 @@ plot_api_g <- function(df_data,
 #' @param no_err hide error bar even when it would normally be plotted?
 #' @param no_line hide line even when it would normally be plotted?
 #' @return A \code{\link[ggplot2]{ggplot}} object.
-#' @family plot APIs
+#' @family internal plot API functions
 plot_api_c <- function(df,
                        df_err = NULL,
                        alpha = 1.0,

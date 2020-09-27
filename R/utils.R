@@ -83,27 +83,6 @@ link_inv <- function(x, likelihood) {
   return(x)
 }
 
-#' Get lgpr version description
-#'
-#' @export
-#' @return package description
-get_pkg_description <- function() {
-  lgprLib <- dirname(system.file(package = "lgpr"))
-  descr <- suppressWarnings(utils::packageDescription("lgpr",
-    lib.loc = lgprLib
-  ))
-  return(descr)
-}
-
-#' Get a stan model of the package
-#'
-#' @export
-#' @param name name of the model
-#' @return an object of class stanmodel
-get_stan_model <- function(name = "lgp") {
-  dollar(stanmodels, name)
-}
-
 #' Ensure vector has expected length
 #'
 #' @param len the expected length
@@ -167,7 +146,6 @@ qinvgamma_stanlike <- function(p, alpha, beta) {
 
 #' Plot colors to use
 #'
-#' @export
 #' @param main Color name. Must be a valid scheme name for
 #' \code{\link[bayesplot]{color_scheme_get}}.
 #' @param variant Must be one of {"light", "light_highlight", "mid",

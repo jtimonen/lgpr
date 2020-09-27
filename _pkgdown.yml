@@ -6,29 +6,44 @@ reference:
 - title: "Public API"
 - desc: "Functions that are exported from the package namespace."
 - contents: 
-  - lgp
-  - create_model
-  - sample_model
-  - optimize_model
-  - uniform
-  - model_summary
-  - fit_summary
-  - pred
-  - get_pred
-  - relevances
-  - ppc
-  - plot_data
-  - plot_draws
-  - plot_pred
-  - plot_f
-  - kernel_matrices
-  
-  - new_x
-  - add_factor
-  - add_dis_age
-  - adjusted_c_hat
-  - simulate_data
-  - plot_sim
+  - add_dis_age 
+  - add_factor 
+  - adjusted_c_hat 
+  - bet 
+  - component_info 
+  - data_info 
+  - fit_summary 
+  - gam 
+  - get_draws 
+  - get_pred 
+  - get_y_rng 
+  - igam 
+  - lgp 
+  - log_normal 
+  - model_summary 
+  - new_x 
+  - normal 
+  - optimize_model 
+  - param_summary 
+  - plot_beta 
+  - plot_components 
+  - plot_data 
+  - plot_draws 
+  - plot_effect_times 
+  - plot_f 
+  - plot_pred 
+  - plot_sim 
+  - plot_warp 
+  - ppc 
+  - pred 
+  - prior_summary 
+  - relevances 
+  - sample_model 
+  - select 
+  - simulate_data 
+  - student_t 
+  - uniform 
+  - validate_data 
   
 - title: "Data"
 - desc: ~

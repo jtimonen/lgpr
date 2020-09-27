@@ -71,7 +71,7 @@ create_model <- function(formula,
   )
   info <- list(
     created = date(),
-    pkg_desc = get_pkg_description(),
+    lgpr_version = utils::packageVersion("lgpr"),
     caseid_map = caseid_map
   )
   var_scalings <- list(y = y_scaling, x_cont = x_cont_scalings)

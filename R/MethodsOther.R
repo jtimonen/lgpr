@@ -174,7 +174,6 @@ class_info_pred <- function(class_name, num_comps, D) {
 
 #' Get simulated components from an lgpsim object
 #'
-#' @export
 #' @param simdata an object of class \linkS4class{lgpsim}
 #' @return a data frame
 get_sim_components <- function(simdata) {

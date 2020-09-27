@@ -45,7 +45,7 @@ test_that("prior checks can be performed with neg bin obs model", {
       refresh = 0,
       prior_only = TRUE
     )
-    y_rng <- ppc.get_y_rng(fit)
+    y_rng <- get_y_rng(fit)
     d <- max(abs(y_rng - round(y_rng)))
     expect_lt(d, 1e-6)
   })
@@ -68,7 +68,7 @@ test_that("prior checks can be performed with beta bin obs model", {
     )
     p <- ppc(fit, dat)
     expect_s3_class(p, "ggplot")
-    y_rng <- ppc.get_y_rng(fit)
+    y_rng <- get_y_rng(fit)
     d <- max(abs(y_rng - round(y_rng)))
     expect_lt(d, 1e-6)
   })

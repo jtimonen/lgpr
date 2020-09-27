@@ -2,13 +2,13 @@
 % Please edit documentation in R/MethodsFit.R
 \name{get_draws}
 \alias{get_draws}
-\alias{get_draws_catch}
+\alias{get_draws.catch}
 \alias{get_num_draws}
 \title{Extract posterior draws}
 \usage{
 get_draws(fit, draws = NULL, reduce = NULL, ...)
 
-get_draws_catch(fit, draws = NULL, reduce = NULL, ...)
+get_draws.catch(fit, draws = NULL, reduce = NULL, ...)
 
 get_num_draws(fit)
 }
@@ -31,12 +31,12 @@ an array of shape \code{num_param_sets} x \code{num_params}
 These functions use \code{\link[rstan]{extract}} with
 \code{permuted = FALSE} and \code{inc_warmup = FALSE}. Chains are stacked
 so that the return value is always a 2-dimensional array.
-The \code{get_draws_catch} function calls \code{get_draws} but catches
+The \code{get_draws.catch} function calls \code{get_draws} but catches
 errors and returns NULL if an error occurs.
 }
 \seealso{
 Other fit postprocessing functions: 
 \code{\link{fit_summary}()},
-\code{\link{ppc.get_y_rng}()}
+\code{\link{get_y_rng}()}
 }
 \concept{fit postprocessing functions}

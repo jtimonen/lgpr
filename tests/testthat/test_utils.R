@@ -18,11 +18,6 @@ test_that("dollar errors correctly", {
   expect_error(dollar(a, "joo"), reason)
 })
 
-test_that("get_stan_model returns a stanmodel", {
-  sm <- get_stan_model()
-  expect_equal(as.character(class(sm)), "stanmodel")
-})
-
 test_that("common array utilities work correctly", {
   a <- matrix(c(1, 2, 3, 10, 20, 30), 2, 3, byrow = TRUE)
   expect_equal(row_vars(a), c(1.0, 100.0))

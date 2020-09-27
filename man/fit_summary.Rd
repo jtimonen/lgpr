@@ -24,6 +24,6 @@ Posterior summary
 \seealso{
 Other fit postprocessing functions: 
 \code{\link{get_draws}()},
-\code{\link{ppc.get_y_rng}()}
+\code{\link{get_y_rng}()}
 }
 \concept{fit postprocessing functions}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/MethodsModel.R
 \name{get_y}
 \alias{get_y}
-\alias{get_y.name}
+\alias{get_y_name}
 \title{Get response variable measurements}
 \usage{
 get_y(object, original = TRUE)
 
-get_y.name(object)
+get_y_name(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or

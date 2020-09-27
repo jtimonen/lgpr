@@ -4,7 +4,6 @@
 \alias{kernel_matrices}
 \alias{kernel_matrices_const}
 \alias{kernel_matrices_create_input}
-\alias{get_kernel_pars}
 \title{Kernel matrix computation using the C++ functions of the package namespace}
 \usage{
 kernel_matrices(model, x1, x2, theta, STREAM = get_stream())
@@ -12,8 +11,6 @@ kernel_matrices(model, x1, x2, theta, STREAM = get_stream())
 kernel_matrices_const(model, x1, x2, STREAM = get_stream())
 
 kernel_matrices_create_input(model, x)
-
-get_kernel_pars(fit, reduce = NULL, draws = NULL)
 }
 \arguments{
 \item{model}{An object of class \linkS4class{lgpmodel}.}
@@ -31,17 +28,6 @@ created by \code{\link{kernel_matrices_create_input}}.}
 
 \item{x}{A data frame of points where the predictions are computed.
 The function \code{\link{new_x}} provides an easy way to create it.}
-
-\item{fit}{An object of class \linkS4class{lgpfit}.}
-
-\item{reduce}{reduction for parameters draws}
-
-\item{draws}{indices of parameter draws}
-}
-\value{
-a list with names "alpha", "ell", "wrp", "beta" and "teff",
-where each element is an array with number of rows equal to number of
-parameter sets
 }
 \description{
 \itemize{

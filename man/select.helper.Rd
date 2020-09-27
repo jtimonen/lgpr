@@ -34,6 +34,8 @@ select.one_draw(rel, threshold)
 
 \item{arr}{an array of frequencies or selections}
 
+\item{rel}{an array of relevances}
+
 \item{threshold}{Threshold for relevance sum.
 Must be a value between 0 and 1.}
 }

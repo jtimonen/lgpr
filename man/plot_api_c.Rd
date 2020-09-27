@@ -46,7 +46,7 @@ and \code{df_err} must have a format where
 }
 }
 \seealso{
-Other plot APIs: 
+Other internal plot API functions: 
 \code{\link{plot_api_g}()}
 }
-\concept{plot APIs}
+\concept{internal plot API functions}
