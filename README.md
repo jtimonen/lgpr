@@ -1,6 +1,7 @@
 # lgpr
 [![coverage](https://codecov.io/gh/jtimonen/lgpr/branch/development/graph/badge.svg)](https://codecov.io/gh/jtimonen/lgpr)
-[![static release](https://zenodo.org/badge/DOI/10.5281/zenodo.3632542.svg)](https://doi.org/10.5281/zenodo.3632542)
+[![build](https://travis-ci.org/jtimonen/lgpr.svg?branch=development)
+[![zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.3632542.svg)](https://doi.org/10.5281/zenodo.3632542)
 
 R package for **L**ongitudinal **G**aussian **P**rocess **R**egression. 
 
