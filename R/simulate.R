@@ -14,8 +14,7 @@
 #' Alternatively, this can be a string of the form \code{"after_n"} or
 #' \code{"random_p"} or \code{"exact"}.
 #' @param f_var variance of f
-#' @param c_hat A constant added to f
-#' @param verbose Verbosity mode.
+#' @param c_hat a constant added to f
 #' @return An object of class \linkS4class{lgpsim}.
 #' @examples
 #' # Generate Gaussian data
@@ -52,14 +51,11 @@ simulate_data <- function(N,
                             lambda = c(pi / 8, pi, 1)
                           ),
                           N_trials = 1,
-                          verbose = FALSE,
                           force_zeromean = TRUE) {
 
   # Input checks
   noise_type <- tolower(noise_type)
-  if (N < 2) stop("There must be at least 2 individuals!")
-  L <- length(t_data)
-  if (L < 3) stop("There must be at least 3 time points per individual!")
+  check_length_geq(t_data, 3)
   names <- sim.check_covariates(covariates, relevances, names, n_categs)
   bad <- N_affected > round(N / 2)
   if (bad) stop("N_affected cannot be greater than round(N/2)!")
@@ -77,7 +73,6 @@ simulate_data <- function(N,
     t_effect_range = t_effect_range,
     continuous_info = continuous_info
   )
-  if (verbose) cat(dollar(IN, "info"))
 
   # Compute X_affected
   k <- length(t_data)
@@ -134,7 +129,8 @@ simulate_data <- function(N,
   info <- list(
     par_ell = lengthscales,
     par_cont = dollar(IN, "par_cont"),
-    p_signal = SSR / (SSR + SSE)
+    p_signal = SSR / (SSR + SSE),
+    msg = dollar(IN, "info")
   )
 
   # Return S4 class object
@@ -333,7 +329,7 @@ sim.data_to_observed <- function(dat, t_observed) {
 #' @param t0_real the real onset
 #' @param rem measurement points after real onset
 #' @return a list with names \code{idx0} and \code{t0}
-sim.apply_onset_fun <- function(fun_obs, t0_real, rem) {
+sim.apply_obs_onset_fun <- function(fun_obs, t0_real, rem) {
   t_possible <- fun_obs(t0_real)
   inds0 <- which(rem > t_possible)
   if (length(inds0) < 1) {

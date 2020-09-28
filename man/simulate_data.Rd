@@ -27,7 +27,6 @@ simulate_data(
   vm_params = c(0.025, 1),
   continuous_info = list(mu = c(pi/8, pi, -0.5), lambda = c(pi/8, pi, 1)),
   N_trials = 1,
-  verbose = FALSE,
   force_zeromean = TRUE
 )
 }
@@ -93,7 +92,7 @@ and returns the (possibly randomly generated) observed onset/initiation time.
 Alternatively, this can be a string of the form \code{"after_n"} or
 \code{"random_p"} or \code{"exact"}.}
 
-\item{c_hat}{A constant added to f}
+\item{c_hat}{a constant added to f}
 
 \item{dis_fun}{A function or a string that defines the disease effect. If
 this is a function, that function is used to generate the effect.
@@ -121,8 +120,6 @@ where
 }}
 
 \item{N_trials}{The number of trials parameter for binomial data.}
-
-\item{verbose}{Verbosity mode.}
 
 \item{force_zeromean}{Should each component (excluding the disease age
 component) be forced to have a zero mean?}

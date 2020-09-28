@@ -19,7 +19,7 @@ test_that("gaussian data can be simulated", {
   expect_equal(names(data), !!data_names)
   teff_names <- c("true", "observed")
   expect_equal(names(dat@effect_times), !!teff_names)
-  info_names <- c("par_ell", "par_cont", "p_signal")
+  info_names <- c("par_ell", "par_cont", "p_signal", "msg")
   expect_equal(names(dat@info), !!info_names)
 })
 
@@ -104,6 +104,22 @@ test_that("error is thrown with invalid input", {
     covariates = c(2),
     lengthscales = c(10, 10, 3, 3)
   ), "lengthscales has length 4, should be 3")
+  
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2),
+    lengthscales = c(10, 10, 3, 3),
+    N_affected = 1000
+  ), "N_affected cannot be greater than")
+  
+  expect_error(simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2,1,0),
+    lengthscales = c(10, 10, 3, 3),
+  ), "covariates vector must be increasing")
+  
 })
 
 test_that("different types of components can be simulated", {
@@ -124,6 +140,7 @@ test_that("disease component can be simulated only for selected individuals", {
     N = 8,
     t_data = seq(6, 36, by = 6),
     covariates = c(0, 2),
+    t_observed = function(x) x + 0.1,
     N_affected = 2
   )
   n <- dim(dat@data)[1]
