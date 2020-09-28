@@ -24,6 +24,7 @@
 #' @param draws indices of parameter draws
 #' @param STREAM External pointer. By default obtained with
 #' \code{\link[rstan]{get_stream}}.
+#' @param show_progbar Should a progress bar be printed?
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
 #' @family prediction functions
@@ -32,26 +33,31 @@ NULL
 
 #' @export
 #' @rdname pred
-pred <- function(fit, x, reduce = mean, draws = NULL,
+pred <- function(fit, x, reduce = mean, draws = NULL, show_progbar = TRUE,
                  STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
+  # show_progbar <- if (is.null(reduce)) show_progbar else FALSE
   if (f_sampled) {
-    out <- pred.kr(fit, x, reduce, draws, STREAM)
+    out <- pred.kr(fit, x, reduce, draws, show_progbar, STREAM)
   } else {
-    out <- pred.gaussian(fit, x, reduce, draws, STREAM)
+    out <- pred.gaussian(fit, x, reduce, draws, show_progbar, STREAM)
   }
   return(out)
 }
 
 #' @rdname pred
-pred.gaussian <- function(fit, x, reduce, draws, STREAM = get_stream()) {
+pred.gaussian <- function(fit, x, reduce, draws, show_progbar,
+                          STREAM = get_stream()) {
   sigma <- get_draws(fit, draws = draws, reduce = reduce, pars = "sigma")
   kernels <- pred_kernels(fit, x, reduce, draws, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   y_norm <- as.vector(get_y(fit, original = FALSE))
-  post <- pred.gaussian_compute(kernels, y_norm, sigma, delta, STREAM)
+  post <- pred.gaussian_compute(
+    kernels, y_norm, sigma,
+    delta, show_progbar, STREAM
+  )
 
   f_mean <- dollar(post, "f_mean")
   f_std <- dollar(post, "f_std")
@@ -69,12 +75,12 @@ pred.gaussian <- function(fit, x, reduce, draws, STREAM = get_stream()) {
 }
 
 #' @rdname pred
-pred.kr <- function(fit, x, reduce, draws, STREAM = get_stream()) {
+pred.kr <- function(fit, x, reduce, draws, show_progbar, STREAM = get_stream()) {
   kernels <- pred_kernels(fit, x, reduce, draws, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   pred <- get_pred(fit, draws = draws, reduce = reduce)
-  kr <- pred.kr_compute(kernels, pred, delta, STREAM)
+  kr <- pred.kr_compute(kernels, pred, delta, show_progbar, STREAM)
   f <- dollar(kr, "f")
   likelihood <- get_obs_model(fit)
 
@@ -85,6 +91,97 @@ pred.kr <- function(fit, x, reduce, draws, STREAM = get_stream()) {
     h = link_inv(f, likelihood)
   )
 }
+
+#' Compute analytic out-of-sample predictions
+#'
+#' @param kernels A list returned by \code{\link{pred_kernels}}.
+#' @param y response variable vector of length \code{num_obs}
+#' @param sigma a vector with length equal to number of parameter sets
+#' @param delta jitter to ensure positive definite matrices
+#' @inheritParams pred
+#' @param pbar should a probgress bar be printed?
+#' @return A list.
+#' @family prediction functions
+pred.gaussian_compute <- function(kernels, y, sigma, delta, pbar,
+                                  STREAM = get_stream()) {
+  sigma <- as.vector(sigma)
+  K <- dollar(kernels, "data_vs_data")
+  Ks <- dollar(kernels, "pred_vs_data")
+  Kss <- dollar(kernels, "pred_vs_pred")
+  num_draws <- dim(Kss)[1]
+  D <- dim(Kss)[2]
+  R <- D + 1
+  num_pred <- dim(Kss)[3]
+  out <- array(0, dim = c(2 * R, num_pred, num_draws))
+  hdr <- progbar_header(num_draws)
+  idx_print <- dollar(hdr, "idx_print")
+  if (pbar) cat(dollar(hdr, "header"), "\n")
+  for (i in seq_len(num_draws)) {
+    k <- arr3_to_list(K[i, , , ])
+    ks <- arr3_to_list(Ks[i, , , ])
+    kss <- arr3_to_list(Kss[i, , , ])
+    post <- cpp_gp_posterior(k, ks, kss, y, delta, sigma[i], STREAM)
+    post <- list_to_matrix(post, num_pred)
+    out[, , i] <- post
+    if (pbar) progbar_print(i, idx_print)
+  }
+  out <- aperm(out, c(1, 3, 2))
+  if (pbar) cat("\n")
+
+  # Return
+  list(
+    f_comp_mean = out[1:D, , , drop = FALSE],
+    f_comp_std = out[(R + 1):(R + D), , , drop = FALSE],
+    f_mean = arr3_select(out, R),
+    f_std = arr3_select(out, 2 * R)
+  )
+}
+
+#' Compute out-of-sample predictions using kernel regression on
+#' sampled function values
+#'
+#' @param pred An object of class \linkS4class{Prediction}.
+#' @inheritParams pred.gaussian_compute
+#' @return An object of class \linkS4class{Prediction}.
+#' @family prediction functions
+pred.kr_compute <- function(kernels, pred, delta, pbar,
+                            STREAM = get_stream()) {
+  K <- dollar(kernels, "data_vs_data")
+  Ks <- dollar(kernels, "pred_vs_data")
+  Kss <- dollar(kernels, "pred_vs_pred")
+  f_comp <- pred@f_comp # list, each elem has shape num_draws x num_obs
+  num_draws <- dim(Kss)[1]
+  D <- dim(Kss)[2]
+  num_obs <- dim(K)[3]
+  num_pred <- dim(Kss)[3]
+  out <- array(0, dim = c(D + 1, num_draws, num_pred))
+  DELTA <- DELTA <- delta * diag(num_obs)
+  hdr <- progbar_header(num_draws)
+  idx_print <- dollar(hdr, "idx_print")
+  if (pbar) cat(dollar(hdr, "header"), "\n")
+  for (i in seq_len(num_draws)) {
+    f_sum <- 0
+    for (j in seq_len(D)) {
+      fj <- f_comp[[j]]
+      k <- K[i, j, , ] + DELTA
+      ks <- Ks[i, j, , ]
+      f <- fj[i, ]
+      f_pred <- ks %*% solve(k, f)
+      out[j, i, ] <- f_pred
+      f_sum <- f_sum + f_pred
+    }
+    out[D + 1, i, ] <- f_sum
+    if (pbar) progbar_print(i, idx_print)
+  }
+  if (pbar) cat("\n")
+
+  # Return
+  list(
+    f_comp = out[1:D, , , drop = FALSE],
+    f = arr3_select(out, D + 1)
+  )
+}
+
 
 #' Compute all kernel matrices required for computing predictions
 #'
@@ -109,83 +206,6 @@ pred_kernels <- function(fit, x, reduce, draws, STREAM = get_stream()) {
     data_vs_data = K,
     pred_vs_data = Ks,
     pred_vs_pred = Kss
-  )
-}
-
-#' Compute analytic out-of-sample predictions
-#'
-#' @param kernels A list returned by \code{\link{pred_kernels}}.
-#' @param y response variable vector of length \code{num_obs}
-#' @param sigma a vector with length equal to number of parameter sets
-#' @param delta jitter to ensure positive definite matrices
-#' @inheritParams pred
-#' @return A list.
-#' @family prediction functions
-pred.gaussian_compute <- function(kernels, y, sigma, delta,
-                                  STREAM = get_stream()) {
-  sigma <- as.vector(sigma)
-  K <- dollar(kernels, "data_vs_data")
-  Ks <- dollar(kernels, "pred_vs_data")
-  Kss <- dollar(kernels, "pred_vs_pred")
-  num_draws <- dim(Kss)[1]
-  D <- dim(Kss)[2]
-  R <- D + 1
-  num_pred <- dim(Kss)[3]
-  out <- array(0, dim = c(2 * R, num_pred, num_draws))
-  for (i in seq_len(num_draws)) {
-    k <- arr3_to_list(K[i, , , ])
-    ks <- arr3_to_list(Ks[i, , , ])
-    kss <- arr3_to_list(Kss[i, , , ])
-    post <- cpp_gp_posterior(k, ks, kss, y, delta, sigma[i], STREAM)
-    post <- list_to_matrix(post, num_pred)
-    out[, , i] <- post
-  }
-  out <- aperm(out, c(1, 3, 2))
-  # Return
-  list(
-    f_comp_mean = out[1:D, , , drop = FALSE],
-    f_comp_std = out[(R + 1):(R + D), , , drop = FALSE],
-    f_mean = arr3_select(out, R),
-    f_std = arr3_select(out, 2 * R)
-  )
-}
-
-#' Compute out-of-sample predictions using kernel regression on
-#' sampled function values
-#'
-#' @param pred An object of class \linkS4class{Prediction}.
-#' @inheritParams pred.gaussian_compute
-#' @return An object of class \linkS4class{Prediction}.
-#' @family prediction functions
-pred.kr_compute <- function(kernels, pred, delta, STREAM = get_stream()) {
-  K <- dollar(kernels, "data_vs_data")
-  Ks <- dollar(kernels, "pred_vs_data")
-  Kss <- dollar(kernels, "pred_vs_pred")
-  f_comp <- pred@f_comp # list, each elem has shape num_draws x num_obs
-  num_draws <- dim(Kss)[1]
-  D <- dim(Kss)[2]
-  num_obs <- dim(K)[3]
-  num_pred <- dim(Kss)[3]
-  out <- array(0, dim = c(D + 1, num_draws, num_pred))
-  DELTA <- DELTA <- delta * diag(num_obs)
-  for (i in seq_len(num_draws)) {
-    f_sum <- 0
-    for (j in seq_len(D)) {
-      fj <- f_comp[[j]]
-      k <- K[i, j, , ] + DELTA
-      ks <- Ks[i, j, , ]
-      f <- fj[i, ]
-      f_pred <- ks %*% solve(k, f)
-      out[j, i, ] <- f_pred
-      f_sum <- f_sum + f_pred
-    }
-    out[D + 1, i, ] <- f_sum
-  }
-
-  # Return
-  list(
-    f_comp = out[1:D, , , drop = FALSE],
-    f = arr3_select(out, D + 1)
   )
 }
 

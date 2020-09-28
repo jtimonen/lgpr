@@ -121,7 +121,7 @@ select.all_thresholds <- function(fit, reduce, p, h, show_progbar, ...) {
   L <- length(H)
   SEL <- array(0, dim = c(L, D))
   colnames(SEL) <- colnames(rel)
-  pb <- progbar_header(L, width = 4)
+  pb <- progbar_header(L)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
   if (show_progbar) cat(hdr, "\n")
@@ -130,11 +130,9 @@ select.all_thresholds <- function(fit, reduce, p, h, show_progbar, ...) {
   for (i in 1:L) {
     sel <- select.all_draws(rel, threshold = H[i])
     SEL[i, ] <- sel
-    if (show_progbar) {
-      if (i %in% idx_print) cat("=")
-      if (i == L) cat("\n")
-    }
+    if (show_progbar) progbar_print(i, idx_print)
   }
+  if (show_progbar) cat("\n")
   return(SEL)
 }
 
@@ -155,7 +153,7 @@ select_freq.all_thresholds <- function(fit, p, h, show_progbar, ...) {
   L <- length(H)
   FREQ <- array(0, dim = c(L, D))
   colnames(FREQ) <- colnames(rel)
-  pb <- progbar_header(L, width = 4)
+  pb <- progbar_header(L)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
   if (show_progbar) cat(hdr, "\n")
@@ -164,11 +162,9 @@ select_freq.all_thresholds <- function(fit, p, h, show_progbar, ...) {
   for (i in 1:L) {
     freq <- select.all_draws(rel, threshold = H[i])
     FREQ[i, ] <- colMeans(freq)
-    if (show_progbar) {
-      if (i %in% idx_print) cat("=")
-      if (i == L) cat("\n")
-    }
+    if (show_progbar) progbar_print(i, idx_print)
   }
+  if (show_progbar) cat("\n")
   return(FREQ)
 }
 

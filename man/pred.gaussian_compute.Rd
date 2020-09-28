@@ -4,7 +4,7 @@
 \alias{pred.gaussian_compute}
 \title{Compute analytic out-of-sample predictions}
 \usage{
-pred.gaussian_compute(kernels, y, sigma, delta, STREAM = get_stream())
+pred.gaussian_compute(kernels, y, sigma, delta, pbar, STREAM = get_stream())
 }
 \arguments{
 \item{kernels}{A list returned by \code{\link{pred_kernels}}.}
@@ -14,6 +14,8 @@ pred.gaussian_compute(kernels, y, sigma, delta, STREAM = get_stream())
 \item{sigma}{a vector with length equal to number of parameter sets}
 
 \item{delta}{jitter to ensure positive definite matrices}
+
+\item{pbar}{should a probgress bar be printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}

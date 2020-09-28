@@ -172,19 +172,20 @@ test_that("prediction kernel computations work correctly", {
 })
 
 test_that("predict.gaussian works correctly", {
-  out <- pred(fit1, x1_pred)
+  out <- pred(fit1, x1_pred, show_progbar = FALSE)
   expect_s4_class(out, "GaussianPrediction")
-  out <- pred(fit1, x1_pred, draws = c(3:43))
+  out <- pred(fit1, x1_pred, draws = c(3:43), show_progbar = FALSE)
   expect_s4_class(out, "GaussianPrediction")
-  out <- pred(fit1, x1_pred, reduce = mean)
+  out <- pred(fit1, x1_pred, reduce = mean, show_progbar = FALSE)
   expect_s4_class(out, "GaussianPrediction")
   expect_equal(dim(out@y_mean), c(1, 44))
+  expect_output(pred(fit1, x1_pred, show_progbar = TRUE))
 })
 
 test_that("predict.kr works correctly", {
-  out <- pred(fit2, x2_pred, reduce = mean)
+  out <- pred(fit2, x2_pred, reduce = mean, show_progbar = FALSE)
   expect_equal(dim(out@h), c(1, 44))
-  out <- pred(fit2, x2_pred, reduce = NULL)
+  out <- pred(fit2, x2_pred, reduce = NULL, show_progbar = FALSE)
   expect_equal(dim(out@h), c(50, 44))
 })
 
@@ -194,8 +195,11 @@ test_that("predict.kr works correctly", {
 context("Out-of-sample prediction visualization")
 
 test_that("out-of-sample predictions can be visualized", {
-  os1 <- pred(fit1, x1_pred)
-  os2 <- pred(fit1, x1_pred, reduce = NULL, draws = c(8:10))
+  os1 <- pred(fit1, x1_pred, show_progbar = FALSE)
+  os2 <- pred(fit1, x1_pred,
+    reduce = NULL, draws = c(8:10),
+    show_progbar = FALSE
+  )
   p1 <- plot_pred(fit1, pred = os1, x = x1_pred)
   p2 <- plot_pred(fit1, pred = os2, x = x1_pred)
   expect_s3_class(p1, "ggplot")
@@ -203,8 +207,11 @@ test_that("out-of-sample predictions can be visualized", {
 })
 
 test_that("out-of-sample inferred components can be visualized", {
-  os1 <- pred(fit1, x1_pred)
-  os2 <- pred(fit1, x1_pred, reduce = NULL, draws = c(8:10))
+  os1 <- pred(fit1, x1_pred, show_progbar = FALSE)
+  os2 <- pred(fit1, x1_pred,
+    reduce = NULL, draws = c(8:10),
+    show_progbar = FALSE
+  )
   p1 <- plot_f(fit1, pred = os1, x = x1_pred)
   p2 <- plot_f(fit1,
     pred = os2, x = x1_pred, comp_idx = 3,
@@ -215,8 +222,11 @@ test_that("out-of-sample inferred components can be visualized", {
 })
 
 test_that("out-of-sample KR can be visualized", {
-  os1 <- pred(fit2, x2_pred)
-  os2 <- pred(fit2, x2_pred, reduce = NULL, draws = c(8:10))
+  os1 <- pred(fit2, x2_pred, show_progbar = FALSE)
+  os2 <- pred(fit2, x2_pred,
+    reduce = NULL, draws = c(8:10),
+    show_progbar = FALSE
+  )
   p1 <- plot_pred(fit2, pred = os1, x = x2_pred)
   p2 <- plot_pred(fit2, pred = os2, x = x2_pred)
   expect_s3_class(p1, "ggplot")
@@ -224,8 +234,11 @@ test_that("out-of-sample KR can be visualized", {
 })
 
 test_that("out-of-sample KR components can be visualized", {
-  os1 <- pred(fit2, x2_pred)
-  os2 <- pred(fit2, x2_pred, reduce = NULL, draws = c(8:10))
+  os1 <- pred(fit2, x2_pred, show_progbar = FALSE)
+  os2 <- pred(fit2, x2_pred,
+    reduce = NULL, draws = c(8:10),
+    show_progbar = FALSE
+  )
   p1 <- plot_f(fit2, pred = os2, x = x2_pred)
   p2 <- plot_f(fit2,
     pred = os2, x = x2_pred, comp_idx = 3,

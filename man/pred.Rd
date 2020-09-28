@@ -6,11 +6,18 @@
 \alias{pred.kr}
 \title{Computing out-of-sample predictions}
 \usage{
-pred(fit, x, reduce = mean, draws = NULL, STREAM = get_stream())
+pred(
+  fit,
+  x,
+  reduce = mean,
+  draws = NULL,
+  show_progbar = TRUE,
+  STREAM = get_stream()
+)
 
-pred.gaussian(fit, x, reduce, draws, STREAM = get_stream())
+pred.gaussian(fit, x, reduce, draws, show_progbar, STREAM = get_stream())
 
-pred.kr(fit, x, reduce, draws, STREAM = get_stream())
+pred.kr(fit, x, reduce, draws, show_progbar, STREAM = get_stream())
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
@@ -21,6 +28,8 @@ The function \code{\link{new_x}} provides an easy way to create it.}
 \item{reduce}{reduction for parameters draws}
 
 \item{draws}{indices of parameter draws}
+
+\item{show_progbar}{Should a progress bar be printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}

@@ -284,20 +284,36 @@ large_data_msg <- function(num_obs, threshold) {
   msg <- if (num_obs >= threshold) cat(msg)
 }
 
-#' Create header for a progress bar
+#' Progress bar for iterative functions
 #'
-#' @param L length
-#' @param width width of one block
-#' @return s string
-progbar_header <- function(L, width = 4) {
+#' \itemize{
+#'   \item \code{progbar_header} creates header for a progress bar
+#'   \item \code{progbar_print} prints part of the bar depending on iteration
+#'   index
+#' }
+#' @name progbar
+NULL
+
+#' @rdname progbar
+#' @param L length of bar
+progbar_header <- function(L) {
   str <- paste0(seq(10, 100, by = 10))
   a <- formatC(str, width = 3)
   str <- paste0("|  ", a, "%")
-  top <- paste(formatC(str, width = width), collapse = "")
+  top <- paste(formatC(str, width = 3), collapse = "")
   top <- paste0(top, "|")
   barlen <- nchar(top) - 1
   list(
     header = top,
     idx_print = ceiling(seq(1, L, length.out = barlen))
   )
+}
+
+#' @rdname progbar
+#' @param idx_print indices of iterations to print a bar block
+#' @param idx current iteration index
+progbar_print <- function(idx, idx_print) {
+  N <- length(which(idx_print == idx))
+  str <- paste(rep("=", N), collapse = "")
+  cat(str)
 }
