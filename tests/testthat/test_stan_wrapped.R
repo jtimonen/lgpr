@@ -26,7 +26,7 @@ test_that("cpp_warp_input works similarly as reference", {
   x <- seq(-3, 3, by = 1.33)
   expect_equal(
     cpp_warp_input(x, a),
-    sim_warp_input(x, a, 0, 1)
+    sim.warp_input(x, a, 0, 1)
   )
 })
 
@@ -52,7 +52,7 @@ test_that("cpp_var_mask works similarly as reference", {
   x <- c(-5, 0, 5)
   expect_equal(
     cpp_var_mask(x, a),
-    sim_var_mask(x, a)
+    sim.var_mask(x, a)
   )
 })
 

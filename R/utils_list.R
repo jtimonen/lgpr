@@ -65,3 +65,15 @@ matrix_to_list <- function(x) {
   }
   return(L)
 }
+
+#' Return first list element if the list has length is one
+#'
+#' @param x a list
+#' @return the original list or just its first element if its length is one
+#' @family list utilities
+simplify_list <- function(x) {
+  check_type(x, "list")
+  L <- length(x)
+  if (L == 1) x <- x[[1]]
+  return(x)
+}

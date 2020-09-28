@@ -23,6 +23,7 @@ not in \code{names(object)}.
 Other list utilities: 
 \code{\link{list_if_named}()},
 \code{\link{list_to_matrix}()},
-\code{\link{matrix_to_list}()}
+\code{\link{matrix_to_list}()},
+\code{\link{simplify_list}()}
 }
 \concept{list utilities}

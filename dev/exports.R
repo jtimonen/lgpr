@@ -1,7 +1,4 @@
-# This file is only for development purposes and not a part of the package
-# itself. Run this in the package root directory to list exported functions.
-
-# read namespace and extract exported functions
+# Read namespace and extract exported functions
 s <- scan("NAMESPACE", what = "character", sep = "\n")
 L <- length(s)
 funs <- NULL

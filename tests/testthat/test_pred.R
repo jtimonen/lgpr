@@ -111,6 +111,8 @@ test_that("probabilistic selection works", {
   expect_equal(dim(b$selected), c(1001, 4))
   b <- select_freq.prob(fit2, show_progbar = FALSE, h = 0.1)
   expect_equal(dim(b$freq), c(11, 4))
+  expect_output(select.prob(fit2, show_progbar = TRUE, h = 0.1))
+  expect_output(select_freq.prob(fit1, show_progbar = TRUE, h = 0.1))
 })
 
 test_that("predictions can be visualized with data on original scale", {

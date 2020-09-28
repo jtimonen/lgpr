@@ -112,12 +112,8 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
 
   # Return ggplot object or list of them
   L <- length(out)
-  if (L == 1) {
-    return(out[[1]])
-  } else {
-    if (L == 0) stop("the model does not have warping parameters")
-    return(out) # if there are multiple warping parameters
-  }
+  if (L == 0) stop("the model does not have warping parameters")
+  simplify_list(out)
 }
 
 #' @export

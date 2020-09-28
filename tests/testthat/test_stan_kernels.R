@@ -23,7 +23,7 @@ test_that("zero-sum kernel works similarly as reference", {
   x <- sample.int(M, size = 8, replace = TRUE)
   expect_equal(
     STAN_kernel_base_zerosum(x, x, M, STREAM),
-    sim_kernel_zerosum(x, x, M)
+    sim.kernel_zerosum(x, x, M)
   )
 })
 
@@ -70,6 +70,6 @@ test_that("variance mask kernel works similarly as reference", {
   stp <- 1.0
   vm_params <- c(0.05, 0.6)
   K_stan <- STAN_kernel_base_var_mask(x, x, stp, vm_params, STREAM)
-  K_r <- sim_kernel_var_mask(x, x, vm_params, stp)
+  K_r <- sim.kernel_var_mask(x, x, vm_params, stp)
   expect_equal(K_stan, K_r)
 })

@@ -1,10 +1,3 @@
-# This file is only for development purposes and not a part of the package
-# itself. Run this in the package root directory to build the stan functions
-# into C++ code.
-#
-# Author: Juho Timonen
-#
-
 # Set paths
 STAN_HOME <- file.path("inst", "stan")
 FILES <- c(

@@ -19,6 +19,7 @@ Wrap list into a list of length 1 if the original list is named
 Other list utilities: 
 \code{\link{dollar}()},
 \code{\link{list_to_matrix}()},
-\code{\link{matrix_to_list}()}
+\code{\link{matrix_to_list}()},
+\code{\link{simplify_list}()}
 }
 \concept{list utilities}

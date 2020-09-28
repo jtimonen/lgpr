@@ -2,9 +2,9 @@
 #'
 #' @export
 #' @description Generate an artificial longitudinal data set.
-#' @inheritParams sim_create_x
-#' @inheritParams sim_create_f
-#' @inheritParams sim_create_y
+#' @inheritParams sim.create_x
+#' @inheritParams sim.create_f
+#' @inheritParams sim.create_y
 #' @param N_affected Number of diseased individuals that are affected by the
 #' disease. This defaults to the number of diseased individuals. This argument
 #' can only be given if \code{covariates} contains a zero.
@@ -60,14 +60,14 @@ simulate_data <- function(N,
   if (N < 2) stop("There must be at least 2 individuals!")
   L <- length(t_data)
   if (L < 3) stop("There must be at least 3 time points per individual!")
-  names <- sim_check_covariates(covariates, relevances, names, n_categs)
+  names <- sim.check_covariates(covariates, relevances, names, n_categs)
   bad <- N_affected > round(N / 2)
   if (bad) stop("N_affected cannot be greater than round(N/2)!")
   bad <- is.unsorted(covariates)
   if (bad) stop("The covariates vector must be increasing!")
 
   # Generate the covariates
-  IN <- sim_create_x(
+  IN <- sim.create_x(
     N = N,
     covariates = covariates,
     names = names,
@@ -84,7 +84,7 @@ simulate_data <- function(N,
   X_affected <- c(rep(1, N_affected * k), rep(0, (N - N_affected) * k))
 
   # Simulate the components F
-  COMP <- sim_create_f(
+  COMP <- sim.create_f(
     dollar(IN, "X"),
     covariates,
     relevances,
@@ -106,7 +106,7 @@ simulate_data <- function(N,
   f <- f + c_hat
 
   # Generate noise
-  NOISY <- sim_create_y(noise_type, f,
+  NOISY <- sim.create_y(noise_type, f,
     snr = snr, phi = phi,
     N_trials = N_trials
   )
@@ -120,7 +120,7 @@ simulate_data <- function(N,
   comp <- cbind(FFF, f, g, noise, y)
 
   # Real diseaseAges to observed ones
-  OBSERVED <- sim_data_to_observed(dat, t_observed)
+  OBSERVED <- sim.data_to_observed(dat, t_observed)
 
   # Signal and noise sums of squares
   SSR <- sum((g - mean(g))^2)
@@ -165,7 +165,7 @@ simulate_data <- function(N,
 #'   \item \code{out$g} is \code{f} mapped through an inverse link function and
 #'   \item \code{out$y} is the noisy response variable.
 #' }
-sim_create_y <- function(noise_type, f, snr, phi, N_trials) {
+sim.create_y <- function(noise_type, f, snr, phi, N_trials) {
   L <- length(f)
   y <- rep(0, L)
   if (noise_type == "gaussian") {
@@ -204,7 +204,7 @@ sim_create_y <- function(noise_type, f, snr, phi, N_trials) {
 #' @param names argument to \code{simulate_data}
 #' @param n_cat the \code{n_categs} argument to \code{simulate_data}
 #' @return the covariate names
-sim_check_covariates <- function(covariates, relevances, names, n_cat) {
+sim.check_covariates <- function(covariates, relevances, names, n_cat) {
 
   # Validity check
   d0 <- sum(covariates == 0)
@@ -217,14 +217,13 @@ sim_check_covariates <- function(covariates, relevances, names, n_cat) {
 
   if (!is.null(names)) {
     # Check input names
-    L4 <- length(names)
-    if (L4 != L1) stop("length(names) must be the same as length(covariates)")
+    check_lengths(names, covariates)
     names <- c("id", "age", names)
   } else {
     # Generate default names
-    names <- sim_generate_names(covariates)
+    names <- sim.generate_names(covariates)
   }
-  if (sum(relevances < 0) > 0) stop("The relevances must be non-negative!")
+  check_non_negative_all(relevances)
   return(names)
 }
 
@@ -232,35 +231,26 @@ sim_check_covariates <- function(covariates, relevances, names, n_cat) {
 #' Generate names for covariates
 #' @param covariates vector of covariate types
 #' @return covariate names
-sim_generate_names <- function(covariates) {
+sim.generate_names <- function(covariates) {
 
   # Get default names
   names <- c("id", "age")
   def <- c("x", "z", "offset", "group")
-  D <- sim_create_x_D(covariates)
+  D <- sim.create_x_D(covariates)
   if (D[1] == 1) {
     names <- c(names, "diseaseAge")
   }
   if (D[2] > 0) {
-    if (D[2] > 1) {
-      names <- c(names, paste(def[1], 1:D[2], sep = ""))
-    } else {
-      names <- c(names, def[1])
-    }
+    str <- paste0(def[1], 1:D[2])
+    names <- if (D[2] > 1) c(names, str) else c(names, def[1])
   }
   if (D[3] > 0) {
-    if (D[3] > 1) {
-      names <- c(names, paste(def[2], 1:D[3], sep = ""))
-    } else {
-      names <- c(names, def[2])
-    }
+    str <- paste0(def[2], 1:D[3])
+    names <- if (D[3] > 1) c(names, str) else c(names, def[2])
   }
   if (D[4] > 0) {
-    if (D[4] > 1) {
-      names <- c(names, paste(def[3], 1:D[4], sep = ""))
-    } else {
-      names <- c(names, def[3])
-    }
+    str <- paste0(def[3], 1:D[4])
+    names <- if (D[4] > 1) c(names, str) else c(names, def[3])
   }
   if (D[5] > 0) {
     names <- c(names, "group")
@@ -275,7 +265,7 @@ sim_generate_names <- function(covariates) {
 #' @param t_observed Determines how the disease onset is observed. See
 #' documentation of \code{\link{simulate_data}}.
 #' @return a new data frame and observed onsets
-sim_data_to_observed <- function(dat, t_observed) {
+sim.data_to_observed <- function(dat, t_observed) {
   flag <- !("diseaseAge" %in% colnames(dat))
   id <- dollar(dat, "id")
   uid <- unique(id)
@@ -306,29 +296,20 @@ sim_data_to_observed <- function(dat, t_observed) {
 
         # sample the observed onset t0
         if (is.function(t_observed)) {
-          t_possible <- t_observed(t0_real)
-          inds0 <- which(rem > t_possible)
-          if (length(inds0) < 1) {
-            stop("There are no data points after t = ", t_possible, "!")
-          } else {
-            idx0 <- inds0[1] # next meas. point after detection is possible
-            t0 <- rem[idx0]
-          }
+          oo <- sim.apply_obs_onset_fun(t_observed, t0_real, rem)
+          t0 <- dollar(oo, "t0")
+          idx0 <- dollar(oo, "idx0")
         } else {
-          parsed <- sim_parse_t_obs(t_observed)
+          parsed <- sim.parse_t_obs(t_observed)
           typ <- dollar(parsed, "type")
           val <- dollar(parsed, "value")
           if (typ == "random") {
-            idx0 <- sim_rtgeom(length(irem), val)
-            if (idx0 > length(rem)) {
-              stop("Not enough data points to go that far!")
-            }
+            idx0 <- sim.rtgeom(length(irem), val)
+            sim.check_too_far(idx0, rem)
             t0 <- rem[idx0]
           } else if (typ == "after") {
             idx0 <- val + 1
-            if (idx0 > length(rem)) {
-              stop("Not enough data points to go that far!")
-            }
+            sim.check_too_far(idx0, rem)
             t0 <- rem[idx0]
           } else {
             t0 <- t0_real
@@ -345,12 +326,43 @@ sim_data_to_observed <- function(dat, t_observed) {
   }
 }
 
+#' Check if trying to simulate onset happening after measurement interval
+#'
+#' @param fun_obs function for generating the observed onset
+#' from real onset
+#' @param t0_real the real onset
+#' @param rem measurement points after real onset
+#' @return a list with names \code{idx0} and \code{t0}
+sim.apply_onset_fun <- function(fun_obs, t0_real, rem) {
+  t_possible <- fun_obs(t0_real)
+  inds0 <- which(rem > t_possible)
+  if (length(inds0) < 1) {
+    stop("There are no data points after t = ", t_possible, "!")
+  } else {
+    idx0 <- inds0[1] # next meas. point after detection is possible
+    t0 <- rem[idx0]
+  }
+  list(idx0 = idx0, t0 = t0)
+}
+
+#' Check if trying to simulate onset happening after measurement interval
+#'
+#' @param idx index of onset point relative to real onset
+#' @param rem measurement points after real onset
+sim.check_too_far <- function(idx, rem) {
+  check_length(idx, 1)
+  if (idx > length(rem)) {
+    stop("Not enough data points to go that far!")
+  }
+  TRUE
+}
+
 #' Sample from the 'truncated geometric' distribution
 #' @param p a number between 0 and 1
 #' @param s an integer
 #' @param n number of samples
 #' @return an integer from the interval 1...n
-sim_rtgeom <- function(s, p, n = 1) {
+sim.rtgeom <- function(s, p, n = 1) {
   s_seq <- 0:(s - 1)
   prob <- p^s_seq
   r <- sample.int(n = s, size = n, prob = prob, replace = TRUE)
@@ -361,7 +373,7 @@ sim_rtgeom <- function(s, p, n = 1) {
 #' Parse the t_observed argument of \code{simulate_data}
 #' @param t_observed a string
 #' @return a list with a name and number
-sim_parse_t_obs <- function(t_observed) {
+sim.parse_t_obs <- function(t_observed) {
   parts <- strsplit(t_observed, "_")[[1]]
   if (parts[1] == "after") {
     type <- "after"
@@ -378,7 +390,7 @@ sim_parse_t_obs <- function(t_observed) {
 
 #' Simulate latent function components for longitudinal data analysis
 #'
-#' @param X input data matrix (generated by \code{\link{sim_create_x}})
+#' @param X input data matrix (generated by \code{\link{sim.create_x}})
 #' @param covariates Integer vector that defines the types of covariates
 #' (other than id and age). Different integers correspond to the
 #' following covariate types:
@@ -412,7 +424,7 @@ sim_parse_t_obs <- function(t_observed) {
 #' component) be forced to have a zero mean?
 #' @return a data frame FFF where one column corresponds to one additive
 #' component
-sim_create_f <- function(X,
+sim.create_f <- function(X,
                          covariates,
                          relevances,
                          lengthscales,
@@ -436,22 +448,22 @@ sim_create_f <- function(X,
     }
   }
 
-  KK <- sim_kernels(
+  KK <- sim.kernels(
     X, D, lengthscales,
     X_affected, bin_kernel,
     useMaskedVarianceKernel,
     steepness, vm_params
   )
 
-  labs <- sim_name_components(D, colnames(X))
-  FFF <- sim_draw_components(KK)
+  labs <- sim.name_components(D, colnames(X))
+  FFF <- sim.draw_components(KK)
   if (sum(D == 3) == 1) {
     i_dis <- which(labs == "diseaseAge")
   } else {
     i_dis <- -1
   }
   if (i_dis > 0 && is.function(dis_fun)) {
-    FFF[, i_dis] <- sim_disease_effect(X[, 1], X[, 3], dis_fun)
+    FFF[, i_dis] <- sim.disease_effect(X[, 1], X[, 3], dis_fun)
   } else {
     # do nothing, keep the component drawn from a GP
   }
@@ -463,7 +475,7 @@ sim_create_f <- function(X,
     i_skip <- c(i_dis)
   }
 
-  FFF <- sim_scale_relevances(FFF, relevances,
+  FFF <- sim.scale_relevances(FFF, relevances,
     force_zeromean = force_zeromean, i_skip
   )
   colnames(FFF) <- labs
@@ -493,7 +505,7 @@ sim_create_f <- function(X,
 #' @param steepness steepness of the input warping function
 #' @param vm_params parameters of the variance mask function
 #' @return a 3D array
-sim_kernels <- function(X,
+sim.kernels <- function(X,
                         types,
                         lengthscales,
                         X_affected,
@@ -518,37 +530,37 @@ sim_kernels <- function(X,
     if (types[j] == 1) {
       j_ell <- j_ell + 1
       N_tot <- length(unique(xj))
-      Kj <- sim_kernel_zerosum(id, id, N_tot) *
-        sim_kernel_se(t, t, ell = ell[j_ell])
+      Kj <- sim.kernel_zerosum(id, id, N_tot) *
+        sim.kernel_se(t, t, ell = ell[j_ell])
     } else if (types[j] == 2) {
       j_ell <- j_ell + 1
-      Kj <- sim_kernel_se(t, t, ell = ell[j_ell])
+      Kj <- sim.kernel_se(t, t, ell = ell[j_ell])
     } else if (types[j] == 3) {
       j_ell <- j_ell + 1
-      Kj <- sim_kernel_bin(X_affected, X_affected) *
-        sim_kernel_ns(xj, xj, ell = ell[j_ell], a = steepness, b = 0, c = 1)
+      Kj <- sim.kernel_bin(X_affected, X_affected) *
+        sim.kernel_ns(xj, xj, ell = ell[j_ell], a = steepness, b = 0, c = 1)
       if (useMaskedVarianceKernel) {
-        M <- sim_kernel_var_mask(xj, xj, vm_params, stp = steepness)
+        M <- sim.kernel_var_mask(xj, xj, vm_params, stp = steepness)
         Kj <- Kj * M
       }
     } else if (types[j] == 4) {
       j_ell <- j_ell + 1
-      Kj <- sim_kernel_se(xj, xj, ell = ell[j_ell])
+      Kj <- sim.kernel_se(xj, xj, ell = ell[j_ell])
     } else if (types[j] == 5) {
       j_ell <- j_ell + 1
       if (bin_kernel) {
-        Kj <- sim_kernel_bin(xj, xj) * sim_kernel_se(t, t, ell = ell[j_ell])
+        Kj <- sim.kernel_bin(xj, xj) * sim.kernel_se(t, t, ell = ell[j_ell])
       } else {
         N_cat <- length(unique(xj))
-        Kj <- sim_kernel_zerosum(xj, xj, N_cat) *
-          sim_kernel_se(t, t, ell = ell[j_ell])
+        Kj <- sim.kernel_zerosum(xj, xj, N_cat) *
+          sim.kernel_se(t, t, ell = ell[j_ell])
       }
     } else if (types[j] == 6) {
       if (bin_kernel) {
-        Kj <- sim_kernel_bin(xj, xj)
+        Kj <- sim.kernel_bin(xj, xj)
       } else {
         N_cat <- length(unique(xj))
-        Kj <- sim_kernel_zerosum(xj, xj, N_cat)
+        Kj <- sim.kernel_zerosum(xj, xj, N_cat)
       }
     } else {
       stop("types contains invalid values")
@@ -563,7 +575,7 @@ sim_kernels <- function(X,
 #' @param types vector of covariate types
 #' @param names names of the covariates
 #' @return a vector of component names
-sim_name_components <- function(types, names) {
+sim.name_components <- function(types, names) {
   d <- length(types)
   componentNames <- rep("foo", d)
   for (j in 1:d) {
@@ -589,12 +601,12 @@ sim_name_components <- function(types, names) {
 #' @param i_skip induces of components for which the zero-mean forcing is
 #' skipped
 #' @return a new matrix \code{FFF}
-sim_scale_relevances <- function(FFF, relevances,
+sim.scale_relevances <- function(FFF, relevances,
                                  force_zeromean, i_skip) {
 
   # Some input checking
   d <- dim(FFF)[2]
-  if (any(relevances < 0)) stop("negative relevances not allowed!")
+  check_non_negative_all(relevances)
 
   # Scale the columns to correct relevances
   for (j in 1:d) {
@@ -614,7 +626,7 @@ sim_scale_relevances <- function(FFF, relevances,
 #'
 #' @param KK 3D matrix where \code{KK[,,j]} is the \code{j}th kernel matrix
 #' @return a matrix \code{FFF}
-sim_draw_components <- function(KK) {
+sim.draw_components <- function(KK) {
   n <- dim(KK)[1]
   d <- dim(KK)[3]
   mu0 <- rep(0, n)
@@ -633,7 +645,7 @@ sim_draw_components <- function(KK) {
 #' @param X_disAge the diseaseAge covariate
 #' @param dis_fun the disease age effect function
 #' @return a vector
-sim_disease_effect <- function(X_id, X_disAge, dis_fun) {
+sim.disease_effect <- function(X_id, X_disAge, dis_fun) {
   n <- length(X_id)
   uid <- unique(X_id)
   F_disAge <- rep(0, n)
@@ -650,14 +662,14 @@ sim_disease_effect <- function(X_id, X_disAge, dis_fun) {
 #' Simulate an input data frame X
 #'
 #' @param names Covariate names.
-#' @inheritParams sim_create_x_D
-#' @inheritParams sim_create_x_check
-#' @inheritParams sim_create_x_dis_age
-#' @inheritParams sim_create_x_other
+#' @inheritParams sim.create_x_D
+#' @inheritParams sim.create_x_check
+#' @inheritParams sim.create_x_dis_age
+#' @inheritParams sim.create_x_other
 #' @param t_jitter Standard deviation of the jitter added to the given
 #' measurement times.
 #' @return a list
-sim_create_x <- function(N,
+sim.create_x <- function(N,
                          covariates,
                          names,
                          n_categs,
@@ -667,25 +679,25 @@ sim_create_x <- function(N,
                          continuous_info) {
 
   # Validate input
-  D <- sim_create_x_D(covariates)
-  checked <- sim_create_x_check(n_categs, D, t_data, t_effect_range)
+  D <- sim.create_x_D(covariates)
+  checked <- sim.create_x_check(n_categs, D, t_data, t_effect_range)
 
   # Initialize data
   k <- length(t_data)
   id <- rep(1:N, each = k)
   id <- as.factor(id)
-  age <- sim_draw_measurement_times(N, t_data, t_jitter)
+  age <- sim.draw_measurement_times(N, t_data, t_jitter)
   X <- data.frame(id, age)
 
   # Effect times and disease ages
   et_range <- dollar(checked, "t_effect_range")
-  parsed_dis <- sim_create_x_dis_age(X, k, N, D, age, et_range)
+  parsed_dis <- sim.create_x_dis_age(X, k, N, D, age, et_range)
   dis_age <- parsed_dis$dis_age
   X <- parsed_dis$X
 
   # Other covariates
   cinfo <- continuous_info
-  parsed_x <- sim_create_x_other(X, k, N, D, n_categs, dis_age, cinfo)
+  parsed_x <- sim.create_x_other(X, k, N, D, n_categs, dis_age, cinfo)
   X <- dollar(parsed_x, "X")
   colnames(X) <- names
 
@@ -699,7 +711,7 @@ sim_create_x <- function(N,
   )
 }
 
-#' Helper function for sim_create_x
+#' Helper function for sim.create_x
 #'
 #' @param covariates Integer vector that defines the types of covariates
 #' (other than id and age). If not given, only the id and age
@@ -714,7 +726,7 @@ sim_create_x <- function(N,
 #'   is restricted to have value 0 for controls and 1 for cases
 #' }
 #' @return an array of five integers
-sim_create_x_D <- function(covariates) {
+sim.create_x_D <- function(covariates) {
   D <- rep(0, 5)
   D[1] <- sum(covariates == 0)
   D[2] <- sum(covariates == 1)
@@ -724,7 +736,7 @@ sim_create_x_D <- function(covariates) {
   return(D)
 }
 
-#' Input check helper function for sim_create_x
+#' Input check helper function for sim.create_x
 #'
 #' @param n_categs An integer vector defining the number of categories
 #' for each categorical covariate, so that \code{length(n_categs)} equals to
@@ -735,17 +747,17 @@ sim_create_x_D <- function(covariates) {
 #' sampled uniformly. Alternatively, This can any function that returns the
 #' (possibly randomly generated) real disease effect time for one individual.
 #' @return a list
-sim_create_x_check <- function(n_categs, D, t_data, t_effect_range) {
+sim.create_x_check <- function(n_categs, D, t_data, t_effect_range) {
 
   # Check length of n_categs
   L1 <- length(n_categs)
   L2 <- sum(D[3:4])
+  msg <- paste0(
+    "Length of <n_categs> must be same as the number of 2's",
+    " and 3's in the <covariates> vector!",
+    " Found = ", L1, ", should be = ", L2, "."
+  )
   if (L1 != L2) {
-    msg <- paste0(
-      "Length of <n_categs> must be same as the number of 2's",
-      " and 3's in the <covariates> vector!",
-      " Found = ", L1, ", should be = ", L2, "."
-    )
     stop(msg)
   }
 
@@ -780,7 +792,7 @@ sim_create_x_check <- function(n_categs, D, t_data, t_effect_range) {
   )
 }
 
-#' Helper function for sim_create_x
+#' Helper function for sim.create_x
 #'
 #' @param X current covariate matrix
 #' @param k number of time points per individual
@@ -789,7 +801,7 @@ sim_create_x_check <- function(n_categs, D, t_data, t_effect_range) {
 #' @param age the age covariate
 #' @param t_effect_range Parsed version of \code{t_effect_range}
 #' @return list
-sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
+sim.create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
   if (D[1] > 0) {
     N_cases <- round(N / 2)
     if (is.function(t_effect_range)) {
@@ -804,7 +816,7 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
       )
     }
     teff <- c(teff, rep(NaN, N - N_cases))
-    dis_age <- sim_onsets_to_dis_age(teff, age, k)
+    dis_age <- sim.onsets_to_dis_age(teff, age, k)
     X <- cbind(X, dis_age)
   } else {
     dis_age <- NULL
@@ -825,10 +837,10 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
 
 
 
-#' Helper function for sim_create_x
+#' Helper function for sim.create_x
 #'
-#' @inheritParams sim_create_x_dis_age
-#' @inheritParams sim_create_x_check
+#' @inheritParams sim.create_x_dis_age
+#' @inheritParams sim.create_x_check
 #' @param continuous_info Info for generating continuous covariates. Must be a
 #' list containing fields \code{lambda} and \code{mu}, which have length 3.
 #' The continuous covariates are generated so that \code{x <- sin(a*t + b) + c},
@@ -841,11 +853,11 @@ sim_create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
 #' }
 #' @param dis_age a disease-age vector
 #' @return a list
-sim_create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
+sim.create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
   if (D[2] > 0) {
     mu <- dollar(continuous_info, "mu")
     lambda <- dollar(continuous_info, "lambda")
-    CONT <- sim_draw_continuous(N, k, D[2], mu, lambda)
+    CONT <- sim.draw_continuous(N, k, D[2], mu, lambda)
     cont <- dollar(CONT, "C")
     par_cont <- list(
       a = dollar(CONT, "A"),
@@ -858,7 +870,7 @@ sim_create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
   }
 
   if ((D[3] + D[4]) > 0) {
-    categ <- sim_draw_categorical(N, k, n_categs)
+    categ <- sim.draw_categorical(N, k, n_categs)
     X <- cbind(X, categ)
   }
 
@@ -886,7 +898,7 @@ sim_create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
 #' @param t_jitter Standard deviation of the jitter added to the given
 #' measurement times.
 #' @return a vector of length \code{N*k}
-sim_draw_measurement_times <- function(N, t_data, t_jitter) {
+sim.draw_measurement_times <- function(N, t_data, t_jitter) {
   k <- length(t_data)
   age <- rep(0, N * k)
   check_non_negative(t_jitter)
@@ -904,7 +916,7 @@ sim_draw_measurement_times <- function(N, t_data, t_jitter) {
 #' @param onsets true disease effect times, a vector of length \code{N}
 #' @param k number of measurements per individual
 #' @return the diseaseAge covariate, a vector of length \code{N*k}
-sim_onsets_to_dis_age <- function(onsets, age, k) {
+sim.onsets_to_dis_age <- function(onsets, age, k) {
   N <- length(onsets)
   n <- N * k
   diseaseAge <- rep(0, n)
@@ -928,7 +940,7 @@ sim_onsets_to_dis_age <- function(onsets, age, k) {
 #' @param mu a vector of length 3
 #' @param lambda a vector of length 3
 #' @return a matrix of size \code{N} x \code{D}
-sim_draw_continuous <- function(N, k, D, mu, lambda) {
+sim.draw_continuous <- function(N, k, D, mu, lambda) {
   C <- matrix(0, N * k, D)
   A <- matrix(0, N, D)
   B <- matrix(0, N, D)
@@ -957,7 +969,7 @@ sim_draw_continuous <- function(N, k, D, mu, lambda) {
 #' @param v vector of numbers of different categories
 #' @return a data frame with \code{N} rows and \code{D} = \code{length(v)}
 #' columns
-sim_draw_categorical <- function(N, k, v) {
+sim.draw_categorical <- function(N, k, v) {
   D <- length(v)
   C <- matrix(0, N, D)
   for (i in seq_len(D)) {
@@ -979,7 +991,7 @@ sim_draw_categorical <- function(N, k, v) {
 #' @param alpha marginal std (default = 1)
 #' @param ell lengthscale (default = 1)
 #' @return A kernel matrix of size n x m
-sim_kernel_se <- function(x1, x2, alpha = 1, ell = 1) {
+sim.kernel_se <- function(x1, x2, alpha = 1, ell = 1) {
   check_positive(ell)
   check_non_negative(alpha)
   n1 <- length(x1)
@@ -998,7 +1010,7 @@ sim_kernel_se <- function(x1, x2, alpha = 1, ell = 1) {
 #' @param M number of categories
 #' @param alpha marginal std (default = 1)
 #' @return A (binary) kernel matrix of size n x m
-sim_kernel_zerosum <- function(x1, x2, M, alpha = 1) {
+sim.kernel_zerosum <- function(x1, x2, M, alpha = 1) {
   check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
@@ -1022,7 +1034,7 @@ sim_kernel_zerosum <- function(x1, x2, M, alpha = 1) {
 #' @param alpha marginal std (default = 1)
 #' @param pos_class the positive class label
 #' @return A kernel matrix of size n x m
-sim_kernel_bin <- function(x1, x2 = NULL, alpha = 1, pos_class = 1) {
+sim.kernel_bin <- function(x1, x2 = NULL, alpha = 1, pos_class = 1) {
   check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
@@ -1044,15 +1056,15 @@ sim_kernel_bin <- function(x1, x2 = NULL, alpha = 1, pos_class = 1) {
 #' @param c maximum range
 #' @param nan_replace the value to use for replacing NaN values
 #' @return A kernel matrix of size n x m
-sim_kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c,
+sim.kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c,
                           nan_replace = 0) {
   check_positive(a)
   check_positive(c)
   x1[is.nan(x1)] <- nan_replace
   x2[is.nan(x2)] <- nan_replace
-  w1 <- sim_warp_input(x1, a, b, c)
-  w2 <- sim_warp_input(x2, a, b, c)
-  K <- sim_kernel_se(w1, w2, alpha, ell)
+  w1 <- sim.warp_input(x1, a, b, c)
+  w2 <- sim.warp_input(x2, a, b, c)
+  K <- sim.kernel_se(w1, w2, alpha, ell)
   return(K)
 }
 
@@ -1064,7 +1076,7 @@ sim_kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c,
 #' @param row_to_caseID_1 mapping from row index to case ID
 #' @param row_to_caseID_2 mapping from row index to case ID
 #' @return a matrix
-sim_kernel_beta <- function(beta, row_to_caseID_1, row_to_caseID_2) {
+sim.kernel_beta <- function(beta, row_to_caseID_1, row_to_caseID_2) {
   n1 <- length(row_to_caseID_1)
   n2 <- length(row_to_caseID_2)
   BETA <- matrix(0, n1, n2)
@@ -1097,7 +1109,7 @@ sim_kernel_beta <- function(beta, row_to_caseID_1, row_to_caseID_2) {
 #' @param stp input warping steepness
 #' @param nan_replace value to replace nans in disAge vectors
 #' @return a matrix of size \code{n1} x \code{n2}
-sim_kernel_var_mask <- function(disAge1, disAge2, vm_params,
+sim.kernel_var_mask <- function(disAge1, disAge2, vm_params,
                                 stp, nan_replace = 0) {
   disAge1[is.nan(disAge1)] <- nan_replace
   disAge2[is.nan(disAge2)] <- nan_replace
@@ -1106,8 +1118,8 @@ sim_kernel_var_mask <- function(disAge1, disAge2, vm_params,
   check_positive(vm_params[2])
   a <- stp * vm_params[2]
   r <- 1 / a * log(vm_params[1] / (1 - vm_params[1]))
-  s1 <- sim_var_mask(disAge1 - r, a)
-  s2 <- sim_var_mask(disAge2 - r, a)
+  s1 <- sim.var_mask(disAge1 - r, a)
+  s2 <- sim.var_mask(disAge2 - r, a)
   M <- tcrossprod(s1, s2)
   return(M)
 }
@@ -1120,7 +1132,7 @@ sim_kernel_var_mask <- function(disAge1, disAge2, vm_params,
 #' @param b location of the effective time window
 #' @param c maximum range
 #' @return a vector of warped inputs \code{w(t)}
-sim_warp_input <- function(t, a, b, c) {
+sim.warp_input <- function(t, a, b, c) {
   w <- 2 * c * (-0.5 + 1 / (1 + exp(-a * (t - b))))
   return(w)
 }
@@ -1130,7 +1142,7 @@ sim_warp_input <- function(t, a, b, c) {
 #' @param x  vector of length \code{n}
 #' @param a a positive real number
 #' @return a vector of length \code{n}
-sim_var_mask <- function(x, a) {
+sim.var_mask <- function(x, a) {
   y <- 1 / (1 + exp(-a * x))
   return(y)
 }

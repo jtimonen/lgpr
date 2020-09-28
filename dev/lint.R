@@ -1,5 +1,3 @@
-# This file is only for development purposes and not a part of the package
-# itself. Run this in the package root directory to lint the package code.
 require(lintr)
 
 # Specify linters
