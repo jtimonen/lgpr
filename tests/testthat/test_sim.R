@@ -104,7 +104,7 @@ test_that("error is thrown with invalid input", {
     covariates = c(2),
     lengthscales = c(10, 10, 3, 3)
   ), "lengthscales has length 4, should be 3")
-  
+
   expect_error(simulate_data(
     N = 4,
     t_data = c(1, 2, 3),
@@ -112,14 +112,13 @@ test_that("error is thrown with invalid input", {
     lengthscales = c(10, 10, 3, 3),
     N_affected = 1000
   ), "N_affected cannot be greater than")
-  
+
   expect_error(simulate_data(
     N = 4,
     t_data = c(1, 2, 3),
-    covariates = c(2,1,0),
+    covariates = c(2, 1, 0),
     lengthscales = c(10, 10, 3, 3),
   ), "covariates vector must be increasing")
-  
 })
 
 test_that("different types of components can be simulated", {
