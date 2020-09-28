@@ -2,9 +2,9 @@
 % Please edit documentation in R/MethodsFit.R
 \name{ppc}
 \alias{ppc}
-\title{Posterior or prior predictive checks for lgpfit objects}
+\title{Graphical posterior or prior predictive checks}
 \usage{
-ppc(fit, data, fun = bayesplot::ppc_dens_overlay, ...)
+ppc(fit, data, fun = default_ppc_fun(fit), ...)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
@@ -13,12 +13,17 @@ ppc(fit, data, fun = bayesplot::ppc_dens_overlay, ...)
 
 \item{fun}{\code{bayesplot} function name}
 
-\item{...}{arguments passed to the default [bayesplot::pp_check()] method in
+\item{...}{additional arguments passed to the default
+\code{\link[bayesplot]{pp_check}} method in
 \code{bayesplot}}
 }
 \value{
 a \code{ggplot} object
 }
 \description{
-Posterior or prior predictive checks for lgpfit objects
+Graphical posterior or prior predictive checks
+}
+\seealso{
+Introduction to graphical posterior predictive
+checks: \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
 }

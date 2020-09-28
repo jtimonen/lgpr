@@ -17,7 +17,7 @@ See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usa
   to have your toolchain setup properly. 
   -  On Windows, install Rtools as explained [here](https://github.com/stan-dev/rstan/wiki/Installing-RStan-from-source-on-Windows#configuration). You also need to complete the **Configuration** step, as described in the
   above link.
-  - On Mac, see toolchain configuration [here](https://github.com/stan-dev/rstan/wiki/Installing-RStan-from-source-on-a-Mac")
+  - On Mac, see toolchain configuration [here](https://github.com/stan-dev/rstan/wiki/Installing-RStan-from-source-on-a-Mac)
   - R 3.4 or later is required, R 4.0.2 or later is recommended
 
 ## Installation

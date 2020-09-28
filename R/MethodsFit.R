@@ -1,13 +1,17 @@
-#' Posterior or prior predictive checks for lgpfit objects
+#' Graphical posterior or prior predictive checks
 #'
 #' @export
 #' @inheritParams get_draws
 #' @param data the original data frame
 #' @param fun \code{bayesplot} function name
-#' @param ... arguments passed to the default [bayesplot::pp_check()] method in
+#' @param ... additional arguments passed to the default
+#' \code{\link[bayesplot]{pp_check}} method in
 #' \code{bayesplot}
 #' @return a \code{ggplot} object
-ppc <- function(fit, data, fun = bayesplot::ppc_dens_overlay, ...) {
+#' @seealso Introduction to graphical posterior predictive
+#' checks: \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
+#'
+ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
   check_type(fit, "lgpfit")
   check_type(data, "data.frame")
   check_type(fun, "function")

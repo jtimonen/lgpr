@@ -5,9 +5,12 @@
 #'   \item \code{default_vm_params} returns variance mask function parameters
 #'   (two numbers)
 #'   \item \code{default_prior} returns a named list that defines a prior
+#'   \item \code{default_ppc_fun} returns a function to be used as argument
+#'   of \code{\link{ppc}}
 #' }
 #' @param name parameter name
 #' @param num_uncrt number of uncertain components
+#' @param object an object of class \linkS4class{lgpfit} or \code{lgpmodel}
 #' @return see description
 #' @name defaults
 NULL
@@ -72,4 +75,14 @@ default_prior_effect_time_info <- function(num_uncrt) {
     desc <- list(desc)
   }
   return(desc)
+}
+
+#' @rdname defaults
+default_ppc_fun <- function(object) {
+  likelihood <- get_obs_model(object)
+  f1 <- bayesplot::ppc_dens_overlay
+  f2 <- bayesplot::ppc_hist
+  fun <- if (likelihood == "gaussian") f1 else f2
+  check_type(fun, "function")
+  return(fun)
 }
