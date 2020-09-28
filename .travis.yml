@@ -5,14 +5,15 @@ cache: packages
 dist: xenial
 addons:
   apt:
-    packages: libnode-dev
+    sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-5.0' ]        
+    packages:
+      - llvm-5.0-dev
+      - libnode-dev
+      - libv8-dev
     
 latex: true
 r_build_args: '--no-build-vignettes'
 r_check_args: '--ignore-vignettes'
-
-r_github_packages:
-  - jimhester/covr
 
 env:
   global:
@@ -45,7 +46,6 @@ after_script:
 
 after_success:
   - travis_wait 40 tar -C .. -xf $PKG_TARBALL
-  - travis_wait 40 Rscript -e 'covr::codecov()'
 
 after_failure:
   - cat lgpr.Rcheck/00*
