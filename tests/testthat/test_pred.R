@@ -157,10 +157,11 @@ test_that("inferred components can be visualized", {
 
 # -------------------------------------------------------------------------
 
-context("Out-of-sample prediction (gaussian)")
+context("Out-of-sample prediction")
 
 t <- seq(0, 50, by = 5)
 x1_pred <- new_x(data1, t, x_ns = "diseaseAge")
+x2_pred <- new_x(data2, t, x_ns = "diseaseAge")
 
 test_that("prediction kernel computations work correctly", {
   kers <- pred_kernels(fit1, x1_pred, NULL, NULL)
@@ -180,6 +181,17 @@ test_that("predict.gaussian works correctly", {
   expect_equal(dim(out@y_mean), c(1, 44))
 })
 
+test_that("predict.kr works correctly", {
+  out <- pred(fit2, x2_pred, reduce = mean)
+  expect_equal(dim(out@h), c(1, 44))
+  out <- pred(fit2, x2_pred, reduce = NULL)
+  expect_equal(dim(out@h), c(50, 44))
+})
+
+
+# -------------------------------------------------------------------------
+
+context("Out-of-sample prediction visualization")
 
 test_that("out-of-sample predictions can be visualized", {
   os1 <- pred(fit1, x1_pred)
@@ -196,6 +208,27 @@ test_that("out-of-sample inferred components can be visualized", {
   p1 <- plot_f(fit1, pred = os1, x = x1_pred)
   p2 <- plot_f(fit1,
     pred = os2, x = x1_pred, comp_idx = 3,
+    color_by = "diseaseAge"
+  )
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+})
+
+test_that("out-of-sample KR can be visualized", {
+  os1 <- pred(fit2, x2_pred)
+  os2 <- pred(fit2, x2_pred, reduce = NULL, draws = c(8:10))
+  p1 <- plot_pred(fit2, pred = os1, x = x2_pred)
+  p2 <- plot_pred(fit2, pred = os2, x = x2_pred)
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+})
+
+test_that("out-of-sample KR components can be visualized", {
+  os1 <- pred(fit2, x2_pred)
+  os2 <- pred(fit2, x2_pred, reduce = NULL, draws = c(8:10))
+  p1 <- plot_f(fit2, pred = os2, x = x2_pred)
+  p2 <- plot_f(fit2,
+    pred = os2, x = x2_pred, comp_idx = 3,
     color_by = "diseaseAge"
   )
   expect_s3_class(p1, "ggplot")

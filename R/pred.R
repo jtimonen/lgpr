@@ -74,7 +74,16 @@ pred.kr <- function(fit, x, reduce, draws, STREAM = get_stream()) {
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   pred <- get_pred(fit, draws = draws, reduce = reduce)
-  pred.kr_compute(kernels, pred, delta, STREAM)
+  kr <- pred.kr_compute(kernels, pred, delta, STREAM)
+  f <- dollar(kr, "f")
+  likelihood <- get_obs_model(fit)
+
+  # Return
+  new("Prediction",
+    f_comp = arr3_to_list(dollar(kr, "f_comp")),
+    f = f,
+    h = link_inv(f, likelihood)
+  )
 }
 
 #' Compute all kernel matrices required for computing predictions
@@ -152,7 +161,32 @@ pred.kr_compute <- function(kernels, pred, delta, STREAM = get_stream()) {
   K <- dollar(kernels, "data_vs_data")
   Ks <- dollar(kernels, "pred_vs_data")
   Kss <- dollar(kernels, "pred_vs_pred")
-  stop("not implemented")
+  f_comp <- pred@f_comp # list, each elem has shape num_draws x num_obs
+  num_draws <- dim(Kss)[1]
+  D <- dim(Kss)[2]
+  num_obs <- dim(K)[3]
+  num_pred <- dim(Kss)[3]
+  out <- array(0, dim = c(D + 1, num_draws, num_pred))
+  DELTA <- DELTA <- delta * diag(num_obs)
+  for (i in seq_len(num_draws)) {
+    f_sum <- 0
+    for (j in seq_len(D)) {
+      fj <- f_comp[[j]]
+      k <- K[i, j, , ] + DELTA
+      ks <- Ks[i, j, , ]
+      f <- fj[i, ]
+      f_pred <- ks %*% solve(k, f)
+      out[j, i, ] <- f_pred
+      f_sum <- f_sum + f_pred
+    }
+    out[D + 1, i, ] <- f_sum
+  }
+
+  # Return
+  list(
+    f_comp = out[1:D, , , drop = FALSE],
+    f = arr3_select(out, D + 1)
+  )
 }
 
 #' Kernel matrix computation using the C++ functions of the package namespace
