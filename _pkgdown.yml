@@ -43,7 +43,7 @@ reference:
   - simulate_data 
   - student_t 
   - uniform 
-  - validate_data 
+  - validate_data
   
 - title: "Data"
   desc: ~
@@ -69,8 +69,6 @@ navbar:
     articles:
       text: Tutorials
       menu:
-      - text: Basic usage
-        href: articles/basic-usage.html
       - text: Vignettes
         href: articles/index.html
     overview:

@@ -37,7 +37,6 @@ pred <- function(fit, x, reduce = mean, draws = NULL, show_progbar = TRUE,
                  STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
-  # show_progbar <- if (is.null(reduce)) show_progbar else FALSE
   if (f_sampled) {
     out <- pred.kr(fit, x, reduce, draws, show_progbar, STREAM)
   } else {
