@@ -1,0 +1,73 @@
+---
+title: "Defining a model in lgpr"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Defining a model in lgpr}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{r load}
+require(lgpr)
+require(ggplot2)
+require(nlme) # the Orthodont data is in this package
+```
+
+## The probabilistic model
+
+Bayesian modeling involves defining the joint (prior) distribution of
+all unknowns, and conditioning on the data to get their posterior distribution. In additive Gaussian process (GP) models of `lgpr`, which model a signal
+$$
+f = f^{(1)} + \ldots + f^{(J)}
+$$
+these unknowns are
+
+  * the functions $f^{(j)}$, which have a GP prior
+  * kernel hyperparameters of those GP priors
+  * possible parameters related to the observation model
+  * possible parameters related to covariate uncertainty
+
+## The Orthodont data
+In this notebook we use the `sleepstudy` data, which consists of reaction time measurements for 18 individuals, who where restricted sleep only 3 hours each night, over a time period of 10 days.
+```{r data1}
+dat <- data.frame(Orthodont)
+str(dat)
+```
+```{r data2, fig.width=6.5, fig.height=4.3}
+plot_data(dat, x_name = "age", y_name = "distance", group_by = "Subject",
+          color_by = "Sex")
+```
+
+## Model formula
+We create a model with the continuous variable `Days` and categorical variable `Subject` as predictors for `Reaction`. 
+```{r data3, fig.width=6.1, fig.height=4.3}
+model <- create_model(distance ~ age + age|Sex + age|Subject, dat)
+model_summary(model)
+```
+The formula `distance ~ age + age|Sex + age|Subject` has the same format as for example in the `lme4` package for linear mixed effect models. This formula
+is automatically converted to the more specific format `distance ~ gp(age) + gp(age)*zs(Sex) + gp(age)*zs(Subject)`. It creates a
+model with three components:
+  * the shared effect of age
+  * the sex-specific deviation from the shared age effect
+  * the subject-specific deviation from the shared age effect
+
+## Parameter priors
+In above model, we did not speficy the parameter priors, so default priors were
+used
+
+## Prior predictive checks
+
+## Other arguments
+
+## Fitting the model
+
+

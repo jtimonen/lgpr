@@ -4,7 +4,7 @@
 \alias{parse_formula}
 \title{Create a model formula}
 \usage{
-parse_formula(formula, data)
+parse_formula(formula, data, verbose = FALSE)
 }
 \arguments{
 \item{formula}{The model formula, where
@@ -24,6 +24,8 @@ response variable must have type \code{"numeric"} and categorical covariates
 must have type \code{"factor"}. Missing values should be indicated with
 \code{NaN} or \code{NA}. The response variable cannot contain missing
 values.}
+
+\item{verbose}{Should more verbose output be printed?}
 }
 \value{
 an object of class \linkS4class{lgpformula}

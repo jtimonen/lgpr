@@ -1,78 +1,3 @@
-#' Information a about data frame
-#'
-#' @export
-#' @param data a data frame
-#' @param var a numeric vector or a factor
-#' @param digits number of digits to show for floats
-#' @family data utilities
-#' @name data_info
-#' @return a named list
-
-#' @rdname data_info
-data_info <- function(data, digits = 2) {
-  check_type(data, "data.frame")
-  N <- nrow(data)
-  J <- ncol(data)
-  list(
-    num_obs = N,
-    num_vars = J,
-    categorical = data_info.fac(data),
-    continuous = data_info.num(data, digits)
-  )
-}
-
-#' @rdname data_info
-data_info.fac <- function(data) {
-  nams <- colnames(data)
-  J <- ncol(data)
-  out <- c()
-  for (j in seq_len(J)) {
-    s <- data_info.var(data[, j], 3)
-    if (s[1] == "factor") {
-      r <- c(nams[j], s[4])
-      out <- rbind(out, r)
-    }
-  }
-  out <- data.frame(out)
-  rownames(out) <- NULL
-  colnames(out) <- c("Name", "Levels")
-  return(out)
-}
-
-#' @rdname data_info
-data_info.num <- function(data, digits) {
-  nams <- colnames(data)
-  J <- ncol(data)
-  out <- c()
-  for (j in seq_len(J)) {
-    s <- data_info.var(data[, j], digits)
-    if (s[1] == "numeric") {
-      r <- c(nams[j], s[2], s[3])
-      out <- rbind(out, r)
-    }
-  }
-  out <- data.frame(out)
-  rownames(out) <- NULL
-  colnames(out) <- c("Name", "Range", "#Missing")
-  return(out)
-}
-
-#' @rdname data_info
-data_info.var <- function(var, digits) {
-  type <- class(var)
-  if (type == "factor") {
-    levs <- paste(as.character(levels(var)), collapse = ", ")
-    range <- ""
-  } else {
-    levs <- ""
-    range <- range(var, na.rm = TRUE)
-    range <- round(range, digits = digits)
-    range <- paste0("[", range[1], ", ", range[2], "]")
-  }
-  miss <- as.character(sum(is.na(var)))
-  c(type, range, miss, levs)
-}
-
 #' Easily add a categorical covariate to a data frame
 #'
 #' @export
@@ -134,53 +59,6 @@ add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
   data$dis_age <- dage
   return(data)
 }
-
-#' Validate data array
-#'
-#' @param data a data frame
-#' @param id_name name of the id variable
-#' @return a data frame
-#' @name valid_data
-#' @family data utilities
-NULL
-
-#' @export
-#' @rdname valid_data
-validate_data <- function(data, id_name = "id") {
-  check_type(data, "data.frame")
-  id <- dollar(data, id_name)
-  check_type(id, "factor")
-  D <- dim(data)[2]
-  for (j in seq_len(D)) {
-    x <- data[, j]
-    if (is.factor(x)) {
-      nam <- names(data)[j]
-      validate_factor(x, id, nam)
-    }
-  }
-  TRUE
-}
-
-#' @rdname valid_data
-#' @param x a factor
-#' @param id the id factor
-#' @param name factor name
-validate_factor <- function(x, id, name) {
-  check_type(x, "factor")
-  check_type(id, "factor")
-  check_lengths(x, id)
-  for (lev in levels(id)) {
-    inds <- which(id == lev)
-    nu <- length(unique(x[inds]))
-    msg <- paste0(
-      "measurements corresponding to <id> level ", lev, " do not",
-      " all have the same level for factor '", name, "'!"
-    )
-    if (nu > 1) stop(msg)
-  }
-  TRUE
-}
-
 
 #' Split data into training and test sets
 #'
@@ -387,12 +265,12 @@ data_types <- function(data) {
   check_type(data, "data.frame")
   D <- ncol(data)
   nams <- names(data)
-  types <- c()
+  types <- list()
   for (j in seq_len(D)) {
-    types <- c(types, class(data[, j]))
+    types[[j]] <- class(data[, j])
   }
   names(types) <- nams
-  as.list(types)
+  return(types)
 }
 
 #' Add a crossing of two factors to a data frame

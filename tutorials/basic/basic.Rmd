@@ -48,7 +48,7 @@ plot_sim(sim, comp_idx = 2)
 In this tutorial we use simulated `testdata_002`, which consists of 12 individuals and 8 time points for each. 
 
 ``````{r head}
-data_info(testdata_002)
+str(testdata_002)
 ```
 
 The `plot_data` function

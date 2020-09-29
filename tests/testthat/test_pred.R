@@ -180,6 +180,7 @@ test_that("predict.gaussian works correctly", {
   expect_s4_class(out, "GaussianPrediction")
   expect_equal(dim(out@y_mean), c(1, 44))
   expect_output(pred(fit1, x1_pred, verbose = TRUE))
+  expect_output(pred(fit2, x2_pred, verbose = TRUE))
 })
 
 test_that("predict.kr works correctly", {

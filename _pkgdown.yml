@@ -11,7 +11,7 @@ reference:
   - adjusted_c_hat 
   - bet 
   - component_info 
-  - data_info 
+  - create_model 
   - fit_summary 
   - gam 
   - get_draws 
@@ -45,8 +45,7 @@ reference:
   - select_freq.integrate 
   - simulate_data 
   - student_t 
-  - uniform 
-  - validate_data
+  - uniform
   
 - title: "Data"
   desc: ~

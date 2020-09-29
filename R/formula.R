@@ -12,11 +12,14 @@
 #' See the "Model formula syntax" section below (\code{\link{lgp}}) for
 #' instructions on how to specify the model terms.
 #' @inheritParams parse_response
+#' @param verbose Should more verbose output be printed?
 #' @return an object of class \linkS4class{lgpformula}
 #' @family model formula functions
-parse_formula <- function(formula, data) {
+parse_formula <- function(formula, data, verbose=FALSE) {
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data)
+  f_str <- as.character(formula)
+  if (verbose) cat("Converted formula to:", f_str, "\n")
   parse_formula_advanced(formula)
 }
 
@@ -77,7 +80,7 @@ rhs_to_advanced <- function(rhs, data) {
     if (length(covs) == 1) {
       check_in_data(covs[1], data)
       t1 <- dollar(types, covs[1])
-      f1 <- if (t1 == "factor") "zs" else "gp"
+      f1 <- if ("factor" %in% t1) "zs" else "gp"
       term <- enclose_fun(covs[1], f1)
     } else {
       check_length(covs, 2)
@@ -85,7 +88,7 @@ rhs_to_advanced <- function(rhs, data) {
       check_in_data(covs[2], data)
       e1 <- enclose_fun(covs[1], "gp")
       t2 <- dollar(types, covs[2])
-      f2 <- if (t2 == "factor") "zs" else "gp"
+      f2 <- if ("factor" %in% t2) "zs" else "gp"
       e2 <- enclose_fun(covs[2], f2)
       term <- paste0(e1, "*", e2)
     }

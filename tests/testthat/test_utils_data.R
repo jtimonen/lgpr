@@ -4,14 +4,6 @@ library(lgpr)
 
 context("Data utility functions")
 
-test_that("data_info works correctly", {
-  d1 <- data_info(testdata_001)
-  d2 <- data_info(testdata_001, digits = 4)
-  expect_equal(d1$num_obs, 24)
-  expect_equal(d2$num_vars, 6)
-})
-
-
 test_that("computing observed effect times from data works correctly", {
   age <- c(10, 20, 30, 10, 20, 30)
   dage <- c(-10, 0, 10, NaN, NaN, NaN)
@@ -20,13 +12,6 @@ test_that("computing observed effect times from data works correctly", {
   t0 <- get_teff_obs(df, x_ns = "dage")
   expect_equal(names(t0), c("4", "6"))
   expect_equal(as.numeric(t0), c(20, NaN))
-})
-
-test_that("data validation works correctly", {
-  dat <- testdata_001
-  dat$sex[1] <- "Female"
-  expect_error(validate_data(dat), "do not all have the same")
-  expect_true(validate_data(testdata_001))
 })
 
 test_that("new_x works correctly without x_ns", {

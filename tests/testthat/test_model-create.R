@@ -249,3 +249,12 @@ test_that("cannot have wrong length of prior list", {
     reason
   )
 })
+
+test_that("verbose mode prints output", {
+  expect_output(
+    create_model(y ~ id + age + sex,
+      data = testdata_001,
+      verbose = TRUE
+    )
+  )
+})

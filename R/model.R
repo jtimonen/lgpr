@@ -1,5 +1,6 @@
 #' Create a model
 #'
+#' @export
 #' @inheritParams parse_formula
 #' @inheritParams parse_response
 #' @inheritParams parse_likelihood
@@ -8,7 +9,6 @@
 #' @inheritParams parse_options
 #' @param prior_only Should this run in prior sampling mode,
 #' where likelihood is ignored?
-#' @param verbose Should more verbose output be printed?
 #' @family main functions
 create_model <- function(formula,
                          data,
@@ -22,16 +22,20 @@ create_model <- function(formula,
                          sample_f = !(likelihood == "gaussian")) {
 
   # Parse formula and options
-  model_formula <- parse_formula(formula, data)
+  if (verbose) cat("Parsing formula and options...\n")
+  model_formula <- parse_formula(formula, data, verbose)
   list_opts <- parse_options(options)
 
   # Parse response and likelihood
+  if (verbose) cat("Parsing response...\n")
   parsed <- parse_response(data, likelihood, model_formula)
   list_y <- dollar(parsed, "to_stan")
   y_scaling <- dollar(parsed, "scaling")
+  if (verbose) cat("Parsing likelihood...\n")
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y, sample_f)
 
   # Parse covariates and components
+  if (verbose) cat("Parsing covariates and components...\n")
   parsed <- parse_covs_and_comps(data, model_formula, NA)
   list_x <- dollar(parsed, "to_stan")
   x_cont_scalings <- dollar(parsed, "x_cont_scalings")
@@ -46,6 +50,7 @@ create_model <- function(formula,
   )
 
   # Parse the prior
+  if (verbose) cat("Parsing prior...\n")
   obm <- dollar(list_lh, "obs_model")
   parsed <- parse_prior(prior, list_x, obm)
   full_prior <- dollar(parsed, "raw")
@@ -55,6 +60,7 @@ create_model <- function(formula,
   }
 
   # Other
+  if (verbose) cat("Parsing other...\n")
   list_other <- list(
     is_verbose = as.numeric(verbose),
     is_likelihood_skipped = as.numeric(prior_only)
@@ -78,6 +84,7 @@ create_model <- function(formula,
   var_info <- list(x_cat_levels = x_cat_levels)
 
   # Create the 'lgpmodel' object
+  if (verbose) cat("Creating lgpmodel object...\n")
   out <- new("lgpmodel",
     model_formula = model_formula,
     data = data,
@@ -89,6 +96,7 @@ create_model <- function(formula,
     stan_model_name = "lgp",
     full_prior = full_prior
   )
+  if (verbose) cat("Done.\n")
   return(out)
 }
 

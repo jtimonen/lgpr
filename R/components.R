@@ -77,7 +77,7 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
   for (name in x_names) {
     X_RAW <- data[[name]]
     c_x <- class(X_RAW)
-    if (c_x == "factor") {
+    if ("factor" %in% c_x) {
 
       # A categorical covariate
       num_cat <- num_cat + 1

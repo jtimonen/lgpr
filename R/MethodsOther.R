@@ -101,6 +101,7 @@ setMethod("show", "lgprhs", function(object) {
 setMethod("show", "lgpterm", function(object) {
   cat("lgpterm: ")
   cat(as.character(object))
+  cat("\n")
   invisible(object)
 })
 
