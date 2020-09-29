@@ -4,7 +4,7 @@
 \alias{parse_covs_and_comps}
 \title{Parse the covariates and model components from given data and formula}
 \usage{
-parse_covs_and_comps(data, model_formula)
+parse_covs_and_comps(data, model_formula, x_cont_scl)
 }
 \arguments{
 \item{data}{A \code{data.frame} where each column corresponds to one
@@ -15,6 +15,14 @@ must have type \code{"factor"}. Missing values should be indicated with
 values.}
 
 \item{model_formula}{An object of class \code{lgpformula}.}
+
+\item{x_cont_scl}{Information on how to scale the continuous covariates.
+This can either be
+\itemize{
+  \item an existing list of objects with class \linkS4class{lgpscaling}, or
+  \item \code{NA}, in which case such list is created by computing mean
+  and standard deviation from \code{data}
+}}
 }
 \value{
 parsed input to stan and covariate scaling

@@ -3,28 +3,28 @@
 \name{select}
 \alias{select}
 \alias{select_freq}
-\alias{select.prob}
-\alias{select_freq.prob}
+\alias{select.integrate}
+\alias{select_freq.integrate}
 \title{Select relevant components}
 \usage{
 select(fit, reduce = mean, threshold = 0.95, ...)
 
 select_freq(fit, threshold = 0.95, ...)
 
-select.prob(
+select.integrate(
   fit,
   reduce = mean,
   p = function(x) {     stats::dbeta(x, 100, 5) },
-  h = 0.001,
-  show_progbar = TRUE,
+  h = 0.01,
+  verbose = TRUE,
   ...
 )
 
-select_freq.prob(
+select_freq.integrate(
   fit,
   p = function(x) {     stats::dbeta(x, 100, 5) },
-  h = 0.001,
-  show_progbar = TRUE,
+  h = 0.01,
+  verbose = TRUE,
   ...
 )
 }
@@ -42,7 +42,7 @@ Must be a value between 0 and 1.}
 
 \item{h}{A discretization parameter for computing a quadrature.}
 
-\item{show_progbar}{Should this show a progress bar?}
+\item{verbose}{Should this show a progress bar?}
 }
 \value{
 See description.
@@ -51,13 +51,13 @@ See description.
 \itemize{
   \item \code{select} performs strict selection, returning a binary
   value (0 = not selected, 1 = selected) for each component.
-  \item \code{select.prob} is like \code{select}, but instead of
+  \item \code{select.integrate} is like \code{select}, but instead of
   a fixed threshold, computes probabilistic selection by integrating over
   a threshold density.
   \item \code{select_freq} performs the selection separately using
   each parameter draw and returns the frequency at which each
   component was selected.
-  \item \code{select_freq.prob} is like \code{select_freq}, but instead of
+  \item \code{select_freq.integrate} is like \code{select_freq}, but instead of
   a fixed threshold, computes probabilistic selection frequencies
   by integrating over a threshold density.
 }

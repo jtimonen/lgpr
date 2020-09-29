@@ -100,19 +100,19 @@ test_that("relevances can be computed and sum to 1", {
 test_that("select and select_freq work", {
   s1a <- select(fit1, reduce = mean)
   s1b <- select_freq(fit1)
-  expect_equal(length(s1a), 4)
-  expect_equal(length(s1b), 4)
+  expect_equal(dim(s1a), c(4, 1))
+  expect_equal(dim(s1b), c(4, 1))
   s2 <- select(fit2, threshold = 0.8)
-  expect_equal(length(s2), 4)
+  expect_equal(dim(s2), c(4, 1))
 })
 
 test_that("probabilistic selection works", {
-  b <- select.prob(fit1, reduce = stats::median, show_progbar = FALSE)
-  expect_equal(dim(b$selected), c(1001, 4))
-  b <- select_freq.prob(fit2, show_progbar = FALSE, h = 0.1)
+  b <- select.integrate(fit1, reduce = stats::median, verbose = FALSE)
+  expect_equal(dim(b$selected), c(101, 4))
+  b <- select_freq.integrate(fit2, verbose = FALSE, h = 0.1)
   expect_equal(dim(b$freq), c(11, 4))
-  expect_output(select.prob(fit2, show_progbar = TRUE, h = 0.1))
-  expect_output(select_freq.prob(fit1, show_progbar = TRUE, h = 0.1))
+  expect_output(select.integrate(fit2, verbose = TRUE, h = 0.1))
+  expect_output(select_freq.integrate(fit1, verbose = TRUE, h = 0.1))
 })
 
 test_that("predictions can be visualized with data on original scale", {
@@ -164,7 +164,7 @@ x1_pred <- new_x(data1, t, x_ns = "diseaseAge")
 x2_pred <- new_x(data2, t, x_ns = "diseaseAge")
 
 test_that("prediction kernel computations work correctly", {
-  kers <- pred_kernels(fit1, x1_pred, NULL, NULL)
+  kers <- pred_kernels(fit1, x1_pred, NULL, NULL, FALSE)
   expect_equal(names(kers), c("data_vs_data", "pred_vs_data", "pred_vs_pred"))
   expect_equal(dim(kers$data_vs_data), c(50, 3, 24, 24))
   expect_equal(dim(kers$pred_vs_data), c(50, 3, 44, 24))
@@ -172,20 +172,20 @@ test_that("prediction kernel computations work correctly", {
 })
 
 test_that("predict.gaussian works correctly", {
-  out <- pred(fit1, x1_pred, show_progbar = FALSE)
+  out <- pred(fit1, x1_pred, verbose = FALSE)
   expect_s4_class(out, "GaussianPrediction")
-  out <- pred(fit1, x1_pred, draws = c(3:43), show_progbar = FALSE)
+  out <- pred(fit1, x1_pred, draws = c(3:43), verbose = FALSE)
   expect_s4_class(out, "GaussianPrediction")
-  out <- pred(fit1, x1_pred, reduce = mean, show_progbar = FALSE)
+  out <- pred(fit1, x1_pred, reduce = mean, verbose = FALSE)
   expect_s4_class(out, "GaussianPrediction")
   expect_equal(dim(out@y_mean), c(1, 44))
-  expect_output(pred(fit1, x1_pred, show_progbar = TRUE))
+  expect_output(pred(fit1, x1_pred, verbose = TRUE))
 })
 
 test_that("predict.kr works correctly", {
-  out <- pred(fit2, x2_pred, reduce = mean, show_progbar = FALSE)
+  out <- pred(fit2, x2_pred, reduce = mean, verbose = FALSE)
   expect_equal(dim(out@h), c(1, 44))
-  out <- pred(fit2, x2_pred, reduce = NULL, show_progbar = FALSE)
+  out <- pred(fit2, x2_pred, reduce = NULL, verbose = FALSE)
   expect_equal(dim(out@h), c(50, 44))
 })
 
@@ -195,10 +195,10 @@ test_that("predict.kr works correctly", {
 context("Out-of-sample prediction visualization")
 
 test_that("out-of-sample predictions can be visualized", {
-  os1 <- pred(fit1, x1_pred, show_progbar = FALSE)
+  os1 <- pred(fit1, x1_pred, verbose = FALSE)
   os2 <- pred(fit1, x1_pred,
     reduce = NULL, draws = c(8:10),
-    show_progbar = FALSE
+    verbose = FALSE
   )
   p1 <- plot_pred(fit1, pred = os1, x = x1_pred)
   p2 <- plot_pred(fit1, pred = os2, x = x1_pred)
@@ -207,10 +207,10 @@ test_that("out-of-sample predictions can be visualized", {
 })
 
 test_that("out-of-sample inferred components can be visualized", {
-  os1 <- pred(fit1, x1_pred, show_progbar = FALSE)
+  os1 <- pred(fit1, x1_pred, verbose = FALSE)
   os2 <- pred(fit1, x1_pred,
     reduce = NULL, draws = c(8:10),
-    show_progbar = FALSE
+    verbose = FALSE
   )
   p1 <- plot_f(fit1, pred = os1, x = x1_pred)
   p2 <- plot_f(fit1,
@@ -222,10 +222,10 @@ test_that("out-of-sample inferred components can be visualized", {
 })
 
 test_that("out-of-sample KR can be visualized", {
-  os1 <- pred(fit2, x2_pred, show_progbar = FALSE)
+  os1 <- pred(fit2, x2_pred, verbose = FALSE)
   os2 <- pred(fit2, x2_pred,
     reduce = NULL, draws = c(8:10),
-    show_progbar = FALSE
+    verbose = FALSE
   )
   p1 <- plot_pred(fit2, pred = os1, x = x2_pred)
   p2 <- plot_pred(fit2, pred = os2, x = x2_pred)
@@ -234,10 +234,10 @@ test_that("out-of-sample KR can be visualized", {
 })
 
 test_that("out-of-sample KR components can be visualized", {
-  os1 <- pred(fit2, x2_pred, show_progbar = FALSE)
+  os1 <- pred(fit2, x2_pred, verbose = FALSE)
   os2 <- pred(fit2, x2_pred,
     reduce = NULL, draws = c(8:10),
-    show_progbar = FALSE
+    verbose = FALSE
   )
   p1 <- plot_f(fit2, pred = os2, x = x2_pred)
   p2 <- plot_f(fit2,

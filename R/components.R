@@ -1,8 +1,16 @@
 #' Parse the covariates and model components from given data and formula
 #'
 #' @inheritParams parse_response
+#' @param x_cont_scl Information on how to scale the continuous covariates.
+#' This can either be
+#' \itemize{
+#'   \item an existing list of objects with class \linkS4class{lgpscaling}, or
+#'   \item \code{NA}, in which case such list is created by computing mean
+#'   and standard deviation from \code{data}
+#' }
+#'
 #' @return parsed input to stan and covariate scaling
-parse_covs_and_comps <- function(data, model_formula) {
+parse_covs_and_comps <- function(data, model_formula, x_cont_scl) {
 
   # Check that all covariates exist in data
   x_names <- rhs_variables(model_formula@terms)
@@ -10,7 +18,7 @@ parse_covs_and_comps <- function(data, model_formula) {
   for (name in x_names) check_in_data(name, data)
 
   # Create the inputs to Stan
-  covariates <- stan_data_covariates(data, x_names)
+  covariates <- stan_data_covariates(data, x_names, x_cont_scl)
   components <- stan_data_components(model_formula, covariates)
   ts1 <- dollar(covariates, "to_stan")
   ts2 <- dollar(components, "to_stan")
@@ -36,6 +44,7 @@ parse_covs_and_comps <- function(data, model_formula) {
 #'   \item \code{x_cont_unnorm}
 #'   \item \code{x_cont_mask}
 #' }
+#' @inheritParams parse_covs_and_comps
 #' @param data a data frame
 #' @param x_names unique covariate names
 #' @return a named list with fields
@@ -46,13 +55,15 @@ parse_covs_and_comps <- function(data, model_formula) {
 #'   \item \code{x_cat_levels}: names of the levels of each categorical
 #'   covariate before conversion from factor to numeric
 #' }
-stan_data_covariates <- function(data, x_names) {
+stan_data_covariates <- function(data, x_names, x_cont_scl) {
+  check_not_null(x_cont_scl)
   num_obs <- dim(data)[1]
+  scl_exists <- is.list(x_cont_scl)
 
   x_cont <- list()
   x_cont_mask <- list()
   x_cont_unnorm <- list()
-  x_cont_scalings <- list()
+  x_cont_scl_new <- list()
   x_cont_names <- c()
 
   x_cat <- list()
@@ -87,8 +98,9 @@ stan_data_covariates <- function(data, x_names) {
       x_cont_mask[[num_cont]] <- as.numeric(is_na)
       X_NONAN <- X_RAW
       X_NONAN[is_na] <- 0
-      normalizer <- create_scaling(X_NONAN, name)
-      x_cont_scalings[[num_cont]] <- normalizer
+      new_normalizer <- create_scaling(X_NONAN, name)
+      x_cont_scl_new[[num_cont]] <- new_normalizer
+      normalizer <- if (scl_exists) x_cont_scl[[num_cont]] else new_normalizer
       x_cont[[num_cont]] <- call_fun(normalizer@fun, X_NONAN)
       x_cont_unnorm[[num_cont]] <- X_NONAN
       x_cont_names[num_cont] <- name
@@ -102,6 +114,7 @@ stan_data_covariates <- function(data, x_names) {
   x_cont_mask <- list_to_matrix(x_cont_mask, num_obs)
 
   # Name lists and matrix rows
+  x_cont_scalings <- if (scl_exists) x_cont_scl else x_cont_scl_new
   names(x_cont_scalings) <- x_cont_names
   names(x_cat_levels) <- x_cat_names
   rownames(x_cat) <- x_cat_names

@@ -11,13 +11,13 @@ pred(
   x,
   reduce = mean,
   draws = NULL,
-  show_progbar = TRUE,
+  verbose = TRUE,
   STREAM = get_stream()
 )
 
-pred.gaussian(fit, x, reduce, draws, show_progbar, STREAM = get_stream())
+pred.gaussian(fit, x, reduce, draws, verbose, STREAM = get_stream())
 
-pred.kr(fit, x, reduce, draws, show_progbar, STREAM = get_stream())
+pred.kr(fit, x, reduce, draws, verbose, STREAM = get_stream())
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
@@ -25,11 +25,14 @@ pred.kr(fit, x, reduce, draws, show_progbar, STREAM = get_stream())
 \item{x}{A data frame of points where the predictions are computed.
 The function \code{\link{new_x}} provides an easy way to create it.}
 
-\item{reduce}{reduction for parameters draws}
+\item{reduce}{Reduction for parameters draws. Can be a function that
+is applied to reduce all parameter draws into one parameter set, or
+NULL (no reduction). Has no effect if \code{draws} is specified.}
 
-\item{draws}{indices of parameter draws}
+\item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
+draws.}
 
-\item{show_progbar}{Should a progress bar be printed?}
+\item{verbose}{Should more information and a progress bar be printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}

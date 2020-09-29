@@ -1,17 +1,16 @@
 #' Select relevant components
 #'
-#' @export
 #' @description
 #' \itemize{
 #'   \item \code{select} performs strict selection, returning a binary
 #'   value (0 = not selected, 1 = selected) for each component.
-#'   \item \code{select.prob} is like \code{select}, but instead of
+#'   \item \code{select.integrate} is like \code{select}, but instead of
 #'   a fixed threshold, computes probabilistic selection by integrating over
 #'   a threshold density.
 #'   \item \code{select_freq} performs the selection separately using
 #'   each parameter draw and returns the frequency at which each
 #'   component was selected.
-#'   \item \code{select_freq.prob} is like \code{select_freq}, but instead of
+#'   \item \code{select_freq.integrate} is like \code{select_freq}, but instead of
 #'   a fixed threshold, computes probabilistic selection frequencies
 #'   by integrating over a threshold density.
 #' }
@@ -21,12 +20,13 @@
 #' Must be a value between 0 and 1.
 #' @param p A threshold density over interval [0,1].
 #' @param h A discretization parameter for computing a quadrature.
-#' @param show_progbar Should this show a progress bar?
+#' @param verbose Should this show a progress bar?
 #' @param ... Additional arguments to \code{\link{relevances}}.
 #' @return See description.
 #' @name select
 NULL
 
+#' @export
 #' @rdname select
 select <- function(fit, reduce = mean, threshold = 0.95, ...) {
   check_type(fit, "lgpfit")
@@ -40,12 +40,10 @@ select <- function(fit, reduce = mean, threshold = 0.95, ...) {
   r <- as.matrix(r)
   colnames(r) <- nam
   s <- select.all_draws(r, threshold)
-  nam <- colnames(s)
-  s <- as.vector(s)
-  names(s) <- nam
-  return(s)
+  result_df(as.logical(s), "Selected", colnames(s))
 }
 
+#' @export
 #' @rdname select
 select_freq <- function(fit, threshold = 0.95, ...) {
   check_type(fit, "lgpfit")
@@ -55,39 +53,43 @@ select_freq <- function(fit, threshold = 0.95, ...) {
   r <- as.matrix(r)
   colnames(r) <- nam
   sel <- select.all_draws(r, threshold)
-  colMeans(sel)
+  result_df(colMeans(sel), "P(selected)", colnames(sel))
 }
 
+#' @export
 #' @rdname select
-select.prob <- function(fit,
-                        reduce = mean,
-                        p = function(x) {
-                          stats::dbeta(x, 100, 5)
-                        },
-                        h = 0.001,
-                        show_progbar = TRUE,
-                        ...) {
-  selected <- select.all_thresholds(fit, reduce, p, h, show_progbar, ...)
-  list(
-    selected = selected,
-    prob = select.integrate(selected, p)
-  )
-}
-
-#' @rdname select
-select_freq.prob <- function(fit,
+select.integrate <- function(fit,
+                             reduce = mean,
                              p = function(x) {
                                stats::dbeta(x, 100, 5)
                              },
-                             h = 0.001,
-                             show_progbar = TRUE,
+                             h = 0.01,
+                             verbose = TRUE,
                              ...) {
-  freqs <- select_freq.all_thresholds(fit, p, h, show_progbar, ...)
+  selected <- select.all_thresholds(fit, reduce, p, h, verbose, ...)
+  prob <- select.compute_integral(selected, p)
+  list(
+    selected = selected,
+    expected = result_df(prob, "P(selected)", colnames(selected))
+  )
+}
+
+#' @export
+#' @rdname select
+select_freq.integrate <- function(fit,
+                                  p = function(x) {
+                                    stats::dbeta(x, 100, 5)
+                                  },
+                                  h = 0.01,
+                                  verbose = TRUE,
+                                  ...) {
+  freqs <- select_freq.all_thresholds(fit, p, h, verbose, ...)
 
   # Compute integral and return
+  prob <- select.compute_integral(freqs, p)
   list(
     freq = freqs,
-    prob = select.integrate(freqs, p)
+    expected = result_df(prob, "P(selected)", colnames(freqs))
   )
 }
 
@@ -101,7 +103,7 @@ NULL
 
 
 #' @rdname select.helper
-select.all_thresholds <- function(fit, reduce, p, h, show_progbar, ...) {
+select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
 
   # Get relevances
   check_type(reduce, "function")
@@ -124,21 +126,21 @@ select.all_thresholds <- function(fit, reduce, p, h, show_progbar, ...) {
   pb <- progbar_header(L)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
-  if (show_progbar) cat(hdr, "\n")
+  if (verbose) cat(hdr, "\n")
 
   # Loop
   for (i in 1:L) {
     sel <- select.all_draws(rel, threshold = H[i])
     SEL[i, ] <- sel
-    if (show_progbar) progbar_print(i, idx_print)
+    if (verbose) progbar_print(i, idx_print)
   }
-  if (show_progbar) cat("\n")
+  if (verbose) cat("\n")
   return(SEL)
 }
 
 
 #' @rdname select.helper
-select_freq.all_thresholds <- function(fit, p, h, show_progbar, ...) {
+select_freq.all_thresholds <- function(fit, p, h, verbose, ...) {
 
   # Get relevances
   check_type(fit, "lgpfit")
@@ -156,22 +158,22 @@ select_freq.all_thresholds <- function(fit, p, h, show_progbar, ...) {
   pb <- progbar_header(L)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
-  if (show_progbar) cat(hdr, "\n")
+  if (verbose) cat(hdr, "\n")
 
   # Loop
   for (i in 1:L) {
     freq <- select.all_draws(rel, threshold = H[i])
     FREQ[i, ] <- colMeans(freq)
-    if (show_progbar) progbar_print(i, idx_print)
+    if (verbose) progbar_print(i, idx_print)
   }
-  if (show_progbar) cat("\n")
+  if (verbose) cat("\n")
   return(FREQ)
 }
 
 
 #' @rdname select.helper
 #' @param arr an array of frequencies or selections
-select.integrate <- function(arr, p) {
+select.compute_integral <- function(arr, p) {
   L <- nrow(arr)
   D <- ncol(arr)
   H <- seq(0, 1, length.out = L)
@@ -213,4 +215,15 @@ select.one_draw <- function(rel, threshold) {
     }
   }
   return(1:J)
+}
+
+#' @rdname select.helper
+#' @param val values
+#' @param val_name name of variable that \code{val} presents
+#' @param comp_names component names
+result_df <- function(val, val_name, comp_names) {
+  df <- data.frame(val)
+  colnames(df) <- c("Component")
+  rownames(df) <- comp_names
+  return(df)
 }

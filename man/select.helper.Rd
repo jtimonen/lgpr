@@ -4,20 +4,23 @@
 \alias{select.helper}
 \alias{select.all_thresholds}
 \alias{select_freq.all_thresholds}
-\alias{select.integrate}
+\alias{select.compute_integral}
 \alias{select.all_draws}
 \alias{select.one_draw}
+\alias{result_df}
 \title{Helper functions for component selection}
 \usage{
-select.all_thresholds(fit, reduce, p, h, show_progbar, ...)
+select.all_thresholds(fit, reduce, p, h, verbose, ...)
 
-select_freq.all_thresholds(fit, p, h, show_progbar, ...)
+select_freq.all_thresholds(fit, p, h, verbose, ...)
 
-select.integrate(arr, p)
+select.compute_integral(arr, p)
 
 select.all_draws(rel, threshold)
 
 select.one_draw(rel, threshold)
+
+result_df(val, val_name, comp_names)
 }
 \arguments{
 \item{fit}{An object of class \code{lgpfit}.}
@@ -28,7 +31,7 @@ select.one_draw(rel, threshold)
 
 \item{h}{A discretization parameter for computing a quadrature.}
 
-\item{show_progbar}{Should this show a progress bar?}
+\item{verbose}{Should this show a progress bar?}
 
 \item{...}{Additional arguments to \code{\link{relevances}}.}
 
@@ -38,6 +41,12 @@ select.one_draw(rel, threshold)
 
 \item{threshold}{Threshold for relevance sum.
 Must be a value between 0 and 1.}
+
+\item{val}{values}
+
+\item{val_name}{name of variable that \code{val} presents}
+
+\item{comp_names}{component names}
 }
 \description{
 Helper functions for component selection

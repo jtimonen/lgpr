@@ -20,49 +20,57 @@
 #' @param fit An object of class \linkS4class{lgpfit}.
 #' @param x A data frame of points where the predictions are computed.
 #' The function \code{\link{new_x}} provides an easy way to create it.
-#' @param reduce reduction for parameters draws
-#' @param draws indices of parameter draws
+#' @param reduce Reduction for parameters draws. Can be a function that
+#' is applied to reduce all parameter draws into one parameter set, or
+#' NULL (no reduction). Has no effect if \code{draws} is specified.
+#' @param draws Indices of parameter draws to use, or \code{NULL} to use all
+#' draws.
 #' @param STREAM External pointer. By default obtained with
 #' \code{\link[rstan]{get_stream}}.
-#' @param show_progbar Should a progress bar be printed?
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
+#' @param verbose Should more information and a progress bar be printed?
 #' @family prediction functions
 #' @name pred
 NULL
 
 #' @export
 #' @rdname pred
-pred <- function(fit, x, reduce = mean, draws = NULL, show_progbar = TRUE,
-                 STREAM = get_stream()) {
+pred <- function(fit, x, reduce = mean, draws = NULL,
+                 verbose = TRUE, STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
+  if (!is.null(draws)) reduce <- NULL
   if (f_sampled) {
-    out <- pred.kr(fit, x, reduce, draws, show_progbar, STREAM)
+    out <- pred.kr(fit, x, reduce, draws, verbose, STREAM)
   } else {
-    out <- pred.gaussian(fit, x, reduce, draws, show_progbar, STREAM)
+    out <- pred.gaussian(fit, x, reduce, draws, verbose, STREAM)
   }
   return(out)
 }
 
 #' @rdname pred
-pred.gaussian <- function(fit, x, reduce, draws, show_progbar,
+pred.gaussian <- function(fit, x, reduce, draws, verbose,
                           STREAM = get_stream()) {
+  if (verbose) cat("Extracting draws of sigma...\n")
   sigma <- get_draws(fit, draws = draws, reduce = reduce, pars = "sigma")
-  kernels <- pred_kernels(fit, x, reduce, draws, STREAM)
+  kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   y_norm <- as.vector(get_y(fit, original = FALSE))
+  if (verbose) cat("Computing posterior distributions...\n")
   post <- pred.gaussian_compute(
     kernels, y_norm, sigma,
-    delta, show_progbar, STREAM
+    delta, verbose, STREAM
   )
 
+  if (verbose) cat("Computing preditive distribution...\n")
   f_mean <- dollar(post, "f_mean")
   f_std <- dollar(post, "f_std")
   y_scl <- dollar(fit@model@var_scalings, "y")
   y_pred <- pred.gaussian.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
 
+  if (verbose) cat("Done.\n")
   new("GaussianPrediction",
     f_comp_mean = arr3_to_list(dollar(post, "f_comp_mean")),
     f_comp_std = arr3_to_list(dollar(post, "f_comp_std")),
@@ -74,14 +82,18 @@ pred.gaussian <- function(fit, x, reduce, draws, show_progbar,
 }
 
 #' @rdname pred
-pred.kr <- function(fit, x, reduce, draws, show_progbar, STREAM = get_stream()) {
-  kernels <- pred_kernels(fit, x, reduce, draws, STREAM)
+pred.kr <- function(fit, x, reduce, draws, verbose,
+                    STREAM = get_stream()) {
+  kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
+  if (verbose) cat("Extracting sampled function components...\n")
   pred <- get_pred(fit, draws = draws, reduce = reduce)
-  kr <- pred.kr_compute(kernels, pred, delta, show_progbar, STREAM)
+  if (verbose) cat("Computing kernel regression...\n")
+  kr <- pred.kr_compute(kernels, pred, delta, verbose, STREAM)
   f <- dollar(kr, "f")
   likelihood <- get_obs_model(fit)
+  if (verbose) cat("Done.\n")
 
   # Return
   new("Prediction",
@@ -98,10 +110,9 @@ pred.kr <- function(fit, x, reduce, draws, show_progbar, STREAM = get_stream()) 
 #' @param sigma a vector with length equal to number of parameter sets
 #' @param delta jitter to ensure positive definite matrices
 #' @inheritParams pred
-#' @param pbar should a probgress bar be printed?
 #' @return A list.
 #' @family prediction functions
-pred.gaussian_compute <- function(kernels, y, sigma, delta, pbar,
+pred.gaussian_compute <- function(kernels, y, sigma, delta, verbose,
                                   STREAM = get_stream()) {
   sigma <- as.vector(sigma)
   K <- dollar(kernels, "data_vs_data")
@@ -114,7 +125,7 @@ pred.gaussian_compute <- function(kernels, y, sigma, delta, pbar,
   out <- array(0, dim = c(2 * R, num_pred, num_draws))
   hdr <- progbar_header(num_draws)
   idx_print <- dollar(hdr, "idx_print")
-  if (pbar) cat(dollar(hdr, "header"), "\n")
+  if (verbose) cat(dollar(hdr, "header"), "\n")
   for (i in seq_len(num_draws)) {
     k <- arr3_to_list(K[i, , , ])
     ks <- arr3_to_list(Ks[i, , , ])
@@ -122,10 +133,10 @@ pred.gaussian_compute <- function(kernels, y, sigma, delta, pbar,
     post <- cpp_gp_posterior(k, ks, kss, y, delta, sigma[i], STREAM)
     post <- list_to_matrix(post, num_pred)
     out[, , i] <- post
-    if (pbar) progbar_print(i, idx_print)
+    if (verbose) progbar_print(i, idx_print)
   }
   out <- aperm(out, c(1, 3, 2))
-  if (pbar) cat("\n")
+  if (verbose) cat("\n")
 
   # Return
   list(
@@ -143,7 +154,7 @@ pred.gaussian_compute <- function(kernels, y, sigma, delta, pbar,
 #' @inheritParams pred.gaussian_compute
 #' @return An object of class \linkS4class{Prediction}.
 #' @family prediction functions
-pred.kr_compute <- function(kernels, pred, delta, pbar,
+pred.kr_compute <- function(kernels, pred, delta, verbose,
                             STREAM = get_stream()) {
   K <- dollar(kernels, "data_vs_data")
   Ks <- dollar(kernels, "pred_vs_data")
@@ -157,7 +168,7 @@ pred.kr_compute <- function(kernels, pred, delta, pbar,
   DELTA <- DELTA <- delta * diag(num_obs)
   hdr <- progbar_header(num_draws)
   idx_print <- dollar(hdr, "idx_print")
-  if (pbar) cat(dollar(hdr, "header"), "\n")
+  if (verbose) cat(dollar(hdr, "header"), "\n")
   for (i in seq_len(num_draws)) {
     f_sum <- 0
     for (j in seq_len(D)) {
@@ -170,9 +181,9 @@ pred.kr_compute <- function(kernels, pred, delta, pbar,
       f_sum <- f_sum + f_pred
     }
     out[D + 1, i, ] <- f_sum
-    if (pbar) progbar_print(i, idx_print)
+    if (verbose) progbar_print(i, idx_print)
   }
-  if (pbar) cat("\n")
+  if (verbose) cat("\n")
 
   # Return
   list(
@@ -189,16 +200,22 @@ pred.kr_compute <- function(kernels, pred, delta, pbar,
 #' \code{pred_vs_data} and \code{pred_vs_pred}. Each of them is a list with
 #' length equal to the number of parameter sets.
 #' @family prediction functions
-pred_kernels <- function(fit, x, reduce, draws, STREAM = get_stream()) {
+pred_kernels <- function(fit, x, reduce, draws, verbose,
+                         STREAM = get_stream()) {
   model <- object_to_model(fit)
   x_data <- model@stan_input
+  if (verbose) cat("Creating kernel matrix input...\n")
   x_pred <- kernel_matrices_create_input(model, x)
+  if (verbose) cat("Extracting kernel parameter draws...\n")
   theta <- get_kernel_pars(fit, reduce, draws)
 
   # Computation
-  K <- kernel_matrices(model, x_data, x_data, theta, STREAM)
-  Ks <- kernel_matrices(model, x_pred, x_data, theta, STREAM)
-  Kss <- kernel_matrices(model, x_pred, x_pred, theta, STREAM)
+  if (verbose) cat("Computing kernel matrices data vs. data...\n")
+  K <- kernel_matrices(model, x_data, x_data, theta, verbose, STREAM)
+  if (verbose) cat("Computing kernel matrices pred vs. data...\n")
+  Ks <- kernel_matrices(model, x_pred, x_data, theta, verbose, STREAM)
+  if (verbose) cat("Computing kernel matrices pred vs. pred...\n")
+  Kss <- kernel_matrices(model, x_pred, x_pred, theta, verbose, STREAM)
 
   # Return
   list(
@@ -234,7 +251,8 @@ NULL
 
 #' @rdname kernel_matrices
 #' @param theta A list of kernel parameter sets.
-kernel_matrices <- function(model, x1, x2, theta, STREAM = get_stream()) {
+kernel_matrices <- function(model, x1, x2, theta, verbose,
+                            STREAM = get_stream()) {
 
   # Compute constant matrices
   K_const <- kernel_matrices_const(model, x1, x2, STREAM)
@@ -268,6 +286,14 @@ kernel_matrices <- function(model, x1, x2, theta, STREAM = get_stream()) {
   J <- nrow(components)
   L <- nrow(alpha)
   K_out <- array(0.0, dim = c(L, J, n1, n2))
+
+  # Progress bar header
+  pb <- progbar_header(L)
+  hdr <- dollar(pb, "header")
+  idx_print <- dollar(pb, "idx_print")
+  if (verbose) cat(hdr, "\n")
+
+  # Loop
   for (i in seq_len(L)) {
     K_i <- cpp_kernel_all(
       n1, n2, K_const, components,
@@ -279,7 +305,9 @@ kernel_matrices <- function(model, x1, x2, theta, STREAM = get_stream()) {
     for (j in seq_len(J)) {
       K_out[i, j, , ] <- K_i[[j]]
     }
+    if (verbose) progbar_print(i, idx_print)
   }
+  if (verbose) cat("\n")
   return(K_out)
 }
 
@@ -310,7 +338,8 @@ kernel_matrices_const <- function(model, x1, x2, STREAM = get_stream()) {
 
 #' @rdname kernel_matrices
 kernel_matrices_create_input <- function(model, x) {
-  proc <- parse_covs_and_comps(x, model@model_formula)
+  x_cont_scl <- dollar(model@var_scalings, "x_cont")
+  proc <- parse_covs_and_comps(x, model@model_formula, x_cont_scl)
   dollar(proc, "to_stan")
 }
 

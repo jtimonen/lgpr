@@ -5,7 +5,7 @@
 \title{Compute out-of-sample predictions using kernel regression on
 sampled function values}
 \usage{
-pred.kr_compute(kernels, pred, delta, pbar, STREAM = get_stream())
+pred.kr_compute(kernels, pred, delta, verbose, STREAM = get_stream())
 }
 \arguments{
 \item{kernels}{A list returned by \code{\link{pred_kernels}}.}
@@ -14,7 +14,7 @@ pred.kr_compute(kernels, pred, delta, pbar, STREAM = get_stream())
 
 \item{delta}{jitter to ensure positive definite matrices}
 
-\item{pbar}{should a probgress bar be printed?}
+\item{verbose}{Should more information and a progress bar be printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}

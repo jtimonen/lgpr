@@ -40,6 +40,9 @@ reference:
   - relevances 
   - sample_model 
   - select 
+  - select.integrate 
+  - select_freq 
+  - select_freq.integrate 
   - simulate_data 
   - student_t 
   - uniform 

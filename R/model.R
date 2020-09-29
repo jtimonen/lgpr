@@ -32,7 +32,7 @@ create_model <- function(formula,
   list_lh <- parse_likelihood(likelihood, c_hat, num_trials, list_y, sample_f)
 
   # Parse covariates and components
-  parsed <- parse_covs_and_comps(data, model_formula)
+  parsed <- parse_covs_and_comps(data, model_formula, NA)
   list_x <- dollar(parsed, "to_stan")
   x_cont_scalings <- dollar(parsed, "x_cont_scalings")
   x_cat_levels <- dollar(parsed, "x_cat_levels")

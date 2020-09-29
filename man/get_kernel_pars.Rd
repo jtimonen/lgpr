@@ -9,9 +9,12 @@ get_kernel_pars(fit, reduce = NULL, draws = NULL)
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{reduce}{reduction for parameters draws}
+\item{reduce}{Reduction for parameters draws. Can be a function that
+is applied to reduce all parameter draws into one parameter set, or
+NULL (no reduction). Has no effect if \code{draws} is specified.}
 
-\item{draws}{indices of parameter draws}
+\item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
+draws.}
 }
 \value{
 a list with names "alpha", "ell", "wrp", "beta" and "teff",

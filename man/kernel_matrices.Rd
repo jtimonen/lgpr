@@ -6,7 +6,7 @@
 \alias{kernel_matrices_create_input}
 \title{Kernel matrix computation using the C++ functions of the package namespace}
 \usage{
-kernel_matrices(model, x1, x2, theta, STREAM = get_stream())
+kernel_matrices(model, x1, x2, theta, verbose, STREAM = get_stream())
 
 kernel_matrices_const(model, x1, x2, STREAM = get_stream())
 
@@ -22,6 +22,8 @@ created by \code{\link{kernel_matrices_create_input}}.}
 created by \code{\link{kernel_matrices_create_input}}.}
 
 \item{theta}{A list of kernel parameter sets.}
+
+\item{verbose}{Should more information and a progress bar be printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}
