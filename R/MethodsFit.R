@@ -130,8 +130,7 @@ plot_beta <- function(fit, type = "dens", ...) {
   }
   h <- plot_draws(fit, type, regex_pars = "beta", ...)
   ptitle <- paste0(
-    "Distribution of individual-specific ",
-    "disease effect magnitudes"
+    "Distribution of individual-specific effect magnitudes"
   )
   h <- h + ggplot2::ggtitle(label = ptitle)
   return(h)
@@ -141,7 +140,7 @@ plot_beta <- function(fit, type = "dens", ...) {
 #' @rdname plot_draws
 plot_effect_times <- function(fit, type = "areas", ...) {
   h <- plot_draws(fit, type, regex_pars = "teff[[]", ...)
-  ptitle <- "Distribution of the inferred disease effect times"
+  ptitle <- "Distribution of the inferred effect times"
   h <- h + ggplot2::ggtitle(label = ptitle)
   return(h)
 }

@@ -76,8 +76,8 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
 
   for (name in x_names) {
     X_RAW <- data[[name]]
-    c_x <- class(X_RAW)
-    if ("factor" %in% c_x) {
+    c_x <- class(X_RAW)[1]
+    if (c_x == "factor") {
 
       # A categorical covariate
       num_cat <- num_cat + 1
@@ -90,7 +90,7 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
       x_cat_num_levels[num_cat] <- length(levels(X_RAW))
       x_cat_levels[[num_cat]] <- levels(X_RAW)
       x_cat_names[num_cat] <- name
-    } else {
+    } else if (c_x == "numeric") {
 
       # A continuous covariate
       num_cont <- num_cont + 1
@@ -104,6 +104,9 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
       x_cont[[num_cont]] <- call_fun(normalizer@fun, X_NONAN)
       x_cont_unnorm[[num_cont]] <- X_NONAN
       x_cont_names[num_cont] <- name
+    } else {
+      msg <- paste0("class(", name, ")[1] is invalid (", c_x, ")")
+      stop(msg)
     }
   }
 

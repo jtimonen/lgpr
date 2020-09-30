@@ -263,11 +263,13 @@ select_factors_and <- function(data, valid) {
 #' @family data utilities
 data_types <- function(data) {
   check_type(data, "data.frame")
+  allowed <- c("factor", "numeric")
   D <- ncol(data)
   nams <- names(data)
   types <- list()
   for (j in seq_len(D)) {
-    types[[j]] <- class(data[, j])
+    check_allowed(class(data[, j])[1], allowed)
+    types[[j]] <- class(data[, j])[1]
   }
   names(types) <- nams
   return(types)

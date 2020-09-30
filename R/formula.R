@@ -15,11 +15,11 @@
 #' @param verbose Should more verbose output be printed?
 #' @return an object of class \linkS4class{lgpformula}
 #' @family model formula functions
-parse_formula <- function(formula, data, verbose=FALSE) {
+parse_formula <- function(formula, data, verbose = FALSE) {
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data)
-  f_str <- as.character(formula)
-  if (verbose) cat("Converted formula to:", f_str, "\n")
+  if (verbose) cat("Formula converted to:\n  ")
+  if (verbose) print(formula)
   parse_formula_advanced(formula)
 }
 

@@ -1,0 +1,79 @@
+---
+title: "Covariate uncertainty modeling in lgpr"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Covariate uncertainty modeling in lgpr}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{r load}
+require("lgpr")
+require("ggplot2")
+```
+
+## Simulating data
+
+In this tutorial we generate a data set which contains a case and control
+individuals, and the disease progression of case individuals is modeled using
+the disease-related age as a covariate.
+The true disease effect times for each case individual $q=1, \ldots,6$  are drawn from $\mathcal{N}(36,4^2)$, but the disease initiation is observable only after time $t_q$ , which is drawn from  $t_q∼\text{Exponential}(0.05)$ .
+
+```{r simulate, fig.width = 7, fig.height=5}
+set.seed(121)
+relev           <- c(0,1,1,1,0,0)
+effect_time_fun <- function(){rnorm(n = 1, mean = 36, sd = 4)}
+obs_fun         <- function(t){min(t + stats::rexp(n = 1, rate = 0.05), 96 - 1e-5)}
+  
+simData <- simulate_data(N            = 12,
+                         t_data       = seq(12, 96, by = 12),
+                         covariates   = c(    0,2,2,2),
+                         relevances   = relev,
+                         lengthscales = c(18,24, 1, 18,18,18),
+                         t_effect_range = effect_time_fun,
+                         t_observed   = obs_fun,
+                         snr          = 3)
+
+plot_sim(simData)
+```
+Above, the blue line represents the data-generating signal and black dots are
+noisy observations of the response variable.
+
+```{r head}
+dat <- simData@data
+str(dat)
+simData@effect_times
+```
+
+## Defining uncertainty prior
+
+```{r prior}
+lb <- 10
+ub <- c(48,72,96,36,48,60)
+unc_info <- list(zero = 0, backwards = FALSE, lower = lb, upper = ub)
+```
+
+```{r fit, fig.width=7.2, fig.height=4.8, cache = TRUE}
+formula <- y ~ zs(id)*gp(age) + gp(age) + unc(id)*gp_vm(diseaseAge) + zs(z1)*gp(age) + zs(z2)*gp(age) + zs(z3)*gp(age)
+fit <- lgp(formula   = formula,
+            data     = dat,
+            prior    = list(effect_time_info = unc_info),
+            iter     = 20,
+            chains   = 1,
+            verbose  = TRUE)
+```
+
+```{r post, fig.width=7.2, fig.height=4.8}
+print(fit)
+print(fit@model)
+```
+
