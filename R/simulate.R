@@ -440,7 +440,8 @@ sim.create_f <- function(X,
     } else if (dis_fun == "gp_warp") {
       useMaskedVarianceKernel <- FALSE
     } else {
-      stop("Invalid keyword for input dis_fun (", dis_fun, ")")
+      msg <- paste0("dis_fun must be gp_warp or gp_warp_vm! found = ", dis_fun)
+      stop(msg)
     }
   }
 
@@ -533,8 +534,9 @@ sim.kernels <- function(X,
       Kj <- sim.kernel_se(t, t, ell = ell[j_ell])
     } else if (types[j] == 3) {
       j_ell <- j_ell + 1
+      ell_ns <- ell[j_ell]
       Kj <- sim.kernel_bin(X_affected, X_affected) *
-        sim.kernel_ns(xj, xj, ell = ell[j_ell], a = steepness, b = 0, c = 1)
+        sim.kernel_ns(xj, xj, ell = ell_ns, a = steepness, b = 0, c = 1)
       if (useMaskedVarianceKernel) {
         M <- sim.kernel_var_mask(xj, xj, vm_params, stp = steepness)
         Kj <- Kj * M
@@ -1050,10 +1052,9 @@ sim.kernel_bin <- function(x1, x2 = NULL, alpha = 1, pos_class = 1) {
 #' @param a steepness of the warping function rise
 #' @param b location of the effective time window
 #' @param c maximum range
-#' @param nan_replace the value to use for replacing NaN values
 #' @return A kernel matrix of size n x m
-sim.kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c,
-                          nan_replace = 0) {
+sim.kernel_ns <- function(x1, x2 = NULL, alpha = 1, ell, a, b, c) {
+  nan_replace <- 0
   check_positive(a)
   check_positive(c)
   x1[is.nan(x1)] <- nan_replace

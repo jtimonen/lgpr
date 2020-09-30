@@ -128,12 +128,17 @@ lgp <- function(formula,
                 sample_f = !(likelihood == "gaussian"),
                 ...) {
 
-  # Create and fit the model
+  # Create model
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
     prior_only, verbose, sample_f
   )
-  sample_model(model = model, ...)
+  
+  # Fit model
+  if (verbose) cat("\nSampling model...\n")
+  fit <- sample_model(model = model, ...)
+  if (verbose) cat("Done.\n")
+  return(fit)
 }
 
 #' Fitting a model
