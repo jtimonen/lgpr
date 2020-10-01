@@ -51,10 +51,24 @@ likelihood_as_int <- function(likelihood) {
   return(index)
 }
 
+#' @rdname likelihood_encoding
+is_bin_or_bb <- function(likelihood) {
+  likelihood %in% c("binomial", "bb")
+}
+
+#' @rdname likelihood_encoding
+is_pois_or_nb <- function(likelihood) {
+  likelihood %in% c("poisson", "nb")
+}
+
 #' Link functions and their inverses
 #'
 #' @param x the input
 #' @param likelihood name of the likelihood model
+#' @param a a vector which should be divided
+#' elementwise by the vector of numbers of trials
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @param divide a boolean value
 #' @returns transformed input
 #' @name link
 NULL
@@ -63,9 +77,9 @@ NULL
 link <- function(x, likelihood) {
   allowed <- likelihood_list()
   check_allowed(likelihood, allowed)
-  if (likelihood %in% c("poisson", "nb")) {
+  if (is_pois_or_nb(likelihood)) {
     x <- log(x)
-  } else if (likelihood %in% c("binomial", "bb")) {
+  } else if (is_bin_or_bb(likelihood)) {
     x <- log(x) - log(1 - x)
   }
   return(x)
@@ -75,12 +89,24 @@ link <- function(x, likelihood) {
 link_inv <- function(x, likelihood) {
   allowed <- likelihood_list()
   check_allowed(likelihood, allowed)
-  if (likelihood %in% c("poisson", "nb")) {
+  if (is_pois_or_nb(likelihood)) {
     x <- exp(x)
-  } else if (likelihood %in% c("binomial", "bb")) {
+  } else if (is_bin_or_bb(likelihood)) {
     x <- 1 / (1 + exp(-x))
   }
   return(x)
+}
+
+#' @rdname link
+divide_by_num_trials <- function(a, fit) {
+  check_type(fit, "lgpfit")
+  likelihood <- get_obs_model(fit)
+  if (!is_bin_or_bb(likelihood)) {
+    return(a)
+  }
+  y_num_trials <- get_num_trials(fit)
+  check_lengths(a, y_num_trials)
+  a / y_num_trials
 }
 
 #' Ensure vector has expected length

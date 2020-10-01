@@ -218,6 +218,7 @@ get_y_name <- function(object) {
 #'   \item \code{get_obs_model} returns the obs. model as a string
 #'   \item \code{get_y_name} returns the response variable name
 #'   \item \code{get_data} returns the original unmodified data frame
+#'   \item \code{get_num_trials} returns the vector of numbers of trials
 #'   \item \code{is_f_sampled} returns a boolean value
 #' }
 NULL
@@ -249,4 +250,10 @@ is_f_sampled <- function(object) {
 get_obs_model <- function(object) {
   lh <- dollar(get_stan_input(object), "obs_model")
   likelihood_as_str(lh)
+}
+
+#' @rdname model_getters
+get_num_trials <- function(object) {
+  num_trials <- dollar(get_stan_input(object), "y_num_trials")
+  as.vector(num_trials)
 }

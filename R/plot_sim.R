@@ -1,11 +1,12 @@
 #' Visualize an lgpsim object (simulated data)
 #'
 #' @param simdata an object of class \linkS4class{lgpsim}
-#' @param f_name name of the signal in \code{simdata$components}
+#' @param h_name name of the signal in \code{simdata$components}
 #' @param x_name name of x-axis variable
 #' @param y_name name of response variable
 #' @param group_by grouping factor
 #' @param color_by coloring factor
+#' @param verbose should some information be printed?
 #' @param ... additional arguments to \code{\link{plot_api_g}} or
 #' \code{\link{plot_api_c}}
 #' @param comp_idx Possible index of a component to be shown.
@@ -20,32 +21,34 @@ NULL
 plot_sim <- function(simdata,
                      group_by = "id",
                      x_name = "age",
-                     f_name = "f",
+                     h_name = "h",
                      y_name = "y",
                      comp_idx = NULL,
                      color_by = NA,
+                     verbose = TRUE,
                      ...) {
   if (is.null(comp_idx)) {
-    p <- plot_sim.data(simdata, group_by, x_name, f_name, y_name, ...)
+    p <- plot_sim.data(simdata, group_by, x_name, h_name, y_name, verbose, ...)
     return(p)
   }
   plot_sim.component(
-    simdata, comp_idx, group_by, x_name, f_name, y_name, color_by, ...
+    simdata, comp_idx, group_by, x_name, color_by, verbose, ...
   )
 }
 
 #' @rdname plot_sim
 plot_sim.data <- function(simdata,
-                          group_by = "id",
-                          x_name = "age",
-                          f_name = "f",
-                          y_name = "y",
+                          group_by,
+                          x_name,
+                          h_name,
+                          y_name,
+                          verbose,
                           ...) {
   check_type(simdata, "lgpsim")
   data <- simdata@data
   df_points <- data[c(group_by, x_name, y_name)]
   df_lines <- data[c(group_by, x_name)]
-  df_lines$y <- simdata@components[[f_name]]
+  df_lines$y <- simdata@components[[h_name]]
 
   teff_true <- dollar(simdata@effect_times, "true")
   teff_true <- null_if_all_nan(teff_true)
@@ -58,27 +61,23 @@ plot_sim.data <- function(simdata,
     teff_obs = teff_obs,
     ...
   )
+  noise_type <- dollar(simdata@info, "noise_type")
+  info <- plot_sim.data.title(noise_type)
   if (!is.null(teff_true)) {
-    info <- paste0(
-      " - Solid vert. line is the real effect time (used to generate ",
-      "signal). \n - Dashed vert. line is the 'observed' disease ",
-      "initiation time."
-    )
-    h <- h + ggplot2::ggtitle("Simulated data", subtitle = info)
-  } else {
-    h <- h + ggplot2::ggtitle("Simulated data")
+    info <- paste(info, plot_sim.data.title_teff(), sep = "\n")
   }
+  if (verbose) cat(info, "\n")
+  h <- h + ggplot2::ggtitle("Simulated data")
   return(h)
 }
 
 #' @rdname plot_sim
 plot_sim.component <- function(simdata,
                                comp_idx,
-                               group_by = "id",
-                               x_name = "age",
-                               f_name = "f",
-                               y_name = "y",
-                               color_by = NA,
+                               group_by,
+                               x_name,
+                               color_by,
+                               verbose,
                                ...) {
   check_type(simdata, "lgpsim")
   check_not_null(comp_idx)
@@ -89,6 +88,7 @@ plot_sim.component <- function(simdata,
   title <- dollar(out, "name")
   h <- plot_api_c(df = dollar(out, "df"), ...)
   h <- h + ggplot2::ylab("f") + ggplot2::ggtitle(title)
+  if (verbose) cat("Plotting component", comp_idx, "\n")
   return(h)
 }
 
@@ -109,11 +109,38 @@ plot_sim.component.df <- function(simdata, x_name, group_by, color_by,
     if (!is.factor(color)) {
       # Color by whether or not the coloring variable is NA or NaN
       color <- as.numeric(!is.na(color))
-      color <- as.factor(c("NA/NaN", "available")[color + 1])
+      color <- as.factor(c("N/A", "available")[color + 1])
     }
   }
   x <- dollar(data, x_name)
   df <- data.frame(group, x, color, f)
   colnames(df) <- c(group_by, x_name, color_by, "y")
   list(df = df, name = name)
+}
+
+
+#' Helpers for plot_sim.data
+#'
+#' @param noise_type noise type name
+#' @name plot_sim_data_title
+NULL
+
+#' @rdname plot_sim_data_title
+plot_sim.data.title <- function(noise_type) {
+  info1 <- "- Dots are noisy observations of the response var."
+  info2 <- "- Line is the true signal mapped through inv. link fun."
+  info3 <- "  (and multiplied by number of trials)"
+  info <- paste(info1, info2, sep = "\n")
+  is_bin <- is_bin_or_bb(noise_type)
+  if (is_bin) info <- paste(info, info3, sep = "\n")
+  return(info)
+}
+
+#' @rdname plot_sim_data_title
+plot_sim.data.title_teff <- function() {
+  paste0(
+    "- Solid vert. line is the real effect time (used to generate ",
+    "signal) \n- Dashed vert. line is the 'observed' disease ",
+    "initiation time"
+  )
 }

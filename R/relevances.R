@@ -71,6 +71,7 @@ relevances.default.noise <- function(fit, pred) {
   num_obs <- ncol(h)
   num_draws <- nrow(h)
   y <- get_y(fit, original = TRUE)
+  y <- divide_by_num_trials(y, fit)
   resid <- h - repvec(y, num_draws)
   signal_var <- row_vars(h)
   error_var <- rowSums(resid^2) / (num_obs - 1)

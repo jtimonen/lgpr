@@ -56,7 +56,7 @@ default_prior_common <- function(name) {
   } else if (idx == 6) {
     prior <- bet(a = 0.2, b = 0.2) # beta
   } else if (idx == 7) {
-    prior <- bet(a = 3, b = 3) # gamma
+    prior <- bet(a = 1, b = 1) # gamma
   } else {
     prior <- uniform() # effect_time
   }

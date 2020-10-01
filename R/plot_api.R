@@ -40,7 +40,8 @@
 #' \code{\link[ggplot2]{facet_wrap}}
 #' @param ncol number of columns, an argument for
 #' \code{\link[ggplot2]{facet_wrap}}
-#' @param y_transform A function.
+#' @param y_transform A function to be applied to the third column of
+#' \code{df_data}.
 #' @return A \code{\link[ggplot2]{ggplot}} object.
 #' @family internal plot API functions
 plot_api_g <- function(df_data,
@@ -63,7 +64,8 @@ plot_api_g <- function(df_data,
   check_type(y_transform, "function")
 
   # Create the plot
-  h <- plot_api_g_create(df_data, i_test, y_transform, nrow, ncol)
+  df_data[, 3] <- call_fun(y_transform, df_data[, 3])
+  h <- plot_api_g_create(df_data, i_test, nrow, ncol)
   group_by <- colnames(df_data)[1]
   x_name <- colnames(df_data)[2]
 
@@ -139,7 +141,7 @@ plot_api_c <- function(df,
 #' @inheritParams plot_api_g
 #' @return a \code{ggplot} object
 #' @family plot_api_g functions
-plot_api_g_create <- function(df_data, i_test, y_transform, nrow, ncol) {
+plot_api_g_create <- function(df_data, i_test, nrow, ncol) {
 
   # Create dummy variable for type (train/test)
   show_test <- !is.null(i_test)

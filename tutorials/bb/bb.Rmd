@@ -1,0 +1,132 @@
+---
+title: "Using a discrete observation model in lgpr"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Using a discrete observation model in lgpr}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{r load}
+require("lgpr")
+require("ggplot2")
+```
+
+## Simulating data
+
+In this tutorial we simulate and analyse count data.
+
+### A) Binomial data 
+We first show how to generate binomial data
+```{r sim1, fig.width = 7, fig.height=5}
+set.seed(131)
+simData   <- simulate_data(N            = 12,
+                           t_data       = seq(12, 72, by = 12),
+                           covariates   = c(    2),
+                           noise_type   = "binomial",
+                           relevances   = c(0,1,1),
+                           lengthscales = c(18,24,18),
+                           N_trials     = 100,
+                           t_jitter     = 1)
+
+plot_sim(simData)
+```
+
+
+### B) Beta-binomial data 
+The noise level in the previous example was rather low. To generate more noisy observations, we can draw from the beta-binomial distribution.
+The overdispersion parameter $\gamma \in (0,1)$ controls the noise level,
+so that $\gamma \rightarrow 0$ would be equivalent to binomial noise (no overdispersion) and larger values mean more noise. Here we set `gamma = 0.3`.
+
+```{r sim2, fig.width = 7, fig.height=5}
+set.seed(131)
+simData   <- simulate_data(N            = 12,
+                           t_data       = seq(12, 72, by = 12),
+                           covariates   = c(    2),
+                           noise_type   = "bb",
+                           gamma        = 0.3,
+                           relevances   = c(0,1,1),
+                           lengthscales = c(18,24,18),
+                           N_trials     = 100,
+                           t_jitter     = 1)
+
+plot_sim(simData)
+```
+
+```{r head}
+dat <- simData@data
+str(dat)
+```
+
+## Defining model
+To use beta-binomial observation model in our analysis, we use the
+`likelihood` argument of `lgp()`. Here we define a uniform prior for
+the `gamma` parameter
+
+```{r prior}
+my_prior <- list(gamma = bet(1, 1))
+```
+
+## Fitting the model
+
+We fit a model using the generated beta-binomial data.
+```{r fit, cache = TRUE}
+fit <- lgp(y ~ age + age|id + age|z,
+           data = dat,
+           likelihood = "bb",
+           num_trials = 100,
+           prior = my_prior,
+           refresh = 300,
+           chains = 3,
+           cores = 3,
+           control = list(adapt_delta = 0.95),
+           iter = 2000)
+```
+
+```{r post1, cache = TRUE}
+print(fit)
+```
+
+We see that the posterior mean of the `gamma` parameter is close to the value used in simulation (0.3). We visualize its posterior draws for each MCMC chain:
+```{r post2, cache = TRUE, fig.width = 7, fig.height=3.5}
+plot_draws(fit, type = "trace", regex_pars = "gamma")
+```
+
+## Visualising predictions and components
+
+We subsample 50 draws from the posterior
+```{r random}
+draws <- sample.int(1000, 50)
+```
+
+and use them to visualize the model predictions
+```{r pred}
+t <- seq(2, 100, by = 2)
+x_pred <- new_x(dat, t)
+p <- pred(fit, x_pred, draws = draws)
+```
+
+```{r plt1, fig.width = 7, fig.height=4.5}
+plot_pred(fit, x = x_pred, pred = p, alpha = 0.1)
+```
+
+and model components
+```{r plt2, fig.width = 7, fig.height=4.5}
+plot_components(fit, x = x_pred, pred = p, alpha = 0.1, color_by = c(NA, NA, "z", "z"))
+```
+
+
+## Computing environment
+
+```{r sess}
+sessionInfo()
+```

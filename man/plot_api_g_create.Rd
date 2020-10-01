@@ -4,14 +4,12 @@
 \alias{plot_api_g_create}
 \title{Initialize a grouped plot}
 \usage{
-plot_api_g_create(df_data, i_test, y_transform, nrow, ncol)
+plot_api_g_create(df_data, i_test, nrow, ncol)
 }
 \arguments{
 \item{df_data}{A data frame containing the observations.}
 
 \item{i_test}{Indices of test points.}
-
-\item{y_transform}{A function.}
 
 \item{nrow}{number of rows, an argument for
 \code{\link[ggplot2]{facet_wrap}}}

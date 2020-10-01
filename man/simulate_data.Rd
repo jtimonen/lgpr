@@ -17,6 +17,7 @@ simulate_data(
   noise_type = "gaussian",
   snr = 3,
   phi = 1,
+  gamma = 0.2,
   N_affected = round(N/2),
   t_effect_range = "auto",
   t_observed = "after_0",
@@ -75,8 +76,10 @@ measurement times.}
 only with \cr
 \code{noise_type = "gaussian"}.}
 
-\item{phi}{The dispersion parameter for negative binomial data. The variance
-is g + g^2/phi.}
+\item{phi}{The inverse overdispersion parameter for negative binomial data.
+The variance is g + g^2/phi.}
+
+\item{gamma}{The dispersion parameter for beta-binomial data.}
 
 \item{N_affected}{Number of diseased individuals that are affected by the
 disease. This defaults to the number of diseased individuals. This argument

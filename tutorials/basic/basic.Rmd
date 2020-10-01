@@ -16,7 +16,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#")
 knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```
 
-This vignette demonstrates how to model a longitudinal data set and perform covariate relevance assessment using the `lgpr` package.
+This vignette demonstrates how to fit an additive Gaussian process (GP) model to a longitudinal data set and perform covariate relevance assessment using the `lgpr` package.
 
 ```{r load}
 require("lgpr")
@@ -45,21 +45,20 @@ plot_sim(sim, comp_idx = 2)
 ```
 
 ## Visualizing longitudinal data
-In this tutorial we use simulated `testdata_002`, which consists of 12 individuals and 8 time points for each. 
+In this tutorial we use simulated `testdata_002`, which is included in the `lgpr` package. It consists of 12 individuals and 8 time points for each. 
 
 ``````{r head}
 str(testdata_002)
 ```
 
-The `plot_data` function
+The `plot_data()` function
 can be used to visualize the data in many ways.
 
 ``````{r pd1, fig.width=7.2, fig.height=4.8}
 plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab('Age (months)')
 ```
 
-Coloring according to the disease-related age (`diseaseage`) shows that individuals 01-06 are cases and 07-12 are controls. The observed disease onset is at around 60
-months for each case individual.
+Coloring according to the disease-related age (`diseaseAge`) shows that individuals 01-06 are cases and 07-12 are controls. The observed disease onset is at around 60 months for each case individual.
 ``````{r pd2, fig.width=7.2, fig.height=4.8}
 plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
   scale_color_gradient2() + xlab('Age (months)')
@@ -67,7 +66,10 @@ plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
 
 
 ## Creating and fitting a model
-We define a model with four components and fit it. The `gp(age)` component
+
+Detailed instructions and the syntax for creating different kinds of models is found in the package documentation and the *Defining a model in lgpr* tutorial.
+
+Here we define a model with four components and fit it. The `gp(age)` component
 is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
 `gp_vm(diseaseAge)` is a non-stationary variance-masked disease effect, and
 `zs(group)` is a static offset component between the two groups (Case/Control).
@@ -80,67 +82,85 @@ fit <- lgp(formula = y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(dise
            refresh  = 250)
 ```
 
-## Studying the fit object
+## Studying the model and fit
 Printing the model object gives info about the model components, variables
-and parameter priors. In this example we did not specify the `prior` argument when
-calling `lgp()` so default priors were used.
+and parameter priors. In this example we did not specify the `prior` argument when calling `lgp()` so default priors were used.
+
 ```{r study1}
-fit@model
+print(fit@model)
 ```
+
+There are four magnitude parameters (alpha), one for each component, and three lengthscale parameters (ell), since the `zs(group)`component does not have a lengthscale parameter. 
+ 
+**Note:** the continuous covariates and the response variable have been normalized to zero mean and unit variance, and the inference of the lengthscale, magnitude, and noise parameters is done on that scale.
 
 Printing the fit object gives info about the posterior distribution of the
 parameters, MCMC settings and convergence diagnostics.
+
 ```{r study2}
-fit
+print(fit)
 ```
 
-Distribution of the parameter draws can be visualized. There are four magnitude
-parameters (alpha), one for each component, and three lengthscale parameters
-(ell), since the `zs(group)`component does not have a lengthscale parameter.
+Distribution of the parameter draws can be visualized.
+
 ```{r study3, fig.width = 6, fig.height = 3.5}
 plot_draws(fit, type = 'dens')
 ```
 
-Note that ell are on normalized scale! Inference is on normalized scale!
-
-## Assessing covariate relevances
+## Assessing component relevances
 Here we compute the average relevance of each component. We see that `id` and `group` have a very low relevance.
+
 ```{r study4, fig.width = 6, fig.height = 3.5}
 Relevance <- relevances(fit, reduce = mean)
 data.frame(Relevance)
 ```
 
-Components can be selected using a threshold for proportion of total explained variance. We see that `id` and `group` are not selected.
+Components can be selected using a threshold for the proportion of total explained variance. We see that `id` and `group` are not selected.
 ```{r study5, fig.width = 6, fig.height = 3.5}
 select(fit, threshold = 0.95)
 ```
 
-## Vis
+In order to avoid having to set a fixed `threshold` for selection, we can integrate over a threshold density on the [0,1] interval, and obtain probabilistic selection. Here we define the density to be `stats::dbeta(x, 20, 2)`, which has most mass between $0.9$ and $1.0$.
 
-Also, the posterior predictive mean ($\pm 2 \times$ standard deviation) can
-be visualized against the data. Here, the posterior predictive mean and
-standard deviation are computed using each parameter draw and then averaged.
+```{r study6, fig.width = 6, fig.height = 3.5}
+threshold_density <- function(x) {stats::dbeta(x, 20, 2)}
+s <- select.integrate(fit, p = threshold_density)
+print(s$expected)
+```
+
+The above table shows for each component the expectation value of being selected.
 
 ## Out-of-sample predictions
 
+We visualize the predictive distribution of the model, using posterior 
+mean hyperparameters (`reduce = mean`). The predictive mean ($\pm 2 \times$ standard deviation) are computed at 120 points for each of the 12 individuals (1440 total prediction points created using `new_x()`) and visualized against the data.
+
 ```{r vis3, fig.width=7, fig.height=4}
-t <- seq(0, 380, by = 1)
+t <- seq(1, 120, by = 1)
 x_pred <- new_x(testdata_002, t, x_ns = "diseaseAge")
 p <- pred(fit, x_pred, reduce = mean)
 plot_pred(fit, x = x_pred, pred = p)
 ```
 
-```{r vis4, fig.width=7, fig.height=4}
-plot_components(fit, x = x_pred, pred = p)
+## Visualizing the inferred covariate effects
+
+Also the posterior distribution of each component can be visualized
+
+```{r vis4, fig.width=7, fig.height=7}
+plot_components(fit, 
+                x = x_pred, 
+                pred = p,
+                color_by = c(NA, NA, "sex", "group", "group", "group"),
+                ylim = c(-3,2),
+                ncol = 2)
 ```
 
+**Note:** the `plot_pred()` function scales the predictions back to the original data scale, whereas the `plot_components()` function plots the inferred functions on the (normalized) inference scale.
 
-## Visualizing inferred components
-TODO: maybe only out-of-sample
-```{r vis1, fig.width=7, fig.height=7}
-plot_components(fit, 
-                no_err = c(F, T, F, F, F, T), 
-                color_by = c(NA, NA, "sex", "group", "group", "group"),
-                ylim = c(-2,2),
-                ncol = 2)
+**Note:** the `plot_pred()` and `plot_components()` functions could be used without the `x` and `pred` arguments, too, in which case computing out-of-sample predictions would not be needed. The predictive and component posteriors would be shown only at the data points.
+
+## Computing environment
+
+```{r sess}
+sessionInfo()
 ```

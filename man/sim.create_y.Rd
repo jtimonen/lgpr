@@ -4,7 +4,7 @@
 \alias{sim.create_y}
 \title{Generate noisy observations}
 \usage{
-sim.create_y(noise_type, f, snr, phi, N_trials)
+sim.create_y(noise_type, f, snr, phi, gamma, N_trials)
 }
 \arguments{
 \item{noise_type}{Either "gaussian", "poisson", "nb" (negative binomial) or
@@ -16,15 +16,18 @@ sim.create_y(noise_type, f, snr, phi, N_trials)
 only with \cr
 \code{noise_type = "gaussian"}.}
 
-\item{phi}{The dispersion parameter for negative binomial data. The variance
-is g + g^2/phi.}
+\item{phi}{The inverse overdispersion parameter for negative binomial data.
+The variance is g + g^2/phi.}
+
+\item{gamma}{The dispersion parameter for beta-binomial data.}
 
 \item{N_trials}{The number of trials parameter for binomial data.}
 }
 \value{
 A list \code{out}, where
 \itemize{
-  \item \code{out$g} is \code{f} mapped through an inverse link function and
+  \item \code{out$h} is \code{f} mapped through an inverse link function
+  (times \code{N_trials} if \code{noise_type} is binomial or beta-binomial)
   \item \code{out$y} is the noisy response variable.
 }
 }

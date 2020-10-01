@@ -100,4 +100,8 @@ p <- pred(fit, x_pred, verbose = FALSE, reduce = stats::median)
 plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')
 ```
 
+## Computing environment
 
+```{r sess}
+sessionInfo()
+```

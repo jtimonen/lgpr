@@ -92,14 +92,13 @@ pred.kr <- function(fit, x, reduce, draws, verbose,
   if (verbose) cat("Computing kernel regression...\n")
   kr <- pred.kr_compute(kernels, pred, delta, verbose, STREAM)
   f <- dollar(kr, "f")
-  likelihood <- get_obs_model(fit)
   if (verbose) cat("Done.\n")
 
   # Return
   new("Prediction",
     f_comp = arr3_to_list(dollar(kr, "f_comp")),
     f = f,
-    h = link_inv(f, likelihood)
+    h = link_inv(f, get_obs_model(fit))
   )
 }
 
@@ -209,12 +208,19 @@ pred_kernels <- function(fit, x, reduce, draws, verbose,
   if (verbose) cat("Extracting kernel parameter draws...\n")
   theta <- get_kernel_pars(fit, reduce, draws)
 
+  # Messages for verbose mode
+  N <- dollar(x_data, "num_obs")
+  P <- nrow(x)
+  msg1 <- paste("Computing", N, "x", N, "kernel matrices (data vs. data)...\n")
+  msg2 <- paste("Computing", P, "x", N, "kernel matrices (pred vs. data)...\n")
+  msg3 <- paste("Computing", P, "x", P, "kernel matrices (pred vs. pred)...\n")
+
   # Computation
-  if (verbose) cat("Computing kernel matrices data vs. data...\n")
+  if (verbose) cat(msg1)
   K <- kernel_matrices(model, x_data, x_data, theta, verbose, STREAM)
-  if (verbose) cat("Computing kernel matrices pred vs. data...\n")
+  if (verbose) cat(msg2)
   Ks <- kernel_matrices(model, x_pred, x_data, theta, verbose, STREAM)
-  if (verbose) cat("Computing kernel matrices pred vs. pred...\n")
+  if (verbose) cat(msg3)
   Kss <- kernel_matrices(model, x_pred, x_pred, theta, verbose, STREAM)
 
   # Return

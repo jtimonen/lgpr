@@ -5,6 +5,8 @@
 \alias{likelihood_list}
 \alias{likelihood_as_str}
 \alias{likelihood_as_int}
+\alias{is_bin_or_bb}
+\alias{is_pois_or_nb}
 \title{Integer encoding of likelihod function names}
 \usage{
 likelihood_list()
@@ -12,6 +14,10 @@ likelihood_list()
 likelihood_as_str(index)
 
 likelihood_as_int(likelihood)
+
+is_bin_or_bb(likelihood)
+
+is_pois_or_nb(likelihood)
 }
 \arguments{
 \item{index}{an integer}

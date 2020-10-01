@@ -148,12 +148,15 @@ plot_effect_times <- function(fit, type = "areas", ...) {
 
 #' Extract posterior draws
 #'
-#' @export
 #' @description These functions use \code{\link[rstan]{extract}} with
 #' \code{permuted = FALSE} and \code{inc_warmup = FALSE}. Chains are stacked
 #' so that the return value is always a 2-dimensional array.
-#' The \code{get_draws.catch} function calls \code{get_draws} but catches
+#' \itemize{
+#'  \item \code{get_draws} extracts posterior draws after warmup
+#'   \item \code{get_draws.catch} function calls \code{get_draws} but catches
 #' errors and returns NULL if an error occurs.
+#'   \item \code{get_num_draws} returns totals number of post-warmup draws
+#' }
 #' @param fit an object of class \linkS4class{lgpfit}
 #' @param draws Indices of parameter draws to return use. All post-warmup
 #' draws are returned if this is \code{NULL}.
@@ -194,6 +197,7 @@ get_draws.catch <- function(fit, draws = NULL, reduce = NULL, ...) {
   )
 }
 
+#' @export
 #' @rdname get_draws
 get_num_draws <- function(fit) {
   draws <- get_draws(fit, draws = NULL, reduce = NULL, pars = "alpha")

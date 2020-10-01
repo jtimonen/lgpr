@@ -65,7 +65,8 @@ generate the signal. Omitted if \code{NULL}.}
 \item{ncol}{number of columns, an argument for
 \code{\link[ggplot2]{facet_wrap}}}
 
-\item{y_transform}{A function.}
+\item{y_transform}{A function to be applied to the third column of
+\code{df_data}.}
 }
 \value{
 A \code{\link[ggplot2]{ggplot}} object.

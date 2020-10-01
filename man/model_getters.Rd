@@ -7,6 +7,7 @@
 \alias{get_num_obs}
 \alias{is_f_sampled}
 \alias{get_obs_model}
+\alias{get_num_trials}
 \title{Functions that access model properties}
 \usage{
 get_stan_input(object)
@@ -18,6 +19,8 @@ get_num_obs(object)
 is_f_sampled(object)
 
 get_obs_model(object)
+
+get_num_trials(object)
 }
 \arguments{
 \item{object}{an object of class \linkS4class{lgpmodel} or
@@ -30,6 +33,7 @@ get_obs_model(object)
   \item \code{get_obs_model} returns the obs. model as a string
   \item \code{get_y_name} returns the response variable name
   \item \code{get_data} returns the original unmodified data frame
+  \item \code{get_num_trials} returns the vector of numbers of trials
   \item \code{is_f_sampled} returns a boolean value
 }
 }

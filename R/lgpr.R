@@ -133,7 +133,7 @@ lgp <- function(formula,
     formula, data, likelihood, prior, c_hat, num_trials, options,
     prior_only, verbose, sample_f
   )
-  
+
   # Fit model
   if (verbose) cat("\nSampling model...\n")
   fit <- sample_model(model = model, ...)

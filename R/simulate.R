@@ -38,6 +38,7 @@ simulate_data <- function(N,
                           noise_type = "gaussian",
                           snr = 3,
                           phi = 1,
+                          gamma = 0.2,
                           N_affected = round(N / 2),
                           t_effect_range = "auto",
                           t_observed = "after_0",
@@ -102,23 +103,23 @@ simulate_data <- function(N,
 
   # Generate noise
   NOISY <- sim.create_y(noise_type, f,
-    snr = snr, phi = phi,
+    snr = snr, phi = phi, gamma = gamma,
     N_trials = N_trials
   )
-  g <- dollar(NOISY, "g")
+  h <- dollar(NOISY, "h")
   y <- dollar(NOISY, "y")
-  noise <- y - g
+  noise <- y - h
 
   # Create the output objects
   dat <- cbind(dollar(IN, "X"), y)
   rownames(dat) <- 1:(N * k)
-  comp <- cbind(FFF, f, g, noise, y)
+  comp <- cbind(FFF, f, h, noise, y)
 
   # Real diseaseAges to observed ones
   OBSERVED <- sim.data_to_observed(dat, t_observed)
 
   # Signal and noise sums of squares
-  SSR <- sum((g - mean(g))^2)
+  SSR <- sum((h - mean(h))^2)
   SSE <- sum(noise^2)
 
   # Create rest of the fields
@@ -130,7 +131,8 @@ simulate_data <- function(N,
     par_ell = lengthscales,
     par_cont = dollar(IN, "par_cont"),
     p_signal = SSR / (SSR + SSE),
-    msg = dollar(IN, "info")
+    msg = dollar(IN, "info"),
+    noise_type = noise_type
   )
 
   # Return S4 class object
@@ -152,44 +154,53 @@ simulate_data <- function(N,
 #' @param snr The desired signal-to-noise ratio. This argument is valid
 #' only with \cr
 #' \code{noise_type = "gaussian"}.
-#' @param phi The dispersion parameter for negative binomial data. The variance
-#' is g + g^2/phi.
+#' @param phi The inverse overdispersion parameter for negative binomial data.
+#' The variance is g + g^2/phi.
+#' @param gamma The dispersion parameter for beta-binomial data.
 #' @param N_trials The number of trials parameter for binomial data.
 #' @param f The underlying signal.
 #' @return A list \code{out}, where
 #' \itemize{
-#'   \item \code{out$g} is \code{f} mapped through an inverse link function and
+#'   \item \code{out$h} is \code{f} mapped through an inverse link function
+#'   (times \code{N_trials} if \code{noise_type} is binomial or beta-binomial)
 #'   \item \code{out$y} is the noisy response variable.
 #' }
-sim.create_y <- function(noise_type, f, snr, phi, N_trials) {
+sim.create_y <- function(noise_type, f, snr, phi, gamma, N_trials) {
   L <- length(f)
   y <- rep(0, L)
+  h <- link_inv(f, noise_type)
   if (noise_type == "gaussian") {
     sf <- stats::var(f)
     sigma_n <- 1 / sqrt(snr) * sqrt(sf)
     y_n <- stats::rnorm(n = L, mean = 0, sd = 1)
     y_n <- sigma_n * (y_n - mean(y_n)) / stats::sd(y_n)
-    g <- f
-    y <- g + y_n
+    y <- h + y_n
   } else if (noise_type == "poisson") {
-    g <- exp(f)
     for (i in 1:L) {
-      y[i] <- stats::rpois(n = 1, lambda = g[i])
+      y[i] <- stats::rpois(n = 1, lambda = h[i])
     }
   } else if (noise_type == "nb") {
-    g <- exp(f)
     for (i in 1:L) {
-      y[i] <- stats::rnbinom(n = 1, mu = g[i], size = phi)
+      y[i] <- stats::rnbinom(n = 1, mu = h[i], size = phi)
     }
   } else if (noise_type == "binomial") {
-    g <- 1 / (1 + exp(-f))
     for (i in 1:L) {
-      y[i] <- stats::rbinom(n = 1, size = N_trials, prob = g[i])
+      y[i] <- stats::rbinom(n = 1, size = N_trials, prob = h[i])
     }
+    h <- N_trials * h
   } else {
-    stop(paste("Invalid input noise_type = '", noise_type, "'", sep = ""))
+    # "bb"
+    check_interval(gamma, 0, 1)
+    for (i in 1:L) {
+      gam_t <- (1 - gamma) / gamma
+      alpha <- gam_t * h[i]
+      beta <- gam_t * (1 - h[i])
+      prob <- stats::rbeta(n = 1, alpha, beta)
+      y[i] <- stats::rbinom(n = 1, size = N_trials, prob = prob)
+    }
+    h <- N_trials * h
   }
-  NOISY <- list(g = g, y = y)
+  NOISY <- list(h = h, y = y)
   return(NOISY)
 }
 

@@ -43,13 +43,24 @@ plot_pred <- function(fit,
   pred <- dollar(input, "pred")
   df_base <- dollar(input, "df_base")
 
+  # Create y transform
+  lh <- get_obs_model(fit)
+  if (is_bin_or_bb(lh)) {
+    y_fun <- function(x) divide_by_num_trials(x, fit)
+    y_lab <- "y / num_trials"
+  } else {
+    y_fun <- function(x) x
+    y_lab <- "y"
+  }
   # Create plot
-  plot_api_g(
+  h <- plot_api_g(
     df_data = df_data,
     df = plot_pred.create.df_line(fit, pred, df_base),
     df_err = plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD),
+    y_transform = y_fun,
     ...
   )
+  h + ggplot2::ylab(y_lab)
 }
 
 

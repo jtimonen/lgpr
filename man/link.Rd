@@ -3,16 +3,26 @@
 \name{link}
 \alias{link}
 \alias{link_inv}
+\alias{divide_by_num_trials}
 \title{Link functions and their inverses}
 \usage{
 link(x, likelihood)
 
 link_inv(x, likelihood)
+
+divide_by_num_trials(a, fit)
 }
 \arguments{
 \item{x}{the input}
 
 \item{likelihood}{name of the likelihood model}
+
+\item{a}{a vector which should be divided
+elementwise by the vector of numbers of trials}
+
+\item{fit}{an object of class \linkS4class{lgpfit}}
+
+\item{divide}{a boolean value}
 }
 \value{
 transformed input

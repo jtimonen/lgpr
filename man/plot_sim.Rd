@@ -11,32 +11,17 @@ plot_sim(
   simdata,
   group_by = "id",
   x_name = "age",
-  f_name = "f",
+  h_name = "h",
   y_name = "y",
   comp_idx = NULL,
   color_by = NA,
+  verbose = TRUE,
   ...
 )
 
-plot_sim.data(
-  simdata,
-  group_by = "id",
-  x_name = "age",
-  f_name = "f",
-  y_name = "y",
-  ...
-)
+plot_sim.data(simdata, group_by, x_name, h_name, y_name, verbose, ...)
 
-plot_sim.component(
-  simdata,
-  comp_idx,
-  group_by = "id",
-  x_name = "age",
-  f_name = "f",
-  y_name = "y",
-  color_by = NA,
-  ...
-)
+plot_sim.component(simdata, comp_idx, group_by, x_name, color_by, verbose, ...)
 
 plot_sim.component.df(simdata, x_name, group_by, color_by, comp_idx)
 }
@@ -47,7 +32,7 @@ plot_sim.component.df(simdata, x_name, group_by, color_by, comp_idx)
 
 \item{x_name}{name of x-axis variable}
 
-\item{f_name}{name of the signal in \code{simdata$components}}
+\item{h_name}{name of the signal in \code{simdata$components}}
 
 \item{y_name}{name of response variable}
 
@@ -55,6 +40,8 @@ plot_sim.component.df(simdata, x_name, group_by, color_by, comp_idx)
 If this is NULL, the data and total signal are shown.}
 
 \item{color_by}{coloring factor}
+
+\item{verbose}{should some information be printed?}
 
 \item{...}{additional arguments to \code{\link{plot_api_g}} or
 \code{\link{plot_api_c}}}

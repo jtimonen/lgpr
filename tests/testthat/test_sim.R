@@ -19,7 +19,7 @@ test_that("gaussian data can be simulated", {
   expect_equal(names(data), !!data_names)
   teff_names <- c("true", "observed")
   expect_equal(names(dat@effect_times), !!teff_names)
-  info_names <- c("par_ell", "par_cont", "p_signal", "msg")
+  info_names <- c("par_ell", "par_cont", "p_signal", "msg", "noise_type")
   expect_equal(names(dat@info), !!info_names)
 })
 
@@ -46,6 +46,7 @@ test_that("negative binomial data can be simulated", {
   y <- dat@data$y
   diff <- round(y) - y
   expect_lt(max(diff), 1e-6)
+  expect_output(plot_sim(dat, verbose = TRUE))
 })
 
 test_that("binomial data can be simulated", {
@@ -62,13 +63,27 @@ test_that("binomial data can be simulated", {
   expect_lt(max(diff), 1e-6)
 })
 
+test_that("beta-binomial data can be simulated", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = c(1, 2, 3),
+    covariates = c(2, 2),
+    bin_kernel = TRUE,
+    noise_type = "bb",
+    N_trials = 100
+  )
+  y <- dat@data$y
+  diff <- round(y) - y
+  expect_lt(max(diff), 1e-6)
+})
+
 test_that("error is thrown with invalid input", {
   expect_error(simulate_data(
     N = 4,
     t_data = c(1, 2, 3),
     covariates = c(2, 2),
     noise_type = "blaablaa",
-  ), "Invalid input noise_type")
+  ), "given value 'blaablaa' for argument <likelihood> is invalid")
 
   expect_error(simulate_data(
     N = 4,
@@ -125,13 +140,24 @@ test_that("different types of components can be simulated", {
   dat <- simulate_data(
     N = 4,
     t_data = seq(6, 36, by = 6),
-    covariates = c(0, 1, 3, 4)
+    covariates = c(0, 1, 3, 4),
+    dis_fun = "gp_warp",
   )
   cnames <- c(
     "id.age", "age", "diseaseAge", "x", "offset", "group",
-    "f", "g", "noise", "y"
+    "f", "h", "noise", "y"
   )
   expect_equal(names(dat@components), cnames)
+})
+
+test_that("invalid disease function cannot be given", {
+  reason <- "dis_fun must be gp_warp or gp_warp_vm"
+  expect_error(simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 1, 3, 4),
+    dis_fun = "notavalidname",
+  ), reason)
 })
 
 test_that("disease component can be simulated only for selected individuals", {

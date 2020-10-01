@@ -40,8 +40,8 @@ simData <- simulate_data(N            = 12,
                          t_observed   = obs_fun,
                          snr          = 3)
 
-plot_sim(simData)
-#plot_sim.component(simData,3)
+plot_sim(simData) + xlab('Age (months)')
+#plot_sim(simData, comp_idx = 3) # to visualize one generated component
 ```
 Above, the blue line represents the data-generating signal and black dots are
 noisy observations of the response variable.
@@ -114,15 +114,19 @@ model_summary(fit)
 We can visualize the inferred effect times for each case individual. We see
 that for individuals 2 and 3 the inferred effect time is much earlier than the observed one.
 ```{r plt1, fig.width=7.2, fig.height=5.2}
-plot_effect_times(fit)
+plot_effect_times(fit) + xlab('Age (months)')
 ```
 
 Finally we plot the inferred disease component
 ```{r plt2, fig.width=7.2, fig.height=4.2}
 t <- seq(0, 100, by = 1)
-x_pred <- new_x(dat, t, x_ns = "diseaseAge")
+x_pred <- new_x(dat, t, x_ns = 'diseaseAge')
 p <- pred(fit, x_pred, verbose = FALSE)
-plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')
+plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')  + xlab('Age (months)')
 ```
 
+## Computing environment
 
+```{r sess}
+sessionInfo()
+```
