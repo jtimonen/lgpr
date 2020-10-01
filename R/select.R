@@ -10,9 +10,9 @@
 #'   \item \code{select_freq} performs the selection separately using
 #'   each parameter draw and returns the frequency at which each
 #'   component was selected.
-#'   \item \code{select_freq.integrate} is like \code{select_freq}, but instead of
-#'   a fixed threshold, computes probabilistic selection frequencies
-#'   by integrating over a threshold density.
+#'   \item \code{select_freq.integrate} is like \code{select_freq}, but
+#'   instead of a fixed threshold, computes probabilistic selection
+#'   frequencies by integrating over a threshold density.
 #' }
 #' @param fit An object of class \code{lgpfit}.
 #' @param reduce The \code{reduce} argument for \code{\link{relevances}}.
