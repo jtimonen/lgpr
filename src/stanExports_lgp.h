@@ -61,13 +61,13 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(620, 44, "restart", "model_lgp");
     reader.add_event(622, 46, "include", "chunks/model-likelihood.stan");
     reader.add_event(622, 0, "start", "chunks/model-likelihood.stan");
-    reader.add_event(673, 51, "end", "chunks/model-likelihood.stan");
-    reader.add_event(673, 47, "restart", "model_lgp");
-    reader.add_event(677, 51, "include", "chunks/generated.stan");
-    reader.add_event(677, 0, "start", "chunks/generated.stan");
-    reader.add_event(729, 52, "end", "chunks/generated.stan");
-    reader.add_event(729, 52, "restart", "model_lgp");
-    reader.add_event(732, 53, "end", "model_lgp");
+    reader.add_event(670, 48, "end", "chunks/model-likelihood.stan");
+    reader.add_event(670, 47, "restart", "model_lgp");
+    reader.add_event(674, 51, "include", "chunks/generated.stan");
+    reader.add_event(674, 0, "start", "chunks/generated.stan");
+    reader.add_event(726, 52, "end", "chunks/generated.stan");
+    reader.add_event(726, 52, "restart", "model_lgp");
+    reader.add_event(729, 53, "end", "model_lgp");
     return reader;
 }
 template <typename T0__>
@@ -2537,21 +2537,14 @@ public:
                     stan::math::fill(KX, DUMMY_VAR__);
                     stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx_expand, idx_expand, teff_zero, pstream__));
                     current_statement_begin__ = 665;
-                    if (as_bool(logical_neq(obs_model, 1))) {
-                        current_statement_begin__ = 666;
-                        std::stringstream errmsg_stream__;
-                        errmsg_stream__ << "<obs_model> must be 1 if the latent functions are not sampled!";
-                        throw std::domain_error(errmsg_stream__.str());
-                    }
-                    current_statement_begin__ = 668;
                     for (int j = 1; j <= num_comps; ++j) {
-                        current_statement_begin__ = 669;
+                        current_statement_begin__ = 666;
                         stan::math::assign(Ky, add(Ky, get_base1(KX, j, "KX", 1)));
                     }
-                    current_statement_begin__ = 671;
+                    current_statement_begin__ = 668;
                     stan::math::assign(Ky, add(Ky, diag_matrix(sigma2_vec)));
-                    current_statement_begin__ = 672;
-                    lp_accum__.add(multi_normal_log(get_base1(y_cont, 1, "y_cont", 1), c_hat, Ky));
+                    current_statement_begin__ = 669;
+                    lp_accum__.add(multi_normal_cholesky_log<propto__>(get_base1(y_cont, 1, "y_cont", 1), c_hat, cholesky_decompose(Ky)));
                     }
                 }
             }
@@ -2851,29 +2844,29 @@ public:
             }
             if (!include_gqs__) return;
             // declare and define generated quantities
-            current_statement_begin__ = 685;
+            current_statement_begin__ = 682;
             validate_non_negative_index("f_post", "num_obs", num_obs);
             validate_non_negative_index("f_post", "logical_eq(is_f_sampled, 0)", logical_eq(is_f_sampled, 0));
             validate_non_negative_index("f_post", "(2 * (num_comps + 1))", (2 * (num_comps + 1)));
             std::vector<std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > > f_post(logical_eq(is_f_sampled, 0), std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >((2 * (num_comps + 1)), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_obs)));
             stan::math::initialize(f_post, DUMMY_VAR__);
             stan::math::fill(f_post, DUMMY_VAR__);
-            current_statement_begin__ = 686;
+            current_statement_begin__ = 683;
             validate_non_negative_index("y_rng_disc", "(primitive_value(is_f_sampled) && primitive_value(logical_neq(obs_model, 1)))", (primitive_value(is_f_sampled) && primitive_value(logical_neq(obs_model, 1))));
             validate_non_negative_index("y_rng_disc", "num_obs", num_obs);
             std::vector<std::vector<int> > y_rng_disc((primitive_value(is_f_sampled) && primitive_value(logical_neq(obs_model, 1))), std::vector<int>(num_obs, int(0)));
             stan::math::fill(y_rng_disc, std::numeric_limits<int>::min());
-            current_statement_begin__ = 687;
+            current_statement_begin__ = 684;
             validate_non_negative_index("y_rng_cont", "(primitive_value(is_f_sampled) && primitive_value(logical_eq(obs_model, 1)))", (primitive_value(is_f_sampled) && primitive_value(logical_eq(obs_model, 1))));
             validate_non_negative_index("y_rng_cont", "num_obs", num_obs);
             std::vector<std::vector<double> > y_rng_cont((primitive_value(is_f_sampled) && primitive_value(logical_eq(obs_model, 1))), std::vector<double>(num_obs, double(0)));
             stan::math::initialize(y_rng_cont, DUMMY_VAR__);
             stan::math::fill(y_rng_cont, DUMMY_VAR__);
             // generated quantities statements
-            current_statement_begin__ = 689;
+            current_statement_begin__ = 686;
             if (as_bool(logical_eq(is_f_sampled, 0))) {
                 {
-                current_statement_begin__ = 692;
+                current_statement_begin__ = 689;
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_comps", num_comps);
@@ -2881,7 +2874,7 @@ public:
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
                 stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx_expand, idx_expand, teff_zero, pstream__));
-                current_statement_begin__ = 698;
+                current_statement_begin__ = 695;
                 stan::model::assign(f_post, 
                             stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                             STAN_gp_posterior(KX, KX, KX, get_base1(y_cont, 1, "y_cont", 1), delta, get_base1(sigma, 1, "sigma", 1), pstream__), 
@@ -2889,22 +2882,22 @@ public:
                 }
             } else {
                 {
-                current_statement_begin__ = 702;
+                current_statement_begin__ = 699;
                 validate_non_negative_index("f_sum", "num_obs", num_obs);
                 Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> f_sum(num_obs);
                 stan::math::initialize(f_sum, DUMMY_VAR__);
                 stan::math::fill(f_sum, DUMMY_VAR__);
                 stan::math::assign(f_sum,add(STAN_vectorsum(get_base1(f_latent, 1, "f_latent", 1), num_obs, pstream__), c_hat));
-                current_statement_begin__ = 703;
+                current_statement_begin__ = 700;
                 if (as_bool(logical_eq(obs_model, 2))) {
                     {
-                    current_statement_begin__ = 705;
+                    current_statement_begin__ = 702;
                     validate_non_negative_index("LOG_MU", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > LOG_MU(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(LOG_MU, DUMMY_VAR__);
                     stan::math::fill(LOG_MU, DUMMY_VAR__);
                     stan::math::assign(LOG_MU,to_array_1d(f_sum));
-                    current_statement_begin__ = 706;
+                    current_statement_begin__ = 703;
                     stan::model::assign(y_rng_disc, 
                                 stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                                 poisson_log_rng(LOG_MU, base_rng__), 
@@ -2912,19 +2905,19 @@ public:
                     }
                 } else if (as_bool(logical_eq(obs_model, 3))) {
                     {
-                    current_statement_begin__ = 709;
+                    current_statement_begin__ = 706;
                     validate_non_negative_index("LOG_MU", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > LOG_MU(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(LOG_MU, DUMMY_VAR__);
                     stan::math::fill(LOG_MU, DUMMY_VAR__);
                     stan::math::assign(LOG_MU,to_array_1d(f_sum));
-                    current_statement_begin__ = 710;
+                    current_statement_begin__ = 707;
                     validate_non_negative_index("PHI", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > PHI(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(PHI, DUMMY_VAR__);
                     stan::math::fill(PHI, DUMMY_VAR__);
                     stan::math::assign(PHI,to_array_1d(rep_vector(get_base1(phi, 1, "phi", 1), num_obs)));
-                    current_statement_begin__ = 711;
+                    current_statement_begin__ = 708;
                     stan::model::assign(y_rng_disc, 
                                 stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                                 neg_binomial_2_log_rng(LOG_MU, PHI, base_rng__), 
@@ -2932,13 +2925,13 @@ public:
                     }
                 } else if (as_bool(logical_eq(obs_model, 4))) {
                     {
-                    current_statement_begin__ = 714;
+                    current_statement_begin__ = 711;
                     validate_non_negative_index("P", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > P(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(P, DUMMY_VAR__);
                     stan::math::fill(P, DUMMY_VAR__);
                     stan::math::assign(P,to_array_1d(inv_logit(f_sum)));
-                    current_statement_begin__ = 715;
+                    current_statement_begin__ = 712;
                     stan::model::assign(y_rng_disc, 
                                 stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                                 binomial_rng(get_base1(y_num_trials, 1, "y_num_trials", 1), P, base_rng__), 
@@ -2946,31 +2939,31 @@ public:
                     }
                 } else if (as_bool(logical_eq(obs_model, 5))) {
                     {
-                    current_statement_begin__ = 718;
+                    current_statement_begin__ = 715;
                     local_scalar_t__ tgam(DUMMY_VAR__);
                     (void) tgam;  // dummy to suppress unused var warning
                     stan::math::initialize(tgam, DUMMY_VAR__);
                     stan::math::fill(tgam, DUMMY_VAR__);
                     stan::math::assign(tgam,(inv(get_base1(gamma, 1, "gamma", 1)) - 1.0));
-                    current_statement_begin__ = 719;
+                    current_statement_begin__ = 716;
                     validate_non_negative_index("P", "num_obs", num_obs);
                     Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> P(num_obs);
                     stan::math::initialize(P, DUMMY_VAR__);
                     stan::math::fill(P, DUMMY_VAR__);
                     stan::math::assign(P,inv_logit(f_sum));
-                    current_statement_begin__ = 720;
+                    current_statement_begin__ = 717;
                     validate_non_negative_index("aa", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > aa(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(aa, DUMMY_VAR__);
                     stan::math::fill(aa, DUMMY_VAR__);
                     stan::math::assign(aa,to_array_1d(multiply(P, tgam)));
-                    current_statement_begin__ = 721;
+                    current_statement_begin__ = 718;
                     validate_non_negative_index("bb", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > bb(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(bb, DUMMY_VAR__);
                     stan::math::fill(bb, DUMMY_VAR__);
                     stan::math::assign(bb,to_array_1d(multiply(subtract(1.0, P), tgam)));
-                    current_statement_begin__ = 722;
+                    current_statement_begin__ = 719;
                     stan::model::assign(y_rng_disc, 
                                 stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                                 beta_binomial_rng(get_base1(y_num_trials, 1, "y_num_trials", 1), aa, bb, base_rng__), 
@@ -2978,19 +2971,19 @@ public:
                     }
                 } else {
                     {
-                    current_statement_begin__ = 725;
+                    current_statement_begin__ = 722;
                     validate_non_negative_index("MU", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > MU(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(MU, DUMMY_VAR__);
                     stan::math::fill(MU, DUMMY_VAR__);
                     stan::math::assign(MU,to_array_1d(f_sum));
-                    current_statement_begin__ = 726;
+                    current_statement_begin__ = 723;
                     validate_non_negative_index("SIGMA", "num_obs", num_obs);
                     std::vector<local_scalar_t__  > SIGMA(num_obs, local_scalar_t__(DUMMY_VAR__));
                     stan::math::initialize(SIGMA, DUMMY_VAR__);
                     stan::math::fill(SIGMA, DUMMY_VAR__);
                     stan::math::assign(SIGMA,to_array_1d(rep_vector(get_base1(sigma, 1, "sigma", 1), num_obs)));
-                    current_statement_begin__ = 727;
+                    current_statement_begin__ = 724;
                     stan::model::assign(y_rng_cont, 
                                 stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
                                 normal_rng(MU, SIGMA, base_rng__), 
@@ -3000,7 +2993,7 @@ public:
                 }
             }
             // validate, write generated quantities
-            current_statement_begin__ = 685;
+            current_statement_begin__ = 682;
             size_t f_post_j_1_max__ = num_obs;
             size_t f_post_k_0_max__ = logical_eq(is_f_sampled, 0);
             size_t f_post_k_1_max__ = (2 * (num_comps + 1));
@@ -3011,7 +3004,7 @@ public:
                     }
                 }
             }
-            current_statement_begin__ = 686;
+            current_statement_begin__ = 683;
             size_t y_rng_disc_k_0_max__ = (primitive_value(is_f_sampled) && primitive_value(logical_neq(obs_model, 1)));
             size_t y_rng_disc_k_1_max__ = num_obs;
             for (size_t k_1__ = 0; k_1__ < y_rng_disc_k_1_max__; ++k_1__) {
@@ -3019,7 +3012,7 @@ public:
                     vars__.push_back(y_rng_disc[k_0__][k_1__]);
                 }
             }
-            current_statement_begin__ = 687;
+            current_statement_begin__ = 684;
             size_t y_rng_cont_k_0_max__ = (primitive_value(is_f_sampled) && primitive_value(logical_eq(obs_model, 1)));
             size_t y_rng_cont_k_1_max__ = num_obs;
             for (size_t k_1__ = 0; k_1__ < y_rng_cont_k_1_max__; ++k_1__) {

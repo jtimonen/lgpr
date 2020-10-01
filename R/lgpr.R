@@ -1,13 +1,19 @@
 #' The 'lgpr' package.
 #'
-#' @description Longitudinal Gaussian Process regression.
-#' The package features additive Gaussian process modeling of longitudinal
-#' data with with interpretable covariate effects and covariate relevance
-#' assesment. Models can include non-stationary, heterogeneous and temporally
-#' uncertain effects. Bayesian inference of the model (hyper)parameters using
-#' \code{\link[rstan]{rstan}}. Functions for visualizing longitudinal data,
+#' @description
+#' \itemize{
+#'   \item A package for Bayesian additive Gaussian process (GP) modeling with
+#' interpretable kernels designed for longitudinal data.
+#'   \item Features inference of covariate effects
+#'   and covariate relevance assesment.
+#'   \item Models can include non-stationary, heterogeneous and temporally
+#' uncertain effects.
+#'   \item Bayesian inference of the model (hyper)parameters using
+#' \code{\link[rstan]{rstan}}.
+#'   \item  Functions for visualizing longitudinal data,
 #' posterior draws, model predictions and inferred covariate effects are
 #' also provided.
+#' }
 #'
 #' @author Juho Timonen (first.last at iki.fi)
 #' @keywords Gaussian processes, longitudinal data, Stan, covariate relevances,

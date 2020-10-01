@@ -72,8 +72,16 @@ navbar:
     articles:
       text: Tutorials
       menu:
-      - text: Vignettes
-        href: articles/index.html
+      - text: Basic usage
+        href: tutorials/basic.html
+      - text: Defining a model
+        href: tutorials/syntax.html
+      - text: Heterogeneous effects
+        href: tutorials/heter.html
+      - text: Temporally uncertain effects
+        href: tutorials/heter.html
+      - text: Discrete observation model
+        href: tutorials/bb.html
     overview:
       text: Overview
       href: reference/lgpr-package.html

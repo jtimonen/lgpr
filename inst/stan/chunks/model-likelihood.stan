@@ -40,12 +40,9 @@ if(is_f_sampled){
       alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_zero);
 
-  if(obs_model!=1){
-    reject("<obs_model> must be 1 if the latent functions are not sampled!")
-  }
   for(j in 1:num_comps){
     Ky += KX[j];
   }
   Ky = Ky + diag_matrix(sigma2_vec);
-  target += multi_normal_lpdf(y_cont[1] | c_hat, Ky);
+  y_cont[1] ~ multi_normal_cholesky(c_hat, cholesky_decompose(Ky));
 }

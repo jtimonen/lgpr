@@ -108,6 +108,7 @@ print(fit)
 Printing the model information clarifies the model and priors
 ```{r mod}
 model_summary(fit)
+#rstan::get_elapsed_time(fit@stan_fit)
 ```
 
 ## Visualizing the inferred effect times
