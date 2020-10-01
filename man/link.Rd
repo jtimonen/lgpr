@@ -21,8 +21,6 @@ divide_by_num_trials(a, fit)
 elementwise by the vector of numbers of trials}
 
 \item{fit}{an object of class \linkS4class{lgpfit}}
-
-\item{divide}{a boolean value}
 }
 \value{
 transformed input

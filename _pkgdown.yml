@@ -15,6 +15,7 @@ reference:
   - fit_summary 
   - gam 
   - get_draws 
+  - get_num_draws 
   - get_pred 
   - get_y_rng 
   - igam 

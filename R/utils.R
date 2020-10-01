@@ -68,7 +68,6 @@ is_pois_or_nb <- function(likelihood) {
 #' @param a a vector which should be divided
 #' elementwise by the vector of numbers of trials
 #' @param fit an object of class \linkS4class{lgpfit}
-#' @param divide a boolean value
 #' @returns transformed input
 #' @name link
 NULL
