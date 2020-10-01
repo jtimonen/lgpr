@@ -13,3 +13,6 @@ inst/doc
 *.so
 *.o
 *.dll
+tutorials
+docs
+
