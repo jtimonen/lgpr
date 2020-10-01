@@ -58,11 +58,6 @@ reference:
   desc: ~
 - contents:
   - starts_with("")
-  
-development:
-  mode: auto
-  version_label: info
-  version_tooltip: "Development version"
     
 navbar:
   structure:
