@@ -1,0 +1,87 @@
+template:
+  params:
+    bootswatch: lumen
+
+reference:
+- title: "Public API"
+  desc: "Functions that are exported from the package namespace."
+- contents: 
+  - add_dis_age 
+  - add_factor 
+  - adjusted_c_hat 
+  - bet 
+  - component_info 
+  - create_model 
+  - fit_summary 
+  - gam 
+  - get_draws 
+  - get_num_draws 
+  - get_pred 
+  - get_y_rng 
+  - igam 
+  - lgp 
+  - log_normal 
+  - model_summary 
+  - new_x 
+  - normal 
+  - optimize_model 
+  - param_summary 
+  - plot_beta 
+  - plot_components 
+  - plot_data 
+  - plot_draws 
+  - plot_effect_times 
+  - plot_f 
+  - plot_pred 
+  - plot_sim 
+  - plot_warp 
+  - ppc 
+  - pred 
+  - prior_summary 
+  - relevances 
+  - sample_model 
+  - select 
+  - select.integrate 
+  - select_freq 
+  - select_freq.integrate 
+  - simulate_data 
+  - student_t 
+  - uniform
+  
+- title: "Data"
+  desc: ~
+- contents:
+  - testdata_001
+  - testdata_002
+
+- title: "Full documentation"
+  desc: ~
+- contents:
+  - starts_with("")
+  
+development:
+  mode: auto
+  version_label: info
+  version_tooltip: "Development version"
+    
+navbar:
+  structure:
+    left:  [home, overview, articles, reference, news]
+    
+  components:
+    articles:
+      text: Tutorials
+      menu:
+      - text: Vignettes
+        href: articles/index.html
+    overview:
+      text: Overview
+      href: reference/lgpr-package.html
+    reference:
+      text: Documentation
+      href: reference/index.html
+    news:
+      text: News
+      href: news/index.html
+    github: ~ 
+

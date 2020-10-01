@@ -2,4 +2,14 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^\_config\.yml$
-^lint\.R$
+tests/testthat/stan_files/.*\.o$
+tests/testthat/stan_files/.*\.cc$
+tests/testthat/stan_files/.*\.hpp$
+^\.github$
+^CONTRIBUTING\.md$
+^NEWS\.md$
+^_pkgdown\.yml$
+pkgdown
+dev
+docs
+tutorials

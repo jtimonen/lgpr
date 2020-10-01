@@ -1,0 +1,132 @@
+---
+title: "Disease effect time uncertainty modeling in lgpr"
+author: "Juho Timonen"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Disease effect time uncertainty modeling in lgpr}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{r load}
+require("lgpr")
+require("ggplot2")
+```
+
+## Simulating data
+
+In this tutorial we simulate and analyse a test data set which contains 6 case and 6 control individuals, and the disease effect on case individuals is modeled using the disease-related age (`diseaseAge`) as a covariate. The disease-related age is defined as age relative to the observed disease initiation. The true disease effect times for each case individual $q=1, \ldots,6$ are drawn from $\mathcal{N}(36,4^2)$, but the disease initiation is observable only after time $t_q$ , which is drawn from  $t_q∼\text{Exponential}(0.05)$ .
+
+```{r simulate, fig.width = 7, fig.height=5}
+set.seed(121)
+relev           <- c(0,1,1,1,0,0)
+effect_time_fun <- function(){rnorm(n = 1, mean = 36, sd = 4)}
+obs_fun         <- function(t){min(t + stats::rexp(n = 1, rate = 0.05), 96 - 1e-5)}
+  
+simData <- simulate_data(N            = 12,
+                         t_data       = seq(12, 96, by = 12),
+                         covariates   = c(    0,2,2,2),
+                         relevances   = relev,
+                         lengthscales = c(18,24, 1.1, 18,18,18),
+                         t_effect_range = effect_time_fun,
+                         t_observed   = obs_fun,
+                         snr          = 3)
+
+plot_sim(simData) + xlab('Age (months)')
+#plot_sim(simData, comp_idx = 3) # to visualize one generated component
+```
+Above, the blue line represents the data-generating signal and black dots are
+noisy observations of the response variable.
+
+```{r head}
+dat <- simData@data
+str(dat)
+simData@effect_times
+```
+
+## Declaring effect time uncertainty
+
+We will define a formula where the term `unc(id)*gp_vm(diseaseAge)`
+declares that the effect time for the nonstationary `gp_vm` term is uncertain and that one uncertainty parameter is needed for each level of `id`.
+
+```{r formula}
+formula <- y ~ zs(id)*gp(age) + gp(age) + unc(id)*gp_vm(diseaseAge) + zs(z1)*gp(age) + zs(z2)*gp(age) + zs(z3)*gp(age)
+```
+
+Because `diseaseAge` is `NaN`
+for the control individuals, it is automatically taken into account that
+a separate uncertainty parameter is actually needed just for each case individual.
+
+## Defining effect time prior
+
+We must define a prior for the effect time of each case individual. This means that the `prior` argument must be a list containing elements named `effect_time_info` and `effect_time`. The first one, `effect_time_info`, must be a list, like below:
+
+```{r prior1}
+lb <- 0
+ub <- c(48,72,96,36,48,60)
+effect_time_info <- list(zero = ub, backwards = TRUE, lower = lb, upper = ub)
+```
+
+The `lower` and `upper` variables define bounds for the effect times. Here
+we have defined the upper bound for each case individual to be the observed disease initiation time, because we know that the true effect has occurred before that. Defining `zero = ub` means that our uncertainty priors are actually for time differences relative to the observed disease initiation time, and `backwards = TRUE` argument is used to define the direction so that the prior is "backwards" in time.
+
+```{r prior2}
+my_prior <- list(
+  effect_time_info = effect_time_info,
+  effect_time = gam(shape = 1, inv_scale = 0.05)
+)
+```
+
+The `effect_time` argument now defines the prior distribution for `- (teff - zero)`. If we had `backwards = FALSE` then the specified prior would be for
+`teff - zero`.
+
+## Fitting the model
+
+```{r fit, fig.width=7.2, fig.height=4.8, cache = TRUE}
+fit <- lgp(formula   = formula,
+            data     = dat,
+            prior    = my_prior,
+            iter     = 2000,
+            chains   = 4,
+            cores    = 4,
+            verbose  = TRUE)
+```
+
+Printing the fit object summarizes the posterior
+```{r post, fig.width=7.2, fig.height=4.8}
+print(fit)
+```
+
+Printing the model information clarifies the model and priors
+```{r mod}
+model_summary(fit)
+```
+
+## Visualizing the inferred effect times
+We can visualize the inferred effect times for each case individual. We see
+that for individuals 2 and 3 the inferred effect time is much earlier than the observed one.
+```{r plt1, fig.width=7.2, fig.height=5.2}
+plot_effect_times(fit) + xlab('Age (months)')
+```
+
+Finally we plot the inferred disease component
+```{r plt2, fig.width=7.2, fig.height=4.2}
+t <- seq(0, 100, by = 1)
+x_pred <- new_x(dat, t, x_ns = 'diseaseAge')
+p <- pred(fit, x_pred, verbose = FALSE)
+plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')  + xlab('Age (months)')
+```
+
+## Computing environment
+
+```{r sess}
+sessionInfo()
+```

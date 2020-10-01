@@ -1,73 +1,105 @@
-
-context("stan helper functions")
-
 library(lgpr)
-library(rstan)
-stanmodel <- lgpr::get_stan_model()
-rstan::expose_stan_functions(stanmodel)
 
-test_that("input warping function works similarly in Stan and R", {
-  a <- exp(stats::rnorm(1))
-  x <- c(-2, 1, 0, 1, 2)
-  expect_equal(
-    STAN_warp_input(x, a),
-    warp_input(x, a, 0, 1)
-  )
+# 1. STAN UTILS -----------------------------------------------------------
+
+context("Stan utils")
+
+STREAM <- get_stream()
+test_that("rstan::get_stream is in namespace", {
+  expect_true(class(STREAM) == "externalptr")
 })
 
-test_that("variance masking function works similarly in Stan and R", {
-  a <- 0.6
-  x <- c(-5, 0, 5)
-  expect_equal(
-    STAN_var_mask(x = x, a = a),
-    var_mask(x = x, a = a)
-  )
+test_that("STAN_expand works for valid input", {
+  p <- c(0.1, 0.2)
+  v <- STAN_expand(p, c(2, 3, 2, 3), STREAM)
+  expect_equal(v, c(0.1, 0.2, 0.1, 0.2))
 })
 
-test_that("STAN_get_x_tilde works properly", {
-  x_disAge <- c(
+test_that("STAN_expand errors when idx_expand has out of bounds indices", {
+  p <- c(0.1, 0.2)
+  idx1 <- c(2, 3, 0, 3)
+  idx2 <- c(2, 3, 4, 3)
+  expect_error(STAN_expand(p, idx1, STREAM))
+  expect_error(STAN_expand(p, idx2, STREAM))
+})
+
+test_that("STAN_edit_x_cont works properly", {
+  x_dis_age <- c(
     -24, -12, 0, 12, -24, -12, 0, 12,
     0, 0, 0, 0, 0, -12, 0, 12, 16
   )
-  T_effect <- c(-1, 2, 10)
-  T_observed <- c(0, 6, 12)
-  mapping <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17),
-    ncol = 4, nrow = 3, byrow = TRUE
-  )
-  map <- list(mapping[1, ], mapping[2, ], mapping[3, ])
-  lengths <- c(4, 4, 4)
-  expected <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
+  teff <- c(-1, 2, 10)
+  teff_obs <- c(0, 6, 12)
+  case_ids <- c(1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 3, 3, 3, 3)
+  idx_expand <- case_ids + 1
+  expand_expect <- c(-1, -1, -1, -1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 10, 10, 10, 10)
+  expect_equal(STAN_expand(teff, idx_expand, STREAM), expand_expect)
+  t_edit <- STAN_edit_x_cont(x_dis_age, idx_expand, teff_obs, teff, STREAM)
+  t_expect <- c(-23, -11, 1, 13, -20, -8, 4, 16, 0, 0, 0, 0, 0, -10, 2, 14, 18)
+  expect_equal(t_edit, t_expect)
+})
+
+test_that("STAN_vectorsum works properly", {
+  vecs <- list(c(1, 10, 1), c(2, 1, 4))
+  s <- STAN_vectorsum(vecs, 3, STREAM)
+  expect_equal(s, c(3, 11, 5))
+})
+
+# 2. STAN PRIORS ----------------------------------------------------------
+
+require(stats)
+context("Stan priors")
+
+test_that("normal prior is correct", {
+  x <- 0.333
+  mu <- -0.11
+  sigma <- 0.23
+  log_p <- STAN_log_prior(x, c(2, 0), c(mu, sigma, 0), STREAM)
+  expect_equal(log_p, stats::dnorm(!!x, !!mu, !!sigma, log = TRUE))
+})
+
+test_that("student-t prior is correct", {
+  x <- 0.333
+  nu <- 16
+  sigma <- 1
+  log_p <- STAN_log_prior(x, c(3, 0), c(nu, sigma, 0), STREAM)
+  expect_equal(log_p, stats::dt(!!x, !!nu, log = TRUE))
+})
+
+test_that("gamma prior is correct", {
+  x <- 0.333
+  a <- 5
+  b <- 8
+  log_p <- STAN_log_prior(x, c(4, 0), c(a, b, 0), STREAM)
+  expect_equal(log_p, stats::dgamma(!!x, shape = !!a, rate = !!b, log = TRUE))
+})
+
+test_that("inverse-gamma prior is correct", {
+  x <- 0.333
+  a <- 5
+  b <- 8
+  log_p <- STAN_log_prior(x, c(5, 0), c(a, b, 0), STREAM)
   expect_equal(
-    STAN_get_x_tilde(x_disAge, T_effect, T_observed, map, lengths),
-    expected
+    log_p,
+    lgpr:::dinvgamma_stanlike(!!x, alpha = !!a, beta = !!b, log = TRUE)
   )
 })
 
-context("stan kernel functions")
-
-test_that("zero-sum kernel works similarly in R and Stan", {
-  M <- 3
-  x <- sample.int(M, size = 8, replace = TRUE)
-  expect_equal(
-    STAN_K_zerosum(x, x, M),
-    kernel_zerosum(x, x, M)
-  )
+test_that("log-normal prior is correct", {
+  x <- 0.333
+  mu <- -0.11
+  sigma <- 0.23
+  log_p <- STAN_log_prior(x, c(6, 0), c(mu, sigma, 0), STREAM)
+  expect_equal(log_p, stats::dlnorm(!!x, !!mu, !!sigma, log = TRUE))
 })
 
-test_that("binary mask kernel works similarly in R and Stan", {
-  x <- sample.int(2, size = 8, replace = TRUE) - 1
-  expect_equal(
-    STAN_K_bin(x, x, 1),
-    kernel_bin(x, x)
-  )
-})
-
-test_that("variance mask kernel works similarly in R and Stan", {
-  x <- c(-24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12, -24, 12, 0, 12)
-  stp <- 1.0
-  vm_params <- c(0.05, 0.6)
-  expect_equal(
-    STAN_K_var_mask(x, stp, vm_params),
-    kernel_var_mask(x, x, vm_params, stp)
+test_that("square transform is taken into account", {
+  x <- 0.333
+  mu <- -0.11
+  sigma <- 0.23
+  log_p <- STAN_log_prior(x, c(6, 1), c(mu, sigma, 0), STREAM)
+  expect_lt(
+    log_p, # -38.9
+    stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
   )
 })

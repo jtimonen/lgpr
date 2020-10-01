@@ -1,71 +1,119 @@
-  
-int<lower=1> N_tot;      // total number of individuals
-int<lower=0> N_cases;    // number of "diseased" individuals
-int<lower=2> d;          // number of covariates (id and age required)
-int<lower=1> n;          // number of observations
-int<lower=0,upper=4> LH; // observation model
+/* 
+  Binary option switches
+  - is verbose mode used?
+  - are function values be sampled?
+  - should likelihood evaluation be skipped?
+*/
+int<lower=0, upper=1> is_verbose;
+int<lower=0, upper=1> is_f_sampled;
+int<lower=0, upper=1> is_likelihood_skipped;
 
-// D is an array of six integers, so that
-//   D[1] = binary value indicating if f(id,age) is in model
-//   D[2] = binary value indicating if f(age) is in model
-//   D[3] = binary value indicating if f(diseaseAge) is in model
-//   D[4] = n. of other continuous covariates
-//   D[5] = n. of discr. covars. that cause deviation from f(age)
-//   D[6] = n. of discr. covars. that only have a baseline offset effect
-int<lower=0> D[6];
+// Dimensions
+int<lower=0> num_obs;            // number of observations
+int<lower=0> num_cov_cont;       // number of continuous covariates
+int<lower=0> num_cov_cat;        // number of categorical covariates
+int<lower=1> num_comps;          // number of additive components
+int<lower=0> num_ell;            // number of ell parameters
+int<lower=0> num_ns;             // number of nonstationary components
+int<lower=0> num_heter;          // number of heterogeneous components
+int<lower=0> num_uncrt;          // number of uncertain continuous covariates
+int<lower=0> num_bt;             // number of beta and/or teff params
 
-vector[n] X[d];           // covariates, X[j] is the jth covariate
-int       X_notnan[n];    // X_notnan[i] tells if X_diseaseAge[i] isn't NaN
-vector[n] y;              // the response variable (as a vector of reals)
-int       y_int[n];       // the response variable (as an array of integers)
-int<lower=1> N_trials[n]; // numbers of trials (ones for bernoulli model)
-int<lower=1> N_cat[1+D[5]+D[6]]; // number of categs for each categ. covar.
-vector[n] C_hat;  // GP mean vector (should be zeros when using Gaussian lh)
+/*
+  Observation model
+  - 1 = Gaussian
+  - 2 = Poisson
+  - 3 = Negative Binomial
+  - 4 = Binomial
+  - 5 = Beta-Binomial
+*/
+int<lower=1,upper=5> obs_model;
 
-// Option switches
-int<lower=0,upper=1> UNCRT;        // are diseaseAge measurements uncertain?
-int<lower=0,upper=1> HMGNS;        // is diseaseAge effect is homogenous?
-int<lower=0,upper=1> F_IS_SAMPLED; // are function values be sampled?
-int<lower=0,upper=1> VERBOSE;      // is model info printed?
-int<lower=0,upper=1> USE_VAR_MASK; // is variance mask kernel used?
-int<lower=0,upper=1> BACKWARDS;    // is prior of effect time "backwards"?
-int<lower=0,upper=1> RELATIVE;     // is prior of effect time rel. to obs. one?
-int<lower=0,upper=1> SKIP_GQ;      // should the gen. quant. block be skipped?
+/* 
+  Each additive function component can be related to at most one continuous and
+  one categorical covariate. Properties of the components are specified by the 
+  "columns" of the integer array <components>. The "rows" are
+    - [,1]: component type
+    - [,2]: kernel type
+    - [,3]: (currently unused row)
+    - [,4]: is the effect magnitude heterogeneous?
+    - [,5]: should input warping be applied to the continuous covariate first?
+    - [,6]: should a variance mask be applied?
+    - [,7]: is there uncertainty in the continuous covariate?
+    - [,8]: index of the categorical covariate in <x_cat>, <x_cat_num_levels>
+    - [,9]: index of the continuous covariate in <x_cont>, <x_cont_mask>
+    
+  NOTES: Options [,6] and [,7] only have an effect if option [,5] is 1.
+  Possible types for option [,1] are
+    - type 0 = component with a single categorical covariate
+      * kernel 0 = zero-sum kernel
+      * kernel 1 = categorical kernel
+    - type 1 = component with a single continuous covariate
+      * kernel 0 = [exp. quadratic] kernel
+    - type 2 = interaction of a categorical and a continuous covariate
+      * kernel 0 = zero-sum kernel * [exp. quadratic]
+      * kernel 1 = categorical kernel * [exp. quadratic]
+*/
 
-// Prior types and transforms
-int t_ID[D[1],4];         // for id*age component
-int t_A[D[2],4];          // for shared age component
-int t_D[D[3],6];          // for disease age component
-int t_CNT[D[4],4];        // for components with continuous covariates
-int t_CAT[D[5],4];        // for components with discrete covariates
-int t_OFS[D[6],2];        // for offset components
-int t_SIG[2];             // for Gaussian noise std
-int t_PHI[2];             // for precision parameter phi
-int t_ONS[N_cases,2];     // for onset, if uncertain
-  
-// Hyperparameters of the priors and scaling factors,
-real p_ID[D[1],6];         // for id*age component
-real p_A[D[2],6];          // for shared age component
-real p_D[D[3],9];          // for disease age component
-real p_CNT[D[4],6];        // for components with continuous covariates
-real p_CAT[D[5],6];        // for components with discrete covariates
-real p_OFS[D[6],3];        // for offset components
-real p_SIG[3];             // for Gaussian noise std
-real p_PHI[3];             // for precision parameter phi
-real p_BET[2];             // hyperparameters of the beta prior of BETA
-real p_ONS[N_cases, 3];    // for onset, if uncertain
-  
-// Inputs related to mapping from row index to case index and back
-int<lower=0,upper=n>        M_max;
-int<lower=0>                caseID_to_rows[N_cases, M_max];
-int<lower=0,upper=N_cases>  row_to_caseID[n];
-int<lower=0,upper=M_max>    caseID_nrows[N_cases];
+int<lower=0> components[num_comps, 9];
 
-// Inputs related to uncertain disease onset
-vector[N_cases] T_observed;     // observed disease effect times
-vector[N_cases] L_ons[UNCRT];   // low bounds for disease effect times
-vector[N_cases] U_ons[UNCRT];   // up bounds for disease effect times
+// Response variable (vector of reals)
+vector[num_obs] y_cont[obs_model==1];
 
-// Other
-real DELTA;         // jitter to ensure pos. def. kernel matrices
-real vm_params[2];  // variance mask parameters
+// Response variable (array of integers)
+int<lower=0> y_disc[obs_model>1, num_obs];
+
+// Covariates
+vector[num_obs] x_cont[num_cov_cont];
+vector[num_obs] x_cont_unnorm[num_cov_cont];
+int x_cont_mask[num_cov_cont, num_obs];
+int x_cat[num_cov_cat, num_obs];
+
+// Number of trials (binomial or bernoulli model)
+int<lower=1> y_num_trials[obs_model>3, num_obs];
+
+// Number of levels for each categorical covariate
+int<lower=0> x_cat_num_levels[num_cov_cat];
+
+// Inputs related to expanding beta and t_effect
+int<lower=1, upper=num_bt+1> idx_expand[num_obs];
+
+/* 
+  Prior types and transforms for positive parameters
+  - [,1]: prior types
+  - [,2]: prior transforms
+*/
+int<lower=0> prior_alpha[num_comps, 2];
+int<lower=0> prior_ell[num_ell, 2];
+int<lower=0> prior_wrp[num_ns, 2];
+int<lower=0> prior_sigma[obs_model==1, 2];
+int<lower=0> prior_phi[obs_model==3, 2];
+
+/*
+  Prior types for effect time uncertainty
+  - [,1]: prior type
+  - [,2]: is prior "backwards"?
+*/
+int<lower=0> prior_teff[num_uncrt>0, 2];
+
+// Hyperparameters of the priors for positive parameters
+real hyper_alpha[num_comps, 3];
+real hyper_ell[num_ell, 3];
+real hyper_wrp[num_ns, 3];
+real hyper_sigma[obs_model==1, 3];
+real hyper_phi[obs_model==3, 3];
+real hyper_teff[num_uncrt>0, 3];
+
+// Hyperparameters of the beta priors for parameters on [0, 1]
+real hyper_gamma[obs_model==5, 2];
+real hyper_beta[num_heter>0, 2];
+
+// Observed effect times and uncertainty bounds for each case subject
+vector[num_bt] teff_zero[num_uncrt>0];
+vector[num_bt] teff_lb[num_uncrt>0];
+vector[num_bt] teff_ub[num_uncrt>0];
+
+// Misc
+vector[num_obs] c_hat; // GP mean vector 
+real delta; // jitter to ensure pos. def. kernel matrices
+real vm_params[num_ns, 2]; // variance mask parameters

@@ -13,3 +13,8 @@ inst/doc
 *.so
 *.o
 *.dll
+docs/
+*.html
+*_cache/
+*_files/
+

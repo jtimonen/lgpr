@@ -1,0 +1,25 @@
+a {
+  color: #A25050;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #505050;
+}
+
+
+footer {
+  font-size: 14px;
+}
+
+body {
+  font-size: 16px;
+}
+
+.fl      {color: #A25050;}  /* numbers   */
+.ch,.st  {color: #A25050;}  /* string    */
+.kw      {color: #505050;}  /* keywords  */
+.fu      {color: #005b96;}  /* functions */
+
+code a, pre a {
+  color: #005b96; /* linked functions */
+}

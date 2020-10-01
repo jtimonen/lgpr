@@ -1,25 +1,35 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 0.33.3
+Version: 1.0.0.9000
 Authors@R: 
-    person(given = "Juho",
+    c(person(given = "Juho",
            family = "Timonen",
            role = c("aut", "cre"),
-           email = "juho.timonen@aalto.fi",
-           comment = c(ORCID = "0000-0003-2341-6765"))
+           email = "juho.timonen@iki.fi",
+           comment = c(ORCID = "0000-0003-2341-6765")),
+    person(given = "Henrik",
+           family = "Mannerström",
+           role = c("ctb")),
+    person(given = "Aki",
+           family = "Vehtari",
+           role = c("ctb")),
+    person(given = "Harri",
+           family = "Lähdesmäki",
+           role = c("ctb"))
+    )
 Description: Implements interpretable nonparametric analysis and
              covariate selection for longitudinal data using additive
-             Gaussian process regression. Includes specialized non-stationary disease
-             effect modeling features for biomedical studies. Bayesian inference for
-             model parameters is performed using Stan.
+             Gaussian process regression. Includes specialized non-stationary
+             disease effect modeling features for biomedical studies. Bayesian
+             inference for model parameters is performed using Stan.
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
 Biarch: true
 Depends: 
     R (>= 3.4.0),
-Imports: 
-    methods,
+    methods
+Imports:
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
     rstantools (>= 2.0.0),
@@ -27,7 +37,7 @@ Imports:
     MASS (>= 7.3-50),
     stats (>= 3.4),
     ggplot2 (>= 3.1.0),
-    ggpubr (>= 0.2)
+    gridExtra (>= 0.3.0)
 LinkingTo: 
     BH (>= 1.72.0-2),
     Rcpp (>= 0.12.0),
@@ -42,3 +52,5 @@ Suggests:
     testthat,
     covr
 VignetteBuilder: knitr
+URL: https://github.com/jtimonen/lgpr
+BugReports: https://github.com/jtimonen/lgpr/issues
