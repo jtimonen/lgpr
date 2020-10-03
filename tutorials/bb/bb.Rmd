@@ -69,11 +69,11 @@ str(dat)
 
 ## Defining model
 To use beta-binomial observation model in our analysis, we use the
-`likelihood` argument of `lgp()`. Here we define a uniform prior for
-the `gamma` parameter
+`likelihood` argument of `lgp()`. Here we define a $\text{Beta}(2,2)$ prior for
+the `gamma` parameter.
 
 ```{r prior}
-my_prior <- list(gamma = bet(1, 1))
+my_prior <- list(gamma = bet(2, 2))
 ```
 
 ## Fitting the model
@@ -116,7 +116,7 @@ p <- pred(fit, x_pred, draws = draws)
 ```
 
 ```{r plt1, fig.width = 7, fig.height=4.5}
-plot_pred(fit, x = x_pred, pred = p, alpha = 0.1)
+plot_pred(fit, x = x_pred, pred = p, alpha = 0.2)
 ```
 
 and model components
