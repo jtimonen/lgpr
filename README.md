@@ -33,3 +33,7 @@ to problems with some recently updated versions of *StanHeaders* or *rstantools*
 remove.packages('rstantools')
 devtools::install_version("rstantools", version = "2.0.0", repos = "http://cran.us.r-project.org")
 ```
+
+## Real data and reproducing the experiments
+For code to reproduce the experiments of our manuscript see https://github.com/jtimonen/lgpr-usage. Preprocessed longitudinal proteomics data is also provided there.
+
