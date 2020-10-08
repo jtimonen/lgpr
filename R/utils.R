@@ -342,3 +342,29 @@ progbar_print <- function(idx, idx_print) {
   str <- paste(rep("=", N), collapse = "")
   cat(str)
 }
+
+
+#' Warning message about using a default prior
+#'
+#' @param desc parameter description
+#' @param name parameter name
+#' @param model_desc model description
+warn_msg_default_prior <- function(desc, name, model_desc) {
+  paste0(
+    "Using a default prior for ", desc, " (", name, "), in a model",
+    " that ", model_desc, ".",
+    " This is not recommended. See the 'Defining a model' tutorial",
+    " at https://jtimonen.github.io/lgpr-usage/index.html."
+  )
+}
+
+
+#' Get number of nonstationary model components
+#'
+#' @param stan_input a list containing an element named \code{components}
+#' @return an integer
+get_num_ns <- function(stan_input) {
+  comp <- dollar(stan_input, "components")
+  num <- sum(comp[, 5] > 0)
+  return(num)
+}

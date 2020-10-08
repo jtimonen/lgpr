@@ -318,26 +318,25 @@ parse_response <- function(data, likelihood, model_formula) {
 #'
 #' @inheritParams parse_response
 #' @param c_hat The GP mean. Must be a vector of length \code{dim(data)[1]}, or
-#' a real number defining a constant GP mean. If \code{NULL}, this is set to
+#' a real number defining a constant GP mean. If not specified, this is set to
 #'  \itemize{
-#'    \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"}, because
-#'    with Gaussian likelihood the response variable is by default centered to
-#'    have zero mean.
+#'    \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"},
 #'    \item \code{c_hat = } \code{log(mean(y))} if \code{likelihood} is
 #'    \code{"poisson"} or \code{"nb"},
 #'    \item \code{c_hat = } \code{log(p/(1-p))}, where
-#'    \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"},
+#'    \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"}
+#'    or \code{"bb"},
 #'  }
-#' where \code{y} denotes the response variable. You can modify this vector to
-#' account for normalization between data points. With Gaussian likelihood
-#' though, do not modify this argument, normalize the data beforehand instead.
+#' where \code{y} denotes the response variable.
 #' @param num_trials This argument (number of trials) is only needed when
-#' likelihood is binomial or beta binomial. Must have length one or equal
-#' to number of data points. Setting \code{num_trials=1} and
+#' likelihood is \code{"binomial"} or \code{"bb"}. Must have length one or
+#' equal to the number of data points. Setting \code{num_trials=1} and
 #' \code{likelihood="binomial"} corresponds to Bernoulli observation model.
 #' @param list_y a list field returned by \code{\link{parse_response}}
 #' @param sample_f Determines if the latent function values are be sampled
-#' (must be \code{TRUE} if likelihood is not \code{"gaussian"}).
+#' (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
+#' \code{TRUE}, the response variable will be normalized to have zero mean
+#' and unit variance.
 #' @return a list of parsed options
 parse_likelihood <- function(likelihood, c_hat, num_trials, list_y, sample_f) {
   LH <- likelihood_as_int(likelihood)
@@ -381,12 +380,8 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
     }
   } else {
     if (LH == 1) {
-      stop(
-        "Only give the c_hat argument if observation model is not Gaussian!",
-        " With Gaussian likelihood, you should use",
-        " c_hat = NULL, in which case the GP mean will be set to zero",
-        " and the response variable is standardized to have mean zero."
-      )
+      msg <- "<c_hat> must be NULL if <likelihood> is 'gaussian'"
+      stop(msg)
     }
   }
   n <- length(response)
@@ -417,7 +412,7 @@ set_num_trials <- function(num_trials, num_obs, LH) {
     if (!is_binom) {
       msg <- paste0(
         "Only give the <num_trials> argument if likelihood is",
-        " binomial or beta-binomial (bb)!"
+        " 'binomial' or 'bb' (beta-binomial)!"
       )
       stop(msg)
     }

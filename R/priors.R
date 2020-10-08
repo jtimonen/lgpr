@@ -135,11 +135,18 @@ bet <- function(a, b) {
 #' @return a named list of parsed options
 parse_prior <- function(prior, stan_input, obs_model) {
   num_uncrt <- dollar(stan_input, "num_uncrt")
+  num_ns <- get_num_ns(stan_input)
   filled <- fill_prior(prior, num_uncrt)
   spec <- dollar(filled, "specified")
-  def <- dollar(filled, "defaulted")
+  dflt <- dollar(filled, "defaulted")
   str1 <- paste(spec, collapse = ", ")
-  str2 <- paste(def, collapse = ", ")
+  str2 <- paste(dflt, collapse = ", ")
+  wrp_defaulted <- "wrp" %in% dflt
+  if (num_ns > 0 && wrp_defaulted) {
+    model_desc <- "involves a gp_ns() or gp_vm() expression"
+    msg <- warn_msg_default_prior("input warping steepness", "wrp", model_desc)
+    warning(msg)
+  }
   msg1 <- paste0("  * user-specified priors found for: {", str1, "}")
   msg2 <- paste0("  * default priors used for: {", str2, "}")
   info <- paste0(msg1, "\n", msg2, "\n")

@@ -46,23 +46,20 @@ binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 (\code{\link{lgp}}).}
 
 \item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
-a real number defining a constant GP mean. If \code{NULL}, this is set to
+a real number defining a constant GP mean. If not specified, this is set to
  \itemize{
-   \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"}, because
-   with Gaussian likelihood the response variable is by default centered to
-   have zero mean.
+   \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"},
    \item \code{c_hat = } \code{log(mean(y))} if \code{likelihood} is
    \code{"poisson"} or \code{"nb"},
    \item \code{c_hat = } \code{log(p/(1-p))}, where
-   \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"},
+   \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"}
+   or \code{"bb"},
  }
-where \code{y} denotes the response variable. You can modify this vector to
-account for normalization between data points. With Gaussian likelihood
-though, do not modify this argument, normalize the data beforehand instead.}
+where \code{y} denotes the response variable.}
 
 \item{num_trials}{This argument (number of trials) is only needed when
-likelihood is binomial or beta binomial. Must have length one or equal
-to number of data points. Setting \code{num_trials=1} and
+likelihood is \code{"binomial"} or \code{"bb"}. Must have length one or
+equal to the number of data points. Setting \code{num_trials=1} and
 \code{likelihood="binomial"} corresponds to Bernoulli observation model.}
 
 \item{options}{A named list with the following possible fields:
@@ -77,7 +74,9 @@ where likelihood is ignored?}
 \item{verbose}{Should more verbose output be printed?}
 
 \item{sample_f}{Determines if the latent function values are be sampled
-(must be \code{TRUE} if likelihood is not \code{"gaussian"}).}
+(must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
+\code{TRUE}, the response variable will be normalized to have zero mean
+and unit variance.}
 
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}
@@ -119,21 +118,55 @@ Either one of the approaches should be used and they should not be mixed.
 
 \section{Defining priors}{
 
-The \code{priors} argument must be a named list. Possible allowed names are
+The \code{priors} argument must be a named list, like
+\code{list(alpha=student_t(4), wrp=igam(30,10))}. See examples in tutorials.
+Possible allowed names are
 \itemize{
  \item \code{"alpha"} = component magnitude parameters
  \item \code{"ell"} = component lengthscale parameters
  \item \code{"wrp"} = input warping steepness parameters
  \item \code{"sigma"} = noise magnitude (Gaussian obs. model)
- \item \code{"phi"} = inverse overdispersion (NB obs. model)
- \item \code{"gamma"} = overdispersion (Beta-binomial obs. model)
+ \item \code{"phi"} = inv. overdispersion (negative binomial obs. model)
+ \item \code{"gamma"} = overdispersion (beta-binomial obs. model)
  \item \code{"beta"} = heterogeneity parameters
  \item \code{"effect_time"} = uncertain effect time parameters
  \item \code{"effect_time_info"} = additional options for the above
 }
-It is recommended to use the \code{\link{priors}} functions to define
-the list elements. If a parameter of a model is not given in this list,
-a default prior will be used for it. See examples in tutorials.
+See \code{\link{priors}} for functions that can be
+used to define the list elements. If a parameter of a model is not given
+in this list, a default prior will be used for it.
+}
+
+\section{When to not use default priors}{
+
+
+It is not recommended to use default priors blindly. Rather, priors should
+be specified according to the knowledge about the problem at hand, as in any
+Bayesian analysis. In \code{lgpr} this is especially important when
+\enumerate{
+ \item Using a non-Gaussian likelihood or otherwise setting
+ \code{sample_f = TRUE}. In this case the response variable is not
+ normalized, so the scale on which the data varies must be taken into
+ account when defining priors of the signal magnitude parameters
+ \code{alpha} and possible noise parameters (\code{sigma}, \code{phi},
+ \code{gamma}). Also it should be checked if \code{c_hat} is set in a
+ sensible way.
+ \item Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
+ expression in its formula. In this case the corresponding covariate
+ \code{x} is not normalized, and the prior for the input warping steepness
+ parameter \code{wrp} must be set according to the expected width of the
+ window in which the nonstationary effect of \code{x} occurs. By default,
+ the width of this window is about 36, which has been set assuming that
+ the unit of \code{x} is months.
+}
+}
+
+\section{More advice on defining models}{
+
+
+See the
+\href{https://jtimonen.github.io/lgpr-usage/index.html}{Defining a model}
+tutorial.
 }
 
 \seealso{

@@ -73,3 +73,8 @@ test_that("invalid prior name or hyperparams cannot be given", {
   reason <- "given value 'stupid' for argument <distribution_name> is invalid"
   expect_error(prior_to_num(p), reason)
 })
+
+test_that("default prior warning works", {
+  msg <- warn_msg_default_prior("param_desc", "param_name", "model_desc")
+  expect_equal(nchar(msg), 192)
+})

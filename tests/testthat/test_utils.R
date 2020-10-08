@@ -89,3 +89,15 @@ test_that("map_factor_to_caseid works correctly", {
 test_that("large_data_msg works correctly", {
   expect_output(large_data_msg(1000, 300))
 })
+
+test_that("get_num_ns works correctly", {
+  pr <- list(wrp = igam(14, 5))
+  m <- create_model(y ~ gp(age) + zs(id), testdata_001)
+  expect_equal(get_num_ns(get_stan_input(m)), 0)
+  m <- create_model(y ~ gp_vm(age) + zs(id), testdata_001, prior = pr)
+  expect_equal(get_num_ns(get_stan_input(m)), 1)
+  m <- create_model(y ~ gp_vm(age) + gp_ns(blood) + zs(id), testdata_001,
+    prior = pr
+  )
+  expect_equal(get_num_ns(get_stan_input(m)), 2)
+})
