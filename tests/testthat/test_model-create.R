@@ -40,7 +40,7 @@ test_that("prior can be parsed from stan_input", {
 
 test_that("quotes can be used in gp(), gp_ns() etc", {
   f <- y ~ gp("age") + categ("id") + categ(id) * gp_ns("age")
-  m <- create_model(f, testdata_001)
+  m <- create_model(f, testdata_001, prior = list(wrp = igam(14, 5)))
   a <- m@model_formula
   c <- .class2(a)
   expect_equal(c, "lgpformula")
@@ -196,7 +196,7 @@ test_that("only the covariates required by the model go to stan data", {
 
 test_that("covariate types are correctly parsed", {
   m <- create_model(y ~ gp(age) + categ(id) * gp(age) + zs(sex) +
-    gp_ns(dis_age), testdata_001)
+    gp_ns(dis_age), testdata_001, prior = list(wrp = igam(14, 5)))
   to_stan <- m@stan_input
   expect_equal(to_stan$num_cov_cat, 2)
   expect_equal(to_stan$num_cov_cont, 2)
@@ -256,5 +256,15 @@ test_that("verbose mode prints output", {
       data = testdata_001,
       verbose = TRUE
     )
+  )
+})
+
+test_that("warning is given about default prior for wrp", {
+  m <- create_model(y ~ gp_vm(age) + gp_vm(blood),
+    prior = list(wrp = igam(14, 5)),
+    testdata_001
+  )
+  expect_warning(
+    create_model(y ~ gp_vm(age), testdata_001)
   )
 })

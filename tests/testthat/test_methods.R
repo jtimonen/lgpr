@@ -48,7 +48,7 @@ context("Methods for lgpmodel objects")
 et <- list(lower = 10, zero = 0, backwards = FALSE, upper = 20)
 model <- create_model(y ~ unc(id) * het(id) * gp_ns(dis_age) +
   zs(sex) * gp(age),
-prior = list(effect_time_info = et),
+prior = list(effect_time_info = et, wrp = igam(14, 5)),
 data = testdata_001
 )
 

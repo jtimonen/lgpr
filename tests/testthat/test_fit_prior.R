@@ -15,7 +15,7 @@ test_that("model with uncertain disease age can be created and fit", {
   formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
   data <- testdata_001
   et <- list(backwards = FALSE, lower = 15, upper = 30, zero = 0)
-  prior <- list(effect_time_info = et)
+  prior <- list(effect_time_info = et, wrp = igam(14, 5))
   model <- create_model(
     formula = formula,
     data = data,
@@ -49,7 +49,8 @@ test_that("model with heterogeneous disease effect can be created and fit", {
   model <- create_model(
     formula = formula,
     data = data,
-    prior_only = TRUE
+    prior_only = TRUE,
+    prior = list(wrp = igam(14, 5))
   )
   si <- get_stan_input(model)
   expect_equal(si$num_bt, 2)
