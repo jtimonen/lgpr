@@ -67,7 +67,7 @@ plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
 
 ## Creating and fitting a model
 
-Detailed instructions and the syntax for creating different kinds of models is found in the package documentation and the *Defining a model in lgpr* tutorial.
+Detailed instructions and the syntax for creating different kinds of models is found in the package documentation and the *Defining a model* tutorial.
 
 Here we define a model with four components and fit it. The `gp(age)` component
 is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
@@ -77,6 +77,7 @@ is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
 ```{r fit, cache=TRUE}
 fit <- lgp(formula = y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
            data     = testdata_002,
+           prior    = list(wrp = igam(14,5)),
            iter     = 1000,
            chains   = 4,
            refresh  = 250)

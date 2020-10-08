@@ -80,6 +80,7 @@ we have defined the upper bound for each case individual to be the observed dise
 
 ```{r prior2}
 my_prior <- list(
+  prior = list(wrp = igam(14,5)),
   effect_time_info = effect_time_info,
   effect_time = gam(shape = 1, inv_scale = 0.05)
 )

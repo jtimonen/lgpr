@@ -73,7 +73,10 @@ To use beta-binomial observation model in our analysis, we use the
 the `gamma` parameter.
 
 ```{r prior}
-my_prior <- list(gamma = bet(2, 2))
+my_prior <- list(
+  alpha = student_t(20),
+  gamma = bet(2, 2)
+)
 ```
 
 ## Fitting the model
