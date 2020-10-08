@@ -45,23 +45,20 @@ binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 (\code{\link{lgp}}).}
 
 \item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
-a real number defining a constant GP mean. If \code{NULL}, this is set to
+a real number defining a constant GP mean. If not specified, this is set to
  \itemize{
-   \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"}, because
-   with Gaussian likelihood the response variable is by default centered to
-   have zero mean.
+   \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"},
    \item \code{c_hat = } \code{log(mean(y))} if \code{likelihood} is
    \code{"poisson"} or \code{"nb"},
    \item \code{c_hat = } \code{log(p/(1-p))}, where
-   \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"},
+   \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"}
+   or \code{"bb"},
  }
-where \code{y} denotes the response variable. You can modify this vector to
-account for normalization between data points. With Gaussian likelihood
-though, do not modify this argument, normalize the data beforehand instead.}
+where \code{y} denotes the response variable.}
 
 \item{num_trials}{This argument (number of trials) is only needed when
-likelihood is binomial or beta binomial. Must have length one or equal
-to number of data points. Setting \code{num_trials=1} and
+likelihood is \code{"binomial"} or \code{"bb"}. Must have length one or
+equal to the number of data points. Setting \code{num_trials=1} and
 \code{likelihood="binomial"} corresponds to Bernoulli observation model.}
 
 \item{options}{A named list with the following possible fields:
@@ -76,7 +73,9 @@ where likelihood is ignored?}
 \item{verbose}{Should more verbose output be printed?}
 
 \item{sample_f}{Determines if the latent function values are be sampled
-(must be \code{TRUE} if likelihood is not \code{"gaussian"}).}
+(must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
+\code{TRUE}, the response variable will be normalized to have zero mean
+and unit variance.}
 }
 \description{
 Create a model
