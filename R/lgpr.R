@@ -124,12 +124,13 @@ NULL
 #' be specified according to the knowledge about the problem at hand, as in any
 #' Bayesian analysis. In \code{lgpr} this is especially important when
 #' \enumerate{
-#'  \item Using a non-Gaussian likelihood or setting \code{sample_f = TRUE}.
-#'  In this case the response variable is not normalized, so the scale on
-#'  which the data varies must be taken into account when defining priors of
-#'  the signal magnitude parameters \code{alpha} and possible noise parameters
-#'  (\code{sigma}, \code{phi}, \code{gamma}).
-#'  Also it should be checked if \code{c_hat} is set in a sensible way.
+#'  \item Using a non-Gaussian likelihood or otherwise setting
+#'  \code{sample_f = TRUE}. In this case the response variable is not
+#'  normalized, so the scale on which the data varies must be taken into
+#'  account when defining priors of the signal magnitude parameters
+#'  \code{alpha} and possible noise parameters (\code{sigma}, \code{phi},
+#'  \code{gamma}). Also it should be checked if \code{c_hat} is set in a
+#'  sensible way.
 #'  \item Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
 #'  expression in its formula. In this case the corresponding covariate
 #'  \code{x} is not normalized, and the prior for the input warping steepness
@@ -138,6 +139,12 @@ NULL
 #'  the width of this window is about 36, which has been set assuming that
 #'  the unit of \code{x} is months.
 #' }
+#'
+#' @section More advice on defining models:
+#'
+#' See the
+#' \href{https://jtimonen.github.io/lgpr-usage/index.html}{Defining a model}
+#' tutorial.
 #'
 #' @name lgp
 #' @family main functions

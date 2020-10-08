@@ -342,3 +342,18 @@ progbar_print <- function(idx, idx_print) {
   str <- paste(rep("=", N), collapse = "")
   cat(str)
 }
+
+
+#' Warning message about using a default prior
+#'
+#' @param desc parameter description
+#' @param name parameter name
+#' @param model_desc model description
+warn_msg_default_prior <- function(desc, name, model_desc) {
+  paste0(
+    "Using a default prior for ", desc, " (", name, "), in a model",
+    " that ", model_desc, ".",
+    " This is not recommended. See the 'Defining a model' tutorial",
+    " at https://jtimonen.github.io/lgpr-usage/index.html."
+  )
+}

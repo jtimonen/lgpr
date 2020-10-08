@@ -103,9 +103,9 @@ test_that("parse_likelihood can be used", {
 
 test_that("parse_likelihood errors correctly", {
   list_y <- list(y_cont = c(1, 2))
-  reason <- "Only give the c_hat argument if observation model is not Gaussian"
+  reason <- "<c_hat> must be NULL"
   expect_error(parse_likelihood("gaussian", 0, NULL, list_y, FALSE), reason)
-  reason <- "<num_trials> argument if likelihood is binomial or beta-binomial"
+  reason <- "<num_trials> argument if likelihood is 'binomial' or 'bb'"
   expect_error(parse_likelihood("gaussian", NULL, 0, list_y, FALSE), reason)
   list_y <- list(y_disc = c(1, 2))
   reason <- "Invalid length of <c_hat>"

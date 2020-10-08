@@ -59,9 +59,11 @@ test_that("cpp_var_mask works similarly as reference", {
 # -------------------------------------------------------------------------
 
 # Model
-m <- create_model(y ~ zs(id) * gp(age) + het(id) * gp_vm(dis_age) +
-  categ(sex) + gp(age) + gp(blood),
-data = testdata_001
+m <- create_model(
+  formula = y ~ zs(id) * gp(age) + het(id) * gp_vm(dis_age) +
+    categ(sex) + gp(age) + gp(blood),
+  prior = list(wrp = igam(14, 5)),
+  data = testdata_001
 )
 
 # Input

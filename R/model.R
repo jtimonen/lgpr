@@ -59,6 +59,12 @@ create_model <- function(formula,
     cat(dollar(parsed, "info"))
   }
 
+  # Warn if using a def prior
+  # desc <- "input warping steepness"
+  # name <- "wrp"
+  # model_desc <- "has a gp_ns() or gp_vm() expression"
+  # msg <- warn_msg_default_prior(desc, name, model_desc)
+
   # Other
   if (verbose) cat("Parsing other...\n")
   list_other <- list(
