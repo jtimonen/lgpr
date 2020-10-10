@@ -10,7 +10,7 @@ citEntry(entry = "article",
   year          = "2020",
   url           = "https://arxiv.org/abs/1912.03549v2",
   textVersion  =
-  paste("Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki (2019).",
+  paste("Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki (2020).",
         "lgpr: An interpretable nonparametric method for inferring covariate effects from longitudinal data.",
         "https://arxiv.org/abs/1912.03549v2")
 )
