@@ -1,16 +1,16 @@
 citHeader("If you use lgpr, please cite the preprint below.")
 
 citEntry(entry = "article",
-  title        = "An interpretable probabilistic machine learning method for heterogeneous longitudinal studies",
+  title        = "lgpr: An interpretable nonparametric method for inferring covariate effects from longitudinal data",
   author       = personList(as.person("Juho Timonen"),
                    as.person("Henrik Mannerström"),
                    as.person("Aki Vehtari"),
                    as.person("Harri Lähdesmäki")),
   journal       = "arXiv:1912.03549",
-  year          = "2019",
-  url           = "https://arxiv.org/abs/1912.03549",
+  year          = "2020",
+  url           = "https://arxiv.org/abs/1912.03549v2",
   textVersion  =
   paste("Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki (2019).",
-        "An interpretable probabilistic machine learning method for heterogeneous longitudinal studies.",
-        "https://arxiv.org/abs/1912.03549")
+        "lgpr: An interpretable nonparametric method for inferring covariate effects from longitudinal data.",
+        "https://arxiv.org/abs/1912.03549v2")
 )
