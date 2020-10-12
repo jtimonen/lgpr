@@ -37,6 +37,9 @@
 #' @section Tutorials:
 #' See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}.
 #'
+#' @section Citation:
+#' Run \code{citation("lgpr")} to get citation information.
+#'
 #' @docType package
 #' @name lgpr-package
 #' @aliases lgpr
@@ -77,7 +80,7 @@ NULL
 #' There are two ways to define the model formula:
 #' \enumerate{
 #'   \item Using a common \code{\link[stats]{formula}}-like syntax, like in
-#'   \code{y ~ age +} \code{age|id} \code{ + sex}. Terms can consits of a
+#'   \code{y ~ age +} \code{age|id} \code{ + sex}. Terms can consist of a
 #'   single variable, such as \code{age}, or an interaction of two variables,
 #'   such as \code{age|id}. In single-variable terms, the variable can be either
 #'   continuous (numeric) or categorical (factor), whereas in interaction terms
@@ -140,11 +143,6 @@ NULL
 #'  the unit of \code{x} is months.
 #' }
 #'
-#' @section More advice on defining models:
-#'
-#' See the
-#' \href{https://jtimonen.github.io/lgpr-usage/index.html}{Defining a model}
-#' tutorial.
 #'
 #' @name lgp
 #' @family main functions

@@ -42,6 +42,11 @@ See the documentation of
 See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}.
 }
 
+\section{Citation}{
+
+Run \code{citation("lgpr")} to get citation information.
+}
+
 \references{
 \enumerate{
   \item Carpenter, B. et al. (2017).

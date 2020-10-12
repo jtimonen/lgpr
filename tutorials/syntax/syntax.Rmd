@@ -19,7 +19,6 @@ knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```{r load}
 require(lgpr)
 require(ggplot2)
-require(nlme) # the Orthodont data is in this package
 ```
 
 ## Introduction
@@ -28,16 +27,18 @@ can be created in `lgpr` using the function `create_model()`, and they
 can be fit by calling `sample_model()`. The easiest way, however, is probably
 to use the `lgp()` function which wraps both `create_model()` and `sample_model()` and has all the same arguments. The complete
 information about these arguments is in the documentation, but here we review
-the most common ones. 
+the most common ones, i.e. `formula`, `data` and `prior`.
 
 In this tutorial we focus on defining a model with
 `create_model()`, and the same syntax applies to `lgp()`.
 
 ## Specifying data
-The `data` argument to `lgp()` or `create_model()` should be a data frame
+The `data` argument to `lgp()` or `create_model()` should be a `data.frame`
 where continuous variables have a numeric type and categorical variables
-are factors. In this notebook we use the `Orthodont` data from the `nlme` package, which consists of orthodontic growth measurements for 11 female and 16 male subjects from age 8 to 14.
+are factors.
+
 ```{r data1}
+library(nlme)
 dat <- data.frame(Orthodont)
 dat$Sex <- as.factor(as.character(dat$Sex))
 dat$Subject <- as.factor(as.character(dat$Subject))
@@ -88,7 +89,7 @@ Above, `x` was used to denote any continuous and `z` any categorical variable.
 Each term can contain at most one continuous variable. Components which contain `gp(x)`, `gp_ns(x)`, or `gp_vm(x)` and have `NaN` or `NA` in the data of `x` are automatically multiplied by a mask for the missing values.
   
 ## Specifying parameter priors
-The `prior` argument to `lgp()` or `create_model()` speficies the prior
+The `prior` argument to `lgp()` or `create_model()` specifies the prior
 distribution for kernel hyperparameters and other model parameters. In above model, we did not speficy `prior`, so default priors were
 used. Custom priors can be given as a named list, like here:
 ```{r data4, fig.width=6.1, fig.height=4.3}
@@ -134,3 +135,23 @@ print(fit)
 plot_pred(fit, t_name = "age", group_by = "Subject")
 ```
 
+## When to not use default priors
+
+It is not recommended to use default priors blindly. Rather, priors should
+be specified according to the knowledge about the problem at hand, as in any
+Bayesian analysis. In `lgpr` this is especially important when
+
+* Using a non-Gaussian likelihood or otherwise setting `sample_f = TRUE`.
+In this case the response variable is not
+normalized, so the scale on which the data varies must be taken into
+  account when defining priors of the signal magnitude parameters
+\code{alpha} and possible noise parameters (`sigma`, `phi`,
+`gamma`). Also it should be checked if `c_hat` is set in a
+sensible way.
+* Using a model that contains a `gp_ns(x)` or `gp_vm(x)`
+expression in its formula. In this case the corresponding covariate
+`x` is not normalized, and the prior for the input warping steepness
+parameter `wrp` must be set according to the expected width of the
+window in which the nonstationary effect of `x` occurs. By default,
+the width of this window is about 36, which has been set assuming that
+ the unit of `x` is months.
