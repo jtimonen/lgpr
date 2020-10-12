@@ -19,13 +19,15 @@ knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```{r load}
 require(lgpr)
 require(ggplot2)
+require(nlme)
 ```
 
 ## Introduction
 The class `lgpmodel` represents an additive Gaussian process model. Such models
 can be created in `lgpr` using the function `create_model()`, and they
 can be fit by calling `sample_model()`. The easiest way, however, is probably
-to use the `lgp()` function which wraps both `create_model()` and `sample_model()` and has all the same arguments. The complete
+to use the `lgp()` function which wraps both `create_model()` and `sample_model()`
+and has all the same arguments. The complete
 information about these arguments is in the documentation, but here we review
 the most common ones, i.e. `formula`, `data` and `prior`.
 
@@ -37,13 +39,16 @@ The `data` argument to `lgp()` or `create_model()` should be a `data.frame`
 where continuous variables have a numeric type and categorical variables
 are factors.
 
+Here we use the `Orthodont` data set from the `nlme` package.
+
 ```{r data1}
-library(nlme)
 dat <- data.frame(Orthodont)
 dat$Sex <- as.factor(as.character(dat$Sex))
 dat$Subject <- as.factor(as.character(dat$Subject))
 str(dat)
 ```
+
+
 ```{r data2, fig.width=6.5, fig.height=4.3}
 plot_data(dat, x_name = "age", y_name = "distance", group_by = "Subject",
           color_by = "Sex") + xlab('Age (years)')
