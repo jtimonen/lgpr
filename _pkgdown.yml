@@ -74,7 +74,7 @@ navbar:
       - text: Heterogeneous effects
         href: tutorials/heter.html
       - text: Temporally uncertain effects
-        href: tutorials/heter.html
+        href: tutorials/uncrt.html
       - text: Discrete observation model
         href: tutorials/bb.html
     overview:
