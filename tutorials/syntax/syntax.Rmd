@@ -3,8 +3,11 @@ title: "Defining a model in lgpr"
 author: "Juho Timonen"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:
+  html_document:
     toc: true
+    toc_float: true
+    number_sections: true
+    theme: yeti
 vignette: >
   %\VignetteIndexEntry{Defining a model in lgpr}
     %\VignetteEngine{knitr::rmarkdown}
@@ -22,7 +25,7 @@ require(ggplot2)
 require(nlme)
 ```
 
-## Introduction
+# Introduction
 The class `lgpmodel` represents an additive Gaussian process model. Such models
 can be created in `lgpr` using the function `create_model()`, and they
 can be fit by calling `sample_model()`. The easiest way, however, is probably
@@ -54,11 +57,11 @@ plot_data(dat, x_name = "age", y_name = "distance", group_by = "Subject",
           color_by = "Sex") + xlab('Age (years)')
 ```
 
-## Specifying the model formula
+# Specifying the model formula
 The `formula` argument to `lgp()` or `create_model()` specifies
 the response variable, model components and covariates.
 
-### A) Common formula syntax
+## A) Common formula syntax
 Here we create a model with the continuous variable `age` and categorical variables `Subject` and `Sex` as predictors for `distance`. 
 ```{r data3, fig.width=6.1, fig.height=4.3}
 model <- create_model(distance ~ age + age|Sex + age|Subject, dat, verbose = FALSE)
@@ -72,7 +75,7 @@ The formula `distance ~ age + age|Sex + age|Subject` has the same format as for 
 
 If we wanted effects 2. and 3. to not depend on age, we could write the formula as just `distance ~ age + Sex + Subject`.
 
-### B) Advanced formula syntax
+## B) Advanced formula syntax
 The above formula was actually automatically converted to the more specific format `distance ~ gp(age) + gp(age)*zs(Sex) + gp(age)*zs(Subject)`. The `lgpr` package has this advanced syntax, because the common formula syntax of R is not
 expressive enough for all kinds of components that our models can have.
 Formulae specified using the advanced syntax consist of terms which can combine
@@ -93,7 +96,7 @@ the following expressions through addition and multiplication:
 Above, `x` was used to denote any continuous and `z` any categorical variable.
 Each term can contain at most one continuous variable. Components which contain `gp(x)`, `gp_ns(x)`, or `gp_vm(x)` and have `NaN` or `NA` in the data of `x` are automatically multiplied by a mask for the missing values.
   
-## Specifying parameter priors
+# Specifying parameter priors
 The `prior` argument to `lgp()` or `create_model()` specifies the prior
 distribution for kernel hyperparameters and other model parameters. In above model, we did not speficy `prior`, so default priors were
 used. Custom priors can be given as a named list, like here:
@@ -140,7 +143,7 @@ print(fit)
 plot_pred(fit, t_name = "age", group_by = "Subject")
 ```
 
-## When to not use default priors
+# When to not use default priors
 
 It is not recommended to use default priors blindly. Rather, priors should
 be specified according to the knowledge about the problem at hand, as in any

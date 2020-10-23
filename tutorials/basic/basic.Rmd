@@ -151,7 +151,7 @@ plot_pred(fit, x = x_pred, pred = p)
 Also the posterior distribution of each component can be visualized
 
 ```{r vis4, fig.width=7, fig.height=7}
-plot_components(fit, 
+plot_components(fit,
                 x = x_pred, 
                 pred = p,
                 color_by = c(NA, NA, "sex", "group", "group", "group"),
