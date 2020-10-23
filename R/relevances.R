@@ -5,7 +5,7 @@
 #'   \item \code{relevances} returns a named vector with length equal to
 #'   \code{num_comps + 1}
 #'   \item \code{relevances.default} is the default method
-#'   \item \code{relevances.default_all} returns a dataframe of size
+#'   \item \code{relevances.default_all} returns a \code{data.frame} of size
 #'   \code{num_draws} x \code{num_comps + 1}
 #' }
 #' @param fit an object of class \code{lgpfit}
@@ -17,7 +17,7 @@ NULL
 
 #' @export
 #' @rdname relevances
-relevances <- function(fit, reduce = mean, ...) {
+relevances <- function(fit, reduce = function(x) base::mean(x), ...) {
   check_type(fit, "lgpfit")
   relevances.default(fit, reduce, ...)
 }

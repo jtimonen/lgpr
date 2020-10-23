@@ -3,6 +3,7 @@
 \name{checks}
 \alias{checks}
 \alias{check_type}
+\alias{check_function}
 \alias{check_numeric}
 \alias{check_positive}
 \alias{check_non_negative}
@@ -25,6 +26,8 @@
 \title{Argument validation}
 \usage{
 check_type(arg, allowed)
+
+check_function(arg, arg_name)
 
 check_numeric(arg)
 
@@ -97,6 +100,7 @@ check_dim(arg, D)
 \description{
 \itemize{
   \item \code{check_type} checks if argument has correct class
+  \item \code{check_function} checks if argument is a function
   \item \code{check_numeric} checks if argument is numeric
   \item \code{check_positive} checks if argument is positive
   \item \code{check_non_negative} checks if argument is non-negative

@@ -1,3 +1,42 @@
+#' Visualize input warping function with several steepness parameter values
+#'
+#' @param wrp a vector of values of the warping steepness parameter
+#' @param x a vector of input values
+#' @param color line color
+#' @param alpha line alpha
+#' @return a \code{ggplot} object
+plot_inputwarp <- function(wrp,
+                           x,
+                           color = colorset("red", "dark"),
+                           alpha = 0.5) {
+  x <- sort(x)
+  L <- length(x)
+  S <- length(wrp)
+  W <- matrix(0, S, L)
+  for (i in seq_len(S)) {
+    w <- cpp_warp_input(x, a = wrp[i])
+    W[i, ] <- w
+  }
+  af <- as.factor(rep(1:S, each = L))
+  df <- data.frame(rep(x, S), as.vector(t(W)), af)
+  colnames(df) <- c("x", "w", "idx")
+
+  # Create ggplot object
+  aes <- ggplot2::aes_string(x = "x", y = "w", group = "idx")
+  plt <- ggplot2::ggplot(df, aes) +
+    ggplot2::geom_line(color = color, alpha = alpha)
+
+  # Add titles and labels
+  plt <- plt + ggplot2::labs(x = "Input", y = "Warped input") +
+    ggplot2::ggtitle("Input-warping function")
+  plt <- plt +
+    ggplot2::geom_hline(yintercept = -1.0, lty = 2) +
+    ggplot2::geom_hline(yintercept = 1.0, lty = 2) +
+    ggplot2::ylim(-1.0, 1.0)
+  return(plt)
+}
+
+
 #' Plot the inverse gamma-distribution pdf
 #'
 #' @inheritParams dinvgamma_stanlike

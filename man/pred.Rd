@@ -9,7 +9,7 @@
 pred(
   fit,
   x,
-  reduce = mean,
+  reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
   STREAM = get_stream()

@@ -3,8 +3,11 @@ title: "Basic usage of the lgpr package"
 author: "Juho Timonen"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:
+  html_document:
     toc: true
+    toc_float: true
+    number_sections: true
+    theme: yeti
 vignette: >
   %\VignetteIndexEntry{Basic usage of the lgpr package}
     %\VignetteEngine{knitr::rmarkdown}
@@ -44,7 +47,7 @@ plot_sim(sim)
 plot_sim(sim, comp_idx = 2)
 ```
 
-## Visualizing longitudinal data
+# Visualizing longitudinal data
 In this tutorial we use simulated `testdata_002`, which is included in the `lgpr` package. It consists of 12 individuals and 8 time points for each. 
 
 ``````{r head}
@@ -65,7 +68,7 @@ plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
 ```
 
 
-## Creating and fitting a model
+# Creating and fitting a model
 
 Detailed instructions and the syntax for creating different kinds of models is found in the package documentation and the *Defining a model* tutorial.
 
@@ -83,7 +86,7 @@ fit <- lgp(formula = y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(dise
            refresh  = 250)
 ```
 
-## Studying the model and fit
+# Studying the model and fit
 Printing the model object gives info about the model components, variables
 and parameter priors. In this example we did not specify the `prior` argument when calling `lgp()` so default priors were used.
 
@@ -108,7 +111,7 @@ Distribution of the parameter draws can be visualized.
 plot_draws(fit, type = 'dens')
 ```
 
-## Assessing component relevances
+# Assessing component relevances
 Here we compute the average relevance of each component. We see that `id` and `group` have a very low relevance.
 
 ```{r study4, fig.width = 6, fig.height = 3.5}
@@ -131,7 +134,7 @@ print(s$expected)
 
 The above table shows for each component the expectation value of being selected.
 
-## Out-of-sample predictions
+# Out-of-sample predictions
 
 We visualize the predictive distribution of the model, using posterior 
 mean hyperparameters (`reduce = mean`). The predictive mean ($\pm 2 \times$ standard deviation) are computed at 120 points for each of the 12 individuals (1440 total prediction points created using `new_x()`) and visualized against the data.
@@ -143,7 +146,7 @@ p <- pred(fit, x_pred, reduce = mean)
 plot_pred(fit, x = x_pred, pred = p)
 ```
 
-## Visualizing the inferred covariate effects
+# Visualizing the inferred covariate effects
 
 Also the posterior distribution of each component can be visualized
 
@@ -160,7 +163,7 @@ plot_components(fit,
 
 **Note:** the `plot_pred()` and `plot_components()` functions could be used without the `x` and `pred` arguments, too, in which case computing out-of-sample predictions would not be needed. The predictive and component posteriors would be shown only at the data points.
 
-## Computing environment
+# Computing environment
 
 ```{r sess}
 sessionInfo()

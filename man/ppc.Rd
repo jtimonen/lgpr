@@ -24,6 +24,6 @@ a \code{ggplot} object
 Graphical posterior or prior predictive checks
 }
 \seealso{
-Introduction to graphical posterior predictive
-checks: \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
+Introduction to graphical posterior predictive checks:
+\href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
 }
