@@ -19,7 +19,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#")
 knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```
 
-This vignette demonstrates how to fit an additive Gaussian process (GP) model to a longitudinal data set and perform covariate relevance assessment using the `lgpr` package.
+This vignette demonstrates how to fit an additive Gaussian process (GP) model
+to a longitudinal data set and perform covariate relevance assessment using the
+`lgpr` package.
 
 ```{r load}
 require("lgpr")
@@ -51,13 +53,17 @@ plot_sim(sim, comp_idx = 2)
 
 
 # Visualizing longitudinal data
-In this tutorial we use simulated `testdata_002`, which is included in the `lgpr` package. It consists of 12 individuals and 8 time points for each. The `plot_data()` function can be used to visualize the data in many ways.
+In this tutorial we use simulated `testdata_002`, which is included in the 
+`lgpr` package. It consists of 12 individuals and 8 time points for each. The
+`plot_data()` function can be used to visualize the data in many ways.
 
 ``````{r pd1, fig.width=7.2, fig.height=4.8}
 plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab('Age (months)')
 ```
 
-Coloring according to the disease-related age (`diseaseAge`) shows that individuals 01-06 are cases and 07-12 are controls. The observed disease onset is at around 60 months for each case individual.
+Coloring according to the disease-related age (`diseaseAge`) shows that
+individuals 01-06 are cases and 07-12 are controls. The observed disease onset
+is at around 60 months for each case individual.
 
 ``````{r pd2, fig.width=7.2, fig.height=4.8}
 plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
@@ -71,8 +77,8 @@ plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
 The class `lgpmodel` represents an additive Gaussian process model. Such models
 can be created in `lgpr` using the function `create_model()`, and they
 can be fit by calling `sample_model()`. The easiest way, however, is probably
-to use the `lgp()` function which wraps both `create_model()` and `sample_model()`
-and has all the same arguments. The complete
+to use the `lgp()` function which wraps both `create_model()` and
+`sample_model()` and has all the same arguments. The complete
 information about these arguments is in the documentation, but here we review
 the most common ones, i.e. `formula`, `data` and `prior`.
 
@@ -90,32 +96,39 @@ str(dat)
 ```
 
 If you don't know how to create a `data.frame` for your own data,
-consult for example [this](https://bookdown.org/ndphillips/YaRrr/matricesdataframes.html) or [this](https://www.tutorialspoint.com/r/r_data_frames.htm).
-Functions in `lgpr` that can help in adding new variables to a data frame are `add_factor()` and `add_dis_age()`.
+consult for example 
+[this](https://bookdown.org/ndphillips/YaRrr/matricesdataframes.html) or [this](https://www.tutorialspoint.com/r/r_data_frames.htm).
+Functions in `lgpr` that can help in adding new variables to a data frame are
+`add_factor()` and `add_dis_age()`.
 
 ## Specifying the model formula
 The `formula` argument to `lgp()` or `create_model()` specifies
 the response variable, model components and covariates.
 
 ### Common formula syntax
-Here we create a model with the continuous variable `age` and categorical variables `sex` and subject `id` as predictors for `y`.
+Here we create a model with the continuous variable `age` and categorical
+variables `sex` and subject `id` as predictors for `y`.
 
 ```{r data3, fig.width=6.1, fig.height=4.3}
 model <- create_model(y ~ age + age|sex + age|id, dat, verbose = FALSE)
 print(model)
 ```
 
-The formula `y ~ age + age|sex + age|id` has the same format as for example in the `lme4` package, which uses linear mixed effect models. In `lgpr`, this
+The formula `y ~ age + age|sex + age|id` has the same format as for example in
+the `lme4` package, which uses linear mixed effect models. In `lgpr`, this
 formula creates a model with three components:
 
   1. the shared effect of age
   2. the sex-specific deviation from the shared age effect
   3. the subject-specific deviation from the shared age effect
 
-If we wanted effects 2. and 3. to not depend on age, we could write the formula as just `y ~ age + sex + id`.
+If we wanted effects 2. and 3. to not depend on age, we could write the formula
+as just `y ~ age + sex + id`.
 
 ### Advanced formula syntax
-The above formula was actually automatically converted to the more specific format `y ~ gp(age) + gp(age)*zs(sex) + gp(age)*zs(id)`. The `lgpr` package has this advanced syntax, because the common formula syntax of R is not
+The above formula was actually automatically converted to the more specific
+format `y ~ gp(age) + gp(age)*zs(sex) + gp(age)*zs(id)`. The `lgpr` package has
+this advanced syntax, because the common formula syntax of R is not
 expressive enough for all kinds of components that our models can have.
 Formulae specified using the advanced syntax consist of terms which can combine
 the following expressions through addition and multiplication:
@@ -133,26 +146,30 @@ the following expressions through addition and multiplication:
   magnitude parameter
 
 Above, `x` was used to denote any continuous and `z` any categorical variable.
-Each term can contain at most one continuous variable. Components which contain `gp(x)`, `gp_ns(x)`, or `gp_vm(x)` and have `NaN` or `NA` in the data of `x` 
+Each term can contain at most one continuous variable. Components which contain
+`gp(x)`, `gp_ns(x)`, or `gp_vm(x)` and have `NaN` or `NA` in the data of `x`
 are automatically multiplied by a mask for the missing values.
 
 Here we define the formula using the advanced syntax.
 ```{r model_advanced, cache=TRUE}
-model <- create_model(y ~ gp(age) + zs(id)*gp(age) + 
-                        zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
-                      data     = testdata_002,
-                      prior    = list(wrp = igam(14,5)))
+model <- create_model(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
+                      data     = testdata_002)
 print(model)
 ```
 
 ## Model parameters
-In the above model, there are four magnitude parameters (alpha), one for each component, and three lengthscale parameters (ell), since the `zs(group)`component does not have a lengthscale parameter. 
+In the above model, there are four magnitude parameters (alpha), one for each
+component, and three lengthscale parameters (ell), since the `zs(group)`
+component does not have a lengthscale parameter. 
  
-**Note:** the continuous covariates and the response variable have been normalized to zero mean and unit variance, and the inference of the lengthscale, magnitude, and noise parameters is done on that scale.
+**Note:** the continuous covariates and the response variable have been
+normalized to zero mean and unit variance, and the inference of the
+lengthscale, magnitude, and noise parameters is done on that scale.
 
 ## Specifying parameter priors
 The `prior` argument to `lgp()` or `create_model()` specifies the prior
-distribution for kernel hyperparameters and other model parameters. In above model, we did not speficy `prior`, so default priors were
+distribution for kernel hyperparameters and other model parameters. In above
+model, we did not speficy `prior`, so default priors were
 used. Custom priors can be given as a named list, like here:
 ```{r data4, fig.width=6.1, fig.height=4.3}
 prior <- list(
@@ -160,10 +177,10 @@ prior <- list(
   ell = igam(shape = 5, scale = 5) # inverse gamma for lengthscales <ell>
 )
 
-model2 <- create_model(formula = y ~ age + age|sex + age|id, 
-                       data = dat, 
-                       prior = prior)
-param_summary(model2)
+model <- create_model(y ~ age + age|sex + age|id,
+                      data = dat, 
+                      prior = prior)
+param_summary(model)
 ```
 Specifying the `prior` argument as a named list gave the same prior for
 all parameters matching that name. If we wanted separate priors for example 
@@ -221,7 +238,8 @@ the width of this window is about 36, which has been set assuming that
 
 # Fitting a model
 
-A model created using `create_model()` could be fitted using the `sample_model()` function. However, in this section we start fresh and show
+A model created using `create_model()` could be fitted using the
+`sample_model()` function. However, in this section we start fresh and show
 how to do both model creation and model fitting using the `lgp()` function.
 
 ## Sampling the posterior
@@ -232,8 +250,7 @@ is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
 `zs(group)` is a static offset component between the two groups (Case/Control).
 
 ```{r fit, cache=TRUE}
-fit <- lgp(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) +
-             zs(group),
+fit <- lgp(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
            data     = testdata_002,
            prior    = list(wrp = igam(14,5)),
            iter     = 2000,
@@ -241,9 +258,10 @@ fit <- lgp(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) +
            refresh  = 500)
 ```
 
-The `lgp()` function can be given any arguments that should be passed to [rstan::sampling()](https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html). We could use for example `cores = 4` to parallelize the
-chains or `control = list(adapt_delta = 0.95)` to set the target acceptance
-rate.
+The `lgp()` function can be given any arguments that should be passed to
+[rstan::sampling()](https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html).
+We could use for example `cores = 4` to parallelize the chains or 
+`control = list(adapt_delta = 0.95)` to set the target acceptance rate.
 
 ## Studying the posterior
 
@@ -260,7 +278,9 @@ Distribution of the parameter draws can be visualized.
 plot_draws(fit, type = 'dens')
 ```
 
-The slot `fit@stan_fit` is a `stanfit` object and can therefore be studied more as is done [here](https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html)
+The slot `fit@stan_fit` is a `stanfit` object and can therefore be studied more
+as is done
+[here](https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html)
 
 ```{r study_stanfit, fig.width = 6, fig.height = 3.5}
 sf <- fit@stan_fit
@@ -271,19 +291,24 @@ print(mean_accept_stat_by_chain)
 ```
 
 # Assessing component relevances
-Here we compute the average relevance of each component. We see that `id` and `group` have a very low relevance.
+Here we compute the average relevance of each component. We see that `id` and
+`group` have a very low relevance.
 
 ```{r study4, fig.width = 6, fig.height = 3.5}
 Relevance <- relevances(fit, reduce = mean)
 data.frame(Relevance)
 ```
 
-Components can be selected using a threshold for the proportion of total explained variance. We see that `id` and `group` are not selected.
+Components can be selected using a threshold for the proportion of total
+explained variance. We see that `id` and `group` are not selected.
 ```{r study5, fig.width = 6, fig.height = 3.5}
 select(fit, threshold = 0.95)
 ```
 
-In order to avoid having to set a fixed `threshold` for selection, we can integrate over a threshold density on the [0,1] interval, and obtain probabilistic selection. Here we define the density to be `stats::dbeta(x, 20, 2)`, which has most mass between $0.9$ and $1.0$.
+In order to avoid having to set a fixed `threshold` for selection, we can
+integrate over a threshold density on the [0,1] interval, and obtain
+probabilistic selection. Here we define the density to be
+`stats::dbeta(x, 20, 2)`, which has most mass between $0.9$ and $1.0$.
 
 ```{r study6, fig.width = 6, fig.height = 3.5}
 threshold_density <- function(x) {stats::dbeta(x, 20, 2)}
@@ -291,12 +316,16 @@ s <- select.integrate(fit, p = threshold_density)
 print(s$expected)
 ```
 
-The above table shows for each component the expectation value of being selected.
+The above table shows for each component the expectation value of being
+selected.
 
 # Out-of-sample predictions
 
 We visualize the predictive distribution of the model, using posterior 
-mean hyperparameters (`reduce = mean`). The predictive mean ($\pm 2 \times$ standard deviation) are computed at 120 points for each of the 12 individuals (1440 total prediction points created using `new_x()`) and visualized against the data.
+mean hyperparameters (`reduce = mean`). The predictive mean ($\pm 2 \times$
+standard deviation) are computed at 120 points for each of the 12 individuals
+(1440 total prediction points created using `new_x()`) and visualized against
+the data.
 
 ```{r vis3, fig.width=7, fig.height=4}
 t <- seq(1, 120, by = 1)
@@ -318,9 +347,14 @@ plot_components(fit,
                 ncol = 2)
 ```
 
-**Note:** the `plot_pred()` function scales the predictions back to the original data scale, whereas the `plot_components()` function plots the inferred functions on the (normalized) inference scale.
+**Note:** the `plot_pred()` function scales the predictions back to the
+original data scale, whereas the `plot_components()` function plots the
+inferred functions on the (normalized) inference scale.
 
-**Note:** the `plot_pred()` and `plot_components()` functions could be used without the `x` and `pred` arguments, too, in which case computing out-of-sample predictions would not be needed. The predictive and component posteriors would be shown only at the data points.
+**Note:** the `plot_pred()` and `plot_components()` functions could be used
+without the `x` and `pred` arguments, too, in which case computing
+out-of-sample predictions would not be needed. The predictive and component
+posteriors would be shown only at the data points.
 
 
 # Computing environment
