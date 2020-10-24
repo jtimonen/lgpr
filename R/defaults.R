@@ -68,6 +68,7 @@ default_prior_effect_time_info <- function(num_uncrt) {
   check_not_null(num_uncrt)
   if (num_uncrt > 0) {
     # There is no default prior for effect time
+    # TODO: more informative message?
     stop("you must specify 'effect_time_info' in <prior>!")
   } else {
     # Will not be used

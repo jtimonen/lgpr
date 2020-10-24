@@ -21,8 +21,15 @@ test_that("check_type works correctly", {
   out2 <- check_type(3.4, c("numeric", "character"))
   expect_true(out1)
   expect_true(out2)
-  reason <- "Allowed classes are"
+  reason <- "must contain one of"
   expect_error(check_type(3.4, "list"), reason)
+})
+
+test_that("check_function works correctly", {
+  out1 <- check_type(function(x) base::mean(x), "function")
+  expect_true(out1)
+  reason <- "must be a function, but is.function"
+  expect_error(check_type("hello", "function"), reason)
 })
 
 test_that("check_length works correctly", {

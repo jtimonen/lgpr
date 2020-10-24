@@ -36,7 +36,7 @@ NULL
 
 #' @export
 #' @rdname pred
-pred <- function(fit, x, reduce = mean, draws = NULL,
+pred <- function(fit, x, reduce = function(x) base::mean(x), draws = NULL,
                  verbose = TRUE, STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)

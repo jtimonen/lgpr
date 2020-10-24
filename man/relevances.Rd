@@ -6,7 +6,7 @@
 \alias{relevances.default.all}
 \title{Assess component relevances}
 \usage{
-relevances(fit, reduce = mean, ...)
+relevances(fit, reduce = function(x) base::mean(x), ...)
 
 relevances.default(fit, reduce, ...)
 
@@ -25,7 +25,7 @@ draw into one value}
   \item \code{relevances} returns a named vector with length equal to
   \code{num_comps + 1}
   \item \code{relevances.default} is the default method
-  \item \code{relevances.default_all} returns a dataframe of size
+  \item \code{relevances.default_all} returns a \code{data.frame} of size
   \code{num_draws} x \code{num_comps + 1}
 }
 }

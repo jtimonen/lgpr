@@ -8,8 +8,8 @@
 #' \code{\link[bayesplot]{pp_check}} method in
 #' \code{bayesplot}
 #' @return a \code{ggplot} object
-#' @seealso Introduction to graphical posterior predictive
-#' checks: \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
+#' @seealso Introduction to graphical posterior predictive checks:
+#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
 #'
 ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
   check_type(fit, "lgpfit")
@@ -97,10 +97,13 @@ plot_draws <- function(fit,
 
 #' @export
 #' @rdname plot_draws
+#' @inheritParams plot_inputwarp
 #' @param num_points number of plot points
 #' @param window_size width of time window
-#' @param color_scheme name of \code{bayesplot} color scheme
+#' @param color_scheme deprecated argument, has no effect
+#' @return a ggplot object
 plot_warp <- function(fit, num_points = 300, window_size = 48,
+                      color = colorset("red", "dark"), alpha = 0.5,
                       color_scheme = "brightblue") {
   check_type(fit, "lgpfit")
   R <- window_size
@@ -109,9 +112,9 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
   out <- list()
   for (j in seq_len(num_ns)) {
     par_name <- paste0("wrp[", j, "]")
-    summary <- rstan::summary(fit@stan_fit, pars = c(par_name))
-    par_summary <- dollar(summary, "summary")
-    out[[j]] <- plot_warp_helper(par_summary, dis_age, color_scheme)
+    draws <- rstan::extract(fit@stan_fit, pars = c(par_name))
+    draws <- dollar(draws, par_name)
+    out[[j]] <- plot_inputwarp(draws, dis_age, color, alpha)
   }
 
   # Return ggplot object or list of them

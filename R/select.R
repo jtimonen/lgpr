@@ -28,7 +28,9 @@ NULL
 
 #' @export
 #' @rdname select
-select <- function(fit, reduce = mean, threshold = 0.95, ...) {
+select <- function(fit,
+                   reduce = function(x) base::mean(x),
+                   threshold = 0.95, ...) {
   check_type(fit, "lgpfit")
   check_interval(threshold, 0, 1)
   check_type(reduce, "function")
@@ -59,10 +61,8 @@ select_freq <- function(fit, threshold = 0.95, ...) {
 #' @export
 #' @rdname select
 select.integrate <- function(fit,
-                             reduce = mean,
-                             p = function(x) {
-                               stats::dbeta(x, 100, 5)
-                             },
+                             reduce = function(x) base::mean(x),
+                             p = function(x) stats::dbeta(x, 100, 5),
                              h = 0.01,
                              verbose = TRUE,
                              ...) {
@@ -77,9 +77,7 @@ select.integrate <- function(fit,
 #' @export
 #' @rdname select
 select_freq.integrate <- function(fit,
-                                  p = function(x) {
-                                    stats::dbeta(x, 100, 5)
-                                  },
+                                  p = function(x) stats::dbeta(x, 100, 5),
                                   h = 0.01,
                                   verbose = TRUE,
                                   ...) {

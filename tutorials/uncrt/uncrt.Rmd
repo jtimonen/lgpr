@@ -3,8 +3,11 @@ title: "Disease effect time uncertainty modeling in lgpr"
 author: "Juho Timonen"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:
+  html_document:
     toc: true
+    toc_float: true
+    number_sections: true
+    theme: yeti
 vignette: >
   %\VignetteIndexEntry{Disease effect time uncertainty modeling in lgpr}
     %\VignetteEngine{knitr::rmarkdown}

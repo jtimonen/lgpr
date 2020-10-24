@@ -5,6 +5,7 @@
 #' @description
 #' \itemize{
 #'   \item \code{check_type} checks if argument has correct class
+#'   \item \code{check_function} checks if argument is a function
 #'   \item \code{check_numeric} checks if argument is numeric
 #'   \item \code{check_positive} checks if argument is positive
 #'   \item \code{check_non_negative} checks if argument is non-negative
@@ -40,14 +41,39 @@ NULL
 #' @rdname checks
 #' @param allowed Allowed class names.
 check_type <- function(arg, allowed) {
-  type <- class(arg)[1]
-  ok <- (type %in% allowed)
+  arg_name <- deparse(substitute(arg))
+
+  # If allowed is 'function'
+  if (length(allowed) == 1) {
+    if (allowed == "function") {
+      check_function(arg, arg_name)
+      return(TRUE)
+    }
+  }
+
+  # Otherwise
+  type <- class(arg)
+  ok <- any(type %in% allowed)
   if (!ok) {
-    arg_name <- deparse(substitute(arg))
-    str <- paste(allowed, collapse = ", ")
+    str1 <- paste(allowed, collapse = ", ")
+    str2 <- paste(type, collapse = ", ")
     msg <- paste0(
-      "class(", arg_name, ")[1] is '", type,
-      "'. Allowed classes are {", str, "}."
+      "class(", arg_name, ") must contain one of {", str1, "}. Found = {",
+      str2, "}."
+    )
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+#' @rdname checks
+#' @param arg_name argument name
+check_function <- function(arg, arg_name) {
+  ok <- is.function(arg)
+  if (!ok) {
+    msg <- paste0(
+      "'", arg_name, "' must be a function, but ",
+      "is.function(", arg_name, ") returned FALSE."
     )
     stop(msg)
   }

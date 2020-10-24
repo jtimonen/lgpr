@@ -2,9 +2,12 @@
 title: "Disease effect heterogeneity modeling in lgpr"
 author: "Juho Timonen"
 date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette:
+output:
+  html_document:
     toc: true
+    toc_float: true
+    number_sections: true
+    theme: yeti
 vignette: >
   %\VignetteIndexEntry{Disease effect heterogeneity modeling in lgpr}
     %\VignetteEngine{knitr::rmarkdown}

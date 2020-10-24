@@ -7,14 +7,14 @@
 \alias{select_freq.integrate}
 \title{Select relevant components}
 \usage{
-select(fit, reduce = mean, threshold = 0.95, ...)
+select(fit, reduce = function(x) base::mean(x), threshold = 0.95, ...)
 
 select_freq(fit, threshold = 0.95, ...)
 
 select.integrate(
   fit,
-  reduce = mean,
-  p = function(x) {     stats::dbeta(x, 100, 5) },
+  reduce = function(x) base::mean(x),
+  p = function(x) stats::dbeta(x, 100, 5),
   h = 0.01,
   verbose = TRUE,
   ...
@@ -22,7 +22,7 @@ select.integrate(
 
 select_freq.integrate(
   fit,
-  p = function(x) {     stats::dbeta(x, 100, 5) },
+  p = function(x) stats::dbeta(x, 100, 5),
   h = 0.01,
   verbose = TRUE,
   ...
