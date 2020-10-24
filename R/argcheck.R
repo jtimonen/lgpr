@@ -67,6 +67,7 @@ check_type <- function(arg, allowed) {
 }
 
 #' @rdname checks
+#' @param arg_name argument name
 check_function <- function(arg, arg_name) {
   ok <- is.function(arg)
   if (!ok) {

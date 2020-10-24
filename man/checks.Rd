@@ -72,6 +72,8 @@ check_dim(arg, D)
 
 \item{allowed}{Allowed class names.}
 
+\item{arg_name}{argument name}
+
 \item{lower}{interval minimum}
 
 \item{upper}{interval maximum}
