@@ -100,9 +100,11 @@ plot_draws <- function(fit,
 #' @inheritParams plot_inputwarp
 #' @param num_points number of plot points
 #' @param window_size width of time window
+#' @param color_scheme deprecated argument, has no effect
 #' @return a ggplot object
 plot_warp <- function(fit, num_points = 300, window_size = 48,
-                      color = colorset("red", "dark"), alpha = 0.5) {
+                      color = colorset("red", "dark"), alpha = 0.5,
+                      color_scheme = "brightblue") {
   check_type(fit, "lgpfit")
   R <- window_size
   num_ns <- dollar(fit@model@stan_input, "num_ns")

@@ -353,7 +353,7 @@ warn_msg_default_prior <- function(desc, name, model_desc) {
   paste0(
     "Using a default prior for ", desc, " (", name, "), in a model",
     " that ", model_desc, ".",
-    " This is not recommended. See the 'Defining a model' tutorial",
+    " This is not recommended. See the 'Basic usage' tutorial",
     " at https://jtimonen.github.io/lgpr-usage/index.html."
   )
 }

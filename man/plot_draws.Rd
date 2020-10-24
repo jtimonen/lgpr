@@ -19,7 +19,8 @@ plot_warp(
   num_points = 300,
   window_size = 48,
   color = colorset("red", "dark"),
-  alpha = 0.5
+  alpha = 0.5,
+  color_scheme = "brightblue"
 )
 
 plot_beta(fit, type = "dens", ...)
@@ -45,6 +46,8 @@ plot_effect_times(fit, type = "areas", ...)
 \item{color}{line color}
 
 \item{alpha}{line alpha}
+
+\item{color_scheme}{deprecated argument, has no effect}
 }
 \value{
 a \code{ggplot} object or list of them

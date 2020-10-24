@@ -76,5 +76,5 @@ test_that("invalid prior name or hyperparams cannot be given", {
 
 test_that("default prior warning works", {
   msg <- warn_msg_default_prior("param_desc", "param_name", "model_desc")
-  expect_equal(nchar(msg), 192)
+  expect_equal(nchar(msg), 187)
 })

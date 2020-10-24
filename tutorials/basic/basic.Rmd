@@ -19,15 +19,17 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#")
 knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```
 
-This vignette demonstrates how to fit an additive Gaussian process (GP) model
-to a longitudinal data set and perform covariate relevance assessment using the
-`lgpr` package.
+This vignette demonstrates the core functionality of the `lgpr` package. We
+demonstrate how to visualize data, create and fit and additive GP model,
+study the results, assess covariate relevances and visualize the inferred
+covariate effects. 
 
 ```{r load}
 require("lgpr")
+require("rstan")
 require("ggplot2")
-require("nlme")
 ```
+
 
 ```{r simulate, include = FALSE, eval = FALSE}
 set.seed(1932)
@@ -51,7 +53,6 @@ plot_sim(sim, comp_idx = 2)
 ```
 
 
-
 # Visualizing longitudinal data
 In this tutorial we use simulated `testdata_002`, which is included in the 
 `lgpr` package. It consists of 12 individuals and 8 time points for each. The
@@ -66,10 +67,8 @@ individuals 01-06 are cases and 07-12 are controls. The observed disease onset
 is at around 60 months for each case individual.
 
 ``````{r pd2, fig.width=7.2, fig.height=4.8}
-plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") +
-  scale_color_gradient2() + xlab('Age (months)')
+plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") + scale_color_gradient2() + xlab('Age (months)')
 ```
-
 
 
 # Creating a model
@@ -84,15 +83,16 @@ the most common ones, i.e. `formula`, `data` and `prior`.
 
 In this section we focus on defining a model with
 `create_model()`, and the same syntax applies to `lgp()`.
+In R, you can see the more help about the mentioned (and any other) functions
+using `?`, as in `?lgp`.
 
-## Specifying data
+## Specifying the data
 The `data` argument to `lgp()` or `create_model()` should be a `data.frame`
 where continuous variables have a numeric type and categorical variables
 are factors. Our test data is already in this format.
 
 ``````{r data_str}
-dat <- testdata_002
-str(dat)
+str(testdata_002)
 ```
 
 If you don't know how to create a `data.frame` for your own data,
@@ -110,7 +110,7 @@ Here we create a model with the continuous variable `age` and categorical
 variables `sex` and subject `id` as predictors for `y`.
 
 ```{r data3, fig.width=6.1, fig.height=4.3}
-model <- create_model(y ~ age + age|sex + age|id, dat, verbose = FALSE)
+model <- create_model(y ~ age + age|sex + age|id, testdata_002, verbose = FALSE)
 print(model)
 ```
 
@@ -151,19 +151,32 @@ Each term can contain at most one continuous variable. Components which contain
 are automatically multiplied by a mask for the missing values.
 
 Here we define the formula using the advanced syntax.
-```{r model_advanced, cache=TRUE}
+```{r model_advanced}
 model <- create_model(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
-                      data     = testdata_002)
+                      testdata_002)
+```
+
+We received a warning because we used `gp_vm()` without specifying a prior.
+This is because the default prior only makes sense if the covariate
+(`diseaseAge`) is expressed in months and the measurement time interval
+is several years. We will get back to this in Section 2.5
+
+```{r model_advanced_print}
 print(model)
 ```
 
 ## Model parameters
-In the above model, there are four magnitude parameters (alpha), one for each
-component, and three lengthscale parameters (ell), since the `zs(group)`
-component does not have a lengthscale parameter. 
+As can be seen in the above output, the model has five magnitude parameters
+(`alpha`), one for each component, and three lengthscale parameters (`ell`),
+since the `zs(group)` component does not have a lengthscale parameter. The
+other parameters are the input warping steepness parameter (`wrp`) for the
+nonstationary `gp_vm(diseaseAge)` component, and the Gaussian noise magnitude
+parameter `sigma`.
+
+<!-- TODO: add rules how different parameters are added? -->
  
-**Note:** the continuous covariates and the response variable have been
-normalized to zero mean and unit variance, and the inference of the
+**Note:** the continuous covariate `age` and the response variable `y` are
+normalized to have zero mean and unit variance, and the inference of the
 lengthscale, magnitude, and noise parameters is done on that scale.
 
 ## Specifying parameter priors
@@ -171,6 +184,7 @@ The `prior` argument to `lgp()` or `create_model()` specifies the prior
 distribution for kernel hyperparameters and other model parameters. In above
 model, we did not speficy `prior`, so default priors were
 used. Custom priors can be given as a named list, like here:
+
 ```{r data4, fig.width=6.1, fig.height=4.3}
 prior <- list(
   alpha = normal(mu = 0, sigma = 1), # gaussian for magnitudes <alpha>
@@ -178,7 +192,7 @@ prior <- list(
 )
 
 model <- create_model(y ~ age + age|sex + age|id,
-                      data = dat, 
+                      data = testdata_002, 
                       prior = prior)
 param_summary(model)
 ```
@@ -203,17 +217,6 @@ print(prior_fit)
 ppc(prior_fit, dat)
 ```
 
-```{r post_sample, eval = FALSE, include = FALSE}
-# The model can the be fit by sampling the posterior. Here we only run one 
-# chain, but it is recommended to run several.
-fit <- lgp(distance ~ age + age|Sex + age|Subject, dat,
-           iter = 1000,
-           refresh = 250,
-           chains = 1)
-print(fit)
-plot_pred(fit, t_name = "age", group_by = "Subject")
-```
-
 ## When to not use default priors
 
 It is not recommended to use default priors blindly. Rather, priors should
@@ -236,10 +239,37 @@ the width of this window is about 36, which has been set assuming that
  the unit of `x` is months.
 
 
+## Prior for the input warping steepness
+
+The disease-related age `diseaseAge` is not normalized, and we need to take
+its range into account when setting the prior for the `wrp` parameter. Here
+we define a log-normal prior, take draws from this prior and visualize the
+input warping function using the drawn steepness values.
+
+```{r input_warp_prior, fig.width=6, fig.height=3.5}
+num_draws <- 300
+mu_wrp <- -0.7
+sigma_wrp <- 0.3
+
+# Define prior for lgp()
+my_prior <- list(wrp = log_normal(mu_wrp, sigma_wrp))
+
+# Take prior draws and show corresponding input warping functions
+wrp_draws <- stats::rlnorm(num_draws, mu_wrp, sigma_wrp)
+ran <- range(testdata_002$diseaseAge, na.rm = TRUE)
+lgpr:::plot_inputwarp(wrp_draws, seq(ran[1], ran[2], by = 1), alpha = 0.1)
+```
+
+Higher `wrp` values mean more rapid changes in the nonstationary component and
+lower values mean slower changes. We see that our prior seems to allow changes
+in the input warping function only in the interval $[-20, 20]$. This means that
+all possible variation in the `diseaseAge` component occurs at most 
+$\pm 20$ months before/after the disease effect time/onset.
+
 # Fitting a model
 
 A model created using `create_model()` could be fitted using the
-`sample_model()` function. However, in this section we start fresh and show
+`sample_model()` function. However, in this section we show
 how to do both model creation and model fitting using the `lgp()` function.
 
 ## Sampling the posterior
@@ -252,7 +282,7 @@ is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
 ```{r fit, cache=TRUE}
 fit <- lgp(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
            data     = testdata_002,
-           prior    = list(wrp = igam(14,5)),
+           prior    = my_prior, # defined earlier
            iter     = 2000,
            chains   = 4,
            refresh  = 500)
