@@ -69,8 +69,6 @@ navbar:
       menu:
       - text: Basic usage
         href: tutorials/basic.html
-      - text: Defining a model
-        href: tutorials/syntax.html
       - text: Heterogeneous effects
         href: tutorials/heter.html
       - text: Temporally uncertain effects
