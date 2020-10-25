@@ -22,9 +22,10 @@ knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```{r load}
 require("lgpr")
 require("ggplot2")
+require("rstan")
 ```
 
-## Simulating data
+# Introduction
 
 In this tutorial we simulate and analyse a test data set which contains 8 case and 8 control individuals, and the disease effect on case individuals is modeled using
 the disease-related age (`diseaseAge`) as a covariate. The disease-related age is defined as age relative to the observed disease initiation. The disease effect is simulated so that
@@ -54,7 +55,7 @@ str(dat)
 simData@effect_times
 ```
 
-## Defining a heterogeneous component
+# Declaring a heterogeneous component
 
 We will define a formula where the term `het(id)*gp_vm(diseaseAge)`
 declares that the `gp_vm` term is heterogeneous and one level-specific magnitude parameter is needed for each level of `id`.
@@ -65,7 +66,7 @@ formula <- y ~ zs(id)*gp(age) + gp(age) + het(id)*gp_vm(diseaseAge) + zs(z1)*gp(
 
 Because `diseaseAge` is `NaN` for the control individuals, it is automatically taken into account that an individual-specific magnitude parameter is actually needed just for each case individual.
 
-## Fitting the model
+# Fitting the model
 
 ```{r fit, fig.width=7.2, fig.height=5.4, cache = TRUE}
 fit <- lgp(formula       = formula,
@@ -94,9 +95,10 @@ and for individuals 5-8 there is considerable posterior mass close to 0.
 plot_beta(fit)
 ```
 
-## Visualizing the inferred heterogeneous effect
+# Visualizing the inferred heterogeneous effect
 Finally we plot the inferred disease component, using posterior median
 hyperparameters, and see that the inferred effects have the same shape for all individuals, but are heterogeneous in magnitude.
+
 ```{r plt2, fig.width=7.2, fig.height=4}
 t <- seq(0, 100, by = 1)
 x_pred <- new_x(dat, t, x_ns = "diseaseAge")
@@ -104,7 +106,7 @@ p <- pred(fit, x_pred, verbose = FALSE, reduce = stats::median)
 plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')
 ```
 
-## Computing environment
+# Computing environment
 
 ```{r sess}
 sessionInfo()

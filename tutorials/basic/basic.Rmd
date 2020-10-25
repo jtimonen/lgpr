@@ -250,14 +250,18 @@ input warping function using the drawn steepness values.
 num_draws <- 300
 mu_wrp <- -0.7
 sigma_wrp <- 0.3
+r <- range(testdata_002$diseaseAge, na.rm = TRUE)
 
 # Define prior for lgp()
 my_prior <- list(wrp = log_normal(mu_wrp, sigma_wrp))
 
-# Take prior draws and show corresponding input warping functions
+# Prior draws
 wrp_draws <- stats::rlnorm(num_draws, mu_wrp, sigma_wrp)
-ran <- range(testdata_002$diseaseAge, na.rm = TRUE)
-lgpr:::plot_inputwarp(wrp_draws, seq(ran[1], ran[2], by = 1), alpha = 0.1)
+
+# Plot corresponding input warping functions
+# - this function is not exported from lgpr so we need to use triple colons :::
+# - alpha here is line opacity, not a GP parameter
+lgpr:::plot_inputwarp(wrp_draws, seq(r[1], r[2], by = 1), alpha = 0.1)
 ```
 
 Higher `wrp` values mean more rapid changes in the nonstationary component and

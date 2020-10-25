@@ -22,11 +22,19 @@ knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```{r load}
 require("lgpr")
 require("ggplot2")
+require("rstan")
 ```
 
-## Simulating data
+# Introduction
 
-In this tutorial we simulate and analyse a test data set which contains 6 case and 6 control individuals, and the disease effect on case individuals is modeled using the disease-related age (`diseaseAge`) as a covariate. The disease-related age is defined as age relative to the observed disease initiation. The true disease effect times for each case individual $q=1, \ldots,6$ are drawn from $\mathcal{N}(36,4^2)$, but the disease initiation is observable only after time $t_q$ , which is drawn from  $t_q∼\text{Exponential}(0.05)$ .
+In this tutorial we simulate and analyse a test data set which contains 6 case
+and 6 control individuals, and the disease effect on case individuals is
+modeled using the disease-related age (`diseaseAge`) as a covariate. The
+disease-related age is defined as age relative to the observed disease
+initiation. The true disease effect times for each case individual
+$q=1, \ldots,6$ are drawn from $\mathcal{N}(36,4^2)$, but the disease
+initiation is observable only after time $t_q$ , which is drawn from
+$t_q∼\text{Exponential}(0.05)$ .
 
 ```{r simulate, fig.width = 7, fig.height=5}
 set.seed(121)
@@ -55,44 +63,90 @@ str(dat)
 simData@effect_times
 ```
 
-## Declaring effect time uncertainty
+# Declaring effect time uncertainty
 
 We will define a formula where the term `unc(id)*gp_vm(diseaseAge)`
-declares that the effect time for the nonstationary `gp_vm` term is uncertain and that one uncertainty parameter is needed for each level of `id`.
+declares that the effect time for the nonstationary `gp_vm` term is uncertain
+and that one uncertainty parameter is needed for each level of `id`.
 
 ```{r formula}
 formula <- y ~ zs(id)*gp(age) + gp(age) + unc(id)*gp_vm(diseaseAge) + zs(z1)*gp(age) + zs(z2)*gp(age) + zs(z3)*gp(age)
 ```
 
-Because `diseaseAge` is `NaN`
-for the control individuals, it is automatically taken into account that
-a separate uncertainty parameter is actually needed just for each case individual.
+Because `diseaseAge` is `NaN` for the control individuals, it is automatically
+taken into account that a separate uncertainty parameter is actually needed
+just for each case individual.
 
-## Defining effect time prior
+# Defining the effect time prior
 
-We must define a prior for the effect time of each case individual. This means that the `prior` argument must be a list containing elements named `effect_time_info` and `effect_time`. The first one, `effect_time_info`, must be a list, like below:
+Declaring a temporally uncrertain component will add parameters `teff` to the
+model. The vector `teff` has length equal to the number of case individuals.
+We must define a prior for each `teff` parameter. This means
+that the `prior` argument must be a list containing elements named
+`effect_time` and `effect_time_info`. The first one is specified using any
+of the basic prior definition functions, like `uniform()`, `normal()`, etc.
+The second one, `effect_time_info`, must be a named list containing the fields
 
-```{r prior1}
-lb <- 0
-ub <- c(48,72,96,36,48,60)
-effect_time_info <- list(zero = ub, backwards = TRUE, lower = lb, upper = ub)
-```
+ * `zero` - this is a vector with same length as `teff`, and can be used to
+ move the center of the prior
+ * `backwards` - this is a boolean value, and the prior defined in `effect_time`
+ will be for
+   * `(teff - zero)` if `backwards = FALSE`
+   * `- (teff - zero)` if `backwards = TRUE`
+ * `lower` - this is a vector with same length as `teff`, and defines the lower
+ bound for each `teff` parameter
+  * `upper` - this is a vector with same length as `teff`, and defines the upper
+ bound for each `teff` parameter
 
-The `lower` and `upper` variables define bounds for the effect times. Here
-we have defined the upper bound for each case individual to be the observed disease initiation time, because we know that the true effect has occurred before that. Defining `zero = ub` means that our uncertainty priors are actually for time differences relative to the observed disease initiation time, and `backwards = TRUE` argument is used to define the direction so that the prior is "backwards" in time.
+You can give `zero`, `lower`, and `upper` also as just one number, in which
+case they are turned into vectors that repeat the save value. The prior
+defined in `effect_time` will be truncated at lower and upper bounds.
 
-```{r prior2}
+## Prior for the effect time directly
+
+We had observed the disease onset at times $48,72,96,36,48,60$ months for each
+case individual, respectively. Now if think that the true effect of the
+disease has occurred for each indiviaul at some time point before the detection
+of the disease, but not before age $18$ months, we could set the prior like
+here.
+
+```{r prior0}
+obs_onset <- c(48,72,96,36,48,60)
+lb <- 18
+ub <- obs_onset
+effect_time_info <- list(zero = 0, backwards = FALSE, lower = lb, upper = ub)
 my_prior <- list(
-  prior = list(wrp = igam(14,5)),
+  effect_time = uniform(), # between lb and ub
   effect_time_info = effect_time_info,
-  effect_time = gam(shape = 1, inv_scale = 0.05)
+  wrp = igam(14, 5) # see how to set this in the 'Basic usage' tutorial
 )
 ```
 
-The `effect_time` argument now defines the prior distribution for `- (teff - zero)`. If we had `backwards = FALSE` then the specified prior would be for
-`teff - zero`.
+## Prior relative to a known time point
 
-## Fitting the model
+It is possible that we want a prior where values closer to the observed onset
+are more likely than those closer to birth. This can be done by defining
+for example an exponentially decaying prior for `-  (teff - obs_onset)`,
+as is done here.
+
+```{r prior1}
+lb <- 18
+ub <- obs_onset
+effect_time_info <- list(zero = ub, backwards = TRUE, lower = lb, upper = ub)
+my_prior <- list(
+  wrp = igam(14,5),
+  effect_time_info = effect_time_info,
+  effect_time = gam(shape = 1, inv_scale = 0.05) # = Exponential(rate=0.05)
+)
+```
+
+Now our uncertainty priors are actually for time differences relative to the
+observed disease initiation time, and `backwards = TRUE` argument is used to
+define the direction so that the prior is "backwards" in time. We used `gam()`
+because the Gamma distribution with `shape=1` and `inv_scale=lambda` is
+equal to the Exponential distribution with `rate= lambda`.
+
+# Fitting the model
 
 ```{r fit, fig.width=7.2, fig.height=4.8, cache = TRUE}
 fit <- lgp(formula   = formula,
@@ -112,10 +166,10 @@ print(fit)
 Printing the model information clarifies the model and priors
 ```{r mod}
 model_summary(fit)
-#rstan::get_elapsed_time(fit@stan_fit)
+rstan::get_elapsed_time(fit@stan_fit)
 ```
 
-## Visualizing the inferred effect times
+# Visualizing the inferred effect times
 We can visualize the inferred effect times for each case individual. We see
 that for individuals 2 and 3 the inferred effect time is much earlier than the observed one.
 ```{r plt1, fig.width=7.2, fig.height=5.2}
@@ -130,7 +184,7 @@ p <- pred(fit, x_pred, verbose = FALSE)
 plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')  + xlab('Age (months)')
 ```
 
-## Computing environment
+# Computing environment
 
 ```{r sess}
 sessionInfo()
