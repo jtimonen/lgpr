@@ -241,21 +241,27 @@ plot_color_palette <- function(n) {
   return(h)
 }
 
-#' A color scales
+#' A color scale.
 #'
 #' @inheritParams color_palette
-#' @return a ggplot object
+#' @return a \code{ggplot} object (if \code{n <= 5}) or NULL (if \code{n > 5})
 #' @family color utilities
 #' @name scale_color
 
 #' @rdname scale_color
 scale_color <- function(n) {
+  if (n > 5) {
+    return(NULL)
+  }
   values <- color_palette(n)
   ggplot2::scale_color_manual(values = values)
 }
 
 #' @rdname scale_color
 scale_fill <- function(n) {
+  if (n > 5) {
+    return(NULL)
+  }
   values <- fill_palette(n)
   ggplot2::scale_fill_manual(values = values)
 }

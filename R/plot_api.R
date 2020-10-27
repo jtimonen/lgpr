@@ -183,16 +183,17 @@ plot_api_g_create <- function(df_data, i_test, nrow, ncol) {
 plot_api_g_create_aes <- function(data, type_name) {
   group_by <- colnames(data)[1]
   x_name <- colnames(data)[2]
+  y_name <- colnames(data)[3]
   if (!is.null(type_name)) {
     aes <- ggplot2::aes_string(
       x = x_name,
-      y = "y",
+      y = y_name,
       group = group_by,
       pch = type_name,
       color = type_name
     )
   } else {
-    aes <- ggplot2::aes_string(x = x_name, y = "y", group = group_by)
+    aes <- ggplot2::aes_string(x = x_name, y = y_name, group = group_by)
   }
   return(aes)
 }
@@ -262,7 +263,9 @@ add_c_layer_line <- function(h, df, x_name, group_by, color_by, alpha) {
       alpha = alpha
     )
     if (!is.null(color_by)) {
-      h <- h + scale_color(5)
+      cfac <- dollar(df, color_by)
+      num_colors <- length(levels(cfac))
+      h <- h + scale_color(num_colors)
     }
   }
   return(h)
@@ -288,7 +291,9 @@ add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
       color = NA # no ribbon edge
     )
     if (!is.null(color_by)) {
-      h <- h + scale_fill(5)
+      cfac <- dollar(df, color_by)
+      num_colors <- length(levels(cfac))
+      h <- h + scale_fill(num_colors)
     }
   }
   return(h)

@@ -39,19 +39,22 @@ plot_pred <- function(fit,
                       ...) {
   check_type(fit, "lgpfit")
   df_data <- create_plot_df(fit, t_name, group_by)
+
   input <- plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
   pred <- dollar(input, "pred")
   df_base <- dollar(input, "df_base")
+  y_name <- get_y_name(fit)
 
   # Create y transform
   lh <- get_obs_model(fit)
   if (is_bin_or_bb(lh)) {
     y_fun <- function(x) divide_by_num_trials(x, fit)
-    y_lab <- "y / num_trials"
+    y_lab <- paste0(y_name, " / num_trials")
   } else {
     y_fun <- function(x) x
-    y_lab <- "y"
+    y_lab <- y_name
   }
+
   # Create plot
   h <- plot_api_g(
     df_data = df_data,

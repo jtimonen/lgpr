@@ -3,7 +3,7 @@
 \name{scale_color}
 \alias{scale_color}
 \alias{scale_fill}
-\title{A color scales}
+\title{A color scale.}
 \usage{
 scale_color(n)
 
@@ -13,10 +13,10 @@ scale_fill(n)
 \item{n}{an integer from 1 to 5}
 }
 \value{
-a ggplot object
+a \code{ggplot} object (if \code{n <= 5}) or NULL (if \code{n > 5})
 }
 \description{
-A color scales
+A color scale.
 }
 \seealso{
 Other color utilities: 
