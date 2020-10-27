@@ -40,6 +40,10 @@
 #' @section Citation:
 #' Run \code{citation("lgpr")} to get citation information.
 #'
+#' @section Feedback:
+#' Bug reports, PRs, enchancement ideas or user experiences in general are
+#' welcome and appreciated. Create an issue in Github or email the author.
+#'
 #' @docType package
 #' @name lgpr-package
 #' @aliases lgpr

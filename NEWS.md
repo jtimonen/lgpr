@@ -1,5 +1,23 @@
 # lgpr 1.0
 
+## 1.0.5
+ * Make `plot_pred()` work with any response variable name (fixes 
+ [#12](https://github.com/jtimonen/lgpr/issues/12)).
+ * Avoid adding `ggplot2::color_scale_manual()` if number of colors > 5 
+ (fixes [#11](https://github.com/jtimonen/lgpr/issues/11)).
+ 
+## 1.0.4
+Edit type checking to work more generally on all systems (fixes [#5](https://github.com/jtimonen/lgpr/issues/5)).
+
+## 1.0.3
+Fix CITATION to point to new preprint.
+
+## 1.0.2
+Added RcppParallel dependency explicitly.
+
+## 1.0.1
+Added warning if using default prior for input warping steepness.
+
 ## 1.0.0
 
 ### New features

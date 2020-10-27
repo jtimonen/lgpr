@@ -47,6 +47,12 @@ See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}.
 Run \code{citation("lgpr")} to get citation information.
 }
 
+\section{Feedback}{
+
+Bug reports, PRs, enchancement ideas or user experiences in general are
+welcome and appreciated. Create an issue in Github or email the author.
+}
+
 \references{
 \enumerate{
   \item Carpenter, B. et al. (2017).
