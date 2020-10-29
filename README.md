@@ -20,7 +20,7 @@ See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usa
   - R 3.4 or later is required, R 4.0.2 or later is recommended
 
 ## License
-[GPL> 3](https://www.gnu.org/licenses/gpl-3.0.html)
+[GPL>=3](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ## Installation
 * Install the dependency [rstan](https://mc-stan.org/rstan/) using [these instructions](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started)
