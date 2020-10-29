@@ -4,6 +4,9 @@
 
 R package for **L**ongitudinal **G**aussian **P**rocess **R**egression. 
 
+## License
+[GPL >= 3](https://www.gnu.org/licenses/gpl-3.0.html)
+
 ## Getting started
 See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usage/index.html. 
 
