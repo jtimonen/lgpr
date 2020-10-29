@@ -4,9 +4,6 @@
 
 R package for **L**ongitudinal **G**aussian **P**rocess **R**egression. 
 
-## License
-[GPL >= 3](https://www.gnu.org/licenses/gpl-3.0.html)
-
 ## Getting started
 See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usage/index.html. 
 
@@ -21,6 +18,9 @@ See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usa
   above link.
   - On Mac, see toolchain configuration [here](https://github.com/stan-dev/rstan/wiki/Installing-RStan-from-source-on-a-Mac)
   - R 3.4 or later is required, R 4.0.2 or later is recommended
+
+## License
+[GPL> 3](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ## Installation
 * Install the dependency [rstan](https://mc-stan.org/rstan/) using [these instructions](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started)
