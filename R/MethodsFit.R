@@ -207,6 +207,7 @@ get_num_draws <- function(fit) {
   nrow(draws)
 }
 
+
 #' Posterior summary
 #'
 #' @export

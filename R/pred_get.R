@@ -189,6 +189,11 @@ get_pred.sampled.h <- function(fit, draws, reduce) {
   y_scl <- dollar(fit@model@var_scalings, "y")
   f <- call_fun(y_scl@fun_inv, f)
 
+  # Add GP mean
+  num_draws <- dim(f)[1]
+  c_hat <- get_chat(fit)
+  f <- f + repvec(c_hat, num_draws)
+
   # Apply inverse link function and reduction
   likelihood <- get_obs_model(fit)
   h <- link_inv(f, likelihood)

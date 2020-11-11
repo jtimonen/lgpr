@@ -2,8 +2,8 @@
 #'
 #' @description
 #' \itemize{
-#'   \item \code{select} performs strict selection, returning a binary
-#'   value (0 = not selected, 1 = selected) for each component.
+#'   \item \code{select} performs strict selection, returning either \code{TRUE}
+#'   or \code{FALSE} for each component.
 #'   \item \code{select.integrate} is like \code{select}, but instead of
 #'   a fixed threshold, computes probabilistic selection by integrating over
 #'   a threshold density.

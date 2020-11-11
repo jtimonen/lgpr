@@ -148,7 +148,10 @@ parse_prior <- function(prior, stan_input, obs_model) {
     warning(msg)
   }
   msg1 <- paste0("  * user-specified priors found for: {", str1, "}")
-  msg2 <- paste0("  * default priors used for: {", str2, "}")
+  msg2 <- paste0(
+    "  * if any of the following parameters are included in the",
+    " model, default priors are used for them: {", str2, "}"
+  )
   info <- paste0(msg1, "\n", msg2, "\n")
   raw <- dollar(filled, "prior")
   to_stan <- parse_prior_full(raw, stan_input, obs_model)

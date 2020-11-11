@@ -42,7 +42,7 @@ model_summary.brief <- function(object) {
   D <- ncol(dat)
   line1 <- paste0("Formula: ", str1)
   line2 <- paste0("Likelihood: ", str2)
-  line3 <- paste("Data:", N, "observations,", D, " variables")
+  line3 <- paste0("Data: ", N, " observations, ", D, " variables")
   out <- paste0(line1, "\n", line2, "\n", line3, "\n")
   return(out)
 }
@@ -176,6 +176,14 @@ component_names <- function(object) {
   rownames(comps)
 }
 
+#' Get the used GP mean vector
+#'
+#' @inheritParams object_to_model
+#' @return a vector with length equal to number of observations
+get_chat <- function(object) {
+  si <- get_stan_input(object)
+  dollar(si, "c_hat")
+}
 
 #' Get response variable measurements
 #'
