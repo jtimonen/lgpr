@@ -1,5 +1,13 @@
 # lgpr 1.0
 
+## 1.0.6
+ * Fix bug in `get_pred()`, which was caused by not adding the GP mean to
+ the sampled signal. This was causing postprocessing functions like
+ `relevances()` and `plot_pred()` to give
+ erroneous results if the GP mean was not a vector of zeros and 
+ `sample_f = TRUE`.
+ * Small edits in documentation and verbose information messages.
+ 
 ## 1.0.5
  * Make `plot_pred()` work with any response variable name (fixes 
  [#12](https://github.com/jtimonen/lgpr/issues/12)).
