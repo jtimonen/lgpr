@@ -148,12 +148,12 @@ pred.gaussian.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
 #' @description These are helper functions for \code{\link{get_pred.sampled}}.
 #' \itemize{
 #'   \item Function \code{get_pred.sampled.f_comp} gets the draws of each
-#'   component of \code{f} on the normalized scale..
+#'   component of \code{f} on the normalized scale.
 #'   \item Function \code{get_pred.sampled.f} gets draws of the total \code{f}
 #'   on the normalized scale.
-#'   \item Function \code{get_pred.sampled.h} gets draws of the total \code{f}.
-#'   maps them to unnormalized scale and through the inverse link function.
-#'   It applies \code{reduce} only after this transformation.
+#'   \item Function \code{get_pred.sampled.h} gets draws of the total \code{f},
+#'   adds \code{c_hat} to each draw, and then maps through the inverse
+#'   link function. It applies \code{reduce} only after this transformation.
 #' }
 #' @inheritParams get_pred.sampled
 #' @return an array of shape \code{num_draws} x \code{num_obs} (actually a

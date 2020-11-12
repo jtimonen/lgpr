@@ -1,5 +1,8 @@
 # lgpr 1.0
 
+## 1.0.7
+  * Small documentation update.
+  
 ## 1.0.6
  * Fix bug in `get_pred()`, which was caused by not adding the GP mean to
  the sampled signal. This was causing postprocessing functions like

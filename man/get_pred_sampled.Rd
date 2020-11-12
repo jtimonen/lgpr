@@ -31,12 +31,12 @@ list of such arrays for \code{get_pred.sampled.f_comp})
 These are helper functions for \code{\link{get_pred.sampled}}.
 \itemize{
   \item Function \code{get_pred.sampled.f_comp} gets the draws of each
-  component of \code{f} on the normalized scale..
+  component of \code{f} on the normalized scale.
   \item Function \code{get_pred.sampled.f} gets draws of the total \code{f}
   on the normalized scale.
-  \item Function \code{get_pred.sampled.h} gets draws of the total \code{f}.
-  maps them to unnormalized scale and through the inverse link function.
-  It applies \code{reduce} only after this transformation.
+  \item Function \code{get_pred.sampled.h} gets draws of the total \code{f},
+  adds \code{c_hat} to each draw, and then maps through the inverse
+  link function. It applies \code{reduce} only after this transformation.
 }
 }
 \seealso{
