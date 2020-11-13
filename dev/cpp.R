@@ -4,6 +4,7 @@ FILES <- c(
   "chunks/functions-utils.stan",
   "chunks/functions-kernels_const.stan",
   "chunks/functions-kernels.stan",
+  "chunks/functions-basisfun.stan",
   "chunks/functions-posterior.stan",
   "chunks/functions-prior.stan"
 )

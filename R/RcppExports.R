@@ -49,6 +49,26 @@ STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_u
     .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__)
 }
 
+STAN_bfa_phi <- function(x, m, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_bfa_phi`, x, m, L, pstream__)
+}
+
+STAN_bfa_lambda <- function(m, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_bfa_lambda`, m, L, pstream__)
+}
+
+STAN_spd_eq <- function(w, alpha, ell, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_spd_eq`, w, alpha, ell, pstream__)
+}
+
+STAN_quad_form_inv <- function(x, A, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_quad_form_inv`, x, A, pstream__)
+}
+
+STAN_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_multi_normal_bfa_lpdf`, y, V, D_diag, sigma, pstream__)
+}
+
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {
     .Call(`_lgpr_STAN_matrix_array_sum`, K, pstream__)
 }
