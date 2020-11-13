@@ -3,19 +3,30 @@ if(is_f_sampled){
   reject("NOT IMPLEMENTED!");
 
 }else{
-  print("num_basisfun = ", num_basisfun);
-  print("width_basisfun = ", width_basisfun);
-  // F NOT SAMPLED
-  //vector[num_obs] sigma2_vec = rep_vector(square(sigma[1]), num_obs);
-  //matrix[num_obs, num_obs] Ky = diag_matrix(num_comps * delta_vec);
-  //matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
-  //    K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
-  //    alpha, ell, wrp, beta, teff,
-  //    vm_params, idx_expand, idx_expand, teff_zero);
 
-  //for(j in 1:num_comps){
-  //  Ky += KX[j];
-  //}
-  //Ky = Ky + diag_matrix(sigma2_vec);
-  //y_cont[1] ~ multi_normal_cholesky(c_hat, cholesky_decompose(Ky));
+  // delta?
+
+
+    //matrix[n, R*M] V = STAN_bfa_create_V(num_obs, num_obs,
+    //  K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
+    //  alpha, ell, wrp, beta, teff,
+    //  vm_params, idx_expand, idx_expand, teff_zero);
+    
+    
+    //vector[R*M] D_diag = STAN_bfa_create_D(num_obs, num_obs,
+    //  K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
+    //  alpha, ell, wrp, beta, teff,
+    //  vm_params, idx_expand, idx_expand, teff_zero);
+      
+  // Increase log prob
+  //target += STAN_multi_normal_bf_lpdf(y, V, D_diag, sigma_n[1]);
+  
+  // Compute Phi and Lambda
+  vector[num_basisfun] Lambda[num_comps] = STAN_bfa_Lambda(alpha, ell, 
+      num_basisfun, width_basisfun);
+  matrix[num_obs, num_basisfun] PHI[num_comps] = STAN_bfa_Phi(x_cont, 
+      num_basisfun, width_basisfun);
+  //print(PHI);
+  print(Lambda);
+
 }

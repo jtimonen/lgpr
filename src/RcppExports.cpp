@@ -245,9 +245,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_multi_normal_bfa_lpdf
-double STAN_multi_normal_bfa_lpdf(const Eigen::Matrix<double, Eigen::Dynamic, 1>& y, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& V, const Eigen::Matrix<double, Eigen::Dynamic, 1>& D_diag, const double& sigma, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_multi_normal_bfa_lpdf(SEXP ySEXP, SEXP VSEXP, SEXP D_diagSEXP, SEXP sigmaSEXP, SEXP pstream__SEXP) {
+// STAN_bfa_multi_normal_lpdf
+double STAN_bfa_multi_normal_lpdf(const Eigen::Matrix<double, Eigen::Dynamic, 1>& y, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& V, const Eigen::Matrix<double, Eigen::Dynamic, 1>& D_diag, const double& sigma, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_bfa_multi_normal_lpdf(SEXP ySEXP, SEXP VSEXP, SEXP D_diagSEXP, SEXP sigmaSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -256,7 +256,36 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type D_diag(D_diagSEXP);
     Rcpp::traits::input_parameter< const double& >::type sigma(sigmaSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_multi_normal_bfa_lpdf(y, V, D_diag, sigma, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_bfa_multi_normal_lpdf(y, V, D_diag, sigma, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_bfa_Phi
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > STAN_bfa_Phi(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x, const int& M, const double& L, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_bfa_Phi(SEXP xSEXP, SEXP MSEXP, SEXP LSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const int& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< const double& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_bfa_Phi(x, M, L, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_bfa_Lambda
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_bfa_Lambda(const std::vector<double>& alpha, const std::vector<double>& ell, const int& M, const double& L, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_bfa_Lambda(SEXP alphaSEXP, SEXP ellSEXP, SEXP MSEXP, SEXP LSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type ell(ellSEXP);
+    Rcpp::traits::input_parameter< const int& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< const double& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_bfa_Lambda(alpha, ell, M, L, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -338,7 +367,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_bfa_lambda", (DL_FUNC) &_lgpr_STAN_bfa_lambda, 3},
     {"_lgpr_STAN_spd_eq", (DL_FUNC) &_lgpr_STAN_spd_eq, 4},
     {"_lgpr_STAN_quad_form_inv", (DL_FUNC) &_lgpr_STAN_quad_form_inv, 3},
-    {"_lgpr_STAN_multi_normal_bfa_lpdf", (DL_FUNC) &_lgpr_STAN_multi_normal_bfa_lpdf, 5},
+    {"_lgpr_STAN_bfa_multi_normal_lpdf", (DL_FUNC) &_lgpr_STAN_bfa_multi_normal_lpdf, 5},
+    {"_lgpr_STAN_bfa_Phi", (DL_FUNC) &_lgpr_STAN_bfa_Phi, 4},
+    {"_lgpr_STAN_bfa_Lambda", (DL_FUNC) &_lgpr_STAN_bfa_Lambda, 5},
     {"_lgpr_STAN_matrix_array_sum", (DL_FUNC) &_lgpr_STAN_matrix_array_sum, 2},
     {"_lgpr_STAN_gp_posterior_helper", (DL_FUNC) &_lgpr_STAN_gp_posterior_helper, 5},
     {"_lgpr_STAN_gp_posterior", (DL_FUNC) &_lgpr_STAN_gp_posterior, 7},

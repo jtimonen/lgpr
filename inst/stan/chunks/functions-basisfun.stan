@@ -27,7 +27,7 @@ real STAN_quad_form_inv(vector x, matrix A){
 }
 
 // LOG PROB OF MULTIVARIATE NORMAL WITH LOW RANK COVARIANCE
-real STAN_multi_normal_bfa_lpdf(vector y, matrix V, vector D_diag, real sigma){
+real STAN_bfa_multi_normal_lpdf(vector y, matrix V, vector D_diag, real sigma){
   int n = num_elements(y);
   int RM = num_elements(D_diag);
   real t1 = n*log(2.0*pi());
@@ -41,10 +41,35 @@ real STAN_multi_normal_bfa_lpdf(vector y, matrix V, vector D_diag, real sigma){
   return(-0.5*(t1 + t2 + t3));
 }
 
-// Inputs related to possible basis function approximation
-//real<lower=0> L_basis; // domain size
-//int<lower=0> M_basis; // #{basis functions} (0 = approximation not used)
-//    // Approximate inference
-//    matrix[n, R*M] V = STAN_create_V();
-//    vector[R*M] D_diag = STAN_create_D;
-//    target += STAN_multi_normal_bf_lpdf(y, V, D_diag, sigma_n[1]);
+// Compute basis function matrices Phi
+matrix[] STAN_bfa_Phi(data vector[] x, data int M, data real L){
+  int n = num_elements(x[1]);
+  int J = size(x);
+  matrix[n, M] PHI[J];
+  for(j in 1:J) {
+    matrix[n, M] PHI_j = rep_matrix(0.0, n, M);
+    for(m in 1:M) {
+      // TODO: use warp-transformed x[j] for some components
+      PHI_j[:,m] = STAN_bfa_phi(x[j], m, L);
+    }
+    PHI[j] = PHI_j;
+  }
+  return(PHI);
+}
+
+// Compute diagonals of diagonal matrices Lambda
+vector[] STAN_bfa_Lambda(real[] alpha, real[] ell, data int M, data real L){
+  int J = size(alpha);
+  vector[M] LAMBDA[J];
+  for(j in 1:J) {
+    vector[M] LAMBDA_j = rep_vector(0.0, M);
+    for(m in 1:M) {
+      // TODO: all components don't have ell
+      real w = (m*pi())/(2.0*L);
+      LAMBDA_j[m] = STAN_spd_eq(w, alpha[j], ell[j]);
+    }
+    LAMBDA[j] = LAMBDA_j;
+  }
+  return(LAMBDA);
+}
+

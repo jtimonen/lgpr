@@ -65,8 +65,16 @@ STAN_quad_form_inv <- function(x, A, pstream__ = 0L) {
     .Call(`_lgpr_STAN_quad_form_inv`, x, A, pstream__)
 }
 
-STAN_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_multi_normal_bfa_lpdf`, y, V, D_diag, sigma, pstream__)
+STAN_bfa_multi_normal_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_bfa_multi_normal_lpdf`, y, V, D_diag, sigma, pstream__)
+}
+
+STAN_bfa_Phi <- function(x, M, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_bfa_Phi`, x, M, L, pstream__)
+}
+
+STAN_bfa_Lambda <- function(alpha, ell, M, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_bfa_Lambda`, alpha, ell, M, L, pstream__)
 }
 
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {

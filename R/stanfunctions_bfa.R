@@ -48,7 +48,7 @@ cpp_spd_eq <- function(w, alpha, ell, STREAM = get_stream()) {
 
 #' Multivariate normal density using basis function approximation
 #'
-#' @description This is a wrapper for \code{STAN_multi_normal_bfa_lpdf},
+#' @description This is a wrapper for \code{STAN_bfa_multi_normal_lpdf},
 #' with some input validation added.
 #' @param y a vector of length \code{n}
 #' @param V a matrix of size \code{n} x \code{R*M}
@@ -57,8 +57,8 @@ cpp_spd_eq <- function(w, alpha, ell, STREAM = get_stream()) {
 #' @inheritParams cpp_kernel_const_all
 #' @family basisfunction approximation functions
 #' @return a real number
-cpp_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma,
+cpp_bfa_multi_normal_lpdf <- function(y, V, D_diag, sigma,
                                       STREAM = get_stream()) {
   check_positive(sigma)
-  STAN_multi_normal_bfa_lpdf(y, V, D_diag, sigma, STREAM)
+  STAN_bfa_multi_normal_lpdf(y, V, D_diag, sigma, STREAM)
 }

@@ -43,6 +43,6 @@ test_that("multivariate normal approximation works", {
   D_diag <- rep(2.3, RM)
   V <- matrix(rnorm(n * RM), n, RM)
   sigma <- 0.3
-  p <- cpp_multi_normal_bfa_lpdf(y, V, D_diag, sigma)
+  p <- cpp_bfa_multi_normal_lpdf(y, V, D_diag, sigma)
   expect_false(is.nan(p))
 })

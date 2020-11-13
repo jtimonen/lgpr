@@ -22,8 +22,8 @@ validation added.
 }
 \seealso{
 Other basisfunction approximation functions: 
+\code{\link{cpp_bfa_multi_normal_lpdf}()},
 \code{\link{cpp_bfa_phi}()},
-\code{\link{cpp_multi_normal_bfa_lpdf}()},
 \code{\link{cpp_spd_eq}()}
 }
 \concept{basisfunction approximation functions}
