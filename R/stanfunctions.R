@@ -47,7 +47,6 @@ cpp_kernel_const_all <- function(n1, n2, x1_cat, x2_cat,
 #' @param idx1_expand expansion of beta and/or teff
 #' @param idx2_expand expansion of beta and/or teff
 #' @param teff_zero observed effect times
-#' @param STREAM an external pointer
 #' @return an array of kernel matrices
 cpp_kernel_all <- function(n1, n2, K_const, components, x1, x2,
                            x1_unnorm, x2_unnorm,
@@ -84,7 +83,7 @@ cpp_kernel_all <- function(n1, n2, K_const, components, x1, x2,
 #' @param y response vector
 #' @param delta jitter
 #' @param sigma Gaussian noise magnitude parameter
-#' @param STREAM an external pointer
+#' @inheritParams cpp_kernel_const_all
 #' @return an array of kernel matrices
 cpp_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
                              STREAM = get_stream()) {
@@ -97,7 +96,7 @@ cpp_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
 #' input validation added
 #' @param x a numeric vector
 #' @param a positive steepness parameter
-#' @param STREAM an external pointer
+#' @inheritParams cpp_kernel_const_all
 #' @return a vector
 cpp_warp_input <- function(x, a, STREAM = get_stream()) {
   check_positive(a)
@@ -110,56 +109,9 @@ cpp_warp_input <- function(x, a, STREAM = get_stream()) {
 #' validation added.
 #' @param x a numeric vector
 #' @param a positive steepness parameter
-#' @param STREAM an external pointer
+#' @inheritParams cpp_kernel_const_all
 #' @return a vector
 cpp_var_mask <- function(x, a, STREAM = get_stream()) {
   check_positive(a)
   STAN_var_mask(x, a, STREAM)
-}
-
-#' The m'th eigenfunction of the Dirichlet boundary value problem
-#'
-#' @description This is a wrapper for \code{STAN_bfa_phi}, with some input
-#' validation added.
-#' @param x a numeric vector
-#' @param m index of the eigenfunction (non-negative integer)
-#' @param L domain width (positive real number)
-#' @param STREAM an external pointer
-#' @family basisfunction approximation functions
-#' @return with length equal to that of \code{x}
-cpp_bfa_phi <- function(x, m, L, STREAM = get_stream()) {
-  check_positive(m)
-  check_positive(L)
-  STAN_bfa_phi(x, m, L, STREAM)
-}
-
-#' The m'th eigenvalue of the Dirichlet boundary value problem
-#'
-#' @description This is a wrapper for \code{STAN_bfa_lambda}, with some input
-#' validation added.
-#' @param m index of the eigenfunction (non-negative integer)
-#' @param L domain width (positive real number)
-#' @param STREAM an external pointer
-#' @family basisfunction approximation functions
-#' @return a number
-cpp_bfa_lambda <- function(m, L, STREAM = get_stream()) {
-  check_positive(m)
-  check_positive(L)
-  STAN_bfa_lambda(m, L, STREAM)
-}
-
-#' Spectral density function of the exponentiated quadratic kernel
-#'
-#' @description This is a wrapper for \code{STAN_spd_eq}, with some input
-#' validation added.
-#' @param w the frequency, real number
-#' @param alpha marginal std of the kernel
-#' @param ell lengthscale of the kernel
-#' @param STREAM an external pointer
-#' @family basisfunction approximation functions
-#' @return a real number
-cpp_spd_eq <- function(w, alpha, ell, STREAM = get_stream()) {
-  check_positive(alpha)
-  check_positive(ell)
-  STAN_spd_eq(w, alpha, ell, STREAM)
 }

@@ -1458,8 +1458,8 @@ STAN_multi_normal_bfa_lpdf(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& y,
         stan::math::fill(inv_s2, DUMMY_VAR__);
         stan::math::assign(inv_s2,inv_square(sigma));
         current_statement_begin__ = 433;
-        validate_non_negative_index("z", "n", n);
-        Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> z(n);
+        validate_non_negative_index("z", "RM", RM);
+        Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> z(RM);
         stan::math::initialize(z, DUMMY_VAR__);
         stan::math::fill(z, DUMMY_VAR__);
         stan::math::assign(z,multiply(transpose(V), y));

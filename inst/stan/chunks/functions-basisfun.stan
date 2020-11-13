@@ -34,7 +34,7 @@ real STAN_multi_normal_bfa_lpdf(vector y, matrix V, vector D_diag, real sigma){
   real t2; // log det
   real t3; // quadratic form
   real inv_s2 = inv_square(sigma);
-  vector[n] z = transpose(V)*y;
+  vector[RM] z = transpose(V)*y;
   matrix[RM,RM] Z = diag_matrix(inv(D_diag)) + inv_s2*crossprod(V);
   t2 = inv_s2*dot_self(y) + square(inv_s2)*STAN_quad_form_inv(z, Z);
   t3 = log_determinant(Z) + sum(log(D_diag)) + 2*n*log(sigma);
