@@ -90,8 +90,10 @@ test_that("parse_formula_advanced throws error if mixing syntaxes", {
 
 test_that("parse_options does not need arguments", {
   a <- parse_options()
-  e <- c("is_generated_skipped", "delta")
-  expect_equal(names(a), e)
+  expect_equal(names(a), c(
+    "is_generated_skipped", "delta",
+    "num_basisfun", "width_basisfun"
+  ))
 })
 
 test_that("parse_likelihood can be used", {

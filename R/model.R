@@ -114,7 +114,9 @@ parse_options <- function(options = NULL) {
   # Set defaults
   opts <- list(
     skip_generated = FALSE,
-    delta = 1e-8
+    delta = 1e-8,
+    num_basisfun = 0,
+    width_basisfun = 2.5
   )
 
   # Replace defaults if found from input
@@ -127,7 +129,9 @@ parse_options <- function(options = NULL) {
   # Format for Stan input
   list(
     is_generated_skipped = as.numeric(dollar(opts, "skip_generated")),
-    delta = dollar(opts, "delta")
+    delta = dollar(opts, "delta"),
+    num_basisfun = dollar(opts, "num_basisfun"),
+    width_basisfun = dollar(opts, "width_basisfun")
   )
 }
 

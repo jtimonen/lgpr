@@ -147,10 +147,9 @@ test_that("an lgpmodel has correct list fields for stan input", {
   m <- create_model(
     formula = y ~ gp(age) + zs(id),
     data = testdata_001,
-    options = list(delta = 1e-5)
+    options = list(delta = 1e-5, L_bf = 1.0),
   )
-  L <- length(m@stan_input)
-  expect_equal(L, 45)
+  expect_equal(length(m@stan_input), 47)
 })
 
 test_that("creating an lgpmodel errors with invalid data", {

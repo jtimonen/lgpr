@@ -22,6 +22,7 @@ functions{
 #include chunks/functions-posterior.stan
 #include chunks/functions-kernels_const.stan
 #include chunks/functions-kernels.stan
+#include chunks/functions-basisfun.stan
 }
 
 data {
