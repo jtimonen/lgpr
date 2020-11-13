@@ -1253,7 +1253,7 @@ STAN_bfa_phi(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x,
         (void) A;  // dummy to suppress unused var warning
         stan::math::initialize(A, DUMMY_VAR__);
         stan::math::fill(A, DUMMY_VAR__);
-        stan::math::assign(A,(1.0 / stan::math::sqrt(L)));
+        stan::math::assign(A,inv(stan::math::sqrt(L)));
         current_statement_begin__ = 400;
         local_scalar_t__ B(DUMMY_VAR__);
         (void) B;  // dummy to suppress unused var warning
@@ -1261,7 +1261,7 @@ STAN_bfa_phi(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x,
         stan::math::fill(B, DUMMY_VAR__);
         stan::math::assign(B,((stan::math::pi() * m) / (2.0 * L)));
         current_statement_begin__ = 401;
-        return stan::math::promote_scalar<fun_return_scalar_t__>(multiply(A, stan::math::sin(multiply(B, subtract(x, L)))));
+        return stan::math::promote_scalar<fun_return_scalar_t__>(multiply(A, stan::math::sin(multiply(B, add(x, L)))));
         }
     } catch (const std::exception& e) {
         stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());

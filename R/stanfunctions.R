@@ -116,3 +116,50 @@ cpp_var_mask <- function(x, a, STREAM = get_stream()) {
   check_positive(a)
   STAN_var_mask(x, a, STREAM)
 }
+
+#' The m'th eigenfunction of the Dirichlet boundary value problem
+#'
+#' @description This is a wrapper for \code{STAN_bfa_phi}, with some input
+#' validation added.
+#' @param x a numeric vector
+#' @param m index of the eigenfunction (non-negative integer)
+#' @param L domain width (positive real number)
+#' @param STREAM an external pointer
+#' @family basisfunction approximation functions
+#' @return with length equal to that of \code{x}
+cpp_bfa_phi <- function(x, m, L, STREAM = get_stream()) {
+  check_positive(m)
+  check_positive(L)
+  STAN_bfa_phi(x, m, L, STREAM)
+}
+
+#' The m'th eigenvalue of the Dirichlet boundary value problem
+#'
+#' @description This is a wrapper for \code{STAN_bfa_lambda}, with some input
+#' validation added.
+#' @param m index of the eigenfunction (non-negative integer)
+#' @param L domain width (positive real number)
+#' @param STREAM an external pointer
+#' @family basisfunction approximation functions
+#' @return a number
+cpp_bfa_lambda <- function(m, L, STREAM = get_stream()) {
+  check_positive(m)
+  check_positive(L)
+  STAN_bfa_lambda(m, L, STREAM)
+}
+
+#' Spectral density function of the exponentiated quadratic kernel
+#'
+#' @description This is a wrapper for \code{STAN_spd_eq}, with some input
+#' validation added.
+#' @param w the frequency, real number
+#' @param alpha marginal std of the kernel
+#' @param ell lengthscale of the kernel
+#' @param STREAM an external pointer
+#' @family basisfunction approximation functions
+#' @return a real number
+cpp_spd_eq <- function(w, alpha, ell, STREAM = get_stream()) {
+  check_positive(alpha)
+  check_positive(ell)
+  STAN_spd_eq(w, alpha, ell, STREAM)
+}

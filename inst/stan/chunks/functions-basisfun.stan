@@ -1,12 +1,12 @@
 // BASIS FUNCTION
-vector STAN_bfa_phi(vector x, int m, real L){
-  real A = 1.0/(sqrt(L));
+vector STAN_bfa_phi(vector x, int m, data real L){
+  real A = inv(sqrt(L));
   real B = pi()*m/(2.0*L);
-  return(A*sin(B*(x-L)));
+  return(A*sin(B*(x+L)));
 }
 
 // EIGENVALUE
-real STAN_bfa_lambda(int m, real L){
+real STAN_bfa_lambda(int m, data real L){
   real A = pi()*m/(2*L);
   return(square(A));
 }
