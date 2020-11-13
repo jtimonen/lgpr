@@ -7,14 +7,14 @@ vector STAN_bfa_phi(vector x, int m, data real L){
 
 // EIGENVALUE
 real STAN_bfa_lambda(int m, data real L){
-  real A = pi()*m/(2*L);
+  real A = pi()*m/(2.0*L);
   return(square(A));
 }
 
 // SPECTRAL DENSITY OF EQ KERNEL
 real STAN_spd_eq(real w, real alpha, real ell){
-  real A = square(alpha)*ell*sqrt(2*pi());
-  real B = 2*square(pi()*ell);
+  real A = square(alpha)*ell*sqrt(2.0*pi());
+  real B = 2.0*square(pi()*ell);
   return(A*exp(-B*square(w)));
 }
 
@@ -30,7 +30,7 @@ real STAN_quad_form_inv(vector x, matrix A){
 real STAN_multi_normal_bfa_lpdf(vector y, matrix V, vector D_diag, real sigma){
   int n = num_elements(y);
   int RM = num_elements(D_diag);
-  real t1 = n*log(2*pi());
+  real t1 = n*log(2.0*pi());
   real t2; // log det
   real t3; // quadratic form
   real inv_s2 = inv_square(sigma);

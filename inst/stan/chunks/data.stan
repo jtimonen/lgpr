@@ -114,6 +114,10 @@ vector[num_bt] teff_lb[num_uncrt>0];
 vector[num_bt] teff_ub[num_uncrt>0];
 
 // Misc
-vector[num_obs] c_hat; // GP mean vector 
+vector[num_obs] c_hat; // "GP mean vector"
 real delta; // jitter to ensure pos. def. kernel matrices
 real vm_params[num_ns, 2]; // variance mask parameters
+
+// Basis function approximation
+int<lower=0> num_basisfun; // 0 = no approximation used
+real<lower=0> width_basisfun;
