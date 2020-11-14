@@ -90,7 +90,6 @@ test_that("model summary prints output", {
 test_that("constant kernel matrix decompositions are correct", {
   m <- create_model(y ~ sex + age + age | sex + age | id + group, testdata_002)
   K <- const_kernels(m)
-  num_comps <- length(K)
   dec <- const_kernels.decompositions(m)
   K_rec <- const_kernels.reconstruct(dec)
   expect_equal(length(K), 5)
@@ -105,6 +104,17 @@ test_that("constant kernel matrix decompositions are correct", {
   expect_lt(mae3, 1e-6)
   expect_lt(mae4, 1e-6)
   expect_lt(mae5, 1e-6)
+})
+
+test_that("entire additive gp matrix low-rank decomposition works", {
+  m <- create_model(y ~ sex + age + age | sex + age | id + group, testdata_002)
+  alpha <- c(1, 1, 1, 1, 1)
+  ell <- c(1, 1, 1)
+  dec <- kernel_decomposition(m, alpha, ell)
+  expect_equal(dec$ranks, c(1, 0, 1, 11, 1))
+  expect_equal(dim(dec$V), c(96, 140))
+  expect_equal(length(dec$D), 140)
+  # TODO: fix the fact that dec$V has NaNs
 })
 
 # -------------------------------------------------------------------------
@@ -143,7 +153,7 @@ test_that("simulated data with disease effect can be plotted", {
   expect_output(plot_sim(dat, comp_idx = 1, verbose = TRUE))
 })
 
-test_that("show method for simualated data prints output", {
+test_that("show method for simulated data prints output", {
   dat <- simulate_data(
     N = 4,
     t_data = seq(6, 36, by = 6),

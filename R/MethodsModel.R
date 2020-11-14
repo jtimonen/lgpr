@@ -354,3 +354,44 @@ const_kernels.reconstruct <- function(decompositions, STREAM = get_stream()) {
   }
   return(K_rec)
 }
+
+#' Basis function decomposition of the full additive kernel matrix
+#'
+#' @inheritParams object_to_model
+#' @param STREAM external pointer
+#' @param alpha vector of magnitude params
+#' @param ell vector of lengthscale params
+#' @param num_basisfun number of basis functions to use
+#' @param width_basisfun basis function domain size (L)
+#' @returns a list containing matrices \code{V} and \code{D}
+kernel_decomposition <- function(object, alpha, ell,
+                                 num_basisfun = 10,
+                                 width_basisfun = 2.5,
+                                 STREAM = get_stream()) {
+  si <- get_stan_input(object)
+
+  # Theta and Delta
+  rank_dec <- const_kernels.decompose(object, STREAM)
+  ranks <- dollar(rank_dec, "ranks")
+  bfa_delta <- dollar(rank_dec, "Delta")
+  bfa_theta <- dollar(rank_dec, "Theta")
+
+  # Lambda and Phi
+  components <- matrix_to_list(dollar(si, "components"))
+  x_cont <- matrix_to_list(dollar(si, "x_cont"))
+  bfa_lambda <- STAN_lambda_matrix(
+    alpha, ell, num_basisfun, width_basisfun,
+    components, STREAM
+  )
+  bfa_phi <- STAN_phi_matrix(
+    x_cont, num_basisfun, width_basisfun,
+    components, STREAM
+  )
+
+  # Finally D and V
+  bfa_D <- STAN_D_matrix(alpha, bfa_lambda, bfa_delta, ranks, STREAM)
+  bfa_V <- STAN_V_matrix(bfa_phi, bfa_theta, ranks, STREAM)
+
+  # Return
+  list(V = bfa_V, D = bfa_D, ranks = ranks)
+}

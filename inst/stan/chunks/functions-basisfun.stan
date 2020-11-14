@@ -49,26 +49,33 @@ matrix[] STAN_phi_matrix(data vector[] x, data int M, data real L,
   int J = size(components);
   matrix[n, M] PHI[J];
   for(j in 1:J) {
-    matrix[n, M] PHI_j = rep_matrix(0.0, n, M);
-    for(m in 1:M) {
-      // TODO: use warp-transformed x[j] for some components
-      PHI_j[:,m] = STAN_phi(x[j], m, L);
+    matrix[n, M] PHI_j = rep_matrix(1.0, n, M); // is this ok?
+    if(components[j,1] > 0) {
+      int idx_cont = components[j,9];
+      for(m in 1:M) {
+        // TODO: use warp-transformed x_cont_unnorm for some components
+        PHI_j[:,m] = STAN_phi(x[idx_cont], m, L);
+      }
+      PHI[j] = PHI_j;
     }
-    PHI[j] = PHI_j;
   }
   return(PHI);
 }
 
 // Compute diagonals of diagonal matrices Lambda
-vector[] STAN_lambda_matrix(real[] alpha, real[] ell, data int M, data real L){
+vector[] STAN_lambda_matrix(real[] alpha, real[] ell, data int M, data real L,
+    data int[,] components){
   int J = size(alpha);
   vector[M] Lambda[J];
+  int j_ell = 0;
   for(j in 1:J) {
-    vector[M] Lambda_j = rep_vector(0.0, M);
-    for(m in 1:M) {
-      // TODO: all components don't have ell
-      real w = (m*pi())/(2.0*L);
-      Lambda_j[m] = STAN_spd_eq(w, alpha[j], ell[j]);
+    vector[M] Lambda_j = rep_vector(1.0, M);
+    if (components[j,1] > 0) {
+      j_ell = j_ell + 1;
+      for(m in 1:M) {
+        real w = (m*pi())/(2.0*L);
+        Lambda_j[m] = STAN_spd_eq(w, alpha[j], ell[j_ell]);
+      }
     }
     Lambda[j] = Lambda_j;
   }
@@ -157,10 +164,28 @@ vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda,
 // - bfa_phi = array of matrices with shape [num_obs, num_basisfun], length 
 //     num_comps
 // - bfa_theta = matrix of shape [num_obs, R]
-matrix STAN_V_matrix(matrix[] bfa_phi, matrix bfa_theta, int RM) {
+matrix STAN_V_matrix(matrix[] bfa_phi, matrix bfa_theta, int[] ranks) {
   int J = size(bfa_phi);
   int n = rows(bfa_phi[1]);
+  int M = cols(bfa_phi[1]);
+  int RM = sum(ranks)*M;
   matrix[n, RM] V = rep_matrix(1.0, n, RM);
+  int q0 = 0;
+  int k0 = 0;
+  for(j in 1:J) {
+    // Create V_j
+    int r = ranks[j];
+    if (r > 0) {
+      for (k in 1:r) {
+        for (m in 1:M) {
+          int q = m + (k-1)*M;
+          V[:,q0 + q] = bfa_theta[:,k0+k] .* bfa_phi[j][:,m];
+        }
+      }
+    }
+    k0 = k0 + r;
+    q0 = q0 + r*M;
+  }
   return V;
 }
 

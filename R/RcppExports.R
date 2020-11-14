@@ -69,12 +69,12 @@ STAN_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
     .Call(`_lgpr_STAN_multi_normal_bfa_lpdf`, y, V, D_diag, sigma, pstream__)
 }
 
-STAN_phi_matrix <- function(x, M, L, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_phi_matrix`, x, M, L, pstream__)
+STAN_phi_matrix <- function(x, M, L, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_phi_matrix`, x, M, L, components, pstream__)
 }
 
-STAN_lambda_matrix <- function(alpha, ell, M, L, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_lambda_matrix`, alpha, ell, M, L, pstream__)
+STAN_lambda_matrix <- function(alpha, ell, M, L, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_lambda_matrix`, alpha, ell, M, L, components, pstream__)
 }
 
 STAN_ranks <- function(components, x_cat_num_levels, pstream__ = 0L) {
@@ -93,8 +93,8 @@ STAN_D_matrix <- function(alpha, bfa_lambda, bfa_delta, ranks, pstream__ = 0L) {
     .Call(`_lgpr_STAN_D_matrix`, alpha, bfa_lambda, bfa_delta, ranks, pstream__)
 }
 
-STAN_V_matrix <- function(bfa_phi, bfa_theta, RM, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_V_matrix`, bfa_phi, bfa_theta, RM, pstream__)
+STAN_V_matrix <- function(bfa_phi, bfa_theta, ranks, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_V_matrix`, bfa_phi, bfa_theta, ranks, pstream__)
 }
 
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {
