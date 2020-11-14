@@ -87,6 +87,26 @@ test_that("model summary prints output", {
   expect_output(show(model@model_formula))
 })
 
+test_that("constant kernel matrix decompositions are correct", {
+  m <- create_model(y ~ sex + age + age | sex + age | id + group, testdata_002)
+  K <- const_kernels(m)
+  num_comps <- length(K)
+  dec <- const_kernels.decompositions(m)
+  K_rec <- const_kernels.reconstruct(dec)
+  expect_equal(length(K), 5)
+  expect_equal(length(K_rec), 5)
+
+  # Compute maximum absolute errors between recontructions and originals
+  mae1 <- max(abs(K[[1]] - K_rec[[1]]))
+  mae3 <- max(abs(K[[3]] - K_rec[[3]]))
+  mae4 <- max(abs(K[[4]] - K_rec[[4]]))
+  mae5 <- max(abs(K[[5]] - K_rec[[5]]))
+  expect_lt(mae1, 1e-6)
+  expect_lt(mae3, 1e-6)
+  expect_lt(mae4, 1e-6)
+  expect_lt(mae5, 1e-6)
+})
+
 # -------------------------------------------------------------------------
 
 context("Methods for lgpsim objects")

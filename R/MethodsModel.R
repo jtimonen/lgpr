@@ -265,3 +265,92 @@ get_num_trials <- function(object) {
   num_trials <- dollar(get_stan_input(object), "y_num_trials")
   as.vector(num_trials)
 }
+
+#' Compute constant kernel matrices which don't depend on parameters
+#'
+#' @description
+#' \itemize{
+#'    \item \code{const_kernels} computes all constant kernels
+#'    \item \code{const_kernels.decompositions} computes their exact
+#'    rank decompositions
+#' }
+#' @inheritParams object_to_model
+#' @param STREAM external pointer
+#' @name const_kernels
+#' @return a list of matrices
+NULL
+
+#' @rdname const_kernels
+const_kernels <- function(object, STREAM = get_stream()) {
+  si <- get_stan_input(object)
+  n <- get_num_obs(object)
+  x_cat <- matrix_to_list(dollar(si, "x_cat"))
+  x_cont_mask <- matrix_to_list(dollar(si, "x_cont_mask"))
+  x_cat_num_levels <- dollar(si, "x_cat_num_levels")
+  components <- matrix_to_list(dollar(si, "components"))
+  K_const <- STAN_kernel_const_all(
+    n, n,
+    x_cat, x_cat,
+    x_cont_mask, x_cont_mask,
+    x_cat_num_levels, components,
+    STREAM
+  )
+  return(K_const)
+}
+
+#' @rdname const_kernels
+const_kernels.decompose <- function(object, STREAM = get_stream()) {
+  K_const <- const_kernels(object, STREAM)
+  si <- get_stan_input(object)
+  x_cat_num_levels <- dollar(si, "x_cat_num_levels")
+  components <- matrix_to_list(dollar(si, "components"))
+  ranks <- STAN_ranks(components, x_cat_num_levels, STREAM)
+  list(
+    ranks = ranks,
+    Delta = STAN_delta_matrix(K_const, ranks, STREAM),
+    Theta = STAN_theta_matrix(K_const, ranks, STREAM)
+  )
+}
+
+#' @rdname const_kernels
+const_kernels.decompositions <- function(object, STREAM = get_stream()) {
+  rank_dec <- const_kernels.decompose(object, STREAM)
+  ranks <- dollar(rank_dec, "ranks")
+  Delta <- dollar(rank_dec, "Delta")
+  Theta <- dollar(rank_dec, "Theta")
+  num_comps <- length(ranks)
+  decompositions <- list()
+  idx <- 1
+  for (j in seq_len(num_comps)) {
+    r <- ranks[j]
+    if (r > 0) {
+      delta_diag <- Delta[idx:(idx + r - 1)]
+      if (length(delta_diag) == 1) delta_diag <- as.matrix(delta_diag)
+      Delta_j <- diag(delta_diag)
+      Theta_j <- Theta[, idx:(idx + r - 1), drop = FALSE]
+      decompositions[[j]] <- list(Delta = Delta_j, Theta = Theta_j)
+      idx <- idx + r
+    } else {
+      decompositions[[j]] <- list(Delta = NULL, Theta = NULL)
+    }
+  }
+  return(decompositions)
+}
+
+
+#' @rdname const_kernels
+#' @param decompositions a list returned by \code{const_kernel.decompositions}
+const_kernels.reconstruct <- function(decompositions, STREAM = get_stream()) {
+  num_comps <- length(decompositions)
+  K_rec <- list()
+  for (j in seq_len(num_comps)) {
+    D <- dollar(decompositions[[j]], "Delta")
+    TH <- dollar(decompositions[[j]], "Theta")
+    if (is.null(D)) {
+      K_rec[[j]] <- NA
+    } else {
+      K_rec[[j]] <- TH %*% D %*% t(TH)
+    }
+  }
+  return(K_rec)
+}

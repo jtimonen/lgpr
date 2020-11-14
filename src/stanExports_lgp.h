@@ -1692,7 +1692,7 @@ STAN_ranks(const std::vector<std::vector<int> >& components,
                 current_statement_begin__ = 480;
                 stan::model::assign(ranks, 
                             stan::model::cons_list(stan::model::index_uni(j), stan::model::nil_index_list()), 
-                            get_base1(x_cat_num_levels, idx, "x_cat_num_levels", 1), 
+                            (get_base1(x_cat_num_levels, idx, "x_cat_num_levels", 1) - 1), 
                             "assigning variable ranks");
             }
             }

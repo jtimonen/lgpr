@@ -81,7 +81,7 @@ int[] STAN_ranks(data int[,] components, data int[] x_cat_num_levels){
   for (j in 1:J) {
     int idx = idx_cat[j];
     if (idx > 0) {
-      ranks[j] = x_cat_num_levels[idx];
+      ranks[j] = x_cat_num_levels[idx] - 1; // TODO: prove this correct
     }
   }
   return(ranks);
