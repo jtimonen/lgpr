@@ -46,7 +46,7 @@ model {
   if(is_likelihood_skipped){
   }else{
     if(num_basisfun > 0) {
-#include chunks/model-likelihood_approx.stan 
+#include chunks/model-likelihood_approx.stan
     } else {
 #include chunks/model-likelihood.stan
     }

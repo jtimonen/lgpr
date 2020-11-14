@@ -49,12 +49,12 @@ STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_u
     .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__)
 }
 
-STAN_bfa_phi <- function(x, m, L, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_bfa_phi`, x, m, L, pstream__)
+STAN_phi <- function(x, m, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_phi`, x, m, L, pstream__)
 }
 
-STAN_bfa_lambda <- function(m, L, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_bfa_lambda`, m, L, pstream__)
+STAN_lambda <- function(m, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_lambda`, m, L, pstream__)
 }
 
 STAN_spd_eq <- function(w, alpha, ell, pstream__ = 0L) {
@@ -65,16 +65,28 @@ STAN_quad_form_inv <- function(x, A, pstream__ = 0L) {
     .Call(`_lgpr_STAN_quad_form_inv`, x, A, pstream__)
 }
 
-STAN_bfa_multi_normal_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_bfa_multi_normal_lpdf`, y, V, D_diag, sigma, pstream__)
+STAN_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_multi_normal_bfa_lpdf`, y, V, D_diag, sigma, pstream__)
 }
 
-STAN_bfa_Phi <- function(x, M, L, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_bfa_Phi`, x, M, L, pstream__)
+STAN_phi_matrix <- function(x, M, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_phi_matrix`, x, M, L, pstream__)
 }
 
-STAN_bfa_Lambda <- function(alpha, ell, M, L, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_bfa_Lambda`, alpha, ell, M, L, pstream__)
+STAN_lambda_matrix <- function(alpha, ell, M, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_lambda_matrix`, alpha, ell, M, L, pstream__)
+}
+
+STAN_ranks <- function(components, x_cat_num_levels, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_ranks`, components, x_cat_num_levels, pstream__)
+}
+
+STAN_delta_matrix <- function(K_const, ranks, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_delta_matrix`, K_const, ranks, pstream__)
+}
+
+STAN_theta_matrix <- function(K_const, ranks, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_theta_matrix`, K_const, ranks, pstream__)
 }
 
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {

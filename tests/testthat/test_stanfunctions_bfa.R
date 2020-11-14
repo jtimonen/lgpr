@@ -7,9 +7,9 @@ test_that("dirichlet eigenfunctions are computed correctly", {
     1 / sqrt(L) * sin((pi * m) / (2 * L) * (x + L))
   }
   x <- seq(-3, 3, by = 0.2)
-  f1 <- cpp_bfa_phi(x, 1, 2.1)
-  f2 <- cpp_bfa_phi(x, 2, 1.1)
-  f3 <- cpp_bfa_phi(x, 3, 0.5)
+  f1 <- cpp_phi(x, 1, 2.1)
+  f2 <- cpp_phi(x, 2, 1.1)
+  f3 <- cpp_phi(x, 3, 0.5)
   expect_equal(sum(f1), sum(eig_fun(x, 1, 2.1)))
   expect_equal(sum(f2), sum(eig_fun(x, 2, 1.1)))
   expect_equal(sum(f3), sum(eig_fun(x, 3, 0.5)))
@@ -20,8 +20,8 @@ test_that("dirichlet eigenvalues are computed correctly", {
     lam <- (pi * m) / (2 * L)
     return(lam^2)
   }
-  l1 <- cpp_bfa_lambda(1, 2.1)
-  l2 <- cpp_bfa_lambda(2, 1.1)
+  l1 <- cpp_lambda(1, 2.1)
+  l2 <- cpp_lambda(2, 1.1)
   expect_equal(l1, eig_val(1, 2.1))
   expect_equal(l2, eig_val(2, 1.1))
 })
@@ -43,6 +43,6 @@ test_that("multivariate normal approximation works", {
   D_diag <- rep(2.3, RM)
   V <- matrix(rnorm(n * RM), n, RM)
   sigma <- 0.3
-  p <- cpp_bfa_multi_normal_lpdf(y, V, D_diag, sigma)
+  p <- cpp_multi_normal_bfa_lpdf(y, V, D_diag, sigma)
   expect_false(is.nan(p))
 })

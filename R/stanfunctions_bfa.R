@@ -1,7 +1,7 @@
 
 #' The m'th eigenfunction of the Dirichlet boundary value problem
 #'
-#' @description This is a wrapper for \code{STAN_bfa_phi}, with some input
+#' @description This is a wrapper for \code{STAN_phi}, with some input
 #' validation added.
 #' @param x a numeric vector
 #' @param m index of the eigenfunction (non-negative integer)
@@ -9,25 +9,25 @@
 #' @inheritParams cpp_kernel_const_all
 #' @family basisfunction approximation functions
 #' @return with length equal to that of \code{x}
-cpp_bfa_phi <- function(x, m, L, STREAM = get_stream()) {
+cpp_phi <- function(x, m, L, STREAM = get_stream()) {
   check_positive(m)
   check_positive(L)
-  STAN_bfa_phi(x, m, L, STREAM)
+  STAN_phi(x, m, L, STREAM)
 }
 
 #' The m'th eigenvalue of the Dirichlet boundary value problem
 #'
-#' @description This is a wrapper for \code{STAN_bfa_lambda}, with some input
+#' @description This is a wrapper for \code{STAN_lambda}, with some input
 #' validation added.
 #' @param m index of the eigenfunction (non-negative integer)
 #' @param L domain width (positive real number)
 #' @inheritParams cpp_kernel_const_all
 #' @family basisfunction approximation functions
 #' @return a number
-cpp_bfa_lambda <- function(m, L, STREAM = get_stream()) {
+cpp_lambda <- function(m, L, STREAM = get_stream()) {
   check_positive(m)
   check_positive(L)
-  STAN_bfa_lambda(m, L, STREAM)
+  STAN_lambda(m, L, STREAM)
 }
 
 #' Spectral density function of the exponentiated quadratic kernel
@@ -48,7 +48,7 @@ cpp_spd_eq <- function(w, alpha, ell, STREAM = get_stream()) {
 
 #' Multivariate normal density using basis function approximation
 #'
-#' @description This is a wrapper for \code{STAN_bfa_multi_normal_lpdf},
+#' @description This is a wrapper for \code{STAN_multi_normal_bfa_lpdf},
 #' with some input validation added.
 #' @param y a vector of length \code{n}
 #' @param V a matrix of size \code{n} x \code{R*M}
@@ -57,8 +57,8 @@ cpp_spd_eq <- function(w, alpha, ell, STREAM = get_stream()) {
 #' @inheritParams cpp_kernel_const_all
 #' @family basisfunction approximation functions
 #' @return a real number
-cpp_bfa_multi_normal_lpdf <- function(y, V, D_diag, sigma,
+cpp_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma,
                                       STREAM = get_stream()) {
   check_positive(sigma)
-  STAN_bfa_multi_normal_lpdf(y, V, D_diag, sigma, STREAM)
+  STAN_multi_normal_bfa_lpdf(y, V, D_diag, sigma, STREAM)
 }
