@@ -42,9 +42,11 @@ real STAN_multi_normal_bfa_lpdf(vector y, matrix V, vector D_diag, real sigma){
 }
 
 // Compute basis function matrices Phi
-matrix[] STAN_phi_matrix(data vector[] x, data int M, data real L){
+// - TODO: add explanation
+matrix[] STAN_phi_matrix(data vector[] x, data int M, data real L, 
+    data int[,] components){
   int n = num_elements(x[1]);
-  int J = size(x);
+  int J = size(components);
   matrix[n, M] PHI[J];
   for(j in 1:J) {
     matrix[n, M] PHI_j = rep_matrix(0.0, n, M);
@@ -121,5 +123,44 @@ matrix STAN_theta_matrix(data matrix[] K_const, data int[] ranks){
     idx = idx + r;
   }
   return(Theta);
+}
+
+// Create D
+// - bfa_lambda = array of vectors with shape [num_basisfun], length num_comps
+// - bfa_delta = a vector of shape [R]
+vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda, 
+    vector bfa_delta, int[] ranks) {
+  int M = num_elements(bfa_lambda[1]);
+  int RM = sum(ranks)*M;
+  int J = size(ranks);
+  vector[RM] D_diag;
+  int q0 = 0;
+  int k0 = 0;
+  for(j in 1:J) {
+    // Create D_j
+    int r = ranks[j];
+    if (r > 0) {
+      for (k in 1:r) {
+        for (m in 1:M) {
+          int q = m + (k-1)*M;
+          D_diag[q0 + q] = alpha[j]*bfa_delta[k0+k]*bfa_lambda[j][m];
+        }
+      }
+    }
+    k0 = k0 + r;
+    q0 = q0 + r*M;
+  }
+  return D_diag;
+}
+
+// Create V
+// - bfa_phi = array of matrices with shape [num_obs, num_basisfun], length 
+//     num_comps
+// - bfa_theta = matrix of shape [num_obs, R]
+matrix STAN_V_matrix(matrix[] bfa_phi, matrix bfa_theta, int RM) {
+  int J = size(bfa_phi);
+  int n = rows(bfa_phi[1]);
+  matrix[n, RM] V = rep_matrix(1.0, n, RM);
+  return V;
 }
 

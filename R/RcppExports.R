@@ -89,6 +89,14 @@ STAN_theta_matrix <- function(K_const, ranks, pstream__ = 0L) {
     .Call(`_lgpr_STAN_theta_matrix`, K_const, ranks, pstream__)
 }
 
+STAN_D_matrix <- function(alpha, bfa_lambda, bfa_delta, ranks, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_D_matrix`, alpha, bfa_lambda, bfa_delta, ranks, pstream__)
+}
+
+STAN_V_matrix <- function(bfa_phi, bfa_theta, RM, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_V_matrix`, bfa_phi, bfa_theta, RM, pstream__)
+}
+
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {
     .Call(`_lgpr_STAN_matrix_array_sum`, K, pstream__)
 }
