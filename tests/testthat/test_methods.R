@@ -110,11 +110,15 @@ test_that("entire additive gp matrix low-rank decomposition works", {
   m <- create_model(y ~ sex + age + age | sex + age | id + group, testdata_002)
   alpha <- c(1, 1, 1, 1, 1)
   ell <- c(1, 1, 1)
-  dec <- kernel_decomposition(m, alpha, ell)
+  dec <- kernel_decomposition(m, alpha, ell, num_basisfun = 4)
   expect_equal(dec$ranks, c(1, 0, 1, 11, 1))
-  expect_equal(dim(dec$V), c(96, 140))
-  expect_equal(length(dec$D), 140)
-  # TODO: fix the fact that dec$V has NaNs
+  expect_equal(dim(dec$V), c(96, 56))
+  expect_equal(length(dec$D), 56)
+  
+  # Reconstruct
+  K_rec <- dec$V %*% diag(dec$D) %*% t(dec$V)
+  expect_equal(dim(K_rec), c(96,96))
+  
 })
 
 # -------------------------------------------------------------------------

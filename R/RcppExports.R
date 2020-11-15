@@ -57,24 +57,24 @@ STAN_lambda <- function(m, L, pstream__ = 0L) {
     .Call(`_lgpr_STAN_lambda`, m, L, pstream__)
 }
 
-STAN_spd_eq <- function(w, alpha, ell, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_spd_eq`, w, alpha, ell, pstream__)
+STAN_spd_eq <- function(w, ell, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_spd_eq`, w, ell, pstream__)
 }
 
 STAN_quad_form_inv <- function(x, A, pstream__ = 0L) {
     .Call(`_lgpr_STAN_quad_form_inv`, x, A, pstream__)
 }
 
-STAN_multi_normal_bfa_lpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_multi_normal_bfa_lpdf`, y, V, D_diag, sigma, pstream__)
+STAN_multi_normal_bfa_logpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_multi_normal_bfa_logpdf`, y, V, D_diag, sigma, pstream__)
 }
 
 STAN_phi_matrix <- function(x, M, L, components, pstream__ = 0L) {
     .Call(`_lgpr_STAN_phi_matrix`, x, M, L, components, pstream__)
 }
 
-STAN_lambda_matrix <- function(alpha, ell, M, L, components, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_lambda_matrix`, alpha, ell, M, L, components, pstream__)
+STAN_lambda_matrix <- function(ell, M, L, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_lambda_matrix`, ell, M, L, components, pstream__)
 }
 
 STAN_ranks <- function(components, x_cat_num_levels, pstream__ = 0L) {

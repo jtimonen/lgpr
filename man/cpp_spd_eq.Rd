@@ -4,12 +4,10 @@
 \alias{cpp_spd_eq}
 \title{Spectral density function of the exponentiated quadratic kernel}
 \usage{
-cpp_spd_eq(w, alpha, ell, STREAM = get_stream())
+cpp_spd_eq(w, ell, STREAM = get_stream())
 }
 \arguments{
 \item{w}{the frequency, real number}
-
-\item{alpha}{marginal std of the kernel}
 
 \item{ell}{lengthscale of the kernel}
 
@@ -23,9 +21,9 @@ This is a wrapper for \code{STAN_spd_eq}, with some input
 validation added.
 }
 \seealso{
-Other basisfunction approximation functions: 
+Other basis function approximation functions: 
 \code{\link{cpp_lambda}()},
-\code{\link{cpp_multi_normal_bfa_lpdf}()},
+\code{\link{cpp_multi_normal_bfa_logpdf}()},
 \code{\link{cpp_phi}()}
 }
-\concept{basisfunction approximation functions}
+\concept{basis function approximation functions}

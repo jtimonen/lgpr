@@ -27,13 +27,13 @@ test_that("dirichlet eigenvalues are computed correctly", {
 })
 
 test_that("spectral density of exp quad kernel is correct", {
-  spd <- function(w, a, l) {
-    a^2 * l * sqrt(2 * pi) * exp(-2 * (pi * l * w)^2)
+  spd <- function(w, l) {
+    l * sqrt(2 * pi) * exp(-2 * (pi * l * w)^2)
   }
-  s1 <- cpp_spd_eq(0, 1, 2)
-  s2 <- cpp_spd_eq(0.2, 1.4, 1.5)
-  expect_equal(s1, spd(0, 1, 2))
-  expect_equal(s2, spd(0.2, 1.4, 1.5))
+  s1 <- cpp_spd_eq(0, 2)
+  s2 <- cpp_spd_eq(0.2, 1.5)
+  expect_equal(s1, spd(0, 2))
+  expect_equal(s2, spd(0.2, 1.5))
 })
 
 test_that("multivariate normal approximation works", {
@@ -43,6 +43,6 @@ test_that("multivariate normal approximation works", {
   D_diag <- rep(2.3, RM)
   V <- matrix(rnorm(n * RM), n, RM)
   sigma <- 0.3
-  p <- cpp_multi_normal_bfa_lpdf(y, V, D_diag, sigma)
+  p <- cpp_multi_normal_bfa_logpdf(y, V, D_diag, sigma)
   expect_false(is.nan(p))
 })

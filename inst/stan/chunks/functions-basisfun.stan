@@ -11,9 +11,9 @@ real STAN_lambda(int m, data real L){
   return(square(A));
 }
 
-// SPECTRAL DENSITY OF EQ KERNEL
-real STAN_spd_eq(real w, real alpha, real ell){
-  real A = square(alpha)*ell*sqrt(2.0*pi());
+// SPECTRAL DENSITY OF EQ KERNEL (alpha=1.0)
+real STAN_spd_eq(real w, real ell){
+  real A = ell*sqrt(2.0*pi());
   real B = 2.0*square(pi()*ell);
   return(A*exp(-B*square(w)));
 }
@@ -27,7 +27,8 @@ real STAN_quad_form_inv(vector x, matrix A){
 }
 
 // LOG PROB OF MULTIVARIATE NORMAL WITH LOW RANK COVARIANCE
-real STAN_multi_normal_bfa_lpdf(vector y, matrix V, vector D_diag, real sigma){
+real STAN_multi_normal_bfa_logpdf(vector y, matrix V, vector D_diag, 
+    real sigma){
   int n = num_elements(y);
   int RM = num_elements(D_diag);
   real t1 = n*log(2.0*pi());
@@ -56,28 +57,25 @@ matrix[] STAN_phi_matrix(data vector[] x, data int M, data real L,
         // TODO: use warp-transformed x_cont_unnorm for some components
         PHI_j[:,m] = STAN_phi(x[idx_cont], m, L);
       }
-      PHI[j] = PHI_j;
     }
+    PHI[j] = PHI_j;
   }
   return(PHI);
 }
 
 // Compute diagonals of diagonal matrices Lambda
-vector[] STAN_lambda_matrix(real[] alpha, real[] ell, data int M, data real L,
+matrix STAN_lambda_matrix(real[] ell, data int M, data real L,
     data int[,] components){
-  int J = size(alpha);
-  vector[M] Lambda[J];
+  int J = size(components);
+  matrix[J, M] Lambda = rep_matrix(1.0, J, M);
   int j_ell = 0;
   for(j in 1:J) {
-    vector[M] Lambda_j = rep_vector(1.0, M);
     if (components[j,1] > 0) {
       j_ell = j_ell + 1;
       for(m in 1:M) {
-        real w = (m*pi())/(2.0*L);
-        Lambda_j[m] = STAN_spd_eq(w, alpha[j], ell[j_ell]);
+        Lambda[j,m] = STAN_spd_eq((m*pi())/(2.0*L), ell[j_ell]);
       }
     }
-    Lambda[j] = Lambda_j;
   }
   return(Lambda);
 }
@@ -133,11 +131,11 @@ matrix STAN_theta_matrix(data matrix[] K_const, data int[] ranks){
 }
 
 // Create D
-// - bfa_lambda = array of vectors with shape [num_basisfun], length num_comps
+// - bfa_lambda = a matrix with shape [num_comps, num_basisfun]
 // - bfa_delta = a vector of shape [R]
-vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda, 
+vector STAN_D_matrix(real[] alpha, matrix bfa_lambda, 
     vector bfa_delta, int[] ranks) {
-  int M = num_elements(bfa_lambda[1]);
+  int M = cols(bfa_lambda);
   int RM = sum(ranks)*M;
   int J = size(ranks);
   vector[RM] D_diag;
@@ -150,7 +148,7 @@ vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda,
       for (k in 1:r) {
         for (m in 1:M) {
           int q = m + (k-1)*M;
-          D_diag[q0 + q] = alpha[j]*bfa_delta[k0+k]*bfa_lambda[j][m];
+          D_diag[q0 + q] = alpha[j]*bfa_delta[k0+k]*bfa_lambda[j,m]; // squared?
         }
       }
     }

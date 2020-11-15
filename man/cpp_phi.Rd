@@ -23,9 +23,9 @@ This is a wrapper for \code{STAN_phi}, with some input
 validation added.
 }
 \seealso{
-Other basisfunction approximation functions: 
+Other basis function approximation functions: 
 \code{\link{cpp_lambda}()},
-\code{\link{cpp_multi_normal_bfa_lpdf}()},
+\code{\link{cpp_multi_normal_bfa_logpdf}()},
 \code{\link{cpp_spd_eq}()}
 }
-\concept{basisfunction approximation functions}
+\concept{basis function approximation functions}

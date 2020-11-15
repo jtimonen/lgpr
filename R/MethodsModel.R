@@ -380,7 +380,7 @@ kernel_decomposition <- function(object, alpha, ell,
   components <- matrix_to_list(dollar(si, "components"))
   x_cont <- matrix_to_list(dollar(si, "x_cont"))
   bfa_lambda <- STAN_lambda_matrix(
-    alpha, ell, num_basisfun, width_basisfun,
+    ell, num_basisfun, width_basisfun,
     components, STREAM
   )
   bfa_phi <- STAN_phi_matrix(
@@ -393,5 +393,5 @@ kernel_decomposition <- function(object, alpha, ell,
   bfa_V <- STAN_V_matrix(bfa_phi, bfa_theta, ranks, STREAM)
 
   # Return
-  list(V = bfa_V, D = bfa_D, ranks = ranks)
+  list(V = bfa_V, D = bfa_D, ranks = ranks, Phi = bfa_phi, Lambda = bfa_lambda)
 }
