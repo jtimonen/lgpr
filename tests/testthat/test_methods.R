@@ -97,10 +97,12 @@ test_that("constant kernel matrix decompositions are correct", {
 
   # Compute maximum absolute errors between recontructions and originals
   mae1 <- max(abs(K[[1]] - K_rec[[1]]))
+  mae2 <- max(abs(K[[2]] - matrix(1, 96, 96)))
   mae3 <- max(abs(K[[3]] - K_rec[[3]]))
   mae4 <- max(abs(K[[4]] - K_rec[[4]]))
   mae5 <- max(abs(K[[5]] - K_rec[[5]]))
   expect_lt(mae1, 1e-6)
+  expect_lt(mae2, 1e-6)
   expect_lt(mae3, 1e-6)
   expect_lt(mae4, 1e-6)
   expect_lt(mae5, 1e-6)
@@ -111,14 +113,13 @@ test_that("entire additive gp matrix low-rank decomposition works", {
   alpha <- c(1, 1, 1, 1, 1)
   ell <- c(1, 1, 1)
   dec <- kernel_decomposition(m, alpha, ell, num_basisfun = 4)
-  expect_equal(dec$ranks, c(1, 0, 1, 11, 1))
-  expect_equal(dim(dec$V), c(96, 56))
-  expect_equal(length(dec$D), 56)
-  
+  expect_equal(dec$ranks, c(1, 1, 1, 11, 1))
+  expect_equal(dim(dec$V), c(96, 15 * 4))
+  expect_equal(length(dec$D), 15 * 4)
+
   # Reconstruct
   K_rec <- dec$V %*% diag(dec$D) %*% t(dec$V)
-  expect_equal(dim(K_rec), c(96,96))
-  
+  expect_equal(dim(K_rec), c(96, 96))
 })
 
 # -------------------------------------------------------------------------

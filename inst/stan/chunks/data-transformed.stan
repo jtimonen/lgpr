@@ -10,6 +10,6 @@ vector[num_obs] delta_vec = rep_vector(delta, num_obs);
 int ranks[num_comps] = STAN_ranks(components, x_cat_num_levels);
 int R = sum(ranks);
 int RM = R * num_basisfun;
-vector[R] bfa_delta = STAN_delta_matrix(K_const, ranks);
-matrix[num_obs, R] bfa_theta = STAN_theta_matrix(K_const, ranks);
+vector[R] bfa_delta = STAN_delta_matrix(K_const, ranks, components);
+matrix[num_obs, R] bfa_theta = STAN_theta_matrix(K_const, ranks, components);
 

@@ -56,7 +56,7 @@ cpp_spd_eq <- function(w, ell, STREAM = get_stream()) {
 #' @family basis function approximation functions
 #' @return a real number
 cpp_multi_normal_bfa_logpdf <- function(y, V, D_diag, sigma,
-                                      STREAM = get_stream()) {
+                                        STREAM = get_stream()) {
   check_positive(sigma)
   STAN_multi_normal_bfa_logpdf(y, V, D_diag, sigma, STREAM)
 }

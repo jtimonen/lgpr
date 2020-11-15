@@ -7,6 +7,58 @@
 
 using namespace Rcpp;
 
+// STAN_rep_vector_times
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_rep_vector_times(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x, const int& J, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_rep_vector_times(SEXP xSEXP, SEXP JSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const int& >::type J(JSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_rep_vector_times(x, J, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_rep_vector_each
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_rep_vector_each(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x, const int& J, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_rep_vector_each(SEXP xSEXP, SEXP JSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const int& >::type J(JSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_rep_vector_each(x, J, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_rep_cols_times
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_rep_cols_times(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X, const int& J, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_rep_cols_times(SEXP XSEXP, SEXP JSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const int& >::type J(JSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_rep_cols_times(X, J, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_rep_cols_each
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_rep_cols_each(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X, const int& J, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_rep_cols_each(SEXP XSEXP, SEXP JSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const int& >::type J(JSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_rep_cols_each(X, J, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
 // STAN_vectorsum
 Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_vectorsum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& vecs, const int& L, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_vectorsum(SEXP vecsSEXP, SEXP LSEXP, SEXP pstream__SEXP) {
@@ -71,6 +123,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type teff(teffSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
     rcpp_result_gen = Rcpp::wrap(STAN_edit_x_cont(x_cont, idx_expand, teff_obs, teff, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_quad_form_inv
+double STAN_quad_form_inv(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& A, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_quad_form_inv(SEXP xSEXP, SEXP ASEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_quad_form_inv(x, A, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -231,34 +296,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_quad_form_inv
-double STAN_quad_form_inv(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& A, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_quad_form_inv(SEXP xSEXP, SEXP ASEXP, SEXP pstream__SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type A(ASEXP);
-    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_quad_form_inv(x, A, pstream__));
-    return rcpp_result_gen;
-END_RCPP
-}
-// STAN_multi_normal_bfa_logpdf
-double STAN_multi_normal_bfa_logpdf(const Eigen::Matrix<double, Eigen::Dynamic, 1>& y, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& V, const Eigen::Matrix<double, Eigen::Dynamic, 1>& D_diag, const double& sigma, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_multi_normal_bfa_logpdf(SEXP ySEXP, SEXP VSEXP, SEXP D_diagSEXP, SEXP sigmaSEXP, SEXP pstream__SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type V(VSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type D_diag(D_diagSEXP);
-    Rcpp::traits::input_parameter< const double& >::type sigma(sigmaSEXP);
-    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_multi_normal_bfa_logpdf(y, V, D_diag, sigma, pstream__));
-    return rcpp_result_gen;
-END_RCPP
-}
 // STAN_phi_matrix
 std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > STAN_phi_matrix(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& x, const int& M, const double& L, const std::vector<std::vector<int> >& components, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_phi_matrix(SEXP xSEXP, SEXP MSEXP, SEXP LSEXP, SEXP componentsSEXP, SEXP pstream__SEXP) {
@@ -275,7 +312,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // STAN_lambda_matrix
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_lambda_matrix(const std::vector<double>& ell, const int& M, const double& L, const std::vector<std::vector<int> >& components, std::ostream* pstream__);
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_lambda_matrix(const std::vector<double>& ell, const int& M, const double& L, const std::vector<std::vector<int> >& components, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_lambda_matrix(SEXP ellSEXP, SEXP MSEXP, SEXP LSEXP, SEXP componentsSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -303,39 +340,41 @@ BEGIN_RCPP
 END_RCPP
 }
 // STAN_delta_matrix
-Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_delta_matrix(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K_const, const std::vector<int>& ranks, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_delta_matrix(SEXP K_constSEXP, SEXP ranksSEXP, SEXP pstream__SEXP) {
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_delta_matrix(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K_const, const std::vector<int>& ranks, const std::vector<std::vector<int> >& components, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_delta_matrix(SEXP K_constSEXP, SEXP ranksSEXP, SEXP componentsSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type K_const(K_constSEXP);
     Rcpp::traits::input_parameter< const std::vector<int>& >::type ranks(ranksSEXP);
+    Rcpp::traits::input_parameter< const std::vector<std::vector<int> >& >::type components(componentsSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_delta_matrix(K_const, ranks, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_delta_matrix(K_const, ranks, components, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
 // STAN_theta_matrix
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_theta_matrix(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K_const, const std::vector<int>& ranks, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_theta_matrix(SEXP K_constSEXP, SEXP ranksSEXP, SEXP pstream__SEXP) {
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_theta_matrix(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K_const, const std::vector<int>& ranks, const std::vector<std::vector<int> >& components, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_theta_matrix(SEXP K_constSEXP, SEXP ranksSEXP, SEXP componentsSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type K_const(K_constSEXP);
     Rcpp::traits::input_parameter< const std::vector<int>& >::type ranks(ranksSEXP);
+    Rcpp::traits::input_parameter< const std::vector<std::vector<int> >& >::type components(componentsSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_theta_matrix(K_const, ranks, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_theta_matrix(K_const, ranks, components, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
 // STAN_D_matrix
-Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_D_matrix(const std::vector<double>& alpha, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& bfa_lambda, const Eigen::Matrix<double, Eigen::Dynamic, 1>& bfa_delta, const std::vector<int>& ranks, std::ostream* pstream__);
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_D_matrix(const std::vector<double>& alpha, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& bfa_lambda, const Eigen::Matrix<double, Eigen::Dynamic, 1>& bfa_delta, const std::vector<int>& ranks, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_D_matrix(SEXP alphaSEXP, SEXP bfa_lambdaSEXP, SEXP bfa_deltaSEXP, SEXP ranksSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<double>& >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type bfa_lambda(bfa_lambdaSEXP);
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type bfa_lambda(bfa_lambdaSEXP);
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type bfa_delta(bfa_deltaSEXP);
     Rcpp::traits::input_parameter< const std::vector<int>& >::type ranks(ranksSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
@@ -354,6 +393,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<int>& >::type ranks(ranksSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
     rcpp_result_gen = Rcpp::wrap(STAN_V_matrix(bfa_phi, bfa_theta, ranks, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_multi_normal_bfa_logpdf
+double STAN_multi_normal_bfa_logpdf(const Eigen::Matrix<double, Eigen::Dynamic, 1>& y, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& V, const Eigen::Matrix<double, Eigen::Dynamic, 1>& D_diag, const double& sigma, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_multi_normal_bfa_logpdf(SEXP ySEXP, SEXP VSEXP, SEXP D_diagSEXP, SEXP sigmaSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type V(VSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type D_diag(D_diagSEXP);
+    Rcpp::traits::input_parameter< const double& >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_multi_normal_bfa_logpdf(y, V, D_diag, sigma, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -419,11 +473,16 @@ END_RCPP
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_lgpr_STAN_rep_vector_times", (DL_FUNC) &_lgpr_STAN_rep_vector_times, 3},
+    {"_lgpr_STAN_rep_vector_each", (DL_FUNC) &_lgpr_STAN_rep_vector_each, 3},
+    {"_lgpr_STAN_rep_cols_times", (DL_FUNC) &_lgpr_STAN_rep_cols_times, 3},
+    {"_lgpr_STAN_rep_cols_each", (DL_FUNC) &_lgpr_STAN_rep_cols_each, 3},
     {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
     {"_lgpr_STAN_warp_input", (DL_FUNC) &_lgpr_STAN_warp_input, 3},
     {"_lgpr_STAN_var_mask", (DL_FUNC) &_lgpr_STAN_var_mask, 3},
     {"_lgpr_STAN_expand", (DL_FUNC) &_lgpr_STAN_expand, 3},
     {"_lgpr_STAN_edit_x_cont", (DL_FUNC) &_lgpr_STAN_edit_x_cont, 5},
+    {"_lgpr_STAN_quad_form_inv", (DL_FUNC) &_lgpr_STAN_quad_form_inv, 3},
     {"_lgpr_STAN_kernel_base_zerosum", (DL_FUNC) &_lgpr_STAN_kernel_base_zerosum, 4},
     {"_lgpr_STAN_kernel_base_cat", (DL_FUNC) &_lgpr_STAN_kernel_base_cat, 3},
     {"_lgpr_STAN_kernel_base_bin_mask", (DL_FUNC) &_lgpr_STAN_kernel_base_bin_mask, 3},
@@ -434,15 +493,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_phi", (DL_FUNC) &_lgpr_STAN_phi, 4},
     {"_lgpr_STAN_lambda", (DL_FUNC) &_lgpr_STAN_lambda, 3},
     {"_lgpr_STAN_spd_eq", (DL_FUNC) &_lgpr_STAN_spd_eq, 3},
-    {"_lgpr_STAN_quad_form_inv", (DL_FUNC) &_lgpr_STAN_quad_form_inv, 3},
-    {"_lgpr_STAN_multi_normal_bfa_logpdf", (DL_FUNC) &_lgpr_STAN_multi_normal_bfa_logpdf, 5},
     {"_lgpr_STAN_phi_matrix", (DL_FUNC) &_lgpr_STAN_phi_matrix, 5},
     {"_lgpr_STAN_lambda_matrix", (DL_FUNC) &_lgpr_STAN_lambda_matrix, 5},
     {"_lgpr_STAN_ranks", (DL_FUNC) &_lgpr_STAN_ranks, 3},
-    {"_lgpr_STAN_delta_matrix", (DL_FUNC) &_lgpr_STAN_delta_matrix, 3},
-    {"_lgpr_STAN_theta_matrix", (DL_FUNC) &_lgpr_STAN_theta_matrix, 3},
+    {"_lgpr_STAN_delta_matrix", (DL_FUNC) &_lgpr_STAN_delta_matrix, 4},
+    {"_lgpr_STAN_theta_matrix", (DL_FUNC) &_lgpr_STAN_theta_matrix, 4},
     {"_lgpr_STAN_D_matrix", (DL_FUNC) &_lgpr_STAN_D_matrix, 5},
     {"_lgpr_STAN_V_matrix", (DL_FUNC) &_lgpr_STAN_V_matrix, 4},
+    {"_lgpr_STAN_multi_normal_bfa_logpdf", (DL_FUNC) &_lgpr_STAN_multi_normal_bfa_logpdf, 5},
     {"_lgpr_STAN_matrix_array_sum", (DL_FUNC) &_lgpr_STAN_matrix_array_sum, 2},
     {"_lgpr_STAN_gp_posterior_helper", (DL_FUNC) &_lgpr_STAN_gp_posterior_helper, 5},
     {"_lgpr_STAN_gp_posterior", (DL_FUNC) &_lgpr_STAN_gp_posterior, 7},

@@ -307,8 +307,9 @@ const_kernels.decompose <- function(object, STREAM = get_stream()) {
   ranks <- STAN_ranks(components, x_cat_num_levels, STREAM)
   list(
     ranks = ranks,
-    Delta = STAN_delta_matrix(K_const, ranks, STREAM),
-    Theta = STAN_theta_matrix(K_const, ranks, STREAM)
+    Delta = STAN_delta_matrix(K_const, ranks, components, STREAM),
+    Theta = STAN_theta_matrix(K_const, ranks, components, STREAM),
+    components = components
   )
 }
 
@@ -318,21 +319,18 @@ const_kernels.decompositions <- function(object, STREAM = get_stream()) {
   ranks <- dollar(rank_dec, "ranks")
   Delta <- dollar(rank_dec, "Delta")
   Theta <- dollar(rank_dec, "Theta")
+  components <- dollar(rank_dec, "components")
   num_comps <- length(ranks)
   decompositions <- list()
   idx <- 1
   for (j in seq_len(num_comps)) {
     r <- ranks[j]
-    if (r > 0) {
-      delta_diag <- Delta[idx:(idx + r - 1)]
-      if (length(delta_diag) == 1) delta_diag <- as.matrix(delta_diag)
-      Delta_j <- diag(delta_diag)
-      Theta_j <- Theta[, idx:(idx + r - 1), drop = FALSE]
-      decompositions[[j]] <- list(Delta = Delta_j, Theta = Theta_j)
-      idx <- idx + r
-    } else {
-      decompositions[[j]] <- list(Delta = NULL, Theta = NULL)
-    }
+    delta_diag <- Delta[idx:(idx + r - 1)]
+    if (length(delta_diag) == 1) delta_diag <- as.matrix(delta_diag)
+    Delta_j <- diag(delta_diag)
+    Theta_j <- Theta[, idx:(idx + r - 1), drop = FALSE]
+    decompositions[[j]] <- list(Delta = Delta_j, Theta = Theta_j)
+    idx <- idx + r
   }
   return(decompositions)
 }
@@ -346,11 +344,7 @@ const_kernels.reconstruct <- function(decompositions, STREAM = get_stream()) {
   for (j in seq_len(num_comps)) {
     D <- dollar(decompositions[[j]], "Delta")
     TH <- dollar(decompositions[[j]], "Theta")
-    if (is.null(D)) {
-      K_rec[[j]] <- NA
-    } else {
-      K_rec[[j]] <- TH %*% D %*% t(TH)
-    }
+    K_rec[[j]] <- TH %*% D %*% t(TH)
   }
   return(K_rec)
 }

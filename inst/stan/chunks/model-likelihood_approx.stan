@@ -15,7 +15,7 @@ if(is_f_sampled){
   //target += STAN_multi_normal_bf_lpdf(y, V, D_diag, sigma_n[1]);
   
   // Compute Phi and Lambda
-  matrix[num_comps, num_basisfun] bfa_lambda = STAN_lambda_matrix(ell, 
+  vector[num_basisfun] bfa_lambda[num_comps] = STAN_lambda_matrix(ell, 
       num_basisfun, width_basisfun, components);
   matrix[num_obs, num_basisfun] bfa_phi[num_comps] = STAN_phi_matrix(
       x_cont, num_basisfun, width_basisfun, components);
