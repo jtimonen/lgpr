@@ -149,6 +149,22 @@ test_that("additive gp matrix decomposition works when there's one component", {
   expect_false(is.unsorted(rev(logerr)))
 })
 
+test_that("fitting basis fun approx works correctly", {
+  sd <- simulate_data(
+    N = 6, t_data = c(1, 2, 3, 4, 5, 6, 7, 8),
+    relevances = c(0, 1),
+    lengthscales = c(1, 1), t_jitter = 0.5
+  )
+  dat <- sd@data
+  f1 <- lgp(y ~ age, dat, iter = 1000, chains = 1)
+  f2 <- lgp(y ~ age, dat,
+    iter = 1000, chains = 1,
+    options = list(num_basisfun = 30, width_basisfun = 100)
+  )
+  # test that f2 is close to f1
+  expect_equal(1, 2)
+})
+
 # -------------------------------------------------------------------------
 
 context("Methods for lgpsim objects")
