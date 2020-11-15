@@ -116,7 +116,7 @@ parse_options <- function(options = NULL) {
     skip_generated = FALSE,
     delta = 1e-8,
     num_basisfun = 0,
-    width_basisfun = 2.5
+    width_basisfun = 4.0
   )
 
   # Replace defaults if found from input

@@ -28,7 +28,7 @@ test_that("dirichlet eigenvalues are computed correctly", {
 
 test_that("spectral density of exp quad kernel is correct", {
   spd <- function(w, l) {
-    l * sqrt(2 * pi) * exp(-2 * (pi * l * w)^2)
+    l * sqrt(2 * pi) * exp(-0.5 * (l * w)^2)
   }
   s1 <- cpp_spd_eq(0, 2)
   s2 <- cpp_spd_eq(0.2, 1.5)

@@ -113,13 +113,40 @@ test_that("entire additive gp matrix low-rank decomposition works", {
   alpha <- c(1, 1, 1, 1, 1)
   ell <- c(1, 1, 1)
   dec <- kernel_decomposition(m, alpha, ell, num_basisfun = 4)
+  K_rec <- dec$V %*% diag(dec$D) %*% t(dec$V)
   expect_equal(dec$ranks, c(1, 1, 1, 11, 1))
   expect_equal(dim(dec$V), c(96, 15 * 4))
   expect_equal(length(dec$D), 15 * 4)
 
   # Reconstruct
-  K_rec <- dec$V %*% diag(dec$D) %*% t(dec$V)
   expect_equal(dim(K_rec), c(96, 96))
+})
+
+test_that("additive gp matrix decomposition works when there's one component", {
+  m <- create_model(y ~ age, testdata_002)
+  alpha <- c(1)
+  ell <- c(1)
+
+  # True kernel
+  x_age <- m@stan_input$x_cont[1, ]
+  K_se <- lgpr:::sim.kernel_se(x_age, x_age, 1, 1)
+
+  # Reconstructions with different numbers of basis functions
+  NUM_BF <- seq(2, 20, by = 2)
+  L <- length(NUM_BF)
+  MAE <- rep(0, L)
+  for (j in seq_len(L)) {
+    dec <- kernel_decomposition(m, alpha, ell,
+      num_basisfun = NUM_BF[j],
+      width_basisfun = 5
+    )
+    K_rec <- dec$V %*% diag(dec$D) %*% t(dec$V)
+    MAE[j] <- mean(abs(K_se - K_rec))
+  }
+  logerr <- log(MAE)
+
+  # Reconstruct
+  expect_false(is.unsorted(rev(logerr)))
 })
 
 # -------------------------------------------------------------------------

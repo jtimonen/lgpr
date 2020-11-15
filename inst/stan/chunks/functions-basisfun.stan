@@ -21,8 +21,8 @@ real STAN_lambda(int m, data real L){
 // - ell = lengthscale of the kernel
 real STAN_spd_eq(real w, real ell){
   real A = ell*sqrt(2.0*pi());
-  real B = 2.0*square(pi()*ell);
-  return(A*exp(-B*square(w)));
+  real B = - 0.5*square(w*ell);
+  return(A*exp(B));
 }
 
 // Compute num_comps basis function matrices Phi, which each have shape
@@ -92,7 +92,7 @@ vector STAN_delta_matrix(data matrix[] K_const, data int[] ranks,
     if (idx_cat > 0) {
       vector[n] lam = eigenvalues_sym(K_const[j]); // eigenvals in asc. order
       Delta[idx:(idx+r-1)] = lam[(n-r+1):n]; // only last r should be nonzero
-      print("DELTA, j = ", j, ", wrote to Delta[",idx,":",idx+r-1,"]");
+      //print("DELTA, j = ", j, ", wrote to Delta[",idx,":",idx+r-1,"]");
     }
     idx = idx + r;
   }
@@ -113,7 +113,7 @@ matrix STAN_theta_matrix(data matrix[] K_const, data int[] ranks,
     if (idx_cat > 0) {
       matrix[n,n] v = eigenvectors_sym(K_const[j]); // eigenvecs in asc. order
       Theta[:, idx:(idx+r-1)] = v[:, (n-r+1):n]; // take only last r vecs
-      print("THETA, j = ", j, ", wrote to Delta[",idx,":",idx+r-1,"]");
+      //print("THETA, j = ", j, ", wrote to Delta[",idx,":",idx+r-1,"]");
     }
     idx = idx + r;
   }
@@ -138,8 +138,8 @@ vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda,
     i2 = i1 + r - 1;
     alpha_diag[i1:i2] = rep_vector(square(alpha[j]), r);
     lambda_diag[i1:i2] = STAN_rep_vector_times(bfa_lambda[j], ranks[j]);
+    //print("D, j = ", j, ", wrote to D[",i1,":",i2,"]");
     i1 = i1 + r;
-    print("D, j = ", j, ", wrote to D[",i1,":",i2,"]");
   }
   return alpha_diag .* delta_diag .* lambda_diag;
 }
@@ -161,8 +161,8 @@ matrix STAN_V_matrix(matrix[] bfa_phi, matrix bfa_theta, int[] ranks) {
     int r = ranks[j]*M;
     i2 = i1 + r - 1;
     PHI[:,i1:i2] = STAN_rep_cols_times(bfa_phi[j], ranks[j]);
+    //print("V, j = ", j, ", wrote to PHI[",i1,":",i2,"]");
     i1 = i1 + r;
-    print("V, j = ", j, ", wrote to PHI[",i1,":",i2,"]");
   }
   return THETA .* PHI;
 }

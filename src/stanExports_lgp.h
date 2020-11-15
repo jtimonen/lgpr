@@ -1629,9 +1629,9 @@ STAN_spd_eq(const T0__& w,
         (void) B;  // dummy to suppress unused var warning
         stan::math::initialize(B, DUMMY_VAR__);
         stan::math::fill(B, DUMMY_VAR__);
-        stan::math::assign(B,(2.0 * square((stan::math::pi() * ell))));
+        stan::math::assign(B,(-(0.5) * square((w * ell))));
         current_statement_begin__ = 483;
-        return stan::math::promote_scalar<fun_return_scalar_t__>((A * stan::math::exp((-(B) * square(w)))));
+        return stan::math::promote_scalar<fun_return_scalar_t__>((A * stan::math::exp(B)));
         }
     } catch (const std::exception& e) {
         stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -1928,17 +1928,6 @@ STAN_delta_matrix(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, Eigen::D
                             stan::model::cons_list(stan::model::index_min_max(idx, ((idx + r) - 1)), stan::model::nil_index_list()), 
                             stan::model::rvalue(lam, stan::model::cons_list(stan::model::index_min_max(((n - r) + 1), n), stan::model::nil_index_list()), "lam"), 
                             "assigning variable Delta");
-                current_statement_begin__ = 553;
-                if (pstream__) {
-                    stan_print(pstream__,"DELTA, j = ");
-                    stan_print(pstream__,j);
-                    stan_print(pstream__,", wrote to Delta[");
-                    stan_print(pstream__,idx);
-                    stan_print(pstream__,":");
-                    stan_print(pstream__,((idx + r) - 1));
-                    stan_print(pstream__,"]");
-                    *pstream__ << std::endl;
-                }
                 }
             }
             current_statement_begin__ = 555;
@@ -2032,17 +2021,6 @@ STAN_theta_matrix(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, Eigen::D
                             stan::model::cons_list(stan::model::index_omni(), stan::model::cons_list(stan::model::index_min_max(idx, ((idx + r) - 1)), stan::model::nil_index_list())), 
                             stan::model::rvalue(v, stan::model::cons_list(stan::model::index_omni(), stan::model::cons_list(stan::model::index_min_max(((n - r) + 1), n), stan::model::nil_index_list())), "v"), 
                             "assigning variable Theta");
-                current_statement_begin__ = 574;
-                if (pstream__) {
-                    stan_print(pstream__,"THETA, j = ");
-                    stan_print(pstream__,j);
-                    stan_print(pstream__,", wrote to Delta[");
-                    stan_print(pstream__,idx);
-                    stan_print(pstream__,":");
-                    stan_print(pstream__,((idx + r) - 1));
-                    stan_print(pstream__,"]");
-                    *pstream__ << std::endl;
-                }
                 }
             }
             current_statement_begin__ = 576;
@@ -2143,19 +2121,8 @@ STAN_D_matrix(const std::vector<T0__>& alpha,
                         stan::model::cons_list(stan::model::index_min_max(i1, i2), stan::model::nil_index_list()), 
                         STAN_rep_vector_times(get_base1(bfa_lambda, j, "bfa_lambda", 1), get_base1(ranks, j, "ranks", 1), pstream__), 
                         "assigning variable lambda_diag");
-            current_statement_begin__ = 599;
-            stan::math::assign(i1, (i1 + r));
             current_statement_begin__ = 600;
-            if (pstream__) {
-                stan_print(pstream__,"D, j = ");
-                stan_print(pstream__,j);
-                stan_print(pstream__,", wrote to D[");
-                stan_print(pstream__,i1);
-                stan_print(pstream__,":");
-                stan_print(pstream__,i2);
-                stan_print(pstream__,"]");
-                *pstream__ << std::endl;
-            }
+            stan::math::assign(i1, (i1 + r));
             }
         }
         current_statement_begin__ = 602;
@@ -2249,19 +2216,8 @@ STAN_V_matrix(const std::vector<Eigen::Matrix<T0__, Eigen::Dynamic, Eigen::Dynam
                         stan::model::cons_list(stan::model::index_omni(), stan::model::cons_list(stan::model::index_min_max(i1, i2), stan::model::nil_index_list())), 
                         STAN_rep_cols_times(get_base1(bfa_phi, j, "bfa_phi", 1), get_base1(ranks, j, "ranks", 1), pstream__), 
                         "assigning variable PHI");
-            current_statement_begin__ = 622;
-            stan::math::assign(i1, (i1 + r));
             current_statement_begin__ = 623;
-            if (pstream__) {
-                stan_print(pstream__,"V, j = ");
-                stan_print(pstream__,j);
-                stan_print(pstream__,", wrote to PHI[");
-                stan_print(pstream__,i1);
-                stan_print(pstream__,":");
-                stan_print(pstream__,i2);
-                stan_print(pstream__,"]");
-                *pstream__ << std::endl;
-            }
+            stan::math::assign(i1, (i1 + r));
             }
         }
         current_statement_begin__ = 625;
