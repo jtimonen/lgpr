@@ -64,14 +64,14 @@ test_that("additive gp matrix decomposition works when there's one component", {
   expect_false(is.unsorted(rev(logerr)))
 })
 
-test_that("fitting basis fun approx works correctly", {
+test_that("fitting basis fun approx works correctly (one component)", {
   sd <- simulate_data(
-    N = 6, t_data = c(1, 2, 3, 4, 5, 6, 7, 8),
+    N = 6, t_data = seq(1, 5, by = 0.6),
     relevances = c(0, 1),
     lengthscales = c(1, 0.5), t_jitter = 0.5
   )
   dat <- sd@data
-  #plot(dat$age, dat$y)
+  # plot(dat$age, dat$y)
   suppressWarnings({
     f1 <- lgp(y ~ age, dat, iter = 1000, chains = 1, refresh = 0)
     f2 <- lgp(y ~ age, dat,
@@ -81,13 +81,10 @@ test_that("fitting basis fun approx works correctly", {
     )
   })
   # test that f2 is close to f1
-  pm1_alpha <- rstan::get_posterior_mean(f1@stan_fit)[1]
-  pm2_alpha <- rstan::get_posterior_mean(f2@stan_fit)[1]
-  pm1_ell <- rstan::get_posterior_mean(f1@stan_fit)[2]
-  pm2_ell <- rstan::get_posterior_mean(f2@stan_fit)[2]
-  pm1_sigma <- rstan::get_posterior_mean(f1@stan_fit)[3]
-  pm2_sigma <- rstan::get_posterior_mean(f2@stan_fit)[3]
-  expect_lt(abs(pm1_alpha - pm2_alpha), 0.2)
-  expect_lt(abs(pm1_ell - pm2_ell), 0.1)
-  expect_lt(abs(pm1_sigma - pm2_sigma), 0.1)
+  pm1 <- rstan::get_posterior_mean(f1@stan_fit)[1:3]
+  pm2 <- rstan::get_posterior_mean(f2@stan_fit)[1:3]
+  diff <- abs(pm1 - pm2)
+  expect_lt(diff[1], 0.2)
+  expect_lt(diff[2], 0.1)
+  expect_lt(diff[3], 0.1)
 })
