@@ -22,7 +22,7 @@ real STAN_lambda(int m, data real L){
 real STAN_spd_eq(real w, real ell){
   real A = ell*sqrt(2.0*pi());
   real B = - 0.5*square(w*ell);
-  return(A*exp(B));
+  return(A*exp(B) + 1e-9);
 }
 
 // Compute num_comps basis function matrices Phi, which each have shape
@@ -180,7 +180,7 @@ real STAN_multi_normal_bfa_logpdf(vector y, matrix V, vector D_diag,
   real inv_s2 = inv_square(sigma);
   vector[RM] z = transpose(V)*y;
   matrix[RM,RM] Z = diag_matrix(inv(D_diag)) + inv_s2*crossprod(V);
-  t2 = inv_s2*dot_self(y) + square(inv_s2)*STAN_quad_form_inv(z, Z);
+  t2 = inv_s2*dot_self(y) - square(inv_s2)*STAN_quad_form_inv(z, Z);
   t3 = log_determinant(Z) + sum(log(D_diag)) + 2*n*log(sigma);
   return(-0.5*(t1 + t2 + t3));
 }

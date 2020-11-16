@@ -1631,7 +1631,7 @@ STAN_spd_eq(const T0__& w,
         stan::math::fill(B, DUMMY_VAR__);
         stan::math::assign(B,(-(0.5) * square((w * ell))));
         current_statement_begin__ = 483;
-        return stan::math::promote_scalar<fun_return_scalar_t__>((A * stan::math::exp(B)));
+        return stan::math::promote_scalar<fun_return_scalar_t__>(((A * stan::math::exp(B)) + 1e-9));
         }
     } catch (const std::exception& e) {
         stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -2299,7 +2299,7 @@ STAN_multi_normal_bfa_logpdf(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& y,
         stan::math::fill(Z, DUMMY_VAR__);
         stan::math::assign(Z,add(diag_matrix(inv(D_diag)), multiply(inv_s2, crossprod(V))));
         current_statement_begin__ = 641;
-        stan::math::assign(t2, ((inv_s2 * dot_self(y)) + (square(inv_s2) * STAN_quad_form_inv(z, Z, pstream__))));
+        stan::math::assign(t2, ((inv_s2 * dot_self(y)) - (square(inv_s2) * STAN_quad_form_inv(z, Z, pstream__))));
         current_statement_begin__ = 642;
         stan::math::assign(t3, ((log_determinant(Z) + sum(stan::math::log(D_diag))) + ((2 * n) * stan::math::log(sigma))));
         current_statement_begin__ = 643;
