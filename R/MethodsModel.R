@@ -255,6 +255,13 @@ is_f_sampled <- function(object) {
 }
 
 #' @rdname model_getters
+is_yrng_done <- function(object) {
+  val <- dollar(get_stan_input(object), "is_yrng_done")
+  as.logical(val)
+}
+
+
+#' @rdname model_getters
 get_obs_model <- function(object) {
   lh <- dollar(get_stan_input(object), "obs_model")
   likelihood_as_str(lh)

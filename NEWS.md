@@ -1,5 +1,14 @@
 # lgpr 1.0
 
+## 1.0.8
+  * Add option `do_yrng` which controls whether to do draws from the
+  predictive distribution. This was previously always done if `sample_f`
+  was `TRUE`. That is now considered a bug because it is unnecessary work if
+  the `y_rng` draws are not needed. So the default is now `do_yrng = FALSE`,
+  since `do_yrng = TRUE` can cause errors with the negative binomial model due
+  to numerical problems (see [here](https://discourse.mc-stan.org/t/numerical-stability-of-gps-with-negative-binomial-likelihood/19343/5)). These problems should be addressed in a future
+  release to allow more stable prior and posterior predictive sampling.
+  
 ## 1.0.7
   * Small documentation update.
   

@@ -149,7 +149,7 @@ test_that("an lgpmodel has correct list fields for stan input", {
     data = testdata_001,
     options = list(delta = 1e-5, L_bf = 1.0),
   )
-  expect_equal(length(m@stan_input), 47)
+  expect_equal(length(m@stan_input), 48)
 })
 
 test_that("creating an lgpmodel errors with invalid data", {

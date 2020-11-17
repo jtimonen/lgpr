@@ -28,6 +28,11 @@ suppressWarnings({
     likelihood = "nb",
     data = data2, chains = 1, iter = 100, refresh = 0
   )
+  fit2_rng <- lgp(y ~ gp(age) + zs(id) + gp_vm(diseaseAge),
+    likelihood = "nb",
+    data = data2, chains = 1, iter = 100, refresh = 0,
+    options = list(do_yrng = TRUE)
+  )
 })
 
 test_that("fit summary prints output", {
@@ -40,7 +45,9 @@ test_that("get_draws works correctly", {
   d <- get_draws(fit1)
   expect_equal(dim(d), c(50, 200))
   d <- get_draws(fit2)
-  expect_equal(dim(d), c(50, 176))
+  expect_equal(dim(d), c(50, 152))
+  d <- get_draws(fit2_rng)
+  expect_equal(dim(d), c(50, 152 + 24))
   d <- get_draws(fit1, pars = "f_post", include = FALSE)
   expect_equal(dim(d), c(50, 8))
   d <- get_draws(fit1, pars = "f_post", include = FALSE, reduce = mean)

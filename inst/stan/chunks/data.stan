@@ -3,10 +3,12 @@
   - is verbose mode used?
   - are function values be sampled?
   - should likelihood evaluation be skipped?
+  - should random numbers be drawn from the predictive distribution?
 */
 int<lower=0, upper=1> is_verbose;
 int<lower=0, upper=1> is_f_sampled;
 int<lower=0, upper=1> is_likelihood_skipped;
+int<lower=0, upper=1> is_yrng_done;
 
 // Dimensions
 int<lower=0> num_obs;            // number of observations

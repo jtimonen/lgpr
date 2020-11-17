@@ -31,8 +31,10 @@ ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
 #' @return an array of shape \code{num_draws} x \code{num_obs}
 #' @family fit postprocessing functions
 get_y_rng <- function(fit, original_scale = TRUE) {
-  f_sampled <- is_f_sampled(fit)
-  if (!f_sampled) stop("f was not sampled!")
+  yrng_done <- is_yrng_done(fit)
+  if (!yrng_done) {
+    stop("y rng was not done! you need options = list(do_yrng = TRUE)")
+  }
   obs_model <- get_obs_model(fit)
   par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
   out <- get_draws(fit, pars = par_name)

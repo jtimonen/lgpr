@@ -65,10 +65,18 @@ equal to the number of data points. Setting \code{num_trials=1} and
 \itemize{
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
-}}
+  \item \code{do_yrng} Should random numbers be drawn from the predictive
+  distribution (one for each posterior draw). This can be set to true
+  in order to do prior or posterior predictive sampling, and only has
+  any effect if \code{sample_f = TRUE}.
+}
+If \code{options} is \code{NULL}, default options are used. The defaults
+are equivalent to \code{options = list(delta = 1e-8, do_yrng = FALSE)}.}
 
-\item{prior_only}{Should this run in prior sampling mode,
-where likelihood is ignored?}
+\item{prior_only}{Should sampling be done in prior mode,
+where likelihood is ignored? This can be used to do prior predictive
+sampling, with \code{options = list(do_yrng = TRUE)} and
+\code{sample_f = TRUE}.}
 
 \item{verbose}{Should more verbose output be printed?}
 

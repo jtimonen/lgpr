@@ -6,6 +6,7 @@
 \alias{get_data}
 \alias{get_num_obs}
 \alias{is_f_sampled}
+\alias{is_yrng_done}
 \alias{get_obs_model}
 \alias{get_num_trials}
 \title{Functions that access model properties}
@@ -17,6 +18,8 @@ get_data(object)
 get_num_obs(object)
 
 is_f_sampled(object)
+
+is_yrng_done(object)
 
 get_obs_model(object)
 

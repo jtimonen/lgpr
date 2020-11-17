@@ -11,7 +11,13 @@ parse_options(options = NULL)
 \itemize{
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
-}}
+  \item \code{do_yrng} Should random numbers be drawn from the predictive
+  distribution (one for each posterior draw). This can be set to true
+  in order to do prior or posterior predictive sampling, and only has
+  any effect if \code{sample_f = TRUE}.
+}
+If \code{options} is \code{NULL}, default options are used. The defaults
+are equivalent to \code{options = list(delta = 1e-8, do_yrng = FALSE)}.}
 }
 \value{
 a named list of parsed options
