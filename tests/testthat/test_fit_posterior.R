@@ -27,7 +27,7 @@ test_that("sample_model can do posterior sampling", {
   p2 <- plot_draws(fit, type = "trace")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
-  expect_error(get_y_rng(fit), "f was not sampled")
+  expect_error(get_y_rng(fit), "y rng was not done!")
   expect_error(plot_warp(fit), "the model does not have warping parameters")
   expect_error(plot_beta(fit), "there are no heterogeneous effects")
 })

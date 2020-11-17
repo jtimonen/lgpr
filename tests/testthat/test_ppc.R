@@ -17,7 +17,8 @@ test_that("prior checks can be performed with gaussian obs model", {
       refresh = 0,
       cores = 2,
       prior_only = TRUE,
-      sample_f = TRUE
+      sample_f = TRUE,
+      options = list(do_yrng = TRUE)
     )
     p <- ppc(fit, testdata_001)
     expect_s3_class(p, "ggplot")
@@ -32,7 +33,7 @@ test_that("prior checks can be performed with neg bin obs model", {
     formula = y ~ gp(age) + categ(sex) * gp(age),
     likelihood = "nb",
     data = dat,
-    sample_f = FALSE
+    sample_f = FALSE,
   ), reason)
 
   suppressWarnings({
@@ -43,7 +44,8 @@ test_that("prior checks can be performed with neg bin obs model", {
       iter = 200,
       chains = 1,
       refresh = 0,
-      prior_only = TRUE
+      prior_only = TRUE,
+      options = list(do_yrng = TRUE)
     )
     y_rng <- get_y_rng(fit)
     d <- max(abs(y_rng - round(y_rng)))
@@ -64,7 +66,8 @@ test_that("prior checks can be performed with beta bin obs model", {
       chains = 1,
       refresh = 0,
       num_trials = 20,
-      prior_only = TRUE
+      prior_only = TRUE,
+      options = list(do_yrng = TRUE)
     )
     p <- ppc(fit, dat)
     expect_s3_class(p, "ggplot")
