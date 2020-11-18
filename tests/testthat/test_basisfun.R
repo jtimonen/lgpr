@@ -71,7 +71,6 @@ test_that("fitting basis fun approx works correctly (one component)", {
     lengthscales = c(1, 0.5), t_jitter = 0.5
   )
   dat <- sd@data
-  # plot(dat$age, dat$y)
   suppressWarnings({
     f1 <- lgp(y ~ age, dat, iter = 1000, chains = 1, refresh = 0)
     f2 <- lgp(y ~ age, dat,

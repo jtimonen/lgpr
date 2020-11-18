@@ -326,7 +326,6 @@ const_kernels.decompositions <- function(object, STREAM = get_stream()) {
   ranks <- dollar(rank_dec, "ranks")
   Delta <- dollar(rank_dec, "Delta")
   Theta <- dollar(rank_dec, "Theta")
-  components <- dollar(rank_dec, "components")
   num_comps <- length(ranks)
   decompositions <- list()
   idx <- 1
