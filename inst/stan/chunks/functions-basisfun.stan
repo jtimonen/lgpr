@@ -138,7 +138,6 @@ vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda,
     i2 = i1 + r - 1;
     alpha_diag[i1:i2] = rep_vector(square(alpha[j]), r);
     lambda_diag[i1:i2] = STAN_rep_vector_times(bfa_lambda[j], ranks[j]);
-    //print("D, j = ", j, ", wrote to D[",i1,":",i2,"]");
     i1 = i1 + r;
   }
   return alpha_diag .* delta_diag .* lambda_diag;
@@ -161,27 +160,23 @@ matrix STAN_V_matrix(matrix[] bfa_phi, matrix bfa_theta, int[] ranks) {
     int r = ranks[j]*M;
     i2 = i1 + r - 1;
     PHI[:,i1:i2] = STAN_rep_cols_times(bfa_phi[j], ranks[j]);
-    //print("V, j = ", j, ", wrote to PHI[",i1,":",i2,"]");
     i1 = i1 + r;
   }
   return THETA .* PHI;
 }
 
-// Compute log density of multivariate normal N(y | m, K), where
-// - m = vector of zeros
+// Compute log density of multivariate normal N(y | 0, K), where
+// - 0 = vector of zeros
 // - K = V*diag(D_diag)*V^T + sigma^2*I
 real STAN_multi_normal_bfa_logpdf(vector y, matrix V, vector D_diag, 
     real sigma){
   int n = num_elements(y);
   int RM = num_elements(D_diag);
-  real t1 = n*log(2.0*pi());
-  real t2; // log det
-  real t3; // quadratic form
-  real inv_s2 = inv_square(sigma);
   vector[RM] z = transpose(V)*y;
-  matrix[RM,RM] Z = diag_matrix(inv(D_diag)) + inv_s2*crossprod(V);
-  t2 = inv_s2*dot_self(y) - square(inv_s2)*STAN_quad_form_inv(z, Z);
-  t3 = log_determinant(Z) + sum(log(D_diag)) + 2*n*log(sigma);
+  matrix[RM,RM] Z = diag_matrix(square(sigma)*inv(D_diag)) + crossprod(V);
+  real t1 = n*log(2.0*pi());
+  real t2 = inv_square(sigma)*(dot_self(y) - STAN_quad_form_inv(z, Z));
+  real t3 = 2*(n-RM)*log(sigma) + log_determinant(Z) + sum(log(D_diag));
   return(-0.5*(t1 + t2 + t3));
 }
 
