@@ -1,5 +1,9 @@
 # lgpr 1.0
 
+## 1.0.9
+  * Internal change for more effective computation of function (component)
+    posterior variances.
+  
 ## 1.0.8
   * Add option `do_yrng` which controls whether to do draws from the
   predictive distribution. This was previously always done if `sample_f`

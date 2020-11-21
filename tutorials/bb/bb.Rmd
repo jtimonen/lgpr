@@ -96,7 +96,7 @@ fit <- lgp(y ~ age + age|id + age|z,
            chains = 3,
            cores = 3,
            control = list(adapt_delta = 0.95),
-           iter = 2000)
+           iter = 3000)
 ```
 
 ```{r post1, cache = TRUE}

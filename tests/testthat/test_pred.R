@@ -178,7 +178,7 @@ test_that("prediction kernel computations work correctly", {
   expect_equal(dim(kers$pred_vs_pred), c(50, 3, 44, 44))
 })
 
-test_that("predict.gaussian works correctly", {
+test_that("pred.gaussian works correctly", {
   out <- pred(fit1, x1_pred, verbose = FALSE)
   expect_s4_class(out, "GaussianPrediction")
   out <- pred(fit1, x1_pred, draws = c(3:43), verbose = FALSE)
@@ -190,7 +190,7 @@ test_that("predict.gaussian works correctly", {
   expect_output(pred(fit2, x2_pred, verbose = TRUE))
 })
 
-test_that("predict.kr works correctly", {
+test_that("pred.kr works correctly", {
   out <- pred(fit2, x2_pred, reduce = mean, verbose = FALSE)
   expect_equal(dim(out@h), c(1, 44))
   out <- pred(fit2, x2_pred, reduce = NULL, verbose = FALSE)
