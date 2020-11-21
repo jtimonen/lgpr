@@ -113,16 +113,24 @@ STAN_multi_normal_bfa_logpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
     .Call(`_lgpr_STAN_multi_normal_bfa_logpdf`, y, V, D_diag, sigma, pstream__)
 }
 
+STAN_vector_array_sum <- function(k, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_vector_array_sum`, k, pstream__)
+}
+
 STAN_matrix_array_sum <- function(K, pstream__ = 0L) {
     .Call(`_lgpr_STAN_matrix_array_sum`, K, pstream__)
 }
 
-STAN_gp_posterior_helper <- function(Ly, K_s, K_ss, v, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_gp_posterior_helper`, Ly, K_s, K_ss, v, pstream__)
+STAN_matrix_array_diagonals <- function(K, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_matrix_array_diagonals`, K, pstream__)
 }
 
-STAN_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_gp_posterior`, KX, KX_s, KX_ss, y, delta, sigma, pstream__)
+STAN_gp_posterior_helper <- function(Ly, K_s, k_ss, v, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_gp_posterior_helper`, Ly, K_s, k_ss, v, pstream__)
+}
+
+STAN_gp_posterior <- function(KX, KX_s, kX_ss, y, delta, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_gp_posterior`, KX, KX_s, kX_ss, y, delta, sigma, pstream__)
 }
 
 STAN_log_prior <- function(x, types, p, pstream__ = 0L) {

@@ -18,7 +18,8 @@ if(is_f_sampled==0){
       vm_params, idx_expand, idx_expand, teff_zero);
       
   // Compute component-wise and total function posteriors
-  f_post[1] = STAN_gp_posterior(KX, KX, KX, y_cont[1], delta, sigma[1]);
+  vector[num_obs] kx[num_comps] = STAN_matrix_array_diagonals(KX);
+  f_post[1] = STAN_gp_posterior(KX, KX, kx, y_cont[1], delta, sigma[1]);
   
 } else {
   

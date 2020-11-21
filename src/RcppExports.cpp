@@ -411,6 +411,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// STAN_vector_array_sum
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_vector_array_sum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& k, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_vector_array_sum(SEXP kSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_vector_array_sum(k, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
 // STAN_matrix_array_sum
 Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_matrix_array_sum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_matrix_array_sum(SEXP KSEXP, SEXP pstream__SEXP) {
@@ -423,35 +435,47 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// STAN_matrix_array_diagonals
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_matrix_array_diagonals(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_matrix_array_diagonals(SEXP KSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type K(KSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_matrix_array_diagonals(K, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
 // STAN_gp_posterior_helper
-std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_gp_posterior_helper(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& Ly, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& K_s, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& K_ss, const Eigen::Matrix<double, Eigen::Dynamic, 1>& v, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_gp_posterior_helper(SEXP LySEXP, SEXP K_sSEXP, SEXP K_ssSEXP, SEXP vSEXP, SEXP pstream__SEXP) {
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_gp_posterior_helper(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& Ly, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& K_s, const Eigen::Matrix<double, Eigen::Dynamic, 1>& k_ss, const Eigen::Matrix<double, Eigen::Dynamic, 1>& v, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_gp_posterior_helper(SEXP LySEXP, SEXP K_sSEXP, SEXP k_ssSEXP, SEXP vSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type Ly(LySEXP);
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type K_s(K_sSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type K_ss(K_ssSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type k_ss(k_ssSEXP);
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type v(vSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_gp_posterior_helper(Ly, K_s, K_ss, v, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_gp_posterior_helper(Ly, K_s, k_ss, v, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
 // STAN_gp_posterior
-std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_gp_posterior(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& KX, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& KX_s, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& KX_ss, const Eigen::Matrix<double, Eigen::Dynamic, 1>& y, const double& delta, const double& sigma, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_gp_posterior(SEXP KXSEXP, SEXP KX_sSEXP, SEXP KX_ssSEXP, SEXP ySEXP, SEXP deltaSEXP, SEXP sigmaSEXP, SEXP pstream__SEXP) {
+std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > STAN_gp_posterior(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& KX, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& KX_s, const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& kX_ss, const Eigen::Matrix<double, Eigen::Dynamic, 1>& y, const double& delta, const double& sigma, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_gp_posterior(SEXP KXSEXP, SEXP KX_sSEXP, SEXP kX_ssSEXP, SEXP ySEXP, SEXP deltaSEXP, SEXP sigmaSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type KX(KXSEXP);
     Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type KX_s(KX_sSEXP);
-    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type KX_ss(KX_ssSEXP);
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type kX_ss(kX_ssSEXP);
     Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const double& >::type delta(deltaSEXP);
     Rcpp::traits::input_parameter< const double& >::type sigma(sigmaSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_gp_posterior(KX, KX_s, KX_ss, y, delta, sigma, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_gp_posterior(KX, KX_s, kX_ss, y, delta, sigma, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -501,7 +525,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_D_matrix", (DL_FUNC) &_lgpr_STAN_D_matrix, 5},
     {"_lgpr_STAN_V_matrix", (DL_FUNC) &_lgpr_STAN_V_matrix, 4},
     {"_lgpr_STAN_multi_normal_bfa_logpdf", (DL_FUNC) &_lgpr_STAN_multi_normal_bfa_logpdf, 5},
+    {"_lgpr_STAN_vector_array_sum", (DL_FUNC) &_lgpr_STAN_vector_array_sum, 2},
     {"_lgpr_STAN_matrix_array_sum", (DL_FUNC) &_lgpr_STAN_matrix_array_sum, 2},
+    {"_lgpr_STAN_matrix_array_diagonals", (DL_FUNC) &_lgpr_STAN_matrix_array_diagonals, 2},
     {"_lgpr_STAN_gp_posterior_helper", (DL_FUNC) &_lgpr_STAN_gp_posterior_helper, 5},
     {"_lgpr_STAN_gp_posterior", (DL_FUNC) &_lgpr_STAN_gp_posterior, 7},
     {"_lgpr_STAN_log_prior", (DL_FUNC) &_lgpr_STAN_log_prior, 4},

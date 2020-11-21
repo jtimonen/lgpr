@@ -87,7 +87,8 @@ cpp_kernel_all <- function(n1, n2, K_const, components, x1, x2,
 #' @return an array of kernel matrices
 cpp_gp_posterior <- function(KX, KX_s, KX_ss, y, delta, sigma,
                              STREAM = get_stream()) {
-  STAN_gp_posterior(KX, KX_s, KX_ss, y, delta, sigma, STREAM)
+  kX_ss <- STAN_matrix_array_diagonals(KX_ss, STREAM)
+  STAN_gp_posterior(KX, KX_s, kX_ss, y, delta, sigma, STREAM)
 }
 
 #' Input warping function
