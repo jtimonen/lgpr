@@ -12,7 +12,8 @@ new_x(data, x_values, group_by = "id", x = "age", x_ns = NULL)
 \item{x_values}{the values of \code{x} to set for each individual}
 
 \item{group_by}{name of the grouping varible, must be a factor
-in \code{data}}
+in \code{data} (or use \code{group_by=NA} to create a dummy grouping
+factor which has only one value)}
 
 \item{x}{of the variable along which to extend,
 must be a numeric in \code{data}}

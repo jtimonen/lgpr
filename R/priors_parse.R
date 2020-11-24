@@ -111,9 +111,12 @@ parse_prior_single <- function(desc, num) {
     prior <- repvec(c(0, 0), L)
     hyper <- repvec(c(0, 0, 0), L)
     for (j in seq_len(L)) {
-      out <- prior_to_num(desc[[j]])
-      prior[j, ] <- repvec(dollar(out, "prior"), num)
-      hyper[j, ] <- repvec(dollar(out, "hyper"), num)
+      desc_j <- desc[[j]]
+      out <- prior_to_num(desc_j)
+      pr <- repvec(dollar(out, "prior"), 1)
+      hp <- repvec(dollar(out, "hyper"), 1)
+      prior[j, ] <- pr
+      hyper[j, ] <- hp
     }
   }
   list(

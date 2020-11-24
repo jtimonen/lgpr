@@ -15,7 +15,8 @@
 #' @param pred An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
 #' @param t_name name of the x-axis variable
-#' @param group_by name of the grouping variable
+#' @param group_by name of the grouping variable (use \code{group_by=NA}
+#' to avoid grouping)
 #' @param draws only has effect if \code{pred} is \code{NULL}
 #' @param reduce only has effect if \code{pred} is \code{NULL}
 #' @param MULT_STD a multiplier for standard deviation
@@ -90,7 +91,8 @@ plot_f <- function(fit,
   df_base <- dollar(input, "df_base")
   bn <- colnames(df_base)
   df_base <- cbind(df_base, color_fac)
-  colnames(df_base) <- c(bn, color_by)
+  color_by_name <- if (is.na(color_by)) NA else paste0(color_by, "__")
+  colnames(df_base) <- c(bn, color_by_name)
   ylab <- if (is.null(comp_idx)) "f" else paste0("f[", comp_idx, "]")
 
   # Create plot
@@ -184,7 +186,9 @@ plot_pred.create_input <- function(fit, pred, x, draws, reduce,
     pred <- get_pred(fit, draws, reduce)
     df_base <- create_plot_df(fit, t_name, group_by)[, 1:2]
   } else {
-    df_base <- data.frame(dollar(x, group_by), dollar(x, t_name))
+    x_grp <- plot.create_grouping_factor(x, group_by)
+    df_base <- data.frame(x_grp, dollar(x, t_name))
+    group_by <- if (is.na(group_by)) "group__" else group_by
     colnames(df_base) <- c(group_by, t_name)
   }
   list(pred = pred, df_base = df_base)
@@ -232,7 +236,7 @@ plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
 #' @inheritParams plot_f
 #' @return a factor
 plot_f.get_color_fac <- function(fit, pred, x, color_by) {
-  n <- if (is.null(pred)) get_stan_input(fit)$num_obs else nrow(x)
+  n <- if (is.null(pred)) get_num_obs(fit) else nrow(x)
   if (is.na(color_by)) {
     color_fac <- as.factor(rep(1, n))
     return(color_fac)

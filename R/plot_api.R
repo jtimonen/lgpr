@@ -374,3 +374,18 @@ add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
   h <- h + ggplot2::facet_wrap(f, nrow = nrow, ncol = ncol, labeller = labfun)
   return(h)
 }
+
+#' Create grouping factor, used e.g. by plot_pred
+#'
+#' @inheritParams plot_pred
+#' @return a factor
+plot.create_grouping_factor <- function(x, group_by) {
+  n <- nrow(x)
+  if (is.na(group_by)) {
+    x_grp <- as.factor(rep("no grouping", n))
+  } else {
+    x_grp <- dollar(x, group_by)
+    check_type(x_grp, "factor")
+  }
+  return(x_grp)
+}

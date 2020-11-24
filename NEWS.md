@@ -1,5 +1,12 @@
 # lgpr 1.0
 
+## 1.0.10
+  * Allow setting `group_by = NA` in `plot_pred()`,
+  `plot_components()` and `new_x()` to avoid grouping in plots.
+  * Allow setting `color_by` as the same factor as `group_by`.
+  * Fix bug which caused an error when trying to define a separate prior
+  for parameters of the same type.
+    
 ## 1.0.9
   * Internal change for more effective computation of function (component)
     posterior variances.

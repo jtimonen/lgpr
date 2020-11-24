@@ -51,18 +51,19 @@ check_type <- function(arg, allowed) {
     }
   }
 
-  # Otherwise
+  # Check type otherwise
   type <- class(arg)
   ok <- any(type %in% allowed)
   if (!ok) {
     str1 <- paste(allowed, collapse = ", ")
     str2 <- paste(type, collapse = ", ")
     msg <- paste0(
-      "class(", arg_name, ") must contain one of {", str1, "}. Found = {",
-      str2, "}."
+      "Wrong argument type: class(", arg_name, ") must contain one of {",
+      str1, "}. Found = {", str2, "}."
     )
     stop(msg)
   }
+
   return(TRUE)
 }
 

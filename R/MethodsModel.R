@@ -68,7 +68,7 @@ prior_summary <- function(object, digits = 3) {
 #'
 #' @inheritParams object_to_model
 #' @param x x-axis variable name
-#' @param group_by grouping variable name
+#' @param group_by grouping variable name (use \code{NULL} for no grouping)
 #' @return a data frame
 create_plot_df <- function(object, x = "age", group_by = "id") {
 
@@ -79,15 +79,14 @@ create_plot_df <- function(object, x = "age", group_by = "id") {
   check_type(x, "numeric")
 
   # Get grouping factor
-  g_name <- group_by
-  group_by <- dollar(dat, g_name)
-  check_type(group_by, "factor")
+  x_grp <- plot.create_grouping_factor(dat, group_by)
 
   # Get response
   y <- get_y(object, original = TRUE)
   y_name <- get_y_name(object)
-  df <- data.frame(group_by, x, y)
-  colnames(df) <- c(g_name, x_name, y_name)
+  df <- data.frame(x_grp, x, y)
+  group_by <- if (is.na(group_by)) "group__" else group_by
+  colnames(df) <- c(group_by, x_name, y_name)
   return(df)
 }
 

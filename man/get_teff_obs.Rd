@@ -9,8 +9,7 @@ get_teff_obs(data, group_by = "id", x = "age", x_ns = "diseaseAge")
 \arguments{
 \item{data}{a data frame}
 
-\item{group_by}{name of the grouping varible, must be a factor
-in \code{data}}
+\item{group_by}{name of the grouping factor, must be found in \code{data}}
 
 \item{x}{of the variable along which to extend,
 must be a numeric in \code{data}}

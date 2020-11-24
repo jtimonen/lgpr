@@ -18,7 +18,7 @@
 parse_formula <- function(formula, data, verbose = FALSE) {
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data)
-  if (verbose) cat("Formula converted to:\n  ")
+  if (verbose) cat("Formula parsed as:\n  ")
   if (verbose) print(formula)
   parse_formula_advanced(formula)
 }

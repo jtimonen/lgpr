@@ -12,7 +12,7 @@ create_plot_df(object, x = "age", group_by = "id")
 
 \item{x}{x-axis variable name}
 
-\item{group_by}{grouping variable name}
+\item{group_by}{grouping variable name (use \code{NULL} for no grouping)}
 }
 \value{
 a data frame

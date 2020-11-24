@@ -163,7 +163,8 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #' @export
 #' @param data a data frame
 #' @param group_by name of the grouping varible, must be a factor
-#' in \code{data}
+#' in \code{data} (or use \code{group_by=NA} to create a dummy grouping
+#' factor which has only one value)
 #' @param x of the variable along which to extend,
 #' must be a numeric in \code{data}
 #' @param x_ns of a nonstationary variable derived from \code{x},
@@ -179,11 +180,16 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #' @family data utilities
 new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   check_type(data, "data.frame")
-  check_not_null(group_by)
   check_not_null(x)
   check_not_null(x_values)
-  check_in_data(group_by, data)
   check_in_data(x, data)
+  if (is.na(group_by)) {
+    x_grp <- plot.create_grouping_factor(data, group_by)
+    data["group__"] <- x_grp
+    group_by <- "group__"
+  } else {
+    check_in_data(group_by, data)
+  }
   df <- pick_one_row_each(data, group_by)
   k <- length(x_values)
   col_names <- if (is.null(x_ns)) x else c(x, x_ns)
@@ -205,6 +211,7 @@ new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
 #' Get observed effect times from a data frame
 #'
 #' @inheritParams new_x
+#' @param group_by name of the grouping factor, must be found in \code{data}
 #' @return a named vector, where the names are the levels of \code{group_by}
 #' @family data utilities
 get_teff_obs <- function(data, group_by = "id", x = "age",

@@ -204,6 +204,10 @@ sample_model <- function(model, ...) {
   object <- stanmodels[[model@stan_model_name]]
   data <- model@stan_input
   sfit <- rstan::sampling(object = object, data = data, check_data = TRUE, ...)
+  if (sfit@mode == 2) {
+    print(sfit)
+    stop("Failed to create fit.")
+  }
   new("lgpfit", model = model, stan_fit = sfit)
 }
 

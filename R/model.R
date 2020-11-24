@@ -277,7 +277,7 @@ map_caseid_to_row <- function(x_fac, map) {
 #' response variable must have type \code{"numeric"} and categorical covariates
 #' must have type \code{"factor"}. Missing values should be indicated with
 #' \code{NaN} or \code{NA}. The response variable cannot contain missing
-#' values.
+#' values. Column names should not contain trailing or leading underscores.
 #' @param likelihood Determines the observation model. Must be either
 #' \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
 #' binomial), \code{"binomial"} or \code{"bb"} (beta binomial).
