@@ -29,7 +29,9 @@ The function \code{\link{new_x}} provides an easy way to create it.}
 \item{c_hat_pred}{This is only used if the latent signal \code{f} was
 sampled. This input contains the values added to the sum \code{f} before
 passing through inverse link function. Must be a vector with length equal to
-the number of prediction points.}
+the number of prediction points. If original \code{c_hat} was constant,
+then \code{c_hat_pred} can be ignored, in which case this will by default
+use the same constant.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or

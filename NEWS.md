@@ -1,5 +1,10 @@
 # lgpr 1.0
 
+## 1.0.11
+  * Add the `c_hat_pred` argument to `pred()`, to be used when `f` has been
+  sampled and `c_hat` is not constant. Previously, `c_hat = 0` was used in
+  all prediction points, which did not make sense in all cases.
+  
 ## 1.0.10
   * Allow setting `group_by = NA` in `plot_pred()`,
   `plot_components()` and `new_x()` to avoid grouping in plots.

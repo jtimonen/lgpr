@@ -23,7 +23,9 @@
 #' @param c_hat_pred This is only used if the latent signal \code{f} was
 #' sampled. This input contains the values added to the sum \code{f} before
 #' passing through inverse link function. Must be a vector with length equal to
-#' the number of prediction points.
+#' the number of prediction points. If original \code{c_hat} was constant,
+#' then \code{c_hat_pred} can be ignored, in which case this will by default
+#' use the same constant.
 #' @param reduce Reduction for parameters draws. Can be a function that
 #' is applied to reduce all parameter draws into one parameter set, or
 #' NULL (no reduction). Has no effect if \code{draws} is specified.
@@ -109,7 +111,7 @@ pred.kr <- function(fit, x, c_hat_pred, reduce, draws, verbose,
 }
 
 #' Map the sum f from pred.kr_compute to h
-#' 
+#'
 #' @inheritParams pred
 #' @param f an array of shape (num_draws, num_pred_points)
 #' @return an array with same shape as \code{f}
