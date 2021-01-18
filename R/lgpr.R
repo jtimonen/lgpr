@@ -107,7 +107,7 @@ NULL
 #' Either one of the approaches should be used and they should not be mixed.
 #'
 #' @section Defining priors:
-#' The \code{priors} argument must be a named list, like
+#' The \code{prior} argument must be a named list, like
 #' \code{list(alpha=student_t(4), wrp=igam(30,10))}. See examples in tutorials.
 #' Possible allowed names are
 #' \itemize{

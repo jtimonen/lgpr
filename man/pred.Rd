@@ -9,6 +9,7 @@
 pred(
   fit,
   x,
+  c_hat_pred = NULL,
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
@@ -17,13 +18,18 @@ pred(
 
 pred.gaussian(fit, x, reduce, draws, verbose, STREAM = get_stream())
 
-pred.kr(fit, x, reduce, draws, verbose, STREAM = get_stream())
+pred.kr(fit, x, c_hat_pred, reduce, draws, verbose, STREAM = get_stream())
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{x}{A data frame of points where the predictions are computed.
 The function \code{\link{new_x}} provides an easy way to create it.}
+
+\item{c_hat_pred}{This is only used if the latent signal \code{f} was
+sampled. This input contains the values added to the sum \code{f} before
+passing through inverse link function. Must be a vector with length equal to
+the number of prediction points.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or

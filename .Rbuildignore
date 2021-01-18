@@ -9,7 +9,7 @@ tests/testthat/stan_files/.*\.hpp$
 ^CONTRIBUTING\.md$
 ^NEWS\.md$
 ^_pkgdown\.yml$
-pkgdown
-dev
-docs
-tutorials
+pkgdown/
+dev/
+docs/
+tutorials/

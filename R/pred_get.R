@@ -185,10 +185,6 @@ get_pred.sampled.h <- function(fit, draws, reduce) {
   # Get f
   f <- get_pred.sampled.f(fit, draws, reduce = NULL)
 
-  # Scale to original unnormalized scale
-  y_scl <- dollar(fit@model@var_scalings, "y")
-  f <- call_fun(y_scl@fun_inv, f)
-
   # Add GP mean
   num_draws <- dim(f)[1]
   c_hat <- get_chat(fit)

@@ -20,6 +20,10 @@
 #' @param fit An object of class \linkS4class{lgpfit}.
 #' @param x A data frame of points where the predictions are computed.
 #' The function \code{\link{new_x}} provides an easy way to create it.
+#' @param c_hat_pred This is only used if the latent signal \code{f} was
+#' sampled. This input contains the values added to the sum \code{f} before
+#' passing through inverse link function. Must be a vector with length equal to
+#' the number of prediction points.
 #' @param reduce Reduction for parameters draws. Can be a function that
 #' is applied to reduce all parameter draws into one parameter set, or
 #' NULL (no reduction). Has no effect if \code{draws} is specified.
@@ -36,13 +40,13 @@ NULL
 
 #' @export
 #' @rdname pred
-pred <- function(fit, x, reduce = function(x) base::mean(x), draws = NULL,
+pred <- function(fit, x, c_hat_pred = NULL, reduce = function(x) base::mean(x), draws = NULL,
                  verbose = TRUE, STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
   if (f_sampled) {
-    out <- pred.kr(fit, x, reduce, draws, verbose, STREAM)
+    out <- pred.kr(fit, x, c_hat_pred, reduce, draws, verbose, STREAM)
   } else {
     out <- pred.gaussian(fit, x, reduce, draws, verbose, STREAM)
   }
@@ -82,7 +86,7 @@ pred.gaussian <- function(fit, x, reduce, draws, verbose,
 }
 
 #' @rdname pred
-pred.kr <- function(fit, x, reduce, draws, verbose,
+pred.kr <- function(fit, x, c_hat_pred, reduce, draws, verbose,
                     STREAM = get_stream()) {
   kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
   si <- get_stan_input(fit)
@@ -94,12 +98,48 @@ pred.kr <- function(fit, x, reduce, draws, verbose,
   f <- dollar(kr, "f")
   if (verbose) cat("Done.\n")
 
+  h <- pred.kr_h(fit, f, c_hat_pred, verbose)
+
   # Return
   new("Prediction",
     f_comp = arr3_to_list(dollar(kr, "f_comp")),
     f = f,
-    h = link_inv(f, get_obs_model(fit))
+    h = h
   )
+}
+
+#' Map the sum f from pred.kr_compute to h
+pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
+
+  # helper function
+  is_constant <- function(x) {
+    s <- sum(x == x[1])
+    s == length(x)
+  }
+
+  num_draws <- dim(f)[1]
+  num_pred <- dim(f)[2]
+  if (is.null(c_hat_pred)) {
+    c_hat_data <- get_chat(fit)
+    if (is_constant(c_hat_data)) {
+      msg <- paste0(
+        "c_hat_pred not given,",
+        " using constant c_hat_pred = ", c_hat_data[1], "\n"
+      )
+      if (verbose) cat(msg)
+      c_hat_pred <- rep(c_hat_data[1], num_pred)
+    } else {
+      msg <- paste0(
+        "c_hat (at data points) is not constant! ",
+        "you must give c_hat_pred (at prediction points) as input!"
+      )
+      stop(msg)
+    }
+  }
+
+  f <- f + repvec(c_hat_pred, num_draws)
+  h <- link_inv(f, get_obs_model(fit))
+  return(h)
 }
 
 #' Compute analytic out-of-sample predictions
@@ -164,7 +204,7 @@ pred.kr_compute <- function(kernels, pred, delta, verbose,
   num_obs <- dim(K)[3]
   num_pred <- dim(Kss)[3]
   out <- array(0, dim = c(D + 1, num_draws, num_pred))
-  DELTA <- DELTA <- delta * diag(num_obs)
+  DELTA <- delta * diag(num_obs)
   hdr <- progbar_header(num_draws)
   idx_print <- dollar(hdr, "idx_print")
   if (verbose) cat(dollar(hdr, "header"), "\n")
