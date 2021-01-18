@@ -131,6 +131,15 @@ and model components
 plot_components(fit, x = x_pred, pred = p, alpha = 0.1, color_by = c(NA, NA, "z", "z"))
 ```
 
+# Additional notes
+
+**Note:** as always, the `plot_pred()` and `plot_components()` functions can be used without the `x` and `pred` arguments, too, in which case computing
+out-of-sample predictions is not be needed. The predictions and inferred components are then shown only at the data points.
+
+```{r vis_datapred, fig.width=7, fig.height=4}
+plot_pred(fit)
+plot_components(fit, color_by = c(NA, NA, "z", "z"))
+```
 
 # Computing environment
 

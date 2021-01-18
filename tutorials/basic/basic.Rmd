@@ -381,15 +381,23 @@ plot_components(fit,
                 ncol = 2)
 ```
 
+# Additional notes
 **Note:** the `plot_pred()` function scales the predictions back to the
 original data scale, whereas the `plot_components()` function plots the
 inferred functions on the (normalized) inference scale.
 
-**Note:** the `plot_pred()` and `plot_components()` functions could be used
+**Note:** the `plot_pred()` and `plot_components()` functions can be used
 without the `x` and `pred` arguments, too, in which case computing
-out-of-sample predictions would not be needed. The predictive and component
-posteriors would be shown only at the data points.
+out-of-sample predictions is not be needed. The predictive and component
+posteriors are then shown only at the data points.
 
+```{r vis5, fig.width=7, fig.height=4}
+plot_pred(fit)
+plot_components(fit,                 
+                color_by = c(NA, NA, "sex", "group", "group", "group"),
+                ylim = c(-3,2),
+                ncol = 2)
+```
 
 # Computing environment
 
