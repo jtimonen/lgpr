@@ -109,6 +109,10 @@ pred.kr <- function(fit, x, c_hat_pred, reduce, draws, verbose,
 }
 
 #' Map the sum f from pred.kr_compute to h
+#' 
+#' @inheritParams pred
+#' @param f an array of shape (num_draws, num_pred_points)
+#' @return an array with same shape as \code{f}
 pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
 
   # helper function
