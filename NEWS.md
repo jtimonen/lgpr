@@ -1,5 +1,12 @@
 # lgpr 1.0
 
+## 1.0.12
+  * Add more informative error message if trying to specify a model like
+  `y ~ age + id | age`, which should be `y ~ age + age | id`, i.e. the
+  continuous covariate on the left of `|` and categorical on the right.
+  * New startup message that prints also `rstan` version
+  * Update citation information
+  
 ## 1.0.11
   * Add the `c_hat_pred` argument to `pred()`, to be used when `f` has been
   sampled and `c_hat` is not constant. Previously, `c_hat = 0` was used in

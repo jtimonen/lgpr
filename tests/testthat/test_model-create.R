@@ -100,7 +100,7 @@ test_that("gp(), gp_ns() and gp_vm() must take a continuous covariate", {
 test_that("one term can contain at most one expression of each type", {
   expect_error(
     create_model(y ~ gp(id) * gp_ns(age), testdata_001),
-    "cannot have more than one gp"
+    "Cannot have more than one gp"
   )
   expect_error(
     create_model(y ~ categ(id) * zs(sex), testdata_001),
@@ -111,6 +111,20 @@ test_that("one term can contain at most one expression of each type", {
     "cannot have more than one"
   )
 })
+
+test_that("if using z|x in formula it is informed that they are wrong way", {
+  msg <- paste0(
+    "If you used the | syntax in your model formula, make sure ",
+    "that the covariate on the left side of | is continuous ",
+    "and the one on the right side is categorical."
+  )
+  expect_error(
+    create_model(y ~ age + id | age, testdata_001),
+    msg
+  )
+})
+
+
 
 test_that("terms with unc() or het() must have other expressions", {
   expect_error(

@@ -451,8 +451,11 @@ reduce_factors_gp <- function(factors) {
   H <- length(idx)
   if (H > 1) {
     msg <- paste0(
-      "cannot have more than one gp(), gp_ns() or gp_vm() expression ",
-      "in one term! found = ", H
+      "Cannot have more than one gp(), gp_ns() or gp_vm() expression ",
+      "in one term (found = ", H,
+      ")! If you used the | syntax in your model formula, make sure that",
+      " the covariate on the left side of | is continuous and the one on",
+      " the right side is categorical."
     )
     stop(msg)
   }
