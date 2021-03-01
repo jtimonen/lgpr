@@ -123,7 +123,7 @@ test_that("simulated data with disease effect can be plotted", {
   expect_output(plot_sim(dat, comp_idx = 1, verbose = TRUE))
 })
 
-test_that("show method for simualated data prints output", {
+test_that("show method for simulated data prints output", {
   dat <- simulate_data(
     N = 4,
     t_data = seq(6, 36, by = 6),
