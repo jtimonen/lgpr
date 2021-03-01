@@ -267,6 +267,7 @@ pred_kernels <- function(fit, x, reduce, draws, verbose,
   if (verbose) cat(msg2)
   Ks <- kernel_matrices(model, x_pred, x_data, theta, verbose, STREAM)
   if (verbose) cat(msg3)
+  # TODO: avoid computing the P x P matrices if not needed
   Kss <- kernel_matrices(model, x_pred, x_pred, theta, verbose, STREAM)
 
   # Return

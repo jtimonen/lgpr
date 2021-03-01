@@ -38,3 +38,63 @@ vector STAN_edit_x_cont(
   vector[n] x_teff = STAN_expand(teff, idx_expand);
   return(x_cont + x_teff_obs - x_teff);
 }
+
+// Repeat vector x, J times
+vector STAN_rep_vector_times(vector x, int J) {
+  int N = num_elements(x);
+  vector[J*N] y = rep_vector(0.0, J*N);
+  int idx = 1;
+  for(j in 1:J) {
+    y[idx:(idx+N-1)] = x;
+    idx = idx + N;
+  }
+  return(y);
+}
+
+// Repeat each element of vector x, J times
+vector STAN_rep_vector_each(vector x, int J) {
+  int N = num_elements(x);
+  vector[J*N] y = rep_vector(0.0, J*N);
+  int idx = 1;
+  for(n in 1:N) {
+    y[idx:(idx+J-1)] = rep_vector(x[n], J);
+    idx = idx + J;
+  }
+  return(y);
+}
+
+// Repeat each column of x, J times
+matrix STAN_rep_cols_times(matrix X, int J) {
+  int R = rows(X);
+  int N = cols(X);
+  matrix[R, J*N] Y = rep_matrix(0.0, R, J*N);
+  int idx = 1;
+  for(j in 1:J) {
+    Y[:, idx:(idx+N-1)] = X;
+    idx = idx + N;
+  }
+  return(Y);
+}
+
+// Repeat each element of vector x, J times
+matrix STAN_rep_cols_each(matrix X, int J) {
+  int R = rows(X);
+  int N = cols(X);
+  matrix[R, J*N] Y = rep_matrix(0.0, R, J*N);
+  int idx = 1;
+  for(n in 1:N) {
+    for(j in 1:J) {
+        Y[:, idx+j-1] = X[:,n];
+    }
+    idx = idx + J;
+  }
+  return(Y);
+}
+
+// Compute the quadractic form x * inv(A) * x^T
+real STAN_quad_form_inv(vector x, matrix A){
+  int n = num_elements(x);
+  matrix[n, n] L = cholesky_decompose(A);
+  vector[n] a = mdivide_left_tri_low(L, x);
+  return dot_self(a);
+}

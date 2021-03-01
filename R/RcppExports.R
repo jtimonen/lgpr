@@ -21,6 +21,26 @@ STAN_edit_x_cont <- function(x_cont, idx_expand, teff_obs, teff, pstream__ = 0L)
     .Call(`_lgpr_STAN_edit_x_cont`, x_cont, idx_expand, teff_obs, teff, pstream__)
 }
 
+STAN_rep_vector_times <- function(x, J, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_rep_vector_times`, x, J, pstream__)
+}
+
+STAN_rep_vector_each <- function(x, J, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_rep_vector_each`, x, J, pstream__)
+}
+
+STAN_rep_cols_times <- function(X, J, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_rep_cols_times`, X, J, pstream__)
+}
+
+STAN_rep_cols_each <- function(X, J, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_rep_cols_each`, X, J, pstream__)
+}
+
+STAN_quad_form_inv <- function(x, A, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_quad_form_inv`, x, A, pstream__)
+}
+
 STAN_kernel_base_zerosum <- function(x1, x2, num_cat, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_base_zerosum`, x1, x2, num_cat, pstream__)
 }
@@ -47,6 +67,50 @@ STAN_kernel_base_var_mask <- function(x1, x2, steepness, vm_params, pstream__ = 
 
 STAN_kernel_all <- function(n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, x1, x2, x1_unnorm, x2_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx1_expand, idx2_expand, teff_zero, pstream__)
+}
+
+STAN_phi <- function(x, m, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_phi`, x, m, L, pstream__)
+}
+
+STAN_lambda <- function(m, L, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_lambda`, m, L, pstream__)
+}
+
+STAN_spd_eq <- function(w, ell, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_spd_eq`, w, ell, pstream__)
+}
+
+STAN_phi_matrix <- function(x, M, L, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_phi_matrix`, x, M, L, components, pstream__)
+}
+
+STAN_lambda_matrix <- function(ell, M, L, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_lambda_matrix`, ell, M, L, components, pstream__)
+}
+
+STAN_ranks <- function(components, x_cat_num_levels, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_ranks`, components, x_cat_num_levels, pstream__)
+}
+
+STAN_delta_matrix <- function(K_const, ranks, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_delta_matrix`, K_const, ranks, components, pstream__)
+}
+
+STAN_theta_matrix <- function(K_const, ranks, components, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_theta_matrix`, K_const, ranks, components, pstream__)
+}
+
+STAN_D_matrix <- function(alpha, bfa_lambda, bfa_delta, ranks, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_D_matrix`, alpha, bfa_lambda, bfa_delta, ranks, pstream__)
+}
+
+STAN_V_matrix <- function(bfa_phi, bfa_theta, ranks, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_V_matrix`, bfa_phi, bfa_theta, ranks, pstream__)
+}
+
+STAN_multi_normal_bfa_logpdf <- function(y, V, D_diag, sigma, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_multi_normal_bfa_logpdf`, y, V, D_diag, sigma, pstream__)
 }
 
 STAN_vector_array_sum <- function(k, pstream__ = 0L) {
