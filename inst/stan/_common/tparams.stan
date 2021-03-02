@@ -1,4 +1,3 @@
-  
   // Transform raw effect times
   vector[num_bt] teff[num_uncrt>0];
   for(j in 1:num_uncrt){

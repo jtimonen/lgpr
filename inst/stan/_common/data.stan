@@ -1,4 +1,3 @@
-  
   // Binary option switches
   int<lower=0, upper=1> is_verbose;
 

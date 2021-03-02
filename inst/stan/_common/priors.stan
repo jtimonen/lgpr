@@ -1,4 +1,3 @@
-
 // Magnitude parameters
 for(j in 1:num_comps){
   target += STAN_log_prior(alpha[j], prior_alpha[j], hyper_alpha[j]);

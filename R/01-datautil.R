@@ -1,3 +1,26 @@
+
+#' Set the GP mean vector, taking TMM or other normalization
+#' into account
+#'
+#' @export
+#' @description Creates the \code{c_hat} input for \code{lgp},
+#' so that it accounts for normalization between data points in the
+#' \code{"poisson"} or \code{"nb"} observation model
+#' @param y response variable, vector of length \code{n}
+#' @param norm_factors normalization factors, vector of length \code{n}
+#' @return a vector of length \code{n}, which can be used as
+#' the \code{c_hat} input to the \code{lgp} function
+adjusted_c_hat <- function(y, norm_factors) {
+  check_lengths(y, norm_factors)
+  check_non_negative_all(y)
+  check_integer_all(y)
+  check_positive_all(norm_factors)
+  c_hat <- log(mean(y))
+  c_hat <- rep(c_hat, length(y))
+  c_hat <- c_hat + log(norm_factors)
+  return(c_hat)
+}
+
 #' Easily add a categorical covariate to a data frame
 #'
 #' @export

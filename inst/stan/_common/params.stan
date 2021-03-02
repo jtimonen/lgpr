@@ -1,4 +1,3 @@
-  
   real<lower=0> alpha[num_comps];
   real<lower=0> ell[num_ell];
   real<lower=0> wrp[num_ns];
