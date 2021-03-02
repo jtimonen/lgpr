@@ -1,51 +1,3 @@
-#' Graphical posterior or prior predictive checks
-#'
-#' @export
-#' @inheritParams get_draws
-#' @param data the original data frame
-#' @param fun \code{bayesplot} function name
-#' @param ... additional arguments passed to the default
-#' \code{\link[bayesplot]{pp_check}} method in
-#' \code{bayesplot}
-#' @return a \code{ggplot} object
-#' @seealso Introduction to graphical posterior predictive checks:
-#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
-#'
-ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
-  check_type(fit, "lgpfit")
-  check_type(data, "data.frame")
-  check_type(fun, "function")
-  y_name <- get_y_name(fit)
-  y <- dollar(data, y_name)
-  y_rep <- get_y_rng(fit, original_scale = TRUE)
-  bayesplot::pp_check(y, y_rep, fun, ...)
-}
-
-#' Extract posterior or prior predictive distribution draws
-#'
-#' @export
-#' @inheritParams get_draws
-#' @param original_scale should the draws be scaled back to original y scale
-#' (only has effect if likelihood is "gaussian", when data has been normalized
-#' to zero mean and unit variance)
-#' @return an array of shape \code{num_draws} x \code{num_obs}
-#' @family fit postprocessing functions
-get_y_rng <- function(fit, original_scale = TRUE) {
-  yrng_done <- is_yrng_done(fit)
-  if (!yrng_done) {
-    stop("y rng was not done! you need options = list(do_yrng = TRUE)")
-  }
-  obs_model <- get_obs_model(fit)
-  par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
-  out <- get_draws(fit, pars = par_name)
-  if (obs_model == "gaussian" && original_scale) {
-    scl <- dollar(fit@model@var_scalings, "y")
-    out <- call_fun(scl@fun_inv, out)
-  }
-  colnames(out) <- NULL
-  return(out)
-}
-
 #' Visualize the distribution of the obtained parameter draws
 #'
 #' @description
@@ -209,7 +161,6 @@ get_num_draws <- function(fit) {
   nrow(draws)
 }
 
-
 #' Posterior summary
 #'
 #' @export
@@ -224,4 +175,54 @@ fit_summary <- function(fit,
                         )) {
   check_type(fit, "lgpfit")
   print(fit@stan_fit, pars = ignore_pars, include = FALSE)
+}
+
+
+
+#' Graphical posterior or prior predictive checks
+#'
+#' @export
+#' @inheritParams get_draws
+#' @param data the original data frame
+#' @param fun \code{bayesplot} function name
+#' @param ... additional arguments passed to the default
+#' \code{\link[bayesplot]{pp_check}} method in
+#' \code{bayesplot}
+#' @return a \code{ggplot} object
+#' @seealso Introduction to graphical posterior predictive checks:
+#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
+#'
+ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
+  check_type(fit, "lgpfit")
+  check_type(data, "data.frame")
+  check_type(fun, "function")
+  y_name <- get_y_name(fit)
+  y <- dollar(data, y_name)
+  y_rep <- get_y_rng(fit, original_scale = TRUE)
+  bayesplot::pp_check(y, y_rep, fun, ...)
+}
+
+#' Extract posterior or prior predictive distribution draws
+#'
+#' @export
+#' @inheritParams get_draws
+#' @param original_scale should the draws be scaled back to original y scale
+#' (only has effect if likelihood is "gaussian", when data has been normalized
+#' to zero mean and unit variance)
+#' @return an array of shape \code{num_draws} x \code{num_obs}
+#' @family fit postprocessing functions
+get_y_rng <- function(fit, original_scale = TRUE) {
+  yrng_done <- is_yrng_done(fit)
+  if (!yrng_done) {
+    stop("y rng was not done! you need options = list(do_yrng = TRUE)")
+  }
+  obs_model <- get_obs_model(fit)
+  par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
+  out <- get_draws(fit, pars = par_name)
+  if (obs_model == "gaussian" && original_scale) {
+    scl <- dollar(fit@model@var_scalings, "y")
+    out <- call_fun(scl@fun_inv, out)
+  }
+  colnames(out) <- NULL
+  return(out)
 }

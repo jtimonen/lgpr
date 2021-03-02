@@ -4,7 +4,7 @@
 \alias{progbar}
 \alias{progbar_header}
 \alias{progbar_print}
-\title{Progress bar for iterative functions}
+\title{Progress bar printing}
 \usage{
 progbar_header(L)
 

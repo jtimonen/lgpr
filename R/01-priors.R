@@ -108,7 +108,6 @@ log_normal <- function(mu, sigma, square = FALSE) {
   )
 }
 
-
 #' @export
 #' @rdname priors
 #' @param a shape parameter

@@ -8,12 +8,13 @@ functions{
 
 data {
 #include _common/data.stan
-  vector[num_obs] y;
+  vector[num_obs] y_norm;
   int<lower=0> prior_sigma[2];
   real hyper_sigma[3];
 }
 
 transformed data{
+  vector[num_obs] m0 = rep_vector(0.0, num_obs);
 #include _common/tdata.stan
 }
 
@@ -33,7 +34,6 @@ model {
 
   // Likelihood
   {
-    vector[num_obs] c_hat = rep_vector(0.0, num_obs);
     vector[num_obs] sigma2_vec = rep_vector(square(sigma), num_obs);
     matrix[num_obs, num_obs] Ky = diag_matrix(delta_vec);
     matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
@@ -45,6 +45,6 @@ model {
       Ky += KX[j];
     }
     Ky = Ky + diag_matrix(sigma2_vec);
-    y ~ multi_normal_cholesky(c_hat, cholesky_decompose(Ky));
+    y_norm ~ multi_normal_cholesky(m0, cholesky_decompose(Ky));
   }
 }

@@ -39,23 +39,23 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(359, 0, "start", "_common/data.stan");
     reader.add_event(427, 68, "end", "_common/data.stan");
     reader.add_event(427, 10, "restart", "model_lgp_latent");
-    reader.add_event(437, 20, "include", "_common/tdata.stan");
-    reader.add_event(437, 0, "start", "_common/tdata.stan");
-    reader.add_event(445, 8, "end", "_common/tdata.stan");
-    reader.add_event(445, 21, "restart", "model_lgp_latent");
-    reader.add_event(448, 24, "include", "_common/params.stan");
-    reader.add_event(448, 0, "start", "_common/params.stan");
-    reader.add_event(453, 5, "end", "_common/params.stan");
-    reader.add_event(453, 25, "restart", "model_lgp_latent");
-    reader.add_event(460, 32, "include", "_common/tparams.stan");
-    reader.add_event(460, 0, "start", "_common/tparams.stan");
-    reader.add_event(465, 5, "end", "_common/tparams.stan");
-    reader.add_event(465, 33, "restart", "model_lgp_latent");
-    reader.add_event(483, 51, "include", "_common/priors.stan");
-    reader.add_event(483, 0, "start", "_common/priors.stan");
-    reader.add_event(513, 30, "end", "_common/priors.stan");
-    reader.add_event(513, 52, "restart", "model_lgp_latent");
-    reader.add_event(545, 82, "end", "model_lgp_latent");
+    reader.add_event(440, 23, "include", "_common/tdata.stan");
+    reader.add_event(440, 0, "start", "_common/tdata.stan");
+    reader.add_event(448, 8, "end", "_common/tdata.stan");
+    reader.add_event(448, 24, "restart", "model_lgp_latent");
+    reader.add_event(451, 27, "include", "_common/params.stan");
+    reader.add_event(451, 0, "start", "_common/params.stan");
+    reader.add_event(456, 5, "end", "_common/params.stan");
+    reader.add_event(456, 28, "restart", "model_lgp_latent");
+    reader.add_event(464, 36, "include", "_common/tparams.stan");
+    reader.add_event(464, 0, "start", "_common/tparams.stan");
+    reader.add_event(469, 5, "end", "_common/tparams.stan");
+    reader.add_event(469, 37, "restart", "model_lgp_latent");
+    reader.add_event(487, 55, "include", "_common/priors.stan");
+    reader.add_event(487, 0, "start", "_common/priors.stan");
+    reader.add_event(517, 30, "end", "_common/priors.stan");
+    reader.add_event(517, 56, "restart", "model_lgp_latent");
+    reader.add_event(555, 92, "end", "model_lgp_latent");
     return reader;
 }
 template <typename T0__>
@@ -1305,9 +1305,12 @@ private:
         double delta;
         std::vector<std::vector<double> > vm_params;
         int obs_model;
-        std::vector<int> y_int;
+        std::vector<std::vector<int> > y_int;
+        std::vector<std::vector<double> > y_real;
         std::vector<std::vector<int> > y_num_trials;
+        std::vector<std::vector<int> > prior_sigma;
         std::vector<std::vector<int> > prior_phi;
+        std::vector<std::vector<double> > hyper_sigma;
         std::vector<std::vector<double> > hyper_phi;
         std::vector<std::vector<double> > hyper_gamma;
         vector_d c_hat;
@@ -1742,23 +1745,44 @@ public:
             vals_i__ = context__.vals_i("obs_model");
             pos__ = 0;
             obs_model = vals_i__[pos__++];
-            check_greater_or_equal(function__, "obs_model", obs_model, 2);
+            check_greater_or_equal(function__, "obs_model", obs_model, 1);
             check_less_or_equal(function__, "obs_model", obs_model, 5);
             current_statement_begin__ = 429;
+            validate_non_negative_index("y_int", "logical_gt(obs_model, 1)", logical_gt(obs_model, 1));
             validate_non_negative_index("y_int", "num_obs", num_obs);
-            context__.validate_dims("data initialization", "y_int", "int", context__.to_vec(num_obs));
-            y_int = std::vector<int>(num_obs, int(0));
+            context__.validate_dims("data initialization", "y_int", "int", context__.to_vec(logical_gt(obs_model, 1),num_obs));
+            y_int = std::vector<std::vector<int> >(logical_gt(obs_model, 1), std::vector<int>(num_obs, int(0)));
             vals_i__ = context__.vals_i("y_int");
             pos__ = 0;
-            size_t y_int_k_0_max__ = num_obs;
-            for (size_t k_0__ = 0; k_0__ < y_int_k_0_max__; ++k_0__) {
-                y_int[k_0__] = vals_i__[pos__++];
+            size_t y_int_k_0_max__ = logical_gt(obs_model, 1);
+            size_t y_int_k_1_max__ = num_obs;
+            for (size_t k_1__ = 0; k_1__ < y_int_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < y_int_k_0_max__; ++k_0__) {
+                    y_int[k_0__][k_1__] = vals_i__[pos__++];
+                }
             }
-            size_t y_int_i_0_max__ = num_obs;
+            size_t y_int_i_0_max__ = logical_gt(obs_model, 1);
+            size_t y_int_i_1_max__ = num_obs;
             for (size_t i_0__ = 0; i_0__ < y_int_i_0_max__; ++i_0__) {
-                check_greater_or_equal(function__, "y_int[i_0__]", y_int[i_0__], 0);
+                for (size_t i_1__ = 0; i_1__ < y_int_i_1_max__; ++i_1__) {
+                    check_greater_or_equal(function__, "y_int[i_0__][i_1__]", y_int[i_0__][i_1__], 0);
+                }
             }
             current_statement_begin__ = 430;
+            validate_non_negative_index("y_real", "logical_eq(obs_model, 1)", logical_eq(obs_model, 1));
+            validate_non_negative_index("y_real", "num_obs", num_obs);
+            context__.validate_dims("data initialization", "y_real", "double", context__.to_vec(logical_eq(obs_model, 1),num_obs));
+            y_real = std::vector<std::vector<double> >(logical_eq(obs_model, 1), std::vector<double>(num_obs, double(0)));
+            vals_r__ = context__.vals_r("y_real");
+            pos__ = 0;
+            size_t y_real_k_0_max__ = logical_eq(obs_model, 1);
+            size_t y_real_k_1_max__ = num_obs;
+            for (size_t k_1__ = 0; k_1__ < y_real_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < y_real_k_0_max__; ++k_0__) {
+                    y_real[k_0__][k_1__] = vals_r__[pos__++];
+                }
+            }
+            current_statement_begin__ = 431;
             validate_non_negative_index("y_num_trials", "logical_gt(obs_model, 3)", logical_gt(obs_model, 3));
             validate_non_negative_index("y_num_trials", "num_obs", num_obs);
             context__.validate_dims("data initialization", "y_num_trials", "int", context__.to_vec(logical_gt(obs_model, 3),num_obs));
@@ -1779,7 +1803,28 @@ public:
                     check_greater_or_equal(function__, "y_num_trials[i_0__][i_1__]", y_num_trials[i_0__][i_1__], 1);
                 }
             }
-            current_statement_begin__ = 431;
+            current_statement_begin__ = 432;
+            validate_non_negative_index("prior_sigma", "logical_eq(obs_model, 1)", logical_eq(obs_model, 1));
+            validate_non_negative_index("prior_sigma", "2", 2);
+            context__.validate_dims("data initialization", "prior_sigma", "int", context__.to_vec(logical_eq(obs_model, 1),2));
+            prior_sigma = std::vector<std::vector<int> >(logical_eq(obs_model, 1), std::vector<int>(2, int(0)));
+            vals_i__ = context__.vals_i("prior_sigma");
+            pos__ = 0;
+            size_t prior_sigma_k_0_max__ = logical_eq(obs_model, 1);
+            size_t prior_sigma_k_1_max__ = 2;
+            for (size_t k_1__ = 0; k_1__ < prior_sigma_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < prior_sigma_k_0_max__; ++k_0__) {
+                    prior_sigma[k_0__][k_1__] = vals_i__[pos__++];
+                }
+            }
+            size_t prior_sigma_i_0_max__ = logical_eq(obs_model, 1);
+            size_t prior_sigma_i_1_max__ = 2;
+            for (size_t i_0__ = 0; i_0__ < prior_sigma_i_0_max__; ++i_0__) {
+                for (size_t i_1__ = 0; i_1__ < prior_sigma_i_1_max__; ++i_1__) {
+                    check_greater_or_equal(function__, "prior_sigma[i_0__][i_1__]", prior_sigma[i_0__][i_1__], 0);
+                }
+            }
+            current_statement_begin__ = 433;
             validate_non_negative_index("prior_phi", "logical_eq(obs_model, 3)", logical_eq(obs_model, 3));
             validate_non_negative_index("prior_phi", "2", 2);
             context__.validate_dims("data initialization", "prior_phi", "int", context__.to_vec(logical_eq(obs_model, 3),2));
@@ -1800,7 +1845,21 @@ public:
                     check_greater_or_equal(function__, "prior_phi[i_0__][i_1__]", prior_phi[i_0__][i_1__], 0);
                 }
             }
-            current_statement_begin__ = 432;
+            current_statement_begin__ = 434;
+            validate_non_negative_index("hyper_sigma", "logical_eq(obs_model, 1)", logical_eq(obs_model, 1));
+            validate_non_negative_index("hyper_sigma", "3", 3);
+            context__.validate_dims("data initialization", "hyper_sigma", "double", context__.to_vec(logical_eq(obs_model, 1),3));
+            hyper_sigma = std::vector<std::vector<double> >(logical_eq(obs_model, 1), std::vector<double>(3, double(0)));
+            vals_r__ = context__.vals_r("hyper_sigma");
+            pos__ = 0;
+            size_t hyper_sigma_k_0_max__ = logical_eq(obs_model, 1);
+            size_t hyper_sigma_k_1_max__ = 3;
+            for (size_t k_1__ = 0; k_1__ < hyper_sigma_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < hyper_sigma_k_0_max__; ++k_0__) {
+                    hyper_sigma[k_0__][k_1__] = vals_r__[pos__++];
+                }
+            }
+            current_statement_begin__ = 435;
             validate_non_negative_index("hyper_phi", "logical_eq(obs_model, 3)", logical_eq(obs_model, 3));
             validate_non_negative_index("hyper_phi", "3", 3);
             context__.validate_dims("data initialization", "hyper_phi", "double", context__.to_vec(logical_eq(obs_model, 3),3));
@@ -1814,7 +1873,7 @@ public:
                     hyper_phi[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 433;
+            current_statement_begin__ = 436;
             validate_non_negative_index("hyper_gamma", "logical_eq(obs_model, 5)", logical_eq(obs_model, 5));
             validate_non_negative_index("hyper_gamma", "2", 2);
             context__.validate_dims("data initialization", "hyper_gamma", "double", context__.to_vec(logical_eq(obs_model, 5),2));
@@ -1828,7 +1887,7 @@ public:
                     hyper_gamma[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 434;
+            current_statement_begin__ = 437;
             validate_non_negative_index("c_hat", "num_obs", num_obs);
             context__.validate_dims("data initialization", "c_hat", "vector_d", context__.to_vec(num_obs));
             c_hat = Eigen::Matrix<double, Eigen::Dynamic, 1>(num_obs);
@@ -1839,14 +1898,14 @@ public:
                 c_hat(j_1__) = vals_r__[pos__++];
             }
             // initialize transformed data variables
-            current_statement_begin__ = 439;
+            current_statement_begin__ = 442;
             validate_non_negative_index("K_const", "num_obs", num_obs);
             validate_non_negative_index("K_const", "num_obs", num_obs);
             validate_non_negative_index("K_const", "num_comps", num_comps);
             K_const = std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >(num_comps, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(num_obs, num_obs));
             stan::math::fill(K_const, DUMMY_VAR__);
             stan::math::assign(K_const,STAN_kernel_const_all(num_obs, num_obs, x_cat, x_cat, x_cont_mask, x_cont_mask, x_cat_num_levels, components, pstream__));
-            current_statement_begin__ = 445;
+            current_statement_begin__ = 448;
             validate_non_negative_index("delta_vec", "num_obs", num_obs);
             delta_vec = Eigen::Matrix<double, Eigen::Dynamic, 1>(num_obs);
             stan::math::fill(delta_vec, DUMMY_VAR__);
@@ -1856,30 +1915,33 @@ public:
             // validate, set parameter ranges
             num_params_r__ = 0U;
             param_ranges_i__.clear();
-            current_statement_begin__ = 449;
+            current_statement_begin__ = 452;
             validate_non_negative_index("alpha", "num_comps", num_comps);
             num_params_r__ += (1 * num_comps);
-            current_statement_begin__ = 450;
+            current_statement_begin__ = 453;
             validate_non_negative_index("ell", "num_ell", num_ell);
             num_params_r__ += (1 * num_ell);
-            current_statement_begin__ = 451;
+            current_statement_begin__ = 454;
             validate_non_negative_index("wrp", "num_ns", num_ns);
             num_params_r__ += (1 * num_ns);
-            current_statement_begin__ = 452;
+            current_statement_begin__ = 455;
             validate_non_negative_index("beta", "num_bt", num_bt);
             validate_non_negative_index("beta", "logical_gt(num_heter, 0)", logical_gt(num_heter, 0));
             num_params_r__ += (num_bt * logical_gt(num_heter, 0));
-            current_statement_begin__ = 453;
+            current_statement_begin__ = 456;
             validate_non_negative_index("teff_raw", "num_bt", num_bt);
             validate_non_negative_index("teff_raw", "logical_gt(num_uncrt, 0)", logical_gt(num_uncrt, 0));
             num_params_r__ += (num_bt * logical_gt(num_uncrt, 0));
-            current_statement_begin__ = 454;
+            current_statement_begin__ = 457;
+            validate_non_negative_index("sigma", "logical_eq(obs_model, 1)", logical_eq(obs_model, 1));
+            num_params_r__ += (1 * logical_eq(obs_model, 1));
+            current_statement_begin__ = 458;
             validate_non_negative_index("phi", "logical_eq(obs_model, 3)", logical_eq(obs_model, 3));
             num_params_r__ += (1 * logical_eq(obs_model, 3));
-            current_statement_begin__ = 455;
+            current_statement_begin__ = 459;
             validate_non_negative_index("gamma", "logical_eq(obs_model, 5)", logical_eq(obs_model, 5));
             num_params_r__ += (1 * logical_eq(obs_model, 5));
-            current_statement_begin__ = 456;
+            current_statement_begin__ = 460;
             validate_non_negative_index("eta", "num_obs", num_obs);
             validate_non_negative_index("eta", "num_comps", num_comps);
             num_params_r__ += (num_obs * num_comps);
@@ -1900,7 +1962,7 @@ public:
         (void) pos__; // dummy call to supress warning
         std::vector<double> vals_r__;
         std::vector<int> vals_i__;
-        current_statement_begin__ = 449;
+        current_statement_begin__ = 452;
         if (!(context__.contains_r("alpha")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable alpha missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("alpha");
@@ -1920,7 +1982,7 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable alpha: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 450;
+        current_statement_begin__ = 453;
         if (!(context__.contains_r("ell")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable ell missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("ell");
@@ -1940,7 +2002,7 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable ell: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 451;
+        current_statement_begin__ = 454;
         if (!(context__.contains_r("wrp")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable wrp missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("wrp");
@@ -1960,7 +2022,7 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable wrp: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 452;
+        current_statement_begin__ = 455;
         if (!(context__.contains_r("beta")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable beta missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("beta");
@@ -1984,7 +2046,7 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable beta: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 453;
+        current_statement_begin__ = 456;
         if (!(context__.contains_r("teff_raw")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable teff_raw missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("teff_raw");
@@ -2008,7 +2070,27 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable teff_raw: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 454;
+        current_statement_begin__ = 457;
+        if (!(context__.contains_r("sigma")))
+            stan::lang::rethrow_located(std::runtime_error(std::string("Variable sigma missing")), current_statement_begin__, prog_reader__());
+        vals_r__ = context__.vals_r("sigma");
+        pos__ = 0U;
+        validate_non_negative_index("sigma", "logical_eq(obs_model, 1)", logical_eq(obs_model, 1));
+        context__.validate_dims("parameter initialization", "sigma", "double", context__.to_vec(logical_eq(obs_model, 1)));
+        std::vector<double> sigma(logical_eq(obs_model, 1), double(0));
+        size_t sigma_k_0_max__ = logical_eq(obs_model, 1);
+        for (size_t k_0__ = 0; k_0__ < sigma_k_0_max__; ++k_0__) {
+            sigma[k_0__] = vals_r__[pos__++];
+        }
+        size_t sigma_i_0_max__ = logical_eq(obs_model, 1);
+        for (size_t i_0__ = 0; i_0__ < sigma_i_0_max__; ++i_0__) {
+            try {
+                writer__.scalar_lb_unconstrain(0, sigma[i_0__]);
+            } catch (const std::exception& e) {
+                stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable sigma: ") + e.what()), current_statement_begin__, prog_reader__());
+            }
+        }
+        current_statement_begin__ = 458;
         if (!(context__.contains_r("phi")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable phi missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("phi");
@@ -2028,7 +2110,7 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable phi: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 455;
+        current_statement_begin__ = 459;
         if (!(context__.contains_r("gamma")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable gamma missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("gamma");
@@ -2048,7 +2130,7 @@ public:
                 stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable gamma: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
-        current_statement_begin__ = 456;
+        current_statement_begin__ = 460;
         if (!(context__.contains_r("eta")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable eta missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("eta");
@@ -2097,7 +2179,7 @@ public:
         try {
             stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);
             // model parameters
-            current_statement_begin__ = 449;
+            current_statement_begin__ = 452;
             std::vector<local_scalar_t__> alpha;
             size_t alpha_d_0_max__ = num_comps;
             alpha.reserve(alpha_d_0_max__);
@@ -2107,7 +2189,7 @@ public:
                 else
                     alpha.push_back(in__.scalar_lb_constrain(0));
             }
-            current_statement_begin__ = 450;
+            current_statement_begin__ = 453;
             std::vector<local_scalar_t__> ell;
             size_t ell_d_0_max__ = num_ell;
             ell.reserve(ell_d_0_max__);
@@ -2117,7 +2199,7 @@ public:
                 else
                     ell.push_back(in__.scalar_lb_constrain(0));
             }
-            current_statement_begin__ = 451;
+            current_statement_begin__ = 454;
             std::vector<local_scalar_t__> wrp;
             size_t wrp_d_0_max__ = num_ns;
             wrp.reserve(wrp_d_0_max__);
@@ -2127,7 +2209,7 @@ public:
                 else
                     wrp.push_back(in__.scalar_lb_constrain(0));
             }
-            current_statement_begin__ = 452;
+            current_statement_begin__ = 455;
             std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > beta;
             size_t beta_d_0_max__ = logical_gt(num_heter, 0);
             beta.reserve(beta_d_0_max__);
@@ -2137,7 +2219,7 @@ public:
                 else
                     beta.push_back(in__.vector_lub_constrain(0, 1, num_bt));
             }
-            current_statement_begin__ = 453;
+            current_statement_begin__ = 456;
             std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > teff_raw;
             size_t teff_raw_d_0_max__ = logical_gt(num_uncrt, 0);
             teff_raw.reserve(teff_raw_d_0_max__);
@@ -2147,7 +2229,17 @@ public:
                 else
                     teff_raw.push_back(in__.vector_lub_constrain(0, 1, num_bt));
             }
-            current_statement_begin__ = 454;
+            current_statement_begin__ = 457;
+            std::vector<local_scalar_t__> sigma;
+            size_t sigma_d_0_max__ = logical_eq(obs_model, 1);
+            sigma.reserve(sigma_d_0_max__);
+            for (size_t d_0__ = 0; d_0__ < sigma_d_0_max__; ++d_0__) {
+                if (jacobian__)
+                    sigma.push_back(in__.scalar_lb_constrain(0, lp__));
+                else
+                    sigma.push_back(in__.scalar_lb_constrain(0));
+            }
+            current_statement_begin__ = 458;
             std::vector<local_scalar_t__> phi;
             size_t phi_d_0_max__ = logical_eq(obs_model, 3);
             phi.reserve(phi_d_0_max__);
@@ -2157,7 +2249,7 @@ public:
                 else
                     phi.push_back(in__.scalar_lb_constrain(0));
             }
-            current_statement_begin__ = 455;
+            current_statement_begin__ = 459;
             std::vector<local_scalar_t__> gamma;
             size_t gamma_d_0_max__ = logical_eq(obs_model, 5);
             gamma.reserve(gamma_d_0_max__);
@@ -2167,7 +2259,7 @@ public:
                 else
                     gamma.push_back(in__.scalar_lub_constrain(0, 1));
             }
-            current_statement_begin__ = 456;
+            current_statement_begin__ = 460;
             std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > eta;
             size_t eta_d_0_max__ = num_comps;
             eta.reserve(eta_d_0_max__);
@@ -2178,36 +2270,36 @@ public:
                     eta.push_back(in__.vector_constrain(num_obs));
             }
             // transformed parameters
-            current_statement_begin__ = 460;
+            current_statement_begin__ = 464;
             validate_non_negative_index("f_latent", "num_obs", num_obs);
             validate_non_negative_index("f_latent", "num_comps", num_comps);
             std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > f_latent(num_comps, Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(num_obs));
             stan::math::initialize(f_latent, DUMMY_VAR__);
             stan::math::fill(f_latent, DUMMY_VAR__);
-            current_statement_begin__ = 462;
+            current_statement_begin__ = 466;
             validate_non_negative_index("teff", "num_bt", num_bt);
             validate_non_negative_index("teff", "logical_gt(num_uncrt, 0)", logical_gt(num_uncrt, 0));
             std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > teff(logical_gt(num_uncrt, 0), Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(num_bt));
             stan::math::initialize(teff, DUMMY_VAR__);
             stan::math::fill(teff, DUMMY_VAR__);
             // transformed parameters block statements
-            current_statement_begin__ = 463;
+            current_statement_begin__ = 467;
             for (int j = 1; j <= num_uncrt; ++j) {
-                current_statement_begin__ = 464;
+                current_statement_begin__ = 468;
                 stan::model::assign(teff, 
                             stan::model::cons_list(stan::model::index_uni(j), stan::model::nil_index_list()), 
                             add(get_base1(teff_lb, j, "teff_lb", 1), elt_multiply(subtract(get_base1(teff_ub, j, "teff_ub", 1), get_base1(teff_lb, j, "teff_lb", 1)), get_base1(teff_raw, j, "teff_raw", 1))), 
                             "assigning variable teff");
             }
             {
-            current_statement_begin__ = 467;
+            current_statement_begin__ = 471;
             validate_non_negative_index("Delta", "num_obs", num_obs);
             validate_non_negative_index("Delta", "num_obs", num_obs);
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic> Delta(num_obs, num_obs);
             stan::math::initialize(Delta, DUMMY_VAR__);
             stan::math::fill(Delta, DUMMY_VAR__);
             stan::math::assign(Delta,diag_matrix(delta_vec));
-            current_statement_begin__ = 468;
+            current_statement_begin__ = 472;
             validate_non_negative_index("KX", "num_obs", num_obs);
             validate_non_negative_index("KX", "num_obs", num_obs);
             validate_non_negative_index("KX", "num_comps", num_comps);
@@ -2215,9 +2307,9 @@ public:
             stan::math::initialize(KX, DUMMY_VAR__);
             stan::math::fill(KX, DUMMY_VAR__);
             stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx_expand, idx_expand, teff_zero, pstream__));
-            current_statement_begin__ = 474;
+            current_statement_begin__ = 478;
             for (int j = 1; j <= num_comps; ++j) {
-                current_statement_begin__ = 475;
+                current_statement_begin__ = 479;
                 stan::model::assign(f_latent, 
                             stan::model::cons_list(stan::model::index_uni(j), stan::model::nil_index_list()), 
                             multiply(cholesky_decompose(add(get_base1(KX, j, "KX", 1), Delta)), get_base1(eta, j, "eta", 1)), 
@@ -2227,7 +2319,7 @@ public:
             // validate transformed parameters
             const char* function__ = "validate transformed params";
             (void) function__;  // dummy to suppress unused var warning
-            current_statement_begin__ = 460;
+            current_statement_begin__ = 464;
             size_t f_latent_k_0_max__ = num_comps;
             size_t f_latent_j_1_max__ = num_obs;
             for (size_t k_0__ = 0; k_0__ < f_latent_k_0_max__; ++k_0__) {
@@ -2239,7 +2331,7 @@ public:
                     }
                 }
             }
-            current_statement_begin__ = 462;
+            current_statement_begin__ = 466;
             size_t teff_k_0_max__ = logical_gt(num_uncrt, 0);
             size_t teff_j_1_max__ = num_bt;
             for (size_t k_0__ = 0; k_0__ < teff_k_0_max__; ++k_0__) {
@@ -2253,145 +2345,159 @@ public:
             }
             // model body
             {
-            current_statement_begin__ = 481;
+            current_statement_begin__ = 485;
             validate_non_negative_index("f_sum", "num_obs", num_obs);
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> f_sum(num_obs);
             stan::math::initialize(f_sum, DUMMY_VAR__);
             stan::math::fill(f_sum, DUMMY_VAR__);
             stan::math::assign(f_sum,add(STAN_vectorsum(f_latent, num_obs, pstream__), c_hat));
-            current_statement_begin__ = 485;
+            current_statement_begin__ = 489;
             for (int j = 1; j <= num_comps; ++j) {
-                current_statement_begin__ = 486;
+                current_statement_begin__ = 490;
                 lp_accum__.add(STAN_log_prior(get_base1(alpha, j, "alpha", 1), get_base1(prior_alpha, j, "prior_alpha", 1), get_base1(hyper_alpha, j, "hyper_alpha", 1), pstream__));
             }
-            current_statement_begin__ = 490;
+            current_statement_begin__ = 494;
             for (int j = 1; j <= num_ell; ++j) {
-                current_statement_begin__ = 491;
+                current_statement_begin__ = 495;
                 lp_accum__.add(STAN_log_prior(get_base1(ell, j, "ell", 1), get_base1(prior_ell, j, "prior_ell", 1), get_base1(hyper_ell, j, "hyper_ell", 1), pstream__));
             }
-            current_statement_begin__ = 495;
+            current_statement_begin__ = 499;
             for (int j = 1; j <= num_ns; ++j) {
-                current_statement_begin__ = 496;
+                current_statement_begin__ = 500;
                 lp_accum__.add(STAN_log_prior(get_base1(wrp, j, "wrp", 1), get_base1(prior_wrp, j, "prior_wrp", 1), get_base1(hyper_wrp, j, "hyper_wrp", 1), pstream__));
             }
-            current_statement_begin__ = 500;
+            current_statement_begin__ = 504;
             for (int j = 1; j <= num_heter; ++j) {
-                current_statement_begin__ = 501;
+                current_statement_begin__ = 505;
                 lp_accum__.add(beta_log(get_base1(beta, j, "beta", 1), get_base1(get_base1(hyper_beta, j, "hyper_beta", 1), 1, "hyper_beta", 2), get_base1(get_base1(hyper_beta, j, "hyper_beta", 1), 2, "hyper_beta", 2)));
             }
-            current_statement_begin__ = 505;
+            current_statement_begin__ = 509;
             for (int j = 1; j <= num_uncrt; ++j) {
                 {
-                current_statement_begin__ = 506;
+                current_statement_begin__ = 510;
                 int ptype(0);
                 (void) ptype;  // dummy to suppress unused var warning
                 stan::math::fill(ptype, std::numeric_limits<int>::min());
                 stan::math::assign(ptype,get_base1(get_base1(prior_teff, 1, "prior_teff", 1), 1, "prior_teff", 2));
-                current_statement_begin__ = 507;
+                current_statement_begin__ = 511;
                 int is_backwards(0);
                 (void) is_backwards;  // dummy to suppress unused var warning
                 stan::math::fill(is_backwards, std::numeric_limits<int>::min());
                 stan::math::assign(is_backwards,get_base1(get_base1(prior_teff, 1, "prior_teff", 1), 2, "prior_teff", 2));
-                current_statement_begin__ = 508;
+                current_statement_begin__ = 512;
                 local_scalar_t__ direction(DUMMY_VAR__);
                 (void) direction;  // dummy to suppress unused var warning
                 stan::math::initialize(direction, DUMMY_VAR__);
                 stan::math::fill(direction, DUMMY_VAR__);
                 stan::math::assign(direction,pow(-(1.0), is_backwards));
-                current_statement_begin__ = 509;
+                current_statement_begin__ = 513;
                 validate_non_negative_index("tx", "num_bt", num_bt);
                 Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> tx(num_bt);
                 stan::math::initialize(tx, DUMMY_VAR__);
                 stan::math::fill(tx, DUMMY_VAR__);
                 stan::math::assign(tx,multiply(direction, subtract(get_base1(teff, 1, "teff", 1), get_base1(teff_zero, 1, "teff_zero", 1))));
-                current_statement_begin__ = 510;
+                current_statement_begin__ = 514;
                 for (int k = 1; k <= num_bt; ++k) {
-                    current_statement_begin__ = 511;
+                    current_statement_begin__ = 515;
                     lp_accum__.add(STAN_log_prior(get_base1(tx, k, "tx", 1), static_cast<std::vector<int> >(stan::math::array_builder<int >().add(ptype).add(0).array()), get_base1(hyper_teff, 1, "hyper_teff", 1), pstream__));
                 }
                 }
             }
-            current_statement_begin__ = 514;
+            current_statement_begin__ = 518;
             for (int j = 1; j <= num_comps; ++j) {
-                current_statement_begin__ = 514;
+                current_statement_begin__ = 518;
                 lp_accum__.add(normal_log(get_base1(eta, j, "eta", 1), 0, 1));
             }
-            current_statement_begin__ = 515;
-            if (as_bool(logical_eq(obs_model, 3))) {
-                current_statement_begin__ = 516;
+            current_statement_begin__ = 519;
+            if (as_bool(logical_eq(obs_model, 1))) {
+                current_statement_begin__ = 520;
+                lp_accum__.add(STAN_log_prior(get_base1(sigma, 1, "sigma", 1), get_base1(prior_sigma, 1, "prior_sigma", 1), get_base1(hyper_sigma, 1, "hyper_sigma", 1), pstream__));
+            } else if (as_bool(logical_eq(obs_model, 3))) {
+                current_statement_begin__ = 522;
                 lp_accum__.add(STAN_log_prior(get_base1(phi, 1, "phi", 1), get_base1(prior_phi, 1, "prior_phi", 1), get_base1(hyper_phi, 1, "hyper_phi", 1), pstream__));
             } else if (as_bool(logical_eq(obs_model, 5))) {
-                current_statement_begin__ = 518;
+                current_statement_begin__ = 524;
                 lp_accum__.add(beta_log(get_base1(gamma, 1, "gamma", 1), get_base1(get_base1(hyper_gamma, 1, "hyper_gamma", 1), 2, "hyper_gamma", 2), get_base1(get_base1(hyper_gamma, 1, "hyper_gamma", 1), 2, "hyper_gamma", 2)));
             }
-            current_statement_begin__ = 522;
-            if (as_bool(logical_eq(obs_model, 2))) {
+            current_statement_begin__ = 528;
+            if (as_bool(logical_eq(obs_model, 1))) {
                 {
-                current_statement_begin__ = 524;
+                current_statement_begin__ = 530;
+                validate_non_negative_index("MU", "num_obs", num_obs);
+                std::vector<local_scalar_t__  > MU(num_obs, local_scalar_t__(DUMMY_VAR__));
+                stan::math::initialize(MU, DUMMY_VAR__);
+                stan::math::fill(MU, DUMMY_VAR__);
+                stan::math::assign(MU,to_array_1d(f_sum));
+                current_statement_begin__ = 531;
+                lp_accum__.add(normal_log(get_base1(y_real, 1, "y_real", 1), MU, get_base1(sigma, 1, "sigma", 1)));
+                }
+            } else if (as_bool(logical_eq(obs_model, 2))) {
+                {
+                current_statement_begin__ = 534;
                 validate_non_negative_index("LOG_MU", "num_obs", num_obs);
                 std::vector<local_scalar_t__  > LOG_MU(num_obs, local_scalar_t__(DUMMY_VAR__));
                 stan::math::initialize(LOG_MU, DUMMY_VAR__);
                 stan::math::fill(LOG_MU, DUMMY_VAR__);
                 stan::math::assign(LOG_MU,to_array_1d(f_sum));
-                current_statement_begin__ = 525;
-                lp_accum__.add(poisson_log_log(y_int, LOG_MU));
+                current_statement_begin__ = 535;
+                lp_accum__.add(poisson_log_log(get_base1(y_int, 1, "y_int", 1), LOG_MU));
                 }
             } else if (as_bool(logical_eq(obs_model, 3))) {
                 {
-                current_statement_begin__ = 528;
+                current_statement_begin__ = 538;
                 validate_non_negative_index("LOG_MU", "num_obs", num_obs);
                 std::vector<local_scalar_t__  > LOG_MU(num_obs, local_scalar_t__(DUMMY_VAR__));
                 stan::math::initialize(LOG_MU, DUMMY_VAR__);
                 stan::math::fill(LOG_MU, DUMMY_VAR__);
                 stan::math::assign(LOG_MU,to_array_1d(f_sum));
-                current_statement_begin__ = 529;
+                current_statement_begin__ = 539;
                 validate_non_negative_index("PHI", "num_obs", num_obs);
                 std::vector<local_scalar_t__  > PHI(num_obs, local_scalar_t__(DUMMY_VAR__));
                 stan::math::initialize(PHI, DUMMY_VAR__);
                 stan::math::fill(PHI, DUMMY_VAR__);
                 stan::math::assign(PHI,to_array_1d(rep_vector(get_base1(phi, 1, "phi", 1), num_obs)));
-                current_statement_begin__ = 530;
-                lp_accum__.add(neg_binomial_2_log_log(y_int, LOG_MU, PHI));
+                current_statement_begin__ = 540;
+                lp_accum__.add(neg_binomial_2_log_log(get_base1(y_int, 1, "y_int", 1), LOG_MU, PHI));
                 }
             } else if (as_bool(logical_eq(obs_model, 4))) {
                 {
-                current_statement_begin__ = 533;
+                current_statement_begin__ = 543;
                 validate_non_negative_index("LOGIT_P", "num_obs", num_obs);
                 std::vector<local_scalar_t__  > LOGIT_P(num_obs, local_scalar_t__(DUMMY_VAR__));
                 stan::math::initialize(LOGIT_P, DUMMY_VAR__);
                 stan::math::fill(LOGIT_P, DUMMY_VAR__);
                 stan::math::assign(LOGIT_P,to_array_1d(f_sum));
-                current_statement_begin__ = 534;
-                lp_accum__.add(binomial_logit_log(y_int, get_base1(y_num_trials, 1, "y_num_trials", 1), LOGIT_P));
+                current_statement_begin__ = 544;
+                lp_accum__.add(binomial_logit_log(get_base1(y_int, 1, "y_int", 1), get_base1(y_num_trials, 1, "y_num_trials", 1), LOGIT_P));
                 }
             } else if (as_bool(logical_eq(obs_model, 5))) {
                 {
-                current_statement_begin__ = 537;
+                current_statement_begin__ = 547;
                 local_scalar_t__ tgam(DUMMY_VAR__);
                 (void) tgam;  // dummy to suppress unused var warning
                 stan::math::initialize(tgam, DUMMY_VAR__);
                 stan::math::fill(tgam, DUMMY_VAR__);
                 stan::math::assign(tgam,(inv(get_base1(gamma, 1, "gamma", 1)) - 1.0));
-                current_statement_begin__ = 538;
+                current_statement_begin__ = 548;
                 validate_non_negative_index("P", "num_obs", num_obs);
                 Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> P(num_obs);
                 stan::math::initialize(P, DUMMY_VAR__);
                 stan::math::fill(P, DUMMY_VAR__);
                 stan::math::assign(P,inv_logit(f_sum));
-                current_statement_begin__ = 539;
+                current_statement_begin__ = 549;
                 validate_non_negative_index("aa", "num_obs", num_obs);
                 std::vector<local_scalar_t__  > aa(num_obs, local_scalar_t__(DUMMY_VAR__));
                 stan::math::initialize(aa, DUMMY_VAR__);
                 stan::math::fill(aa, DUMMY_VAR__);
                 stan::math::assign(aa,to_array_1d(multiply(P, tgam)));
-                current_statement_begin__ = 540;
+                current_statement_begin__ = 550;
                 validate_non_negative_index("bb", "num_obs", num_obs);
                 std::vector<local_scalar_t__  > bb(num_obs, local_scalar_t__(DUMMY_VAR__));
                 stan::math::initialize(bb, DUMMY_VAR__);
                 stan::math::fill(bb, DUMMY_VAR__);
                 stan::math::assign(bb,to_array_1d(multiply(subtract(1.0, P), tgam)));
-                current_statement_begin__ = 541;
-                lp_accum__.add(beta_binomial_log(y_int, get_base1(y_num_trials, 1, "y_num_trials", 1), aa, bb));
+                current_statement_begin__ = 551;
+                lp_accum__.add(beta_binomial_log(get_base1(y_int, 1, "y_int", 1), get_base1(y_num_trials, 1, "y_num_trials", 1), aa, bb));
                 }
             }
             }
@@ -2420,6 +2526,7 @@ public:
         names__.push_back("wrp");
         names__.push_back("beta");
         names__.push_back("teff_raw");
+        names__.push_back("sigma");
         names__.push_back("phi");
         names__.push_back("gamma");
         names__.push_back("eta");
@@ -2445,6 +2552,9 @@ public:
         dims__.resize(0);
         dims__.push_back(logical_gt(num_uncrt, 0));
         dims__.push_back(num_bt);
+        dimss__.push_back(dims__);
+        dims__.resize(0);
+        dims__.push_back(logical_eq(obs_model, 1));
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(logical_eq(obs_model, 3));
@@ -2535,6 +2645,16 @@ public:
                 vars__.push_back(teff_raw[k_0__](j_1__));
             }
         }
+        std::vector<double> sigma;
+        size_t sigma_d_0_max__ = logical_eq(obs_model, 1);
+        sigma.reserve(sigma_d_0_max__);
+        for (size_t d_0__ = 0; d_0__ < sigma_d_0_max__; ++d_0__) {
+            sigma.push_back(in__.scalar_lb_constrain(0));
+        }
+        size_t sigma_k_0_max__ = logical_eq(obs_model, 1);
+        for (size_t k_0__ = 0; k_0__ < sigma_k_0_max__; ++k_0__) {
+            vars__.push_back(sigma[k_0__]);
+        }
         std::vector<double> phi;
         size_t phi_d_0_max__ = logical_eq(obs_model, 3);
         phi.reserve(phi_d_0_max__);
@@ -2576,36 +2696,36 @@ public:
         if (!include_tparams__ && !include_gqs__) return;
         try {
             // declare and define transformed parameters
-            current_statement_begin__ = 460;
+            current_statement_begin__ = 464;
             validate_non_negative_index("f_latent", "num_obs", num_obs);
             validate_non_negative_index("f_latent", "num_comps", num_comps);
             std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > f_latent(num_comps, Eigen::Matrix<double, Eigen::Dynamic, 1>(num_obs));
             stan::math::initialize(f_latent, DUMMY_VAR__);
             stan::math::fill(f_latent, DUMMY_VAR__);
-            current_statement_begin__ = 462;
+            current_statement_begin__ = 466;
             validate_non_negative_index("teff", "num_bt", num_bt);
             validate_non_negative_index("teff", "logical_gt(num_uncrt, 0)", logical_gt(num_uncrt, 0));
             std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > teff(logical_gt(num_uncrt, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_bt));
             stan::math::initialize(teff, DUMMY_VAR__);
             stan::math::fill(teff, DUMMY_VAR__);
             // do transformed parameters statements
-            current_statement_begin__ = 463;
+            current_statement_begin__ = 467;
             for (int j = 1; j <= num_uncrt; ++j) {
-                current_statement_begin__ = 464;
+                current_statement_begin__ = 468;
                 stan::model::assign(teff, 
                             stan::model::cons_list(stan::model::index_uni(j), stan::model::nil_index_list()), 
                             add(get_base1(teff_lb, j, "teff_lb", 1), elt_multiply(subtract(get_base1(teff_ub, j, "teff_ub", 1), get_base1(teff_lb, j, "teff_lb", 1)), get_base1(teff_raw, j, "teff_raw", 1))), 
                             "assigning variable teff");
             }
             {
-            current_statement_begin__ = 467;
+            current_statement_begin__ = 471;
             validate_non_negative_index("Delta", "num_obs", num_obs);
             validate_non_negative_index("Delta", "num_obs", num_obs);
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic> Delta(num_obs, num_obs);
             stan::math::initialize(Delta, DUMMY_VAR__);
             stan::math::fill(Delta, DUMMY_VAR__);
             stan::math::assign(Delta,diag_matrix(delta_vec));
-            current_statement_begin__ = 468;
+            current_statement_begin__ = 472;
             validate_non_negative_index("KX", "num_obs", num_obs);
             validate_non_negative_index("KX", "num_obs", num_obs);
             validate_non_negative_index("KX", "num_comps", num_comps);
@@ -2613,9 +2733,9 @@ public:
             stan::math::initialize(KX, DUMMY_VAR__);
             stan::math::fill(KX, DUMMY_VAR__);
             stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx_expand, idx_expand, teff_zero, pstream__));
-            current_statement_begin__ = 474;
+            current_statement_begin__ = 478;
             for (int j = 1; j <= num_comps; ++j) {
-                current_statement_begin__ = 475;
+                current_statement_begin__ = 479;
                 stan::model::assign(f_latent, 
                             stan::model::cons_list(stan::model::index_uni(j), stan::model::nil_index_list()), 
                             multiply(cholesky_decompose(add(get_base1(KX, j, "KX", 1), Delta)), get_base1(eta, j, "eta", 1)), 
@@ -2710,6 +2830,12 @@ public:
                 param_names__.push_back(param_name_stream__.str());
             }
         }
+        size_t sigma_k_0_max__ = logical_eq(obs_model, 1);
+        for (size_t k_0__ = 0; k_0__ < sigma_k_0_max__; ++k_0__) {
+            param_name_stream__.str(std::string());
+            param_name_stream__ << "sigma" << '.' << k_0__ + 1;
+            param_names__.push_back(param_name_stream__.str());
+        }
         size_t phi_k_0_max__ = logical_eq(obs_model, 3);
         for (size_t k_0__ = 0; k_0__ < phi_k_0_max__; ++k_0__) {
             param_name_stream__.str(std::string());
@@ -2793,6 +2919,12 @@ public:
                 param_name_stream__ << "teff_raw" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                 param_names__.push_back(param_name_stream__.str());
             }
+        }
+        size_t sigma_k_0_max__ = logical_eq(obs_model, 1);
+        for (size_t k_0__ = 0; k_0__ < sigma_k_0_max__; ++k_0__) {
+            param_name_stream__.str(std::string());
+            param_name_stream__ << "sigma" << '.' << k_0__ + 1;
+            param_names__.push_back(param_name_stream__.str());
         }
         size_t phi_k_0_max__ = logical_eq(obs_model, 3);
         for (size_t k_0__ = 0; k_0__ < phi_k_0_max__; ++k_0__) {

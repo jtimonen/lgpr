@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-datautil.R
 \name{plot_data_num_colors}
 \alias{plot_data_num_colors}
-\title{Get number of distinct colors needsd by plot_data}
+\title{Get number of distinct colors needed by plot_data}
 \usage{
 plot_data_num_colors(data, color_by)
 }
@@ -15,5 +15,5 @@ plot_data_num_colors(data, color_by)
 a list
 }
 \description{
-Get number of distinct colors needsd by plot_data
+Get number of distinct colors needed by plot_data
 }

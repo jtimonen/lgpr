@@ -2,7 +2,7 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
-context("Simulating data (simulate_data)")
+context("Simulating data")
 
 test_that("gaussian data can be simulated", {
   dat <- simulate_data(
@@ -236,7 +236,7 @@ test_that("custom dis_fun argument can be given", {
 
 # -------------------------------------------------------------------------
 
-context("Kernel functions (sim)")
+context("Kernel functions (sim.*)")
 
 test_that("base kernels work correctly", {
   expect_equal(

@@ -285,76 +285,6 @@ select_factors_and <- function(data, valid) {
   data[, col_inds]
 }
 
-
-#' Get type of each data column
-#'
-#' @param data a data frame
-#' @return a named list
-#' @family data utilities
-data_types <- function(data) {
-  check_type(data, "data.frame")
-  allowed <- c("factor", "numeric")
-  D <- ncol(data)
-  nams <- names(data)
-  types <- list()
-  for (j in seq_len(D)) {
-    check_allowed(class(data[, j])[1], allowed)
-    types[[j]] <- class(data[, j])[1]
-  }
-  names(types) <- nams
-  return(types)
-}
-
-#' Add a crossing of two factors to a data frame
-#'
-#' @param df a data frame
-#' @param fac1 name of first factor, must be found in \code{df}
-#' @param fac2 name of second factor, must be found in \code{df}
-#' @param new_name name of the new factor
-#' @return a data frame
-#' @family data utilities
-add_factor_crossing <- function(df, fac1, fac2, new_name) {
-  a <- dollar(df, fac1)
-  b <- dollar(df, fac2)
-  check_not_null(new_name)
-  check_type(a, "factor")
-  check_type(b, "factor")
-  df[[new_name]] <- interaction(a, b, sep = "*")
-  return(df)
-}
-
-#' Data frame and additional information to long format
-#'
-#' @param df a data frame in wide format
-#' @return a data frame where first column is a factor that determines the
-#' column variable name in the original data and second column contains
-#' the actual values
-#' @family data utilities
-to_long_format <- function(df) {
-  nam <- colnames(df)
-  x <- c()
-  J <- ncol(df)
-  N <- nrow(df)
-  for (j in seq_len(J)) {
-    x <- c(x, as.vector(df[, j]))
-  }
-  fac <- as.factor(rep(nam, each = N))
-  out <- data.frame(fac, x)
-  return(out)
-}
-
-#' Repeat a data frame vertically
-#'
-#' @param df a data frame
-#' @param times number of times to repeat
-#' @return a data frame
-#' @family data utilities
-rep_df <- function(df, times) {
-  out <- c()
-  for (j in seq_len(times)) out <- rbind(out, df)
-  return(out)
-}
-
 #' Vizualizing longitudinal data
 #'
 #' @export
@@ -446,7 +376,7 @@ plot_data_titles <- function(main, sub, data, group_by) {
   list(main = main, sub = sub, N = N, n = n)
 }
 
-#' Get number of distinct colors needsd by plot_data
+#' Get number of distinct colors needed by plot_data
 #'
 #' @inheritParams plot_data
 #' @return a list
