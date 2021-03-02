@@ -159,7 +159,7 @@ class_info <- function(class_name) {
   return(str)
 }
 
-#' Class info for show methods
+#' Class info for show methods of pred objects
 #'
 #' @param class_name class name
 #' @param num_comps number of components
@@ -173,25 +173,39 @@ class_info_pred <- function(class_name, num_comps, D) {
   return(desc)
 }
 
-#' Get simulated components from an lgpsim object
+#' Visualize input warping function with several steepness parameter values
 #'
-#' @param simdata an object of class \linkS4class{lgpsim}
-#' @return a data frame
-get_sim_components <- function(simdata) {
-  df <- simdata@components
-  nams <- colnames(df)
-  idx <- which(nams == "f")
-  df <- df[, 1:(idx - 1)]
-  nams <- colnames(df)
-  prettify <- function(str, i) {
-    str <- gsub(str, pattern = ".", replacement = ", ", fixed = TRUE)
-    str <- paste0("f[", i, "](", str, ")")
-    return(str)
+#' @param wrp a vector of values of the warping steepness parameter
+#' @param x a vector of input values
+#' @param color line color
+#' @param alpha line alpha
+#' @return a \code{ggplot} object
+plot_inputwarp <- function(wrp,
+                           x,
+                           color = colorset("red", "dark"),
+                           alpha = 0.5) {
+  x <- sort(x)
+  L <- length(x)
+  S <- length(wrp)
+  W <- matrix(0, S, L)
+  for (i in seq_len(S)) {
+    w <- cpp_warp_input(x, a = wrp[i])
+    W[i, ] <- w
   }
-  J <- length(nams)
-  for (j in seq_len(J)) {
-    nams[j] <- prettify(nams[j], j)
-  }
-  colnames(df) <- nams
-  return(df)
+  af <- as.factor(rep(1:S, each = L))
+  df <- data.frame(rep(x, S), as.vector(t(W)), af)
+  colnames(df) <- c("x", "w", "idx")
+
+  # Create ggplot object
+  aes <- ggplot2::aes_string(x = "x", y = "w", group = "idx")
+  plt <- ggplot2::ggplot(df, aes)
+
+  # Add titles and labels
+  plt <- plt + ggplot2::labs(x = "Input", y = "Warped input") +
+    ggplot2::ggtitle("Input-warping function")
+  plt <- plt + ggplot2::ylim(-1.0, 1.0)
+
+  # Plot the actual lines of interest
+  plt <- plt + ggplot2::geom_line(color = color, alpha = alpha)
+  return(plt)
 }

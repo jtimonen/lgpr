@@ -1,40 +1,44 @@
-#' Visualize input warping function with several steepness parameter values
+
+#' Density and quantile functions of the inverse gamma distribution
 #'
-#' @param wrp a vector of values of the warping steepness parameter
-#' @param x a vector of input values
-#' @param color line color
-#' @param alpha line alpha
-#' @return a \code{ggplot} object
-plot_inputwarp <- function(wrp,
-                           x,
-                           color = colorset("red", "dark"),
-                           alpha = 0.5) {
-  x <- sort(x)
-  L <- length(x)
-  S <- length(wrp)
-  W <- matrix(0, S, L)
-  for (i in seq_len(S)) {
-    w <- cpp_warp_input(x, a = wrp[i])
-    W[i, ] <- w
+#' @description Using the same parametrization as Stan. More info
+#' \href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{here}.
+#' @param alpha positive real number
+#' @param beta positive real number
+#' @param x point where to compute the density
+#' @param log is log-scale used?
+#' @return density/quantile value
+#' @name dinvgamma_stanlike
+#' @family functions related to the inverse-gamma distribution
+
+#' @rdname dinvgamma_stanlike
+dinvgamma_stanlike <- function(x, alpha, beta, log = FALSE) {
+  if (alpha <= 0) {
+    stop("alpha must be positive")
   }
-  af <- as.factor(rep(1:S, each = L))
-  df <- data.frame(rep(x, S), as.vector(t(W)), af)
-  colnames(df) <- c("x", "w", "idx")
-
-  # Create ggplot object
-  aes <- ggplot2::aes_string(x = "x", y = "w", group = "idx")
-  plt <- ggplot2::ggplot(df, aes)
-
-  # Add titles and labels
-  plt <- plt + ggplot2::labs(x = "Input", y = "Warped input") +
-    ggplot2::ggtitle("Input-warping function")
-  plt <- plt + ggplot2::ylim(-1.0, 1.0)
-
-  # Plot the actual lines of interest
-  plt <- plt + ggplot2::geom_line(color = color, alpha = alpha)
-  return(plt)
+  if (beta <= 0) {
+    stop("beta must be positive")
+  }
+  t1 <- alpha * log(beta) - lgamma(alpha)
+  t2 <- -1 * (alpha + 1) * log(x)
+  t3 <- -beta / x
+  log_p <- t1 + t2 + t3
+  if (log) {
+    return(log_p)
+  } else {
+    return(exp(log_p))
+  }
 }
 
+#' @param p quantile (must be between 0 and 1)
+#' @rdname dinvgamma_stanlike
+qinvgamma_stanlike <- function(p, alpha, beta) {
+  check_positive(alpha)
+  check_positive(beta)
+  check_interval(p, 0, 1)
+  r <- stats::qgamma(1 - p, shape = alpha, rate = beta)
+  return(1 / r)
+}
 
 #' Plot the inverse gamma-distribution pdf
 #'

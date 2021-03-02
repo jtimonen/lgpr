@@ -2,7 +2,7 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
-context("Simulating data (sim)")
+context("Simulating data (simulate_data)")
 
 test_that("gaussian data can be simulated", {
   dat <- simulate_data(
@@ -295,4 +295,52 @@ test_that("sim.check_too_far works correctly", {
   expect_true(sim.check_too_far(1, rem))
   reason <- "Not enough data points to go that far"
   expect_error(sim.check_too_far(4, rem), reason)
+})
+
+
+
+# -------------------------------------------------------------------------
+
+context("Methods for lgpsim objects")
+set.seed(123)
+
+test_that("simulated data can be plotted", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(1, 2)
+  )
+  p1 <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4, verbose = FALSE)
+  p2 <- plot_sim(dat, comp_idx = 2, verbose = FALSE) # not colored
+  p3 <- plot_sim(dat, comp_idx = 3, color_by = "z", verbose = FALSE) # colored
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
+})
+
+test_that("simulated data with disease effect can be plotted", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "after_1"
+  )
+  p1 <- plot_sim(dat, i_test = c(1, 2, 3), ncol = 4, verbose = FALSE) # vlines
+  p2 <- plot_sim(dat, comp_idx = 1, verbose = FALSE)
+  p3 <- plot_sim(dat, comp_idx = 3, color_by = "diseaseAge", verbose = FALSE)
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
+  expect_output(plot_sim(dat, verbose = TRUE))
+  expect_output(plot_sim(dat, comp_idx = 1, verbose = TRUE))
+})
+
+test_that("show method for simulated data prints output", {
+  dat <- simulate_data(
+    N = 4,
+    t_data = seq(6, 36, by = 6),
+    covariates = c(0, 2),
+    t_observed = "after_1"
+  )
+  expect_output(show(dat))
 })
