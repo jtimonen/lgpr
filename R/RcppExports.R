@@ -41,8 +41,8 @@ STAN_quad_form_inv <- function(x, A, pstream__ = 0L) {
     .Call(`_lgpr_STAN_quad_form_inv`, x, A, pstream__)
 }
 
-STAN_kernel_base_zerosum <- function(x1, x2, num_cat, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_base_zerosum`, x1, x2, num_cat, pstream__)
+STAN_kernel_base_zerosum <- function(x1, x2, ncat, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_base_zerosum`, x1, x2, ncat, pstream__)
 }
 
 STAN_kernel_base_cat <- function(x1, x2, pstream__ = 0L) {
@@ -53,8 +53,8 @@ STAN_kernel_base_bin_mask <- function(x1, x2, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_base_bin_mask`, x1, x2, pstream__)
 }
 
-STAN_kernel_const <- function(x1, x2, kernel_type, num_cat, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_const`, x1, x2, kernel_type, num_cat, pstream__)
+STAN_kernel_const <- function(x1, x2, kernel_type, ncat, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_const`, x1, x2, kernel_type, ncat, pstream__)
 }
 
 STAN_kernel_const_all <- function(n1, n2, x1, x2, x1_mask, x2_mask, num_levels, components, pstream__ = 0L) {

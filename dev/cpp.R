@@ -1,12 +1,11 @@
 # Set paths
 STAN_HOME <- file.path("inst", "stan")
 FILES <- c(
-  "chunks/functions-utils.stan",
-  "chunks/functions-kernels_const.stan",
-  "chunks/functions-kernels.stan",
-  "chunks/functions-basisfun.stan",
-  "chunks/functions-posterior.stan",
-  "chunks/functions-prior.stan"
+  "_common/functions-utils.stan",
+  "_common/functions-kernels.stan",
+  "_common/functions-basisfun.stan",
+  "_common/functions-posterior.stan",
+  "_common/functions-prior.stan"
 )
 
 # Create stan model containing only a functions block with all the functions

@@ -2,12 +2,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp ;
-#include "stanExports_lgp.h"
+#include "stanExports_lgp_marginal.h"
 
-RCPP_MODULE(stan_fit4lgp_mod) {
+RCPP_MODULE(stan_fit4lgp_marginal_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_lgp")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_lgp_marginal")
 
     .constructor<SEXP,SEXP,SEXP>()
 
