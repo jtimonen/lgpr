@@ -18,6 +18,6 @@ to avoid grouping)}
 a factor
 }
 \description{
-used e.g. by \cide{\link{plot_pred}} and
+used e.g. by \code{\link{plot_pred}} and
 \code{\link{new_x}}
 }

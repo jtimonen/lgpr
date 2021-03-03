@@ -374,3 +374,102 @@ add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
   h <- h + ggplot2::facet_wrap(f, nrow = nrow, ncol = ncol, labeller = labfun)
   return(h)
 }
+
+
+
+#' Plot colors to use
+#'
+#' @param main Color name. Must be a valid scheme name for
+#' \code{\link[bayesplot]{color_scheme_get}}.
+#' @param variant Must be one of {"light", "light_highlight", "mid",
+#' "mid_highlight", "dark", "dark_highlight"}.
+#' @return A hex value of the color.
+#' @family color utilities
+colorset <- function(main, variant = "mid") {
+  scheme <- bayesplot::color_scheme_get(scheme = main)
+  col <- scheme[[variant]]
+  if (is.null(col)) {
+    stop("Invalid color!")
+  }
+  return(col)
+}
+
+#' A color palettes
+#'
+#' @param n an integer from 1 to 5
+#' @return an array of \code{n} hex values
+#' @family color utilities
+#' @name color_palette
+
+#' @rdname color_palette
+color_palette <- function(n) {
+  c1 <- colorset("brightblue", "mid_highlight")
+  c2 <- colorset("red", "mid_highlight")
+  c3 <- colorset("orange", "mid_highlight")
+  c4 <- colorset("green", "mid_highlight")
+  c5 <- colorset("gray", "dark_highlight")
+  palette <- c(c1, c2, c3, c4, c5)
+  palette[1:n]
+}
+
+#' @rdname color_palette
+fill_palette <- function(n) {
+  c1 <- colorset("brightblue", "mid")
+  c2 <- colorset("red", "mid")
+  c3 <- colorset("orange", "mid")
+  c4 <- colorset("green", "mid")
+  c5 <- colorset("gray", "dark")
+  palette <- c(c1, c2, c3, c4, c5)
+  palette[1:n]
+}
+
+#' Visualize a color palette
+#'
+#' @inheritParams color_palette
+#' @return a \code{ggplot} object
+#' @family color utilities
+plot_color_palette <- function(n) {
+  colors <- color_palette(n)
+  x <- rep(c(0, 1), n)
+  y <- rep(c(1:n), each = 2)
+  col <- as.factor(rep(colors, each = 2))
+  df <- data.frame(x, y, col)
+  aes <- ggplot2::aes_string(x = x, y = y, color = col, group = col)
+  h <- ggplot2::ggplot(df) +
+    ggplot2::geom_line(aes, lwd = 1)
+  h <- h + ggplot2::scale_color_manual(values = colors)
+  blank <- ggplot2::element_blank()
+  h <- h + ggplot2::theme(
+    axis.text = blank,
+    axis.title = blank,
+    axis.ticks = blank
+  )
+  h <- h + ggplot2::theme(legend.position = "none")
+  h <- h + ggplot2::ggtitle("Colors")
+  return(h)
+}
+
+#' A color scale.
+#'
+#' @inheritParams color_palette
+#' @return a \code{ggplot} object (if \code{n <= 5}) or NULL (if \code{n > 5})
+#' @family color utilities
+#' @name scale_color
+
+#' @rdname scale_color
+scale_color <- function(n) {
+  if (n > 5) {
+    return(NULL)
+  }
+  values <- color_palette(n)
+  ggplot2::scale_color_manual(values = values)
+}
+
+#' @rdname scale_color
+scale_fill <- function(n) {
+  if (n > 5) {
+    return(NULL)
+  }
+  values <- fill_palette(n)
+  ggplot2::scale_fill_manual(values = values)
+}
