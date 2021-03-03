@@ -273,7 +273,7 @@ check_in_data <- function(var_name, data) {
   if (!ok) {
     str <- paste(d_names, collapse = ", ")
     msg <- paste0(
-      "The variable '", var_name, "' not found in <data>! ",
+      "The variable '", var_name, "' not found in <data>!",
       " Found data columns = {", str, "}."
     )
     stop(msg)

@@ -157,16 +157,6 @@ test_that("a formula term cannot have more than 4 expressions", {
   )
 })
 
-test_that("an lgpmodel has correct list fields for stan input", {
-  m <- create_model(
-    formula = y ~ gp(age) + zs(id),
-    data = testdata_001,
-    options = list(delta = 1e-5)
-  )
-  L <- length(m@stan_input)
-  expect_equal(L, 46)
-})
-
 test_that("creating an lgpmodel errors with invalid data", {
   expect_error(
     create_model(notvar ~ gp(age) + categ(id), testdata_001),

@@ -220,6 +220,7 @@ get_y_name <- function(object) {
 #' @inheritParams object_to_model
 #' @return
 #' \itemize{
+#'   \item \code{get_stan_model} returns a \code{\link[rstan]{stanmodel}}
 #'   \item \code{get_stan_input} returns a list
 #'   \item \code{get_num_obs} returns the number of observations
 #'   \item \code{get_obs_model} returns the obs. model as a string
@@ -229,6 +230,18 @@ get_y_name <- function(object) {
 #'   \item \code{is_f_sampled} returns a boolean value
 #' }
 NULL
+
+
+#' @rdname model_getters
+get_stan_model <- function(object) {
+  model <- object_to_model(object)
+  if (is_f_sampled(model)) {
+    model_name <- "lgp_latent"
+  } else {
+    model_name <- "lgp_marginal"
+  }
+  stanmodels[[model_name]] # global variable (list of all pkg models)
+}
 
 #' @rdname model_getters
 get_stan_input <- function(object) {
@@ -249,8 +262,8 @@ get_num_obs <- function(object) {
 
 #' @rdname model_getters
 is_f_sampled <- function(object) {
-  val <- dollar(get_stan_input(object), "is_f_sampled")
-  as.logical(val)
+  object <- object_to_model(object)
+  object@sample_f
 }
 
 #' @rdname model_getters
@@ -258,7 +271,6 @@ is_yrng_done <- function(object) {
   val <- dollar(get_stan_input(object), "is_yrng_done")
   as.logical(val)
 }
-
 
 #' @rdname model_getters
 get_obs_model <- function(object) {

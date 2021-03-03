@@ -1,6 +1,6 @@
 #' Parse the covariates and model components from given data and formula
 #'
-#' @inheritParams parse_response
+#' @inheritParams parse_y
 #' @param x_cont_scl Information on how to scale the continuous covariates.
 #' This can either be
 #' \itemize{
@@ -10,9 +10,16 @@
 #' }
 #'
 #' @return parsed input to stan and covariate scaling
-parse_covs_and_comps <- function(data, model_formula, x_cont_scl) {
+parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 
+  # Check that data is a data.frame
+  c_data <- class(data)
+  if (c_data != "data.frame") {
+    stop("<data> must be a data.frame! found = ", c_data)
+  }
+  
   # Check that all covariates exist in data
+  if (verbose) cat("Parsing covariates and components...\n")
   x_names <- rhs_variables(model_formula@terms)
   x_names <- unique(x_names)
   for (name in x_names) check_in_data(name, data)
@@ -22,13 +29,26 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl) {
   components <- stan_data_components(model_formula, covariates)
   ts1 <- dollar(covariates, "to_stan")
   ts2 <- dollar(components, "to_stan")
+  to_stan <- c(ts1, ts2)
+
+  # Other info
+  x_cont_scalings <- dollar(covariates, "x_cont_scalings")
+  x_cat_levels <- dollar(covariates, "x_cat_levels")
+
+  # Variable names
+  var_names <- list(
+    y = model_formula@y_name,
+    x_cont = names(x_cont_scalings),
+    x_cat = names(x_cat_levels)
+  )
 
   # Return
   list(
-    to_stan = c(ts1, ts2),
-    x_cont_scalings = dollar(covariates, "x_cont_scalings"),
-    x_cat_levels = dollar(covariates, "x_cat_levels"),
-    caseid_map = dollar(components, "caseid_map")
+    to_stan = to_stan,
+    x_cont_scalings = x_cont_scalings,
+    x_cat_levels = x_cat_levels,
+    caseid_map = dollar(components, "caseid_map"),
+    var_names = var_names
   )
 }
 
@@ -44,7 +64,7 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl) {
 #'   \item \code{x_cont_unnorm}
 #'   \item \code{x_cont_mask}
 #' }
-#' @inheritParams parse_covs_and_comps
+#' @inheritParams parse_y
 #' @param data a data frame
 #' @param x_names unique covariate names
 #' @return a named list with fields
@@ -173,8 +193,6 @@ stan_data_components <- function(model_formula, covariates) {
   num_bt <- length(unique(idx_expand[idx_expand > 1]))
   num_ns <- sum(components[, 5] != 0)
   num_vm <- sum(components[, 6] != 0)
-  VM <- default_vm_params()
-  vm_params <- matrix(rep(VM, num_ns), num_ns, 2, byrow = TRUE)
 
   to_stan <- list(
     components = components,
@@ -185,8 +203,7 @@ stan_data_components <- function(model_formula, covariates) {
     num_ns = num_ns,
     num_vm = num_vm,
     num_uncrt = sum(components[, 7] != 0),
-    num_comps = dim(components)[1],
-    vm_params = vm_params
+    num_comps = dim(components)[1]
   )
 
   # Return

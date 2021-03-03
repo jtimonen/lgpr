@@ -4,20 +4,21 @@
 \alias{parse_options}
 \title{Parse the given modeling options}
 \usage{
-parse_options(options = NULL)
+parse_options(options, verbose)
 }
 \arguments{
 \item{options}{A named list with the following possible fields:
 \itemize{
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
-  \item \code{do_yrng} Should random numbers be drawn from the predictive
-  distribution (one for each posterior draw). This can be set to true
-  in order to do prior or posterior predictive sampling, and only has
-  any effect if \code{sample_f = TRUE}.
+  \item \code{vm_params} Variance mask function parameters (numeric
+  vector of length 2).
 }
 If \code{options} is \code{NULL}, default options are used. The defaults
-are equivalent to \code{options = list(delta = 1e-8, do_yrng = FALSE)}.}
+are equivalent to
+\code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
+
+\item{verbose}{Should some informative messages be printed?}
 }
 \value{
 a named list of parsed options

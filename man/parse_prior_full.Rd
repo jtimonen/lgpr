@@ -7,11 +7,11 @@
 \alias{parse_prior_full_teff}
 \title{Parse a fully defined prior}
 \usage{
-parse_prior_full(prior, stan_input, obs_model)
+parse_prior_full(prior, stan_input)
 
-parse_prior_full_pos(prior, stan_input, obs_model)
+parse_prior_full_pos(prior, stan_input)
 
-parse_prior_full_unit(prior, stan_input, obs_model)
+parse_prior_full_unit(prior, stan_input)
 
 parse_prior_full_teff(prior, stan_input)
 }
@@ -21,8 +21,6 @@ parse_prior_full_teff(prior, stan_input)
 (\code{\link{lgp}}).}
 
 \item{stan_input}{a list of stan input fields}
-
-\item{obs_model}{observation model as integer}
 }
 \value{
 a named list to be given to Stan

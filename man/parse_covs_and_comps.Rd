@@ -4,7 +4,7 @@
 \alias{parse_covs_and_comps}
 \title{Parse the covariates and model components from given data and formula}
 \usage{
-parse_covs_and_comps(data, model_formula, x_cont_scl)
+parse_covs_and_comps(data, model_formula, x_cont_scl, verbose)
 }
 \arguments{
 \item{data}{A \code{data.frame} where each column corresponds to one
@@ -14,8 +14,6 @@ must have type \code{"factor"}. Missing values should be indicated with
 \code{NaN} or \code{NA}. The response variable cannot contain missing
 values. Column names should not contain trailing or leading underscores.}
 
-\item{model_formula}{An object of class \code{lgpformula}.}
-
 \item{x_cont_scl}{Information on how to scale the continuous covariates.
 This can either be
 \itemize{
@@ -23,6 +21,8 @@ This can either be
   \item \code{NA}, in which case such list is created by computing mean
   and standard deviation from \code{data}
 }}
+
+\item{verbose}{Should some informative messages be printed?}
 }
 \value{
 parsed input to stan and covariate scaling

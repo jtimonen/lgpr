@@ -25,7 +25,7 @@ must have type \code{"factor"}. Missing values should be indicated with
 \code{NaN} or \code{NA}. The response variable cannot contain missing
 values. Column names should not contain trailing or leading underscores.}
 
-\item{verbose}{Should more verbose output be printed?}
+\item{verbose}{Should some informative messages be printed?}
 }
 \value{
 an object of class \linkS4class{lgpformula}

@@ -10,14 +10,6 @@ stan_data_covariates(data, x_names, x_cont_scl)
 \item{data}{a data frame}
 
 \item{x_names}{unique covariate names}
-
-\item{x_cont_scl}{Information on how to scale the continuous covariates.
-This can either be
-\itemize{
-  \item an existing list of objects with class \linkS4class{lgpscaling}, or
-  \item \code{NA}, in which case such list is created by computing mean
-  and standard deviation from \code{data}
-}}
 }
 \value{
 a named list with fields

@@ -36,7 +36,7 @@ An S4 class to represent an lgp model
 
 \item{\code{info}}{Other info in text format.}
 
-\item{\code{stan_model_name}}{Name of Stan model.}
+\item{\code{sample_f}}{Whether the signal \code{f} is sampled or marginalized.}
 
 \item{\code{full_prior}}{Complete prior information.}
 }}

@@ -45,17 +45,20 @@ binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 (hyper)parameters. See the "Defining priors" section below
 (\code{\link{lgp}}).}
 
-\item{c_hat}{The GP mean. Must be a vector of length \code{dim(data)[1]}, or
-a real number defining a constant GP mean. If not specified, this is set to
+\item{c_hat}{The GP mean. This should only be given if \code{sample_f} is
+\code{TRUE}, otherwise the GP will always have zero mean. If \code{sample_f}
+is \code{TRUE}, the given \code{c_hat} can be a vector of length
+\code{dim(data)[1]}, or a real number defining a constant GP mean. If not
+specified and \code{sample_f} is \code{TRUE}, \code{c_hat} is set to
  \itemize{
-   \item \code{c_hat = 0}, if \code{likelihood} is \code{"gaussian"},
+   \item \code{c_hat = mean(y)}, if \code{likelihood} is \code{"gaussian"},
    \item \code{c_hat = } \code{log(mean(y))} if \code{likelihood} is
    \code{"poisson"} or \code{"nb"},
    \item \code{c_hat = } \code{log(p/(1-p))}, where
    \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"}
    or \code{"bb"},
  }
-where \code{y} denotes the response variable.}
+where \code{y} denotes the response variable measurements.}
 
 \item{num_trials}{This argument (number of trials) is only needed when
 likelihood is \code{"binomial"} or \code{"bb"}. Must have length one or
@@ -66,22 +69,19 @@ equal to the number of data points. Setting \code{num_trials=1} and
 \itemize{
   \item \code{delta} Amount of added jitter to ensure positive definite
   covariance matrices.
-  \item \code{do_yrng} Should random numbers be drawn from the predictive
-  distribution (one for each posterior draw). This can be set to true
-  in order to do prior or posterior predictive sampling, and only has
-  any effect if \code{sample_f = TRUE}.
+  \item \code{vm_params} Variance mask function parameters (numeric
+  vector of length 2).
 }
 If \code{options} is \code{NULL}, default options are used. The defaults
-are equivalent to \code{options = list(delta = 1e-8, do_yrng = FALSE)}.}
+are equivalent to
+\code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
 
 \item{prior_only}{Should sampling be done in prior mode,
-where likelihood is ignored? This can be used to do prior predictive
-sampling, with \code{options = list(do_yrng = TRUE)} and
-\code{sample_f = TRUE}.}
+where likelihood is ignored?.}
 
-\item{verbose}{Should more verbose output be printed?}
+\item{verbose}{Should some informative messages be printed?}
 
-\item{sample_f}{Determines if the latent function values are be sampled
+\item{sample_f}{Determines if the latent function values are sampled
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
 \code{TRUE}, the response variable will be normalized to have zero mean
 and unit variance.}

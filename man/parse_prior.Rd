@@ -4,7 +4,7 @@
 \alias{parse_prior}
 \title{Parse given prior}
 \usage{
-parse_prior(prior, stan_input, obs_model)
+parse_prior(prior, stan_input, verbose)
 }
 \arguments{
 \item{prior}{A named list, defining the prior distribution of model
@@ -13,7 +13,7 @@ parse_prior(prior, stan_input, obs_model)
 
 \item{stan_input}{a list of stan input fields}
 
-\item{obs_model}{observation model as integer}
+\item{verbose}{Should some informative messages be printed?}
 }
 \value{
 a named list of parsed options

@@ -2,8 +2,6 @@
 #'
 #' @description
 #' \itemize{
-#'   \item \code{default_vm_params} returns variance mask function parameters
-#'   (two numbers)
 #'   \item \code{default_prior} returns a named list that defines a prior
 #'   \item \code{default_ppc_fun} returns a function to be used as argument
 #'   of \code{\link{ppc}}
@@ -14,11 +12,6 @@
 #' @return see description
 #' @name defaults
 NULL
-
-#' @rdname defaults
-default_vm_params <- function() {
-  c(0.025, 1)
-}
 
 #' @rdname defaults
 default_prior <- function(name, num_uncrt = NULL) {

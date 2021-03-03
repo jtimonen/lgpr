@@ -127,7 +127,7 @@
     real[] wrp,
     vector[] beta,
     vector[] teff,
-    data real[,] vm_params,
+    data real[] vm_params,
     data int[] idx1_expand,
     data int[] idx2_expand,
     data vector[] teff_zero)
@@ -180,7 +180,7 @@
         // 4.2 Variance masking
         s = wrp[idx_wrp];
         if(is_var_masked){
-          K = K .* STAN_kernel_base_var_mask(X1, X2, s, vm_params[idx_wrp]);
+          K = K .* STAN_kernel_base_var_mask(X1, X2, s, vm_params);
         }
         
         // 4.3 Input warping

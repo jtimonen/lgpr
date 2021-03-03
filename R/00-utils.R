@@ -232,9 +232,7 @@ warn_msg_default_prior <- function(desc, name, model_desc) {
 #' @param stan_input a list containing an element named \code{components}
 #' @return an integer
 get_num_ns <- function(stan_input) {
-  comp <- dollar(stan_input, "components")
-  num <- sum(comp[, 5] > 0)
-  return(num)
+  dollar(stan_input, "num_ns")
 }
 
 #' Repeat a vector as a rows of an array

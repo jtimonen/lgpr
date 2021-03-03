@@ -2,6 +2,7 @@
 % Please edit documentation in R/02-model_info.R
 \name{model_getters}
 \alias{model_getters}
+\alias{get_stan_model}
 \alias{get_stan_input}
 \alias{get_data}
 \alias{get_num_obs}
@@ -11,6 +12,8 @@
 \alias{get_num_trials}
 \title{Functions that access model properties}
 \usage{
+get_stan_model(object)
+
 get_stan_input(object)
 
 get_data(object)
@@ -31,6 +34,7 @@ get_num_trials(object)
 }
 \value{
 \itemize{
+  \item \code{get_stan_model} returns a \code{\link[rstan]{stanmodel}}
   \item \code{get_stan_input} returns a list
   \item \code{get_num_obs} returns the number of observations
   \item \code{get_obs_model} returns the obs. model as a string

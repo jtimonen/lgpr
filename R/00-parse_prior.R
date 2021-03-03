@@ -1,15 +1,15 @@
-
 #' Parse given prior
 #'
+#' @inheritParams parse_y
 #' @param prior A named list, defining the prior distribution of model
 #' (hyper)parameters. See the "Defining priors" section below
 #' (\code{\link{lgp}}).
 #' @param stan_input a list of stan input fields
-#' @param obs_model observation model as integer
 #' @return a named list of parsed options
-parse_prior <- function(prior, stan_input, obs_model) {
+parse_prior <- function(prior, stan_input, verbose) {
+  if (verbose) cat("Parsing prior...\n")
   num_uncrt <- dollar(stan_input, "num_uncrt")
-  num_ns <- get_num_ns(stan_input)
+  num_ns <- dollar(stan_input, "num_ns")
   filled <- fill_prior(prior, num_uncrt)
   spec <- dollar(filled, "specified")
   dflt <- dollar(filled, "defaulted")
@@ -27,11 +27,12 @@ parse_prior <- function(prior, stan_input, obs_model) {
     " model, default priors are used for them: {", str2, "}"
   )
   info <- paste0(msg1, "\n", msg2, "\n")
+  if (verbose) cat(info)
+
   raw <- dollar(filled, "prior")
-  to_stan <- parse_prior_full(raw, stan_input, obs_model)
+  to_stan <- parse_prior_full(raw, stan_input)
   list(
     to_stan = to_stan,
-    info = info,
     raw = raw
   )
 }
@@ -279,15 +280,16 @@ prior_to_str <- function(parname, prior, hyper, digits) {
 NULL
 
 #' @name parse_prior_full
-parse_prior_full <- function(prior, stan_input, obs_model) {
-  list_pos <- parse_prior_full_pos(prior, stan_input, obs_model)
-  list_unit <- parse_prior_full_unit(prior, stan_input, obs_model)
+parse_prior_full <- function(prior, stan_input) {
+  list_pos <- parse_prior_full_pos(prior, stan_input)
+  list_unit <- parse_prior_full_unit(prior, stan_input)
   list_teff <- parse_prior_full_teff(prior, stan_input)
   c(list_pos, list_unit, list_teff)
 }
 
 #' @rdname parse_prior_full
-parse_prior_full_pos <- function(prior, stan_input, obs_model) {
+parse_prior_full_pos <- function(prior, stan_input) {
+  obs_model <- dollar(stan_input, "obs_model")
   par_names <- c("alpha", "ell", "wrp", "sigma", "phi")
   nums <- stan_input[c("num_comps", "num_ell", "num_ns")]
   num_sigma <- as.numeric(obs_model == 1)
@@ -309,7 +311,8 @@ parse_prior_full_pos <- function(prior, stan_input, obs_model) {
 
 
 #' @rdname parse_prior_full
-parse_prior_full_unit <- function(prior, stan_input, obs_model) {
+parse_prior_full_unit <- function(prior, stan_input) {
+  obs_model <- dollar(stan_input, "obs_model")
   par_names <- c("beta", "gamma")
   num_gamma <- as.numeric(obs_model == 5)
   num_heter <- dollar(stan_input, "num_heter")

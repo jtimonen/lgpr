@@ -129,7 +129,7 @@ NULL
 sample_model <- function(model, ...) {
   num_obs <- get_num_obs(model)
   large_data_msg(num_obs, 300)
-  object <- stanmodels[[model@stan_model_name]]
+  object <- get_stan_model(model)
   data <- model@stan_input
   sfit <- rstan::sampling(object = object, data = data, check_data = TRUE, ...)
   if (sfit@mode == 2) {

@@ -1,5 +1,6 @@
   // Binary option switches
   int<lower=0, upper=1> is_verbose;
+  int<lower=0, upper=1> is_likelihood_skipped;
 
   // Dimensions
   int<lower=0> num_obs;         // number of observations
@@ -65,4 +66,4 @@
 
   // Misc
   real delta; // jitter to ensure pos. def. kernel matrices
-  real vm_params[num_ns, 2]; // variance mask parameters (nonstat comps)
+  real vm_params[2]; // variance mask parameters (nonstat comps)

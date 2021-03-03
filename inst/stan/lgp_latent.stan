@@ -64,24 +64,24 @@ model {
   }
 
   // Likelihood
-  if(obs_model==1){
+  if(obs_model==1 && is_likelihood_skipped==0) {
     // 1. Gaussian
     real MU[num_obs] = to_array_1d(f_sum); // means
     target += normal_lpdf(y_real[1] | MU, sigma[1]);
-  }else if(obs_model==2){
+  }else if(obs_model==2 && is_likelihood_skipped==0){
     // 2. Poisson
     real LOG_MU[num_obs] = to_array_1d(f_sum); // means (log-scale)
     target += poisson_log_lpmf(y_int[1] | LOG_MU);
-  }else if(obs_model==3){
+  }else if(obs_model==3 && is_likelihood_skipped==0){
     // 3. Negative binomial
     real LOG_MU[num_obs] = to_array_1d(f_sum); // means (log-scale)
     real PHI[num_obs] = to_array_1d(rep_vector(phi[1], num_obs)); // dispersion
     target += neg_binomial_2_log_lpmf(y_int[1] | LOG_MU, PHI);
-  }else if(obs_model==4){
+  }else if(obs_model==4 && is_likelihood_skipped==0){
     // 4. Binomial
     real LOGIT_P[num_obs] = to_array_1d(f_sum); // p success (logit-scale)
     target += binomial_logit_lpmf(y_int[1] | y_num_trials[1], LOGIT_P);
-  }else if(obs_model==5){
+  }else if(obs_model==5 && is_likelihood_skipped==0){
     // 5. Beta-binomial
     real tgam = inv(gamma[1]) - 1.0;
     vector[num_obs] P = inv_logit(f_sum); // p success

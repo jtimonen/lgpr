@@ -9,8 +9,8 @@ functions{
 data {
 #include _common/data.stan
   vector[num_obs] y_norm;
-  int<lower=0> prior_sigma[2];
-  real hyper_sigma[3];
+  int<lower=0> prior_sigma[1, 2];
+  real hyper_sigma[1, 3];
 }
 
 transformed data{
@@ -20,7 +20,7 @@ transformed data{
 
 parameters {
 #include _common/params.stan
-  real<lower=0> sigma;
+  real<lower=0> sigma[1];
 }
 
 transformed parameters {
@@ -30,11 +30,11 @@ transformed parameters {
 model {
   // Priors
 #include _common/priors.stan
-  target += STAN_log_prior(sigma, prior_sigma, hyper_sigma);
+  target += STAN_log_prior(sigma[1], prior_sigma[1], hyper_sigma[1]);
 
   // Likelihood
-  {
-    vector[num_obs] sigma2_vec = rep_vector(square(sigma), num_obs);
+  if (is_likelihood_skipped == 0) {
+    vector[num_obs] sigma2_vec = rep_vector(square(sigma[1]), num_obs);
     matrix[num_obs, num_obs] Ky = diag_matrix(delta_vec);
     matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
       K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,

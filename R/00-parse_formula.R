@@ -11,15 +11,16 @@
 #' }
 #' See the "Model formula syntax" section below (\code{\link{lgp}}) for
 #' instructions on how to specify the model terms.
-#' @inheritParams parse_response
-#' @param verbose Should more verbose output be printed?
+#' @inheritParams parse_y
 #' @return an object of class \linkS4class{lgpformula}
 #' @family model formula functions
 parse_formula <- function(formula, data, verbose = FALSE) {
+  if (verbose) cat("Parsing formula...\n")
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data)
-  if (verbose) cat("Formula parsed as:\n  ")
-  if (verbose) print(formula)
+  fp <- as.character(formula)
+  formula_str <- paste(fp[2], fp[1], fp[3])
+  if (verbose) cat("Formula interpreted as:", formula_str, "\n")
   parse_formula_advanced(formula)
 }
 

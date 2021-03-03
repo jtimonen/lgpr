@@ -188,7 +188,7 @@ lgpscaling <- setClass("lgpscaling",
 #'   before converting from factor to numeric.
 #' }
 #' @slot info Other info in text format.
-#' @slot stan_model_name Name of Stan model.
+#' @slot sample_f Whether the signal \code{f} is sampled or marginalized.
 #' @slot full_prior Complete prior information.
 #' @seealso
 #' \code{\link{model_getters}}
@@ -201,7 +201,7 @@ lgpmodel <- setClass("lgpmodel",
     var_scalings = "list",
     var_info = "list",
     info = "list",
-    stan_model_name = "character",
+    sample_f = "logical",
     full_prior = "list"
   )
 )
