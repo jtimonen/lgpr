@@ -4,6 +4,7 @@
 \alias{model_getters}
 \alias{get_stan_model}
 \alias{get_stan_input}
+\alias{get_component_info}
 \alias{get_data}
 \alias{get_num_obs}
 \alias{is_f_sampled}
@@ -15,6 +16,8 @@
 get_stan_model(object)
 
 get_stan_input(object)
+
+get_component_info(object)
 
 get_data(object)
 
@@ -36,6 +39,7 @@ get_num_trials(object)
 \itemize{
   \item \code{get_stan_model} returns a \code{\link[rstan]{stanmodel}}
   \item \code{get_stan_input} returns a list
+  \item \code{get_component_info} returns model component info matrix
   \item \code{get_num_obs} returns the number of observations
   \item \code{get_obs_model} returns the obs. model as a string
   \item \code{get_y_name} returns the response variable name

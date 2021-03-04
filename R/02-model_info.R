@@ -222,6 +222,7 @@ get_y_name <- function(object) {
 #' \itemize{
 #'   \item \code{get_stan_model} returns a \code{\link[rstan]{stanmodel}}
 #'   \item \code{get_stan_input} returns a list
+#'   \item \code{get_component_info} returns model component info matrix
 #'   \item \code{get_num_obs} returns the number of observations
 #'   \item \code{get_obs_model} returns the obs. model as a string
 #'   \item \code{get_y_name} returns the response variable name
@@ -247,6 +248,12 @@ get_stan_model <- function(object) {
 get_stan_input <- function(object) {
   model <- object_to_model(object)
   return(model@stan_input)
+}
+
+#' @rdname model_getters
+get_component_info <- function(object) {
+  si <- get_stan_input(object)
+  dollar(si, "components")
 }
 
 #' @rdname model_getters

@@ -51,8 +51,15 @@ parse_y <- function(data, likelihood, c_hat, num_trials,
 
   # Call different subroutines depending on sample_f
   if (!sample_f) {
-    if (LH != 1) stop("sample_f must be TRUE when likelihood is ", likelihood)
-    if (!is.null(c_hat)) stop("c_hat must be NULL when sample_f is FALSE!")
+    if (LH != 1) {
+      stop("<sample_f> must be TRUE when <likelihood> is ", likelihood)
+    }
+    if (!is.null(c_hat)) {
+      stop("<c_hat> must be NULL when <sample_f> is FALSE!")
+    }
+    if (!is.null(num_trials)) {
+      stop("<num_trials> must be NULL when <sample_f> is FALSE!")
+    }
     y_info <- parse_y.marginal(Y_RAW, y_name)
   } else {
     y_info <- parse_y.latent(Y_RAW, y_name, LH, c_hat, num_trials)
@@ -184,10 +191,11 @@ set_num_trials <- function(num_trials, y, LH) {
 #' @param y the response variable measurements
 #' @param obs_model observation model (integer encoding)
 check_response <- function(y, obs_model) {
-  check_type(y, "numeric")
+  response <- y
+  check_type(response, "numeric")
   if (obs_model != 1) {
-    check_non_negative_all(y)
-    check_integer_all(y)
+    check_non_negative_all(response)
+    check_integer_all(response)
   }
   return(TRUE)
 }
@@ -203,7 +211,8 @@ create_scaling <- function(y, name) {
   m <- mean(y)
   std <- stats::sd(y)
   if (std == 0) {
-    stop("the varible measurements have zero variance!")
+    msg <- paste0("the variable <", name, "> has zero variance!")
+    stop(msg)
   }
   fun <- function(x) {
     (x - m) / std

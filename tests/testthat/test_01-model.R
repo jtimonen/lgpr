@@ -22,7 +22,7 @@ test_that("created model is valid", {
 test_that("cannot create nb model where sample_f is FALSE", {
   dat <- testdata_001
   dat$y <- round(exp(dat$y))
-  reason <- "sample_f must be TRUE when likelihood is nb"
+  reason <- "<sample_f> must be TRUE when <likelihood> is nb"
   expect_error(create_model(
     formula = y ~ gp(age) + categ(sex) * gp(age),
     likelihood = "nb",
@@ -179,43 +179,29 @@ test_that("the num_trials argument works correctly", {
     likelihood = "binomial",
     num_trials = 10
   )
-  nt <- as.numeric(m@stan_input$y_num_trials)
+  si <- get_stan_input(m)
+  nt <- as.numeric(si$y_num_trials)
   expect_equal(nt, rep(10, times = 24))
-  reason <- "Invalid length of <num_trials>"
-  expect_error(
-    create_model(y ~ gp(age) + zs(id), dat,
-      likelihood = "binomial",
-      num_trials = c(10, 4, 6)
-    ),
-    reason
-  )
 })
 
 test_that("only the covariates required by the model go to stan data", {
   m <- create_model(y ~ categ(sex) + zs(id), testdata_001)
-  to_stan <- m@stan_input
-  expect_equal(to_stan$num_cov_cat, 2)
-  expect_equal(dim(to_stan$x_cont), c(0, 24))
+  si <- get_stan_input(m)
+  expect_equal(si$num_cov_cat, 2)
+  expect_equal(dim(si$x_cont), c(0, 24))
 })
 
 test_that("covariate types are correctly parsed", {
   m <- create_model(y ~ gp(age) + categ(id) * gp(age) + zs(sex) +
     gp_ns(dis_age), testdata_001, prior = list(wrp = igam(14, 5)))
-  to_stan <- m@stan_input
-  expect_equal(to_stan$num_cov_cat, 2)
-  expect_equal(to_stan$num_cov_cont, 2)
-  ts <- as.numeric(to_stan$x_cat_num_levels)
+  si <- get_stan_input(m)
+  expect_equal(si$num_cov_cat, 2)
+  expect_equal(si$num_cov_cont, 2)
+  ts <- as.numeric(si$x_cat_num_levels)
   expect_equal(ts, c(4, 2))
-  expect_equal(sum(to_stan$x_cont_mask), 12)
+  expect_equal(sum(si$x_cont_mask), 12)
 })
 
-
-test_that("cannot have a continuous covariate with zero variance", {
-  newdat <- testdata_001
-  newdat$age <- -1
-  reason <- "have zero variance"
-  expect_error(create_model(y ~ gp(age) + zs(id), newdat), reason)
-})
 
 test_that("cannot have NaNs on differing rows", {
   newdat <- testdata_001
@@ -271,4 +257,155 @@ test_that("warning is given about default prior for wrp", {
   expect_warning(
     create_model(y ~ gp_vm(age), testdata_001)
   )
+})
+
+
+test_that("simple formulas are translated to advanced", {
+  m <- create_model(y ~ age + sex, testdata_001)
+  expect_equal(as.character(m@model_formula), "y ~ gp(age) + zs(sex)")
+  m <- create_model(y ~ age + age | sex, testdata_001)
+  form <- m@model_formula
+  expect_equal(as.character(form), "y ~ gp(age) + gp(age) * zs(sex)")
+  expect_output(show(form@terms))
+  expect_output(show(form@terms@summands[[1]]))
+  reason <- "variable 'notvar' not found in <data>"
+  expect_error(create_model(y ~ age + notvar, testdata_001), reason)
+})
+
+test_that("response variable cannot be also a covariate", {
+  f <- y ~ gp(x) + categ(y) * gp(t)
+  msg <- "the response variable cannot be also a covariate"
+  expect_error(create_model(f, testdata_001), msg)
+})
+
+test_that("advanced formula parsing works with a single lgpexpr", {
+  m <- create_model(y ~ gp(age), testdata_001)
+  ci <- get_component_info(m)
+  expect_equal(rownames(ci), c("gp(age)"))
+  types <- as.numeric(ci[, 1])
+  expect_equal(types, 1)
+})
+
+test_that("two lgpterms can be summed", {
+  m <- create_model(age ~ gp(y) * categ(sex) + gp(y) * zs(id), testdata_001)
+  ci <- get_component_info(m)
+  expect_equal(rownames(ci), c("gp(y)*categ(sex)", "gp(y)*zs(id)"))
+  types <- as.numeric(ci[, 1])
+  expect_equal(types, c(2, 2))
+})
+
+test_that("lgpterm and lgpexpr can be summed", {
+  m <- create_model(y ~ gp(age) * zs(sex) + categ("id"), testdata_001)
+  ci <- get_component_info(m)
+  expect_equal(rownames(ci), c("gp(age)*zs(sex)", "categ(id)"))
+  types <- as.numeric(ci[, 1])
+  expect_equal(types, c(2, 0))
+})
+
+test_that("lgpexpr and lgpterm can be summed", {
+  m <- create_model(y ~ gp(age) + categ(sex) * gp_ns(dis_age), testdata_001,
+    prior = list(wrp = normal(1, 0.1))
+  )
+  ci <- get_component_info(m)
+  expect_equal(rownames(ci), c("gp(age)", "categ(sex)*gp_ns(dis_age)"))
+  types <- as.numeric(ci[, 1])
+  ns <- as.numeric(ci[, 5])
+  expect_equal(ns, c(0, 1))
+})
+
+test_that("error is thrown when formula is not a formula", {
+  reason <- "Wrong argument type"
+  expect_error(create_model("a + b ", testdata_001), reason)
+})
+
+test_that("formula parsing errors with invalid formula", {
+  dat <- testdata_001
+  expect_error(create_model(y ~ notfun(age), dat), "<fun> must be one of")
+  expect_error(create_model(y ~ gp(""), dat), "covariate name cannot be empty")
+  expect_error(
+    create_model(y ~ gp(x) + gp((a)), dat),
+    "expression must contain exactly one opening and closing parenthesis"
+  )
+  expect_error(
+    create_model(y ~ gp(x)(y), dat),
+    "expression must contain exactly one opening and closing parenthesis"
+  )
+})
+
+test_that("formula parsing throws error if mixing syntaxes", {
+  reason <- "Be sure not to mix the advanced and simple formula syntaxes"
+  expect_error(create_model(5 ~ koira + gp(r), testdata_001), reason)
+})
+
+test_that("parsing likelihood and response errors correctly", {
+  dat <- testdata_001
+  reason <- "<c_hat> must be NULL when <sample_f> is FALSE"
+  expect_error(create_model(y ~ age, dat, c_hat = 0), reason)
+  reason <- "<num_trials> must be NULL when <sample_f> is FALSE"
+  expect_error(create_model(y ~ age, dat, num_trials = 100), reason)
+
+  dat$y <- round(exp(dat$y))
+  reason <- "<num_trials> argument if likelihood is 'binomial' or 'bb'"
+  expect_error(create_model(y ~ age, dat,
+    num_trials = 0,
+    likelihood = "nb"
+  ), reason)
+  expect_error(
+    create_model(y ~ age, likelihood = "Poisson", dat, c_hat = c(1, 2)),
+    "Invalid length of <c_hat>"
+  )
+  expect_error(
+    create_model(y ~ age, likelihood = "binomial", dat, num_trials = c(1, 2)),
+    "Invalid length of <num_trials>"
+  )
+  expect_error(
+    create_model(y ~ age, likelihood = "binomial", dat, num_trials = c(3)),
+    "value of <response> is larger than value of <num_trials> at"
+  )
+})
+
+
+test_that("y_scaling is created and and applied, original data staying as is", {
+  dat <- testdata_001
+  ADD <- 300
+  dat$y <- 100 * dat$y + ADD
+  m <- create_model(y ~ gp(age) + zs(id), dat)
+  y_scl <- m@var_scalings$y
+  expect_true(class(y_scl) == "lgpscaling")
+  expect_equal(mean(get_data(m)$y), ADD) # should be original
+
+  # Check zero mean and unit variance of y_norm
+  y_norm <- get_stan_input(m)$y_norm
+  expect_equal(mean(y_norm), 0.0)
+  expect_equal(var(y_norm), 1.0)
+})
+
+test_that("cannot have negative or non-integer response with NB etc.", {
+  dat <- testdata_001
+  dat$y <- exp(dat$y)
+  expect_error(
+    create_model(y ~ age, dat, likelihood = "NB"),
+    "<response> must have only integer values"
+  )
+  dat <- testdata_001
+  dat$y <- round(100 * dat$y)
+  expect_error(
+    create_model(y ~ age, dat, likelihood = "NB"),
+    "<response> must have only non-negative values"
+  )
+})
+
+test_that("a data variable that will be normalized can't have zero variance", {
+
+  # Response
+  dat <- testdata_001
+  dat$y <- rep(10.3, nrow(dat))
+  reason <- "the variable <y> has zero variance"
+  expect_error(create_model(y ~ gp(age) + zs(id), dat), reason)
+
+  # Continuous covariate
+  dat <- testdata_001
+  dat$age <- rep(-3.2, nrow(dat))
+  reason <- "the variable <age> has zero variance"
+  expect_error(create_model(y ~ gp(age) + zs(id), dat), reason)
 })

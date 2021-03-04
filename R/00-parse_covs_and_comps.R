@@ -17,7 +17,7 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
   if (c_data != "data.frame") {
     stop("<data> must be a data.frame! found = ", c_data)
   }
-  
+
   # Check that all covariates exist in data
   if (verbose) cat("Parsing covariates and components...\n")
   x_names <- rhs_variables(model_formula@terms)
