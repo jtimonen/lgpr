@@ -207,7 +207,7 @@ new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   check_not_null(x_values)
   check_in_data(x, data)
   if (is.na(group_by)) {
-    x_grp <- plot.create_grouping_factor(data, group_by)
+    x_grp <- create_grouping_factor(data, group_by) # util
     data["group__"] <- x_grp
     group_by <- "group__"
   } else {

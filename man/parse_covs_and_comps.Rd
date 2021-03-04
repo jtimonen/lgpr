@@ -14,6 +14,8 @@ must have type \code{"factor"}. Missing values should be indicated with
 \code{NaN} or \code{NA}. The response variable cannot contain missing
 values. Column names should not contain trailing or leading underscores.}
 
+\item{model_formula}{an object of class \linkS4class{lgpformula}}
+
 \item{x_cont_scl}{Information on how to scale the continuous covariates.
 This can either be
 \itemize{

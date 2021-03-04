@@ -79,7 +79,7 @@ create_plot_df <- function(object, x = "age", group_by = "id") {
   check_type(x, "numeric")
 
   # Get grouping factor
-  x_grp <- plot.create_grouping_factor(dat, group_by)
+  x_grp <- create_grouping_factor(dat, group_by) # util
 
   # Get response
   y <- get_y(object, original = TRUE)
@@ -220,7 +220,7 @@ get_y_name <- function(object) {
 #' @inheritParams object_to_model
 #' @return
 #' \itemize{
-#'   \item \code{get_stan_model} returns a \code{\link[rstan]{stanmodel}}
+#'   \item \code{get_stan_model} returns a \code{stanmodel} (rstan)
 #'   \item \code{get_stan_input} returns a list
 #'   \item \code{get_component_info} returns model component info matrix
 #'   \item \code{get_num_obs} returns the number of observations

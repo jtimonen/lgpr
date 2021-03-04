@@ -37,7 +37,7 @@ get_num_trials(object)
 }
 \value{
 \itemize{
-  \item \code{get_stan_model} returns a \code{\link[rstan]{stanmodel}}
+  \item \code{get_stan_model} returns a \code{stanmodel} (rstan)
   \item \code{get_stan_input} returns a list
   \item \code{get_component_info} returns model component info matrix
   \item \code{get_num_obs} returns the number of observations

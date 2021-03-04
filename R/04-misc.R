@@ -189,7 +189,7 @@ plot_inputwarp <- function(wrp,
   S <- length(wrp)
   W <- matrix(0, S, L)
   for (i in seq_len(S)) {
-    w <- cpp_warp_input(x, a = wrp[i])
+    w <- STAN_warp_input(x, a = wrp[i], get_stream())
     W[i, ] <- w
   }
   af <- as.factor(rep(1:S, each = L))

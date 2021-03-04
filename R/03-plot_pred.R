@@ -186,7 +186,7 @@ plot_pred.create_input <- function(fit, pred, x, draws, reduce,
     pred <- get_pred(fit, draws, reduce)
     df_base <- create_plot_df(fit, t_name, group_by)[, 1:2]
   } else {
-    x_grp <- plot.create_grouping_factor(x, group_by)
+    x_grp <- create_grouping_factor(x, group_by) # util
     df_base <- data.frame(x_grp, dollar(x, t_name))
     group_by <- if (is.na(group_by)) "group__" else group_by
     colnames(df_base) <- c(group_by, t_name)

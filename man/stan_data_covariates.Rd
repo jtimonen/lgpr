@@ -10,6 +10,8 @@ stan_data_covariates(data, x_names, x_cont_scl)
 \item{data}{a data frame}
 
 \item{x_names}{unique covariate names}
+
+\item{x_cont_scl}{possible existing continuous covariate scaling (list)}
 }
 \value{
 a named list with fields

@@ -1,6 +1,7 @@
 #' Parse the covariates and model components from given data and formula
 #'
 #' @inheritParams parse_y
+#' @param model_formula an object of class \linkS4class{lgpformula}
 #' @param x_cont_scl Information on how to scale the continuous covariates.
 #' This can either be
 #' \itemize{
@@ -8,7 +9,6 @@
 #'   \item \code{NA}, in which case such list is created by computing mean
 #'   and standard deviation from \code{data}
 #' }
-#'
 #' @return parsed input to stan and covariate scaling
 parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 
@@ -64,9 +64,9 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 #'   \item \code{x_cont_unnorm}
 #'   \item \code{x_cont_mask}
 #' }
-#' @inheritParams parse_y
 #' @param data a data frame
 #' @param x_names unique covariate names
+#' @param x_cont_scl possible existing continuous covariate scaling (list)
 #' @return a named list with fields
 #' \itemize{
 #'   \item \code{to_stan}: a list of stan data
