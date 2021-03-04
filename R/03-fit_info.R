@@ -61,7 +61,7 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
                       color_scheme = "brightblue") {
   check_type(fit, "lgpfit")
   R <- window_size
-  num_ns <- dollar(fit@model@stan_input, "num_ns")
+  num_ns <- dollar(get_stan_input(fit), "num_ns")
   dis_age <- seq(-R / 2, R / 2, length.out = num_points)
   out <- list()
   for (j in seq_len(num_ns)) {
@@ -81,7 +81,7 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
 #' @rdname plot_draws
 plot_beta <- function(fit, type = "dens", ...) {
   check_type(fit, "lgpfit")
-  num_heter <- fit@model@stan_input$num_heter
+  num_heter <- dollar(get_stan_input(fit), "num_heter")
   if (num_heter == 0) {
     stop("there are no heterogeneous effects in the model")
   }
@@ -96,6 +96,10 @@ plot_beta <- function(fit, type = "dens", ...) {
 #' @export
 #' @rdname plot_draws
 plot_effect_times <- function(fit, type = "areas", ...) {
+  num_uncrt <- dollar(get_stan_input(fit), "num_uncrt")
+  if (num_uncrt == 0) {
+    stop("there are no uncertain effect times in the model")
+  }
   h <- plot_draws(fit, type, regex_pars = "teff[[]", ...)
   ptitle <- "Distribution of the inferred effect times"
   h <- h + ggplot2::ggtitle(label = ptitle)
@@ -161,6 +165,15 @@ get_num_draws <- function(fit) {
   nrow(draws)
 }
 
+#' Get the stanfit object from an lgpfit
+#'
+#' @export
+#' @inheritParams get_draws
+#' @family fit postprocessing functions
+get_stan_fit <- function(fit) {
+  fit@stan_fit
+}
+
 #' Posterior summary
 #'
 #' @export
@@ -170,14 +183,13 @@ get_num_draws <- function(fit) {
 #' @family fit postprocessing functions
 fit_summary <- function(fit,
                         ignore_pars = c(
-                          "f_post", "f_latent", "eta",
-                          "y_rng_disc", "y_rng_cont", "teff_raw", "lp__"
+                          "f_latent", "eta",
+                          "teff_raw", "lp__"
                         )) {
   check_type(fit, "lgpfit")
-  print(fit@stan_fit, pars = ignore_pars, include = FALSE)
+  sf <- get_stan_fit(fit)
+  print(sf, pars = ignore_pars, include = FALSE)
 }
-
-
 
 #' Graphical posterior or prior predictive checks
 #'
@@ -200,29 +212,4 @@ ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
   y <- dollar(data, y_name)
   y_rep <- get_y_rng(fit, original_scale = TRUE)
   bayesplot::pp_check(y, y_rep, fun, ...)
-}
-
-#' Extract posterior or prior predictive distribution draws
-#'
-#' @export
-#' @inheritParams get_draws
-#' @param original_scale should the draws be scaled back to original y scale
-#' (only has effect if likelihood is "gaussian", when data has been normalized
-#' to zero mean and unit variance)
-#' @return an array of shape \code{num_draws} x \code{num_obs}
-#' @family fit postprocessing functions
-get_y_rng <- function(fit, original_scale = TRUE) {
-  yrng_done <- is_yrng_done(fit)
-  if (!yrng_done) {
-    stop("y rng was not done! you need options = list(do_yrng = TRUE)")
-  }
-  obs_model <- get_obs_model(fit)
-  par_name <- if (obs_model == "gaussian") "y_rng_cont" else "y_rng_disc"
-  out <- get_draws(fit, pars = par_name)
-  if (obs_model == "gaussian" && original_scale) {
-    scl <- dollar(fit@model@var_scalings, "y")
-    out <- call_fun(scl@fun_inv, out)
-  }
-  colnames(out) <- NULL
-  return(out)
 }

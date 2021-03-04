@@ -142,7 +142,9 @@ sample_model <- function(model, ...) {
 #' @rdname sample_model
 #' @export
 optimize_model <- function(model, ...) {
-  object <- stanmodels[[model@stan_model_name]]
+  num_obs <- get_num_obs(model)
+  large_data_msg(num_obs, 300)
+  object <- get_stan_model(model)
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
 }

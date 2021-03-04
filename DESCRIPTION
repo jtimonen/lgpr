@@ -1,6 +1,6 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 1.1.0.9009
+Version: 1.1.0.9010
 Authors@R:
     c(person(given = "Juho",
            family = "Timonen",

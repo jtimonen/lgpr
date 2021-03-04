@@ -8,7 +8,6 @@
 \alias{get_data}
 \alias{get_num_obs}
 \alias{is_f_sampled}
-\alias{is_yrng_done}
 \alias{get_obs_model}
 \alias{get_num_trials}
 \title{Functions that access model properties}
@@ -25,8 +24,6 @@ get_num_obs(object)
 
 is_f_sampled(object)
 
-is_yrng_done(object)
-
 get_obs_model(object)
 
 get_num_trials(object)
@@ -42,7 +39,6 @@ get_num_trials(object)
   \item \code{get_component_info} returns model component info matrix
   \item \code{get_num_obs} returns the number of observations
   \item \code{get_obs_model} returns the obs. model as a string
-  \item \code{get_y_name} returns the response variable name
   \item \code{get_data} returns the original unmodified data frame
   \item \code{get_num_trials} returns the vector of numbers of trials
   \item \code{is_f_sampled} returns a boolean value

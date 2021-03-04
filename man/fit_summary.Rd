@@ -4,11 +4,7 @@
 \alias{fit_summary}
 \title{Posterior summary}
 \usage{
-fit_summary(
-  fit,
-  ignore_pars = c("f_post", "f_latent", "eta", "y_rng_disc", "y_rng_cont", "teff_raw",
-    "lp__")
-)
+fit_summary(fit, ignore_pars = c("f_latent", "eta", "teff_raw", "lp__"))
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
@@ -24,6 +20,6 @@ Posterior summary
 \seealso{
 Other fit postprocessing functions: 
 \code{\link{get_draws}()},
-\code{\link{get_y_rng}()}
+\code{\link{get_stan_fit}()}
 }
 \concept{fit postprocessing functions}

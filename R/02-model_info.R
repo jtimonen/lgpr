@@ -225,7 +225,6 @@ get_y_name <- function(object) {
 #'   \item \code{get_component_info} returns model component info matrix
 #'   \item \code{get_num_obs} returns the number of observations
 #'   \item \code{get_obs_model} returns the obs. model as a string
-#'   \item \code{get_y_name} returns the response variable name
 #'   \item \code{get_data} returns the original unmodified data frame
 #'   \item \code{get_num_trials} returns the vector of numbers of trials
 #'   \item \code{is_f_sampled} returns a boolean value
@@ -271,12 +270,6 @@ get_num_obs <- function(object) {
 is_f_sampled <- function(object) {
   object <- object_to_model(object)
   object@sample_f
-}
-
-#' @rdname model_getters
-is_yrng_done <- function(object) {
-  val <- dollar(get_stan_input(object), "is_yrng_done")
-  as.logical(val)
 }
 
 #' @rdname model_getters
