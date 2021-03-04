@@ -1,5 +1,9 @@
 require(covr)
-exclusions <- list('src/stanExports_lgp.h', 'src/stanFunctions.cpp')
+exclusions <- list(
+  'src/stanExports_lgp_marginal.h',
+  'src/stanExports_lgp_latent.h',
+  'src/stanFunctions.cpp'
+)
 cov <- package_coverage(line_exclusions = exclusions, pre_clean = TRUE)
 report(cov)
 
