@@ -409,3 +409,18 @@ test_that("a data variable that will be normalized can't have zero variance", {
   reason <- "the variable <age> has zero variance"
   expect_error(create_model(y ~ gp(age) + zs(id), dat), reason)
 })
+
+test_that("a model with uncertain disease age needs prior specified", {
+  formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
+  data <- testdata_001
+  reason <- "you must specify 'effect_time_info' in"
+  expect_error(create_model(formula = formula, data = data), reason)
+})
+
+test_that("can't have only partly missing vals for group when using het()", {
+  formula <- y ~ gp(age) + het(id) * gp(dis_age)
+  dat <- testdata_001
+  dat$dis_age[20] <- 1.1
+  reason <- "inconsistent x_cont_mask values observations where id = 4"
+  expect_error(create_model(formula = formula, data = dat), reason)
+})

@@ -2,15 +2,9 @@
 % Please edit documentation in R/00-parse_y.R
 \name{parse_y}
 \alias{parse_y}
-\alias{parse_y.marginal}
-\alias{parse_y.latent}
 \title{Parse the response variable and its likelihood model}
 \usage{
 parse_y(data, likelihood, c_hat, num_trials, y_name, sample_f, verbose)
-
-parse_y.marginal(Y_RAW, y_name)
-
-parse_y.latent(Y_RAW, y_name, LH, c_hat, num_trials)
 }
 \arguments{
 \item{data}{A \code{data.frame} where each column corresponds to one

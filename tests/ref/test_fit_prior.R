@@ -4,13 +4,6 @@ library(lgpr)
 
 context("Prior sampling with different modeling options")
 
-test_that("a model with uncertain disease age needs prior specified", {
-  formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
-  data <- testdata_001
-  reason <- "you must specify 'effect_time_info' in"
-  expect_error(create_model(formula = formula, data = data), reason)
-})
-
 test_that("model with uncertain disease age can be created and fit", {
   formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
   data <- testdata_001

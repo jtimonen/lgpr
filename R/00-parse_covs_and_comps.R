@@ -486,3 +486,140 @@ reduce_factors_gp <- function(factors) {
   }
   list(factors = factors, covariate = covariate, kernel = kernel)
 }
+
+
+
+
+#' Create the function that does a standardizing transform and its inverse
+#'
+#' @param y variable measurements
+#' @param name variable name
+#' @return an object of class \linkS4class{lgpscaling}
+create_scaling <- function(y, name) {
+  check_length_geq(y, 2)
+  m <- mean(y)
+  std <- stats::sd(y)
+  if (std == 0) {
+    msg <- paste0("the variable <", name, "> has zero variance!")
+    stop(msg)
+  }
+  fun <- function(x) {
+    (x - m) / std
+  }
+  fun_inv <- function(x) {
+    x * std + m
+  }
+  new("lgpscaling", fun = fun, fun_inv = fun_inv, var_name = name)
+}
+
+
+#' Creating the idx_expand input for Stan
+#'
+#' @name idx_expand
+#' @param components the \code{components} input for Stan
+#' @param x_cat the \code{x_cat} input for Stan
+#' @param x_cont_mask the \code{x_cont_mask} input for Stan
+#' @param x_fac object returned by \code{\link{create_idx_expand_picker}}
+#' @param map object returned by \code{\link{map_factor_to_caseid}}
+#' @return the \code{idx_expand} input for Stan and a mapping data frame
+NULL
+
+#' @rdname idx_expand
+create_idx_expand <- function(components, x_cat, x_cont_mask) {
+  pick <- create_idx_expand_picker(components, x_cat)
+  x_fac <- dollar(pick, "x_fac")
+  factor_name <- dollar(pick, "factor_name")
+  inds <- which(components[, 4] + components[, 7] > 0)
+  inds <- as.numeric(inds) # remove names
+  L <- length(inds)
+  if (L == 0) {
+    idx_expand <- x_fac
+    map <- NULL
+  } else {
+    i_cont <- components[inds, 9]
+    to_red <- x_cont_mask[i_cont, ]
+    if (length(i_cont) == 1) {
+      to_red <- repvec(to_red, 1)
+    }
+    idx_mask <- reduce_rows(to_red)
+    map <- map_factor_to_caseid(x_fac, idx_mask, factor_name)
+    idx_expand <- map_caseid_to_row(x_fac, map) + 1 # note the plus 1
+  }
+
+  # Return
+  list(map = map, idx_expand = idx_expand)
+}
+
+#' @rdname idx_expand
+create_idx_expand_picker <- function(components, x_cat) {
+  n_obs <- dim(x_cat)[2]
+  inds <- c(components[, 4], components[, 7])
+  inds <- as.numeric(inds[inds != 0])
+  J <- length(inds)
+  if (J == 0) {
+    x_fac <- rep(1, n_obs)
+    name <- NULL
+  } else {
+    all_same <- all(inds == inds[1])
+    if (!all_same) {
+      str <- paste(inds, collapse = ", ")
+      msg <- paste0(
+        "The het() and unc() expressions must have the same ",
+        "categorical covariate in every term! ",
+        "Found inds = {", str, "}"
+      )
+      stop(msg)
+    }
+    i1 <- inds[1]
+    x_fac <- as.numeric(x_cat[i1, ])
+    name <- rownames(x_cat)[i1]
+  }
+
+  # Return
+  list(x_fac = x_fac, factor_name = name)
+}
+
+#' @rdname idx_expand
+#' @param factor_name factor name
+map_factor_to_caseid <- function(x_fac, x_cont_mask, factor_name) {
+  id <- c()
+  case_id <- c()
+  num_cases <- 0
+  facs <- unique(x_fac)
+  for (u in facs) {
+    inds <- which(x_fac == u)
+    vals <- x_cont_mask[inds]
+    L <- length(vals)
+    all0 <- all.equal(vals, rep(0, L)) == TRUE
+    all1 <- all.equal(vals, rep(1, L)) == TRUE
+    if (all0) {
+      num_cases <- num_cases + 1
+      id[num_cases] <- u
+      case_id[num_cases] <- num_cases
+    } else if (all1) {
+      num_cases <- num_cases + 1
+    } else {
+      msg <- paste0(
+        "inconsistent x_cont_mask values observations where ",
+        factor_name, " = ", u
+      )
+      stop(msg)
+    }
+  }
+  out <- data.frame(id, case_id)
+  colnames(out) <- c(factor_name, "case_id")
+  return(out)
+}
+
+#' @rdname idx_expand
+map_caseid_to_row <- function(x_fac, map) {
+  out <- rep(0, length(x_fac))
+  num_levels <- dim(map)[1]
+  for (j in seq_len(num_levels)) {
+    id <- map[j, 1]
+    caseid <- map[j, 2]
+    inds <- which(x_fac == id)
+    out[inds] <- caseid
+  }
+  return(out)
+}

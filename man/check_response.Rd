@@ -2,7 +2,7 @@
 % Please edit documentation in R/00-parse_y.R
 \name{check_response}
 \alias{check_response}
-\title{Check that the response is numeric and compatibile with observation model}
+\title{Check that the response is numeric and compatible with observation model}
 \usage{
 check_response(y, obs_model)
 }
@@ -12,5 +12,5 @@ check_response(y, obs_model)
 \item{obs_model}{observation model (integer encoding)}
 }
 \description{
-Check that the response is numeric and compatibile with observation model
+Check that the response is numeric and compatible with observation model
 }
