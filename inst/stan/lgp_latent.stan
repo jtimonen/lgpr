@@ -7,7 +7,9 @@ functions{
 }
 
 data {
-#include _common/data.stan
+#include _common/data-general.stan
+#include _common/data-covariates.stan
+#include _common/data-priors.stan
   int<lower=1,upper=5> obs_model; // 1-5: Gaussian, Poisson, NB, Bin, BB
   int<lower=0> y_int[obs_model>1, num_obs]; // response variable (int)
   real y_real[obs_model==1, num_obs]; // response variable (real)

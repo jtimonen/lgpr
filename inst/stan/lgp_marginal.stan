@@ -7,7 +7,9 @@ functions{
 }
 
 data {
-#include _common/data.stan
+#include _common/data-general.stan
+#include _common/data-covariates.stan
+#include _common/data-priors.stan
   vector[num_obs] y_norm;
   int<lower=0> prior_sigma[1, 2];
   real hyper_sigma[1, 3];

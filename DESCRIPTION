@@ -1,24 +1,18 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 1.1.0.9011
+Version: 1.1.0.9012
 Authors@R:
     c(person(given = "Juho",
            family = "Timonen",
            role = c("aut", "cre"),
            email = "juho.timonen@iki.fi",
            comment = c(ORCID = "0000-0003-2341-6765")),
-    person(given = "Henrik",
-           family = "Mannerström",
-           role = c("ctb")),
-    person(given = "Aki",
-           family = "Vehtari",
-           role = c("ctb")),
-    person(given = "Harri",
-           family = "Lähdesmäki",
-           role = c("ctb"))
+      person(given = "Henrik", family = "Mannerström",role = c("ctb")),
+      person(given = "Aki", family = "Vehtari", role = c("ctb")),
+      person(given = "Harri", family = "Lähdesmäki", role = c("ctb"))
     )
-Description: Implements interpretable nonparametric analysis and
-             covariate selection for longitudinal data using additive
+Description: Interpretable nonparametric analysis and covariate relevance
+             assessment for longitudinal data using additive
              Gaussian process regression. Includes specialized non-stationary
              disease effect modeling features for biomedical studies. Bayesian
              inference for model parameters is performed using Stan.
