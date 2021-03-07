@@ -1,125 +1,3 @@
-#' Extract model predictions
-#'
-#' @inheritParams get_draws
-#' @return an object of class \linkS4class{GaussianPrediction} or
-#' \linkS4class{Prediction}
-#' @name get_pred
-#' @family prediction extraction functions
-NULL
-
-#' @export
-#' @rdname get_pred
-get_pred <- function(fit, draws = NULL, reduce = NULL) {
-  check_type(fit, "lgpfit")
-  in1 <- is.null(draws)
-  in2 <- is.null(reduce)
-  if (!in1 && !in2) stop("either draws or reduce (or both) must be NULL")
-  if (is_f_sampled(fit)) {
-    pred <- get_pred.sampled(fit, draws, reduce)
-  } else {
-    pred <- get_pred.gaussian(fit, draws, reduce)
-  }
-  return(pred)
-}
-
-#' @rdname get_pred
-get_pred.gaussian <- function(fit, draws, reduce) {
-  f_comp <- get_pred.gaussian.f_comp(fit, draws, reduce)
-  f <- get_pred.gaussian.f(fit, draws, reduce)
-  y <- get_pred.gaussian.y(fit, draws, reduce)
-  new("GaussianPrediction",
-    f_comp_mean = dollar(f_comp, "mean"),
-    f_comp_std = dollar(f_comp, "std"),
-    f_mean = dollar(f, "mean"),
-    f_std = dollar(f, "std"),
-    y_mean = dollar(y, "mean"),
-    y_std = dollar(y, "std")
-  )
-}
-
-#' @rdname get_pred
-get_pred.sampled <- function(fit, draws, reduce) {
-  new("Prediction",
-    f_comp = get_pred.sampled.f_comp(fit, draws, reduce),
-    f = get_pred.sampled.f(fit, draws, reduce),
-    h = get_pred.sampled.h(fit, draws, reduce)
-  )
-}
-
-#' Get analytic posterior or predictive distributions
-#'
-#' @description These are helper functions for \code{\link{get_pred.gaussian}}.
-#' \itemize{
-#'   \item Function \code{get_pred.gaussian.f_comp} gets the componentwise
-#'   posterior distributions of each component of \code{f} on the normalized
-#'   scale.
-#'   \item Function \code{get_pred.gaussian.f} gets the total posterior
-#'   distribution of \code{f} on the normalized scale.
-#'   \item Function \code{get_pred.gaussian.y} gets the predictive distribution
-#'   on the unnormalized original data scale. It applies \code{reduce} only
-#'   after adding sigma^2 to the variance of \code{f}.
-#' }
-#' @inheritParams get_pred.gaussian
-#' @return a list with names \code{mean} and \code{std}
-#' @name get_pred_gaussian
-#' @family prediction extraction functions
-NULL
-
-#' @rdname get_pred_gaussian
-get_pred.gaussian.f_comp <- function(fit, draws, reduce) {
-  nams <- c(component_names(fit), "total")
-  R <- length(nams)
-  fp <- get_draws(fit, pars = "f_post", draws = draws, reduce = reduce)
-  alist <- array_to_arraylist(fp, 2 * R)
-  mu <- alist[1:R] # means
-  std <- alist[(R + 1):(2 * R)] # stds
-  names(mu) <- nams
-  names(std) <- nams
-
-  # Return
-  list(
-    mean = mu[1:(R - 1)],
-    std = std[1:(R - 1)]
-  )
-}
-
-#' @rdname get_pred_gaussian
-get_pred.gaussian.f <- function(fit, draws, reduce) {
-  nams <- c(component_names(fit), "total")
-  R <- length(nams)
-  fp <- get_draws(fit, pars = "f_post", draws = draws, reduce)
-  alist <- array_to_arraylist(fp, 2 * R)
-  mu <- alist[1:R] # means
-  std <- alist[(R + 1):(2 * R)] # stds
-  names(mu) <- nams
-  names(std) <- nams
-  list(
-    mean = dollar(mu, "total"),
-    std = dollar(std, "total")
-  )
-}
-
-#' @rdname get_pred_gaussian
-get_pred.gaussian.y <- function(fit, draws, reduce) {
-
-  # Get posterior of f and sigma on normalized scale without any reduction
-  f <- get_pred.gaussian.f(fit, draws, reduce = NULL)
-  sigma <- get_draws(fit, pars = "sigma", draws = draws, reduce = NULL)
-  sigma <- as.vector(sigma)
-
-  # Add sigma to get y_pred
-  f_mean <- dollar(f, "mean")
-  f_std <- dollar(f, "std")
-  y_scl <- dollar(fit@model@var_scalings, "y")
-  y_pred <- pred.gaussian.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
-
-  # Apply reduce and return
-  list(
-    mean = apply_reduce(dollar(y_pred, "mean"), reduce),
-    std = apply_reduce(dollar(y_pred, "std"), reduce)
-  )
-}
-
 #' Tranform distribution of f to distribution of y
 #'
 #' @param f_mean an array of shape \code{num_draws} x \code{num_points}
@@ -128,7 +6,7 @@ get_pred.gaussian.y <- function(fit, draws, reduce) {
 #' @param y_norm_inv inverse normalization function for y
 #' @return a list with names \code{mean} and \code{std}, both of which are
 #' arrays of shape \code{num_draws} x \code{num_points}
-pred.gaussian.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
+pred.marginal.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
   y_mean <- f_mean
   y_var <- add_to_columns(f_std^2, sigma^2)
   y_std <- sqrt(y_var)
@@ -143,72 +21,18 @@ pred.gaussian.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
   list(mean = y_mean, std = y_std)
 }
 
-#' Get predictions for a model where the latent function f was sampled
-#'
-#' @description These are helper functions for \code{\link{get_pred.sampled}}.
-#' \itemize{
-#'   \item Function \code{get_pred.sampled.f_comp} gets the draws of each
-#'   component of \code{f} on the normalized scale.
-#'   \item Function \code{get_pred.sampled.f} gets draws of the total \code{f}
-#'   on the normalized scale.
-#'   \item Function \code{get_pred.sampled.h} gets draws of the total \code{f},
-#'   adds \code{c_hat} to each draw, and then maps through the inverse
-#'   link function. It applies \code{reduce} only after this transformation.
-#' }
-#' @inheritParams get_pred.sampled
-#' @return an array of shape \code{num_draws} x \code{num_obs} (actually a
-#' list of such arrays for \code{get_pred.sampled.f_comp})
-#' @name get_pred_sampled
-#' @family prediction extraction functions
-NULL
-
-#' @rdname get_pred_sampled
-get_pred.sampled.f_comp <- function(fit, draws, reduce) {
-  nams <- component_names(fit)
-  D <- length(nams)
-  fp <- get_draws(fit, pars = "f_latent", draws = draws, reduce = reduce)
-  fp <- array_to_arraylist(fp, D)
-  names(fp) <- nams
-  return(fp)
-}
-
-#' @rdname get_pred_sampled
-get_pred.sampled.f <- function(fit, draws, reduce) {
-  f_comp <- get_pred.sampled.f_comp(fit, draws, reduce)
-  f <- STAN_matrix_array_sum(f_comp, get_stream())
-  return(f)
-}
-
-#' @rdname get_pred_sampled
-get_pred.sampled.h <- function(fit, draws, reduce) {
-
-  # Get f
-  f <- get_pred.sampled.f(fit, draws, reduce = NULL)
-
-  # Add GP mean
-  num_draws <- dim(f)[1]
-  c_hat <- get_chat(fit)
-  f <- f + repvec(c_hat, num_draws)
-
-  # Apply inverse link function and reduction
-  likelihood <- get_obs_model(fit)
-  h <- link_inv(f, likelihood)
-  h <- apply_reduce(h, reduce)
-  return(h)
-}
-
 
 #' Computing out-of-sample predictions
 #'
 #' @description
 #' \itemize{
-#'   \item \code{pred} calls either \code{pred.gaussian} or
-#'   \code{pred.kr} depending on whether \code{fit} is for a model
+#'   \item \code{pred} calls either \code{pred.marginal} or
+#'   \code{pred.latent} depending on whether \code{fit} is for a model
 #'   that marginalized or sampled the latent signal \code{f}
-#'   \item \code{pred.gaussian} computes analytic posterior or prior
+#'   \item \code{pred.marginal} computes analytic posterior or prior
 #'   predictive distribution and returns an object of class
 #'   \linkS4class{GaussianPrediction}
-#'   \item \code{pred.kr} computes predictions using kernel regression for
+#'   \item \code{pred.latent} computes predictions using kernel regression for
 #'   the samples of \code{f} and returns an object of class
 #'   \linkS4class{Prediction}
 #' }
@@ -219,7 +43,7 @@ get_pred.sampled.h <- function(fit, draws, reduce) {
 #'
 #' @param fit An object of class \linkS4class{lgpfit}.
 #' @param x A data frame of points where the predictions are computed.
-#' The function \code{\link{new_x}} provides an easy way to create it.
+#' The function \code{\link{new_x}} can help in creating it.
 #' @param c_hat_pred This is only used if the latent signal \code{f} was
 #' sampled. This input contains the values added to the sum \code{f} before
 #' passing through inverse link function. Must be a vector with length equal to
@@ -242,22 +66,46 @@ NULL
 
 #' @export
 #' @rdname pred
-pred <- function(fit, x, c_hat_pred = NULL, reduce = function(x) base::mean(x), draws = NULL,
-                 verbose = TRUE, STREAM = get_stream()) {
-  check_type(x, "data.frame")
+pred <- function(fit,
+                 x = NULL,
+                 c_hat_pred = NULL,
+                 reduce = function(x) base::mean(x),
+                 draws = NULL,
+                 verbose = TRUE) {
+  # check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
   if (f_sampled) {
-    out <- pred.kr(fit, x, c_hat_pred, reduce, draws, verbose, STREAM)
+    ## not implemented
+    out <- pred.latent(fit, x, c_hat_pred, reduce, draws, verbose)
   } else {
-    out <- pred.gaussian(fit, x, reduce, draws, verbose, STREAM)
+    out <- pred.marginal(fit, x, reduce, draws, verbose)
   }
   return(out)
 }
 
 #' @rdname pred
-pred.gaussian <- function(fit, x, reduce, draws, verbose,
-                          STREAM = get_stream()) {
+pred.marginal <- function(fit, x, reduce, draws, verbose) {
+  if (verbose) cat("Creating Stan input...\n")
+  stan_data <- pred_input(fit, x, reduce, draws)
+  stan_model <- dollar(stanmodels, "lgp_predict")
+  utils::capture.output({
+    stan_fit <- rstan::sampling(
+      object = stan_model,
+      data = stan_data,
+      check_data = TRUE,
+      algorithm = "Fixed_param",
+      iter = 1,
+      chains = 1,
+      show_messages = FALSE
+    )
+  })
+  f_pred <- rstan::extract(stan_fit, pars = "F_POST")$F_POST[1, 1, , ]
+  return(f_pred)
+}
+
+#' @rdname pred
+pred.marginal_old <- function(fit, x, reduce, draws, verbose) {
   if (verbose) cat("Extracting draws of sigma...\n")
   sigma <- get_draws(fit, draws = draws, reduce = reduce, pars = "sigma")
   kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
@@ -265,7 +113,7 @@ pred.gaussian <- function(fit, x, reduce, draws, verbose,
   delta <- dollar(si, "delta")
   y_norm <- as.vector(get_y(fit, original = FALSE))
   if (verbose) cat("Computing posterior distributions...\n")
-  post <- pred.gaussian_compute(
+  post <- pred.marginal_compute(
     kernels, y_norm, sigma,
     delta, verbose, STREAM
   )
@@ -274,7 +122,7 @@ pred.gaussian <- function(fit, x, reduce, draws, verbose,
   f_mean <- dollar(post, "f_mean")
   f_std <- dollar(post, "f_std")
   y_scl <- dollar(fit@model@var_scalings, "y")
-  y_pred <- pred.gaussian.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
+  y_pred <- pred.marginal.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
 
   if (verbose) cat("Done.\n")
   new("GaussianPrediction",
@@ -288,19 +136,19 @@ pred.gaussian <- function(fit, x, reduce, draws, verbose,
 }
 
 #' @rdname pred
-pred.kr <- function(fit, x, c_hat_pred, reduce, draws, verbose,
-                    STREAM = get_stream()) {
+pred.latent <- function(fit, x, c_hat_pred, reduce, draws, verbose,
+                        STREAM = get_stream()) {
   kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
   if (verbose) cat("Extracting sampled function components...\n")
   pred <- get_pred(fit, draws = draws, reduce = reduce)
   if (verbose) cat("Computing kernel regression...\n")
-  kr <- pred.kr_compute(kernels, pred, delta, verbose, STREAM)
+  kr <- pred.latent_compute(kernels, pred, delta, verbose, STREAM)
   f <- dollar(kr, "f")
   if (verbose) cat("Done.\n")
 
-  h <- pred.kr_h(fit, f, c_hat_pred, verbose)
+  h <- pred.latent_h(fit, f, c_hat_pred, verbose)
 
   # Return
   new("Prediction",
@@ -310,12 +158,12 @@ pred.kr <- function(fit, x, c_hat_pred, reduce, draws, verbose,
   )
 }
 
-#' Map the sum f from pred.kr_compute to h
+#' Map the sum f from pred.latent_compute to h
 #'
 #' @inheritParams pred
 #' @param f an array of shape (num_draws, num_pred_points)
 #' @return an array with same shape as \code{f}
-pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
+pred.latent_h <- function(fit, f, c_hat_pred, verbose) {
 
   # helper function
   is_constant <- function(x) {
@@ -357,7 +205,7 @@ pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
 #' @inheritParams pred
 #' @return A list.
 #' @family prediction functions
-pred.gaussian_compute <- function(kernels, y, sigma, delta, verbose,
+pred.marginal_compute <- function(kernels, y, sigma, delta, verbose,
                                   STREAM = get_stream()) {
   sigma <- as.vector(sigma)
   K <- dollar(kernels, "data_vs_data")
@@ -396,11 +244,11 @@ pred.gaussian_compute <- function(kernels, y, sigma, delta, verbose,
 #' sampled function values
 #'
 #' @param pred An object of class \linkS4class{Prediction}.
-#' @inheritParams pred.gaussian_compute
+#' @inheritParams pred.marginal_compute
 #' @return An object of class \linkS4class{Prediction}.
 #' @family prediction functions
-pred.kr_compute <- function(kernels, pred, delta, verbose,
-                            STREAM = get_stream()) {
+pred.latent_compute <- function(kernels, pred, delta, verbose,
+                                STREAM = get_stream()) {
   K <- dollar(kernels, "data_vs_data")
   Ks <- dollar(kernels, "pred_vs_data")
   Kss <- dollar(kernels, "pred_vs_pred")
@@ -612,4 +460,183 @@ get_kernel_pars <- function(fit, reduce = NULL, draws = NULL) {
     out[[pn]] <- if (is.null(s)) na_array else s
   }
   return(out)
+}
+
+
+
+
+#' Extract model predictions
+#'
+#' @inheritParams get_draws
+#' @return an object of class \linkS4class{GaussianPrediction} or
+#' \linkS4class{Prediction}
+#' @name get_pred
+#' @family prediction extraction functions
+NULL
+
+#' @export
+#' @rdname get_pred
+get_pred <- function(fit, draws = NULL, reduce = NULL) {
+  check_type(fit, "lgpfit")
+  in1 <- is.null(draws)
+  in2 <- is.null(reduce)
+  if (!in1 && !in2) stop("either draws or reduce (or both) must be NULL")
+  if (is_f_sampled(fit)) {
+    pred <- get_pred.latent(fit, draws, reduce)
+  } else {
+    pred <- get_pred.marginal(fit, draws, reduce)
+  }
+  return(pred)
+}
+
+#' @rdname get_pred
+get_pred.marginal <- function(fit, draws, reduce) {
+  f_comp <- get_pred.marginal.f_comp(fit, draws, reduce)
+  f <- get_pred.marginal.f(fit, draws, reduce)
+  y <- get_pred.marginal.y(fit, draws, reduce)
+  new("GaussianPrediction",
+    f_comp_mean = dollar(f_comp, "mean"),
+    f_comp_std = dollar(f_comp, "std"),
+    f_mean = dollar(f, "mean"),
+    f_std = dollar(f, "std"),
+    y_mean = dollar(y, "mean"),
+    y_std = dollar(y, "std")
+  )
+}
+
+#' @rdname get_pred
+get_pred.latent <- function(fit, draws, reduce) {
+  new("Prediction",
+    f_comp = get_pred.latent.f_comp(fit, draws, reduce),
+    f = get_pred.latent.f(fit, draws, reduce),
+    h = get_pred.latent.h(fit, draws, reduce)
+  )
+}
+
+#' Get analytic posterior or predictive distributions
+#'
+#' @description These are helper functions for \code{\link{get_pred.marginal}}.
+#' \itemize{
+#'   \item Function \code{get_pred.marginal.f_comp} gets the componentwise
+#'   posterior distributions of each component of \code{f} on the normalized
+#'   scale.
+#'   \item Function \code{get_pred.marginal.f} gets the total posterior
+#'   distribution of \code{f} on the normalized scale.
+#'   \item Function \code{get_pred.marginal.y} gets the predictive distribution
+#'   on the unnormalized original data scale. It applies \code{reduce} only
+#'   after adding sigma^2 to the variance of \code{f}.
+#' }
+#' @inheritParams get_pred.marginal
+#' @return a list with names \code{mean} and \code{std}
+#' @name get_pred_gaussian
+#' @family prediction extraction functions
+NULL
+
+#' @rdname get_pred_gaussian
+get_pred.marginal.f_comp <- function(fit, draws, reduce) {
+  nams <- c(component_names(fit), "total")
+  R <- length(nams)
+  fp <- get_draws(fit, pars = "f_post", draws = draws, reduce = reduce)
+  alist <- array_to_arraylist(fp, 2 * R)
+  mu <- alist[1:R] # means
+  std <- alist[(R + 1):(2 * R)] # stds
+  names(mu) <- nams
+  names(std) <- nams
+
+  # Return
+  list(
+    mean = mu[1:(R - 1)],
+    std = std[1:(R - 1)]
+  )
+}
+
+#' @rdname get_pred_gaussian
+get_pred.marginal.f <- function(fit, draws, reduce) {
+  nams <- c(component_names(fit), "total")
+  R <- length(nams)
+  fp <- get_draws(fit, pars = "f_post", draws = draws, reduce)
+  alist <- array_to_arraylist(fp, 2 * R)
+  mu <- alist[1:R] # means
+  std <- alist[(R + 1):(2 * R)] # stds
+  names(mu) <- nams
+  names(std) <- nams
+  list(
+    mean = dollar(mu, "total"),
+    std = dollar(std, "total")
+  )
+}
+
+#' @rdname get_pred_gaussian
+get_pred.marginal.y <- function(fit, draws, reduce) {
+
+  # Get posterior of f and sigma on normalized scale without any reduction
+  f <- get_pred.marginal.f(fit, draws, reduce = NULL)
+  sigma <- get_draws(fit, pars = "sigma", draws = draws, reduce = NULL)
+  sigma <- as.vector(sigma)
+
+  # Add sigma to get y_pred
+  f_mean <- dollar(f, "mean")
+  f_std <- dollar(f, "std")
+  y_scl <- dollar(fit@model@var_scalings, "y")
+  y_pred <- pred.marginal.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
+
+  # Apply reduce and return
+  list(
+    mean = apply_reduce(dollar(y_pred, "mean"), reduce),
+    std = apply_reduce(dollar(y_pred, "std"), reduce)
+  )
+}
+
+#' Get predictions for a model where the latent function f was sampled
+#'
+#' @description These are helper functions for \code{\link{get_pred.latent}}.
+#' \itemize{
+#'   \item Function \code{get_pred.latent.f_comp} gets the draws of each
+#'   component of \code{f} on the normalized scale.
+#'   \item Function \code{get_pred.latent.f} gets draws of the total \code{f}
+#'   on the normalized scale.
+#'   \item Function \code{get_pred.latent.h} gets draws of the total \code{f},
+#'   adds \code{c_hat} to each draw, and then maps through the inverse
+#'   link function. It applies \code{reduce} only after this transformation.
+#' }
+#' @inheritParams get_pred.latent
+#' @return an array of shape \code{num_draws} x \code{num_obs} (actually a
+#' list of such arrays for \code{get_pred.latent.f_comp})
+#' @name get_pred_sampled
+#' @family prediction extraction functions
+NULL
+
+#' @rdname get_pred_sampled
+get_pred.latent.f_comp <- function(fit, draws, reduce) {
+  nams <- component_names(fit)
+  D <- length(nams)
+  fp <- get_draws(fit, pars = "f_latent", draws = draws, reduce = reduce)
+  fp <- array_to_arraylist(fp, D)
+  names(fp) <- nams
+  return(fp)
+}
+
+#' @rdname get_pred_sampled
+get_pred.latent.f <- function(fit, draws, reduce) {
+  f_comp <- get_pred.latent.f_comp(fit, draws, reduce)
+  f <- STAN_matrix_array_sum(f_comp, get_stream())
+  return(f)
+}
+
+#' @rdname get_pred_sampled
+get_pred.latent.h <- function(fit, draws, reduce) {
+
+  # Get f
+  f <- get_pred.latent.f(fit, draws, reduce = NULL)
+
+  # Add GP mean
+  num_draws <- dim(f)[1]
+  c_hat <- get_chat(fit)
+  f <- f + repvec(c_hat, num_draws)
+
+  # Apply inverse link function and reduction
+  likelihood <- get_obs_model(fit)
+  h <- link_inv(f, likelihood)
+  h <- apply_reduce(h, reduce)
+  return(h)
 }

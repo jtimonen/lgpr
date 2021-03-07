@@ -2,15 +2,15 @@
 % Please edit documentation in R/03-pred.R
 \name{get_pred}
 \alias{get_pred}
-\alias{get_pred.gaussian}
-\alias{get_pred.sampled}
+\alias{get_pred.marginal}
+\alias{get_pred.latent}
 \title{Extract model predictions}
 \usage{
 get_pred(fit, draws = NULL, reduce = NULL)
 
-get_pred.gaussian(fit, draws, reduce)
+get_pred.marginal(fit, draws, reduce)
 
-get_pred.sampled(fit, draws, reduce)
+get_pred.latent(fit, draws, reduce)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}

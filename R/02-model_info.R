@@ -7,7 +7,6 @@
 #'   \item \code{\link{model_summary.brief}} returns a string
 #'   \item \code{\link{model_summary}} prints the summary and
 #' returns \code{object} invisibly
-#'   and returns \code{object} invisibly
 #' }
 model_summary <- function(object) {
   model <- object_to_model(object)

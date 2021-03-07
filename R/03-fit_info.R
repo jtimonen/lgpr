@@ -161,8 +161,22 @@ get_draws.catch <- function(fit, draws = NULL, reduce = NULL, ...) {
 #' @export
 #' @rdname get_draws
 get_num_draws <- function(fit) {
+  # TODO: should be optimized
   draws <- get_draws(fit, draws = NULL, reduce = NULL, pars = "alpha")
   nrow(draws)
+}
+
+#' Decide number of output param sets
+#'
+#' @description Decide number of output param sets based on total number of
+#' posterior draws, possible reduction and subset of draw indices
+#' @inheritParams get_draws
+#' @return an integer
+get_num_paramsets <- function(fit, draws, reduce) {
+  S <- get_num_draws(fit)
+  if (!is.null(reduce)) S <- 1
+  if (!is.null(draws)) S <- length(draws)
+  return(S)
 }
 
 #' Get the stanfit object from an lgpfit

@@ -59,7 +59,7 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(508, 0, "start", "_common/tdata-pred.stan");
     reader.add_event(519, 11, "end", "_common/tdata-pred.stan");
     reader.add_event(519, 20, "restart", "model_lgp_predict");
-    reader.add_event(548, 47, "end", "model_lgp_predict");
+    reader.add_event(554, 53, "end", "model_lgp_predict");
     return reader;
 }
 template <typename T0__>
@@ -1583,7 +1583,7 @@ private:
         std::vector<std::vector<double> > d_wrp;
         std::vector<std::vector<vector_d> > d_beta;
         std::vector<std::vector<vector_d> > d_teff;
-        std::vector<double> d_sigma;
+        std::vector<std::vector<double> > d_sigma;
         vector_d y_norm;
         std::vector<matrix_d> K_const;
         vector_d delta_vec;
@@ -2055,17 +2055,24 @@ public:
             }
             current_statement_begin__ = 496;
             validate_non_negative_index("d_sigma", "S", S);
-            context__.validate_dims("data initialization", "d_sigma", "double", context__.to_vec(S));
-            d_sigma = std::vector<double>(S, double(0));
+            validate_non_negative_index("d_sigma", "1", 1);
+            context__.validate_dims("data initialization", "d_sigma", "double", context__.to_vec(S,1));
+            d_sigma = std::vector<std::vector<double> >(S, std::vector<double>(1, double(0)));
             vals_r__ = context__.vals_r("d_sigma");
             pos__ = 0;
             size_t d_sigma_k_0_max__ = S;
-            for (size_t k_0__ = 0; k_0__ < d_sigma_k_0_max__; ++k_0__) {
-                d_sigma[k_0__] = vals_r__[pos__++];
+            size_t d_sigma_k_1_max__ = 1;
+            for (size_t k_1__ = 0; k_1__ < d_sigma_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < d_sigma_k_0_max__; ++k_0__) {
+                    d_sigma[k_0__][k_1__] = vals_r__[pos__++];
+                }
             }
             size_t d_sigma_i_0_max__ = S;
+            size_t d_sigma_i_1_max__ = 1;
             for (size_t i_0__ = 0; i_0__ < d_sigma_i_0_max__; ++i_0__) {
-                check_greater_or_equal(function__, "d_sigma[i_0__]", d_sigma[i_0__], 0);
+                for (size_t i_1__ = 0; i_1__ < d_sigma_i_1_max__; ++i_1__) {
+                    check_greater_or_equal(function__, "d_sigma[i_0__][i_1__]", d_sigma[i_0__][i_1__], 0);
+                }
             }
             current_statement_begin__ = 497;
             validate_non_negative_index("y_norm", "num_obs", num_obs);
@@ -2224,7 +2231,7 @@ public:
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>  > f_post((2 * (num_comps + 1)), Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(num_pred));
                 stan::math::initialize(f_post, DUMMY_VAR__);
                 stan::math::fill(f_post, DUMMY_VAR__);
-                current_statement_begin__ = 526;
+                current_statement_begin__ = 528;
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_comps", num_comps);
@@ -2232,7 +2239,7 @@ public:
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
                 stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, get_base1(d_alpha, is, "d_alpha", 1), get_base1(d_ell, is, "d_ell", 1), get_base1(d_wrp, is, "d_wrp", 1), get_base1(d_beta, is, "d_beta", 1), get_base1(d_teff, is, "d_teff", 1), vm_params, idx_expand, idx_expand, teff_zero, pstream__));
-                current_statement_begin__ = 532;
+                current_statement_begin__ = 534;
                 validate_non_negative_index("KX_s", "num_pred", num_pred);
                 validate_non_negative_index("KX_s", "num_obs", num_obs);
                 validate_non_negative_index("KX_s", "num_comps", num_comps);
@@ -2240,7 +2247,7 @@ public:
                 stan::math::initialize(KX_s, DUMMY_VAR__);
                 stan::math::fill(KX_s, DUMMY_VAR__);
                 stan::math::assign(KX_s,STAN_kernel_all(num_pred, num_obs, K_const_s, components, x_cont_PRED, x_cont, x_cont_unnorm_PRED, x_cont_unnorm, get_base1(d_alpha, is, "d_alpha", 1), get_base1(d_ell, is, "d_ell", 1), get_base1(d_wrp, is, "d_wrp", 1), get_base1(d_beta, is, "d_beta", 1), get_base1(d_teff, is, "d_teff", 1), vm_params, idx_expand_PRED, idx_expand, teff_zero, pstream__));
-                current_statement_begin__ = 538;
+                current_statement_begin__ = 540;
                 validate_non_negative_index("KX_ss", "num_pred", num_pred);
                 validate_non_negative_index("KX_ss", "num_pred", num_pred);
                 validate_non_negative_index("KX_ss", "num_comps", num_comps);
@@ -2248,10 +2255,10 @@ public:
                 stan::math::initialize(KX_ss, DUMMY_VAR__);
                 stan::math::fill(KX_ss, DUMMY_VAR__);
                 stan::math::assign(KX_ss,STAN_kernel_all(num_pred, num_pred, K_const_ss, components, x_cont_PRED, x_cont_PRED, x_cont_unnorm_PRED, x_cont_unnorm_PRED, get_base1(d_alpha, is, "d_alpha", 1), get_base1(d_ell, is, "d_ell", 1), get_base1(d_wrp, is, "d_wrp", 1), get_base1(d_beta, is, "d_beta", 1), get_base1(d_teff, is, "d_teff", 1), vm_params, idx_expand_PRED, idx_expand_PRED, teff_zero, pstream__));
-                current_statement_begin__ = 544;
+                current_statement_begin__ = 548;
                 stan::model::assign(F_POST, 
                             stan::model::cons_list(stan::model::index_uni(is), stan::model::nil_index_list()), 
-                            STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, get_base1(d_sigma, is, "d_sigma", 1), pstream__), 
+                            STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, get_base1(get_base1(d_sigma, is, "d_sigma", 1), 1, "d_sigma", 2), pstream__), 
                             "assigning variable F_POST");
                 }
             }

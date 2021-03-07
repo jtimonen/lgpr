@@ -29,7 +29,7 @@ created by \code{\link{kernel_matrices_create_input}}.}
 \code{\link[rstan]{get_stream}}.}
 
 \item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} provides an easy way to create it.}
+The function \code{\link{new_x}} can help in creating it.}
 }
 \description{
 \itemize{
@@ -46,8 +46,8 @@ The function \code{\link{new_x}} provides an easy way to create it.}
 }
 \seealso{
 Other prediction functions: 
-\code{\link{pred.gaussian_compute}()},
-\code{\link{pred.kr_compute}()},
+\code{\link{pred.latent_compute}()},
+\code{\link{pred.marginal_compute}()},
 \code{\link{pred_kernels}()},
 \code{\link{pred}()}
 }

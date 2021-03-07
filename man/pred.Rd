@@ -2,29 +2,31 @@
 % Please edit documentation in R/03-pred.R
 \name{pred}
 \alias{pred}
-\alias{pred.gaussian}
-\alias{pred.kr}
+\alias{pred.marginal}
+\alias{pred.marginal_old}
+\alias{pred.latent}
 \title{Computing out-of-sample predictions}
 \usage{
 pred(
   fit,
-  x,
+  x = NULL,
   c_hat_pred = NULL,
   reduce = function(x) base::mean(x),
   draws = NULL,
-  verbose = TRUE,
-  STREAM = get_stream()
+  verbose = TRUE
 )
 
-pred.gaussian(fit, x, reduce, draws, verbose, STREAM = get_stream())
+pred.marginal(fit, x, reduce, draws, verbose)
 
-pred.kr(fit, x, c_hat_pred, reduce, draws, verbose, STREAM = get_stream())
+pred.marginal_old(fit, x, reduce, draws, verbose)
+
+pred.latent(fit, x, c_hat_pred, reduce, draws, verbose, STREAM = get_stream())
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} provides an easy way to create it.}
+The function \code{\link{new_x}} can help in creating it.}
 
 \item{c_hat_pred}{This is only used if the latent signal \code{f} was
 sampled. This input contains the values added to the sum \code{f} before
@@ -51,13 +53,13 @@ An object of class \linkS4class{GaussianPrediction} or
 }
 \description{
 \itemize{
-  \item \code{pred} calls either \code{pred.gaussian} or
-  \code{pred.kr} depending on whether \code{fit} is for a model
+  \item \code{pred} calls either \code{pred.marginal} or
+  \code{pred.latent} depending on whether \code{fit} is for a model
   that marginalized or sampled the latent signal \code{f}
-  \item \code{pred.gaussian} computes analytic posterior or prior
+  \item \code{pred.marginal} computes analytic posterior or prior
   predictive distribution and returns an object of class
   \linkS4class{GaussianPrediction}
-  \item \code{pred.kr} computes predictions using kernel regression for
+  \item \code{pred.latent} computes predictions using kernel regression for
   the samples of \code{f} and returns an object of class
   \linkS4class{Prediction}
 }
@@ -69,8 +71,8 @@ each parameter draw (defined by \code{draws}), or other parameter set
 \seealso{
 Other prediction functions: 
 \code{\link{kernel_matrices}()},
-\code{\link{pred.gaussian_compute}()},
-\code{\link{pred.kr_compute}()},
+\code{\link{pred.latent_compute}()},
+\code{\link{pred.marginal_compute}()},
 \code{\link{pred_kernels}()}
 }
 \concept{prediction functions}

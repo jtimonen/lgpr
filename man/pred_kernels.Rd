@@ -10,7 +10,7 @@ pred_kernels(fit, x, reduce, draws, verbose, STREAM = get_stream())
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} provides an easy way to create it.}
+The function \code{\link{new_x}} can help in creating it.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
@@ -35,8 +35,8 @@ Compute all kernel matrices required for computing predictions
 \seealso{
 Other prediction functions: 
 \code{\link{kernel_matrices}()},
-\code{\link{pred.gaussian_compute}()},
-\code{\link{pred.kr_compute}()},
+\code{\link{pred.latent_compute}()},
+\code{\link{pred.marginal_compute}()},
 \code{\link{pred}()}
 }
 \concept{prediction functions}

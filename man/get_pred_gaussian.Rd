@@ -2,16 +2,16 @@
 % Please edit documentation in R/03-pred.R
 \name{get_pred_gaussian}
 \alias{get_pred_gaussian}
-\alias{get_pred.gaussian.f_comp}
-\alias{get_pred.gaussian.f}
-\alias{get_pred.gaussian.y}
+\alias{get_pred.marginal.f_comp}
+\alias{get_pred.marginal.f}
+\alias{get_pred.marginal.y}
 \title{Get analytic posterior or predictive distributions}
 \usage{
-get_pred.gaussian.f_comp(fit, draws, reduce)
+get_pred.marginal.f_comp(fit, draws, reduce)
 
-get_pred.gaussian.f(fit, draws, reduce)
+get_pred.marginal.f(fit, draws, reduce)
 
-get_pred.gaussian.y(fit, draws, reduce)
+get_pred.marginal.y(fit, draws, reduce)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
@@ -27,14 +27,14 @@ one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 a list with names \code{mean} and \code{std}
 }
 \description{
-These are helper functions for \code{\link{get_pred.gaussian}}.
+These are helper functions for \code{\link{get_pred.marginal}}.
 \itemize{
-  \item Function \code{get_pred.gaussian.f_comp} gets the componentwise
+  \item Function \code{get_pred.marginal.f_comp} gets the componentwise
   posterior distributions of each component of \code{f} on the normalized
   scale.
-  \item Function \code{get_pred.gaussian.f} gets the total posterior
+  \item Function \code{get_pred.marginal.f} gets the total posterior
   distribution of \code{f} on the normalized scale.
-  \item Function \code{get_pred.gaussian.y} gets the predictive distribution
+  \item Function \code{get_pred.marginal.y} gets the predictive distribution
   on the unnormalized original data scale. It applies \code{reduce} only
   after adding sigma^2 to the variance of \code{f}.
 }

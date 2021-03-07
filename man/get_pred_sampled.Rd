@@ -2,16 +2,16 @@
 % Please edit documentation in R/03-pred.R
 \name{get_pred_sampled}
 \alias{get_pred_sampled}
-\alias{get_pred.sampled.f_comp}
-\alias{get_pred.sampled.f}
-\alias{get_pred.sampled.h}
+\alias{get_pred.latent.f_comp}
+\alias{get_pred.latent.f}
+\alias{get_pred.latent.h}
 \title{Get predictions for a model where the latent function f was sampled}
 \usage{
-get_pred.sampled.f_comp(fit, draws, reduce)
+get_pred.latent.f_comp(fit, draws, reduce)
 
-get_pred.sampled.f(fit, draws, reduce)
+get_pred.latent.f(fit, draws, reduce)
 
-get_pred.sampled.h(fit, draws, reduce)
+get_pred.latent.h(fit, draws, reduce)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
@@ -25,16 +25,16 @@ one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 }
 \value{
 an array of shape \code{num_draws} x \code{num_obs} (actually a
-list of such arrays for \code{get_pred.sampled.f_comp})
+list of such arrays for \code{get_pred.latent.f_comp})
 }
 \description{
-These are helper functions for \code{\link{get_pred.sampled}}.
+These are helper functions for \code{\link{get_pred.latent}}.
 \itemize{
-  \item Function \code{get_pred.sampled.f_comp} gets the draws of each
+  \item Function \code{get_pred.latent.f_comp} gets the draws of each
   component of \code{f} on the normalized scale.
-  \item Function \code{get_pred.sampled.f} gets draws of the total \code{f}
+  \item Function \code{get_pred.latent.f} gets draws of the total \code{f}
   on the normalized scale.
-  \item Function \code{get_pred.sampled.h} gets draws of the total \code{f},
+  \item Function \code{get_pred.latent.h} gets draws of the total \code{f},
   adds \code{c_hat} to each draw, and then maps through the inverse
   link function. It applies \code{reduce} only after this transformation.
 }

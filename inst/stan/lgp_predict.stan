@@ -11,7 +11,7 @@ data {
 #include _common/data-covariates.stan
 #include _common/data-pred.stan
 #include _common/data-draws.stan
-  real<lower=0> d_sigma[S];
+  real<lower=0> d_sigma[S, 1];
   vector[num_obs] y_norm;
 }
 
@@ -24,6 +24,8 @@ generated quantities {
   vector[num_pred] F_POST[S, 2*(num_comps+1)];
   for (is in 1:S) {
     vector[num_pred] f_post[2*(num_comps+1)];
+    
+    // Compute kernel matrices
     matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(
       num_obs, num_obs, K_const, components, 
       x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
@@ -42,6 +44,10 @@ generated quantities {
       d_alpha[is], d_ell[is], d_wrp[is], d_beta[is], d_teff[is],
       vm_params, idx_expand_PRED, idx_expand_PRED, teff_zero
     );
-    F_POST[is] = STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, d_sigma[is]);
+    
+    // Compute the posterior means and variances
+    F_POST[is] = STAN_gp_posterior(
+      KX, KX_s, KX_ss, y_norm, delta, d_sigma[is, 1]
+    );
   }
 }

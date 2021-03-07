@@ -131,12 +131,19 @@ sample_model <- function(model, ...) {
   large_data_msg(num_obs, 300)
   object <- get_stan_model(model)
   data <- model@stan_input
-  sfit <- rstan::sampling(object = object, data = data, check_data = TRUE, ...)
-  if (sfit@mode == 2) {
-    print(sfit)
-    stop("Failed to create fit.")
+  stan_fit <- rstan::sampling(
+    object = object,
+    data = data,
+    check_data = TRUE,
+    pars = "eta",
+    include = FALSE,
+    ...
+  )
+  if (stan_fit@mode == 2) {
+    print(stan_fit)
+    stop("Failed to create stanfit.")
   }
-  new("lgpfit", model = model, stan_fit = sfit)
+  new("lgpfit", model = model, stan_fit = stan_fit)
 }
 
 #' @rdname sample_model
