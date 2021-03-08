@@ -11,7 +11,8 @@ stan_data_covariates(data, x_names, x_cont_scl)
 
 \item{x_names}{unique covariate names}
 
-\item{x_cont_scl}{possible existing continuous covariate scaling (list)}
+\item{x_cont_scl}{Possible existing continuous covariate scaling (list) or
+\code{NA}.}
 }
 \value{
 a named list with fields
@@ -28,10 +29,12 @@ Creates the following Stan data input list fields:
 \itemize{
   \item \code{num_cov_cat}
   \item \code{num_cov_cont}
-  \item \code{x_cat}
   \item \code{x_cat_num_levels}
-  \item \code{x_cont}
-  \item \code{x_cont_unnorm}
-  \item \code{x_cont_mask}
+  \item \code{x_cat} (\code{_PRED})
+  \item \code{x_cont} (\code{_PRED})
+  \item \code{x_cont_unnorm} (\code{_PRED})
+  \item \code{x_cont_mask} (\code{_PRED})
 }
+This is used without an existing scaling in
+\code{\link{parse_covs_and_comps}} and with one in \code{\link{pred_input}}.
 }

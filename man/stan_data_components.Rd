@@ -12,11 +12,7 @@ stan_data_components(model_formula, covariates)
 \item{covariates}{a list returned by \code{\link{stan_data_covariates}}}
 }
 \value{
-a named list with fields
-\itemize{
-  \item \code{to_stan}: a list of stan data
-  \item \code{caseid_map}: a data frame
-}
+a named list
 }
 \description{
 Create model components data for Stan input

@@ -41,7 +41,7 @@ parse_y <- function(data, likelihood, c_hat, num_trials,
 
   # Check that data contains the response variable,
   # which is numeric and compatible with observation model
-  check_in_data(y_name, data)
+  check_in_data(y_name, data, "data")
   Y_RAW <- dollar(data, y_name)
   check_response(Y_RAW, LH)
 

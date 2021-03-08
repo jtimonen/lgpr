@@ -1898,13 +1898,13 @@ public:
             }
             current_statement_begin__ = 486;
             validate_non_negative_index("x_cont_mask_PRED", "num_cov_cont", num_cov_cont);
-            validate_non_negative_index("x_cont_mask_PRED", "num_obs", num_obs);
-            context__.validate_dims("data initialization", "x_cont_mask_PRED", "int", context__.to_vec(num_cov_cont,num_obs));
-            x_cont_mask_PRED = std::vector<std::vector<int> >(num_cov_cont, std::vector<int>(num_obs, int(0)));
+            validate_non_negative_index("x_cont_mask_PRED", "num_pred", num_pred);
+            context__.validate_dims("data initialization", "x_cont_mask_PRED", "int", context__.to_vec(num_cov_cont,num_pred));
+            x_cont_mask_PRED = std::vector<std::vector<int> >(num_cov_cont, std::vector<int>(num_pred, int(0)));
             vals_i__ = context__.vals_i("x_cont_mask_PRED");
             pos__ = 0;
             size_t x_cont_mask_PRED_k_0_max__ = num_cov_cont;
-            size_t x_cont_mask_PRED_k_1_max__ = num_obs;
+            size_t x_cont_mask_PRED_k_1_max__ = num_pred;
             for (size_t k_1__ = 0; k_1__ < x_cont_mask_PRED_k_1_max__; ++k_1__) {
                 for (size_t k_0__ = 0; k_0__ < x_cont_mask_PRED_k_0_max__; ++k_0__) {
                     x_cont_mask_PRED[k_0__][k_1__] = vals_i__[pos__++];
@@ -1912,13 +1912,13 @@ public:
             }
             current_statement_begin__ = 487;
             validate_non_negative_index("x_cat_PRED", "num_cov_cat", num_cov_cat);
-            validate_non_negative_index("x_cat_PRED", "num_obs", num_obs);
-            context__.validate_dims("data initialization", "x_cat_PRED", "int", context__.to_vec(num_cov_cat,num_obs));
-            x_cat_PRED = std::vector<std::vector<int> >(num_cov_cat, std::vector<int>(num_obs, int(0)));
+            validate_non_negative_index("x_cat_PRED", "num_pred", num_pred);
+            context__.validate_dims("data initialization", "x_cat_PRED", "int", context__.to_vec(num_cov_cat,num_pred));
+            x_cat_PRED = std::vector<std::vector<int> >(num_cov_cat, std::vector<int>(num_pred, int(0)));
             vals_i__ = context__.vals_i("x_cat_PRED");
             pos__ = 0;
             size_t x_cat_PRED_k_0_max__ = num_cov_cat;
-            size_t x_cat_PRED_k_1_max__ = num_obs;
+            size_t x_cat_PRED_k_1_max__ = num_pred;
             for (size_t k_1__ = 0; k_1__ < x_cat_PRED_k_1_max__; ++k_1__) {
                 for (size_t k_0__ = 0; k_0__ < x_cat_PRED_k_0_max__; ++k_0__) {
                     x_cat_PRED[k_0__][k_1__] = vals_i__[pos__++];

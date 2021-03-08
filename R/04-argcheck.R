@@ -2,43 +2,11 @@
 #'
 #' @name checks
 #' @param arg An argument to check.
-#' @description
-#' \itemize{
-#'   \item \code{check_type} checks if argument has correct class
-#'   \item \code{check_function} checks if argument is a function
-#'   \item \code{check_numeric} checks if argument is numeric
-#'   \item \code{check_positive} checks if argument is positive
-#'   \item \code{check_non_negative} checks if argument is non-negative
-#'   \item \code{check_positive_all} checks if argument has only positive
-#'   values
-#'   \item \code{check_non_negative_all} checks if argument has only
-#'   non-negative values
-#'   \item \code{check_integer_all} checks if argument has only
-#'   integer values
-#'   \item \code{check_interval} checks if argument is inside a given interval
-#'   \item \code{check_not_null} checks if argument is not null
-#'   \item \code{check_false} checks if argument is false or zero
-#'   \item \code{check_length} checks if argument has given length
-#'   \item \code{check_length_1_or} checks if argument has given length or
-#'   length 1
-#'   \item \code{check_length_geq} checks if argument has at least a
-#'   given length
-#'   \item \code{check_lengths} checks if two arguments have equal length
-#'   \item \code{check_in_data} checks that variable exists in a data frame
-#'   \item \code{check_all_leq} checks that argument has values less than equal
-#'   to given maximums, elementwise
-#'   \item \code{check_not_named} checks that \code{names(arg)} is NULL
-#'   \item \code{check_named} checks that length of \code{names(arg)} is
-#'   greater than zero
-#'   \item \code{check_dim} checks that \code{arg} has expected number of
-#'   dimensions
-#'   \item \code{check_null} checks that \code{arg} is NULL
-#' }
-#' @return \code{TRUE} if the check passes.
+#' @return \code{TRUE} if the check passes, throw error otherwise.
 #' @family argument checks
 NULL
 
-#' @rdname checks
+#' @describeIn checks checks that argument has expected type
 #' @param allowed Allowed class names.
 check_type <- function(arg, allowed) {
   arg_name <- deparse(substitute(arg))
@@ -63,11 +31,10 @@ check_type <- function(arg, allowed) {
     )
     stop(msg)
   }
-
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is a function
 #' @param arg_name argument name
 check_function <- function(arg, arg_name) {
   ok <- is.function(arg)
@@ -78,20 +45,20 @@ check_function <- function(arg, arg_name) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is numeric
 check_numeric <- function(arg) {
   if (!is.numeric(arg)) {
     arg_name <- deparse(substitute(arg))
     msg <- paste0("<", arg_name, "> must be numeric! found = ", arg)
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is positive
 check_positive <- function(arg) {
   check_numeric(arg)
   if (arg <= 0) {
@@ -99,10 +66,10 @@ check_positive <- function(arg) {
     msg <- paste0("<", arg_name, "> must be positive! found = ", arg)
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is non-negative
 check_non_negative <- function(arg) {
   check_numeric(arg)
   if (arg < 0) {
@@ -110,10 +77,10 @@ check_non_negative <- function(arg) {
     msg <- paste0("<", arg_name, "> must be non-negative! found = ", arg)
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has only positive values
 check_positive_all <- function(arg) {
   check_numeric(arg)
   if (any(arg <= 0)) {
@@ -121,10 +88,10 @@ check_positive_all <- function(arg) {
     msg <- paste0("<", arg_name, "> must have only positive values")
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has only non-negative values
 check_non_negative_all <- function(arg) {
   check_numeric(arg)
   if (any(arg < 0)) {
@@ -132,10 +99,10 @@ check_non_negative_all <- function(arg) {
     msg <- paste0("<", arg_name, "> must have only non-negative values")
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has only integer values
 check_integer_all <- function(arg) {
   check_numeric(arg)
   if (sum(round(arg) != arg) > 0) {
@@ -143,10 +110,10 @@ check_integer_all <- function(arg) {
     msg <- paste0("<", arg_name, "> must have only integer values")
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that value is in some interval (strictly)
 #' @param lower interval minimum
 #' @param upper interval maximum
 check_interval <- function(arg, lower, upper) {
@@ -159,19 +126,19 @@ check_interval <- function(arg, lower, upper) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is not NULL
 check_not_null <- function(arg) {
   arg_name <- deparse(substitute(arg))
   if (is.null(arg)) {
     stop(arg_name, " should not be NULL!")
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is NULL
 #' @param reason explanation why the argument should be NULL
 check_null <- function(arg, reason = NULL) {
   arg_name <- deparse(substitute(arg))
@@ -182,10 +149,10 @@ check_null <- function(arg, reason = NULL) {
     }
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has expected length
 #' @param expected Expected length.
 check_length <- function(arg, expected) {
   L <- length(arg)
@@ -198,10 +165,10 @@ check_length <- function(arg, expected) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has length 1 or required other value
 #' @param expected Expected length.
 check_length_1_or <- function(arg, expected) {
   L <- length(arg)
@@ -214,10 +181,10 @@ check_length_1_or <- function(arg, expected) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has at least some length
 #' @param min_length Minimum allowed length.
 check_length_geq <- function(arg, min_length) {
   L <- length(arg)
@@ -230,12 +197,12 @@ check_length_geq <- function(arg, min_length) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
+#' @describeIn checks checks that arguments have same length
 #' @param a An argument to check.
 #' @param b An argument to check.
-#' @rdname checks
 check_lengths <- function(a, b) {
   L1 <- length(a)
   L2 <- length(b)
@@ -248,10 +215,10 @@ check_lengths <- function(a, b) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is FALSE
 check_false <- function(arg) {
   arg_name <- deparse(substitute(arg))
   check_not_null(arg)
@@ -261,27 +228,44 @@ check_false <- function(arg) {
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that data frame contains a variable
 #' @param var_name the variable to be searched for
 #' @param data a data frame
-check_in_data <- function(var_name, data) {
+#' @param arg_name name of the data frame
+check_in_data <- function(var_name, data, arg_name) {
   d_names <- colnames(data)
   ok <- (var_name %in% d_names)
   if (!ok) {
     str <- paste(d_names, collapse = ", ")
     msg <- paste0(
-      "The variable '", var_name, "' not found in <data>!",
-      " Found data columns = {", str, "}."
+      "The variable '", var_name, "' not found in <", arg_name, ">!",
+      " Found columns = {", str, "}."
     )
     stop(msg)
   }
-  return(TRUE)
+  TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument is a \code{data.frame} and contains
+#' required variables
+#' @param var_names required variable names in a data frame
+check_df_with <- function(arg, var_names) {
+  arg_name <- deparse(substitute(arg))
+  c_data <- class(arg)
+  if (c_data != "data.frame") {
+    msg <- paste0("<", arg_name, "> must be a data.frame! found = ", c_data)
+    stop(msg)
+  }
+  var_names <- unique(var_names)
+  for (name in var_names) check_in_data(name, arg, arg_name)
+  TRUE
+}
+
+#' @describeIn checks checks that argument has values less than equal to
+#' given maximums, elementwise
 #' @param maximums maximum allowed values for \code{arg}
 check_all_leq <- function(arg, maximums) {
   check_lengths(arg, maximums)
@@ -302,7 +286,7 @@ check_all_leq <- function(arg, maximums) {
   TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that object has no names
 check_not_named <- function(arg) {
   arg_name <- deparse(substitute(arg))
   nams <- names(arg)
@@ -314,7 +298,7 @@ check_not_named <- function(arg) {
   TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that object has names
 check_named <- function(arg) {
   arg_name <- deparse(substitute(arg))
   nams <- names(arg)
@@ -325,7 +309,7 @@ check_named <- function(arg) {
   TRUE
 }
 
-#' @rdname checks
+#' @describeIn checks checks that argument has expected number of dimensions
 #' @param D expected number of dimensions
 check_dim <- function(arg, D) {
   arg_name <- deparse(substitute(arg))
@@ -337,6 +321,15 @@ check_dim <- function(arg, D) {
     )
     stop(msg)
   }
+  TRUE
+}
+
+#' @describeIn checks checks that vector has only unique values
+check_unique <- function(arg) {
+  arg_name <- deparse(substitute(arg))
+  L1 <- length(arg)
+  L2 <- length(unique(arg))
+  if (L1 != L2) stop("<", arg_name, "> must have only unique elements!")
   TRUE
 }
 

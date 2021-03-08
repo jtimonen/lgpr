@@ -79,14 +79,14 @@ rhs_to_advanced <- function(rhs, data) {
     idx <- idx + 1
     covs <- strsplit(t, split = "|", fixed = TRUE)[[1]]
     if (length(covs) == 1) {
-      check_in_data(covs[1], data)
+      check_in_data(covs[1], data, "data")
       t1 <- dollar(types, covs[1])
       f1 <- if ("factor" %in% t1) "zs" else "gp"
       term <- enclose_fun(covs[1], f1)
     } else {
       check_length(covs, 2)
-      check_in_data(covs[1], data)
-      check_in_data(covs[2], data)
+      check_in_data(covs[1], data, "data")
+      check_in_data(covs[2], data, "data")
       e1 <- enclose_fun(covs[1], "gp")
       t2 <- dollar(types, covs[2])
       f2 <- if ("factor" %in% t2) "zs" else "gp"

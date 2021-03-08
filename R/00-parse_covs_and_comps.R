@@ -12,24 +12,21 @@
 #' @return parsed input to stan and covariate scaling
 parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 
-  # Check that data is a data.frame
-  c_data <- class(data)
-  if (c_data != "data.frame") {
-    stop("<data> must be a data.frame! found = ", c_data)
-  }
-
-  # Check that all covariates exist in data
+  # Check that data is a data.frame and that all covariates exist in it
+  x_names <- unique(rhs_variables(model_formula@terms))
   if (verbose) cat("Parsing covariates and components...\n")
-  x_names <- rhs_variables(model_formula@terms)
-  x_names <- unique(x_names)
-  for (name in x_names) check_in_data(name, data)
+  check_df_with(data, x_names)
 
   # Create the inputs to Stan
   covariates <- stan_data_covariates(data, x_names, x_cont_scl)
-  components <- stan_data_components(model_formula, covariates)
-  ts1 <- dollar(covariates, "to_stan")
-  ts2 <- dollar(components, "to_stan")
-  to_stan <- c(ts1, ts2)
+  covs_stan <- dollar(covariates, "to_stan")
+  comps_stan <- stan_data_components(model_formula, covariates)
+  expanding <- stan_data_expanding(covs_stan, dollar(comps_stan, "components"))
+  to_stan <- c(
+    covs_stan,
+    comps_stan,
+    dollar(expanding, "to_stan")
+  )
 
   # Other info
   x_cont_scalings <- dollar(covariates, "x_cont_scalings")
@@ -47,7 +44,7 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
     to_stan = to_stan,
     x_cont_scalings = x_cont_scalings,
     x_cat_levels = x_cat_levels,
-    caseid_map = dollar(components, "caseid_map"),
+    caseid_map = dollar(expanding, "caseid_map"),
     var_names = var_names
   )
 }
@@ -58,15 +55,19 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 #' \itemize{
 #'   \item \code{num_cov_cat}
 #'   \item \code{num_cov_cont}
-#'   \item \code{x_cat}
 #'   \item \code{x_cat_num_levels}
-#'   \item \code{x_cont}
-#'   \item \code{x_cont_unnorm}
-#'   \item \code{x_cont_mask}
+#'   \item \code{x_cat} (\code{_PRED})
+#'   \item \code{x_cont} (\code{_PRED})
+#'   \item \code{x_cont_unnorm} (\code{_PRED})
+#'   \item \code{x_cont_mask} (\code{_PRED})
 #' }
+#' This is used without an existing scaling in
+#' \code{\link{parse_covs_and_comps}} and with one in \code{\link{pred_input}}.
+#'
 #' @param data a data frame
 #' @param x_names unique covariate names
-#' @param x_cont_scl possible existing continuous covariate scaling (list)
+#' @param x_cont_scl Possible existing continuous covariate scaling (list) or
+#' \code{NA}.
 #' @return a named list with fields
 #' \itemize{
 #'   \item \code{to_stan}: a list of stan data
@@ -76,6 +77,7 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 #'   covariate before conversion from factor to numeric
 #' }
 stan_data_covariates <- function(data, x_names, x_cont_scl) {
+  check_unique(x_names)
   check_not_null(x_cont_scl)
   num_obs <- dim(data)[1]
   scl_exists <- is.list(x_cont_scl)
@@ -175,29 +177,15 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
 #'
 #' @param model_formula an object of class \linkS4class{lgpformula}
 #' @param covariates a list returned by \code{\link{stan_data_covariates}}
-#' @return a named list with fields
-#' \itemize{
-#'   \item \code{to_stan}: a list of stan data
-#'   \item \code{caseid_map}: a data frame
-#' }
+#' @return a named list
 stan_data_components <- function(model_formula, covariates) {
   components <- create_components_encoding(model_formula, covariates)
-
-  # Create idx_expand, num_cases and vm_params
-  cts <- dollar(covariates, "to_stan")
-  x_cat <- dollar(cts, "x_cat")
-  x_cont_mask <- dollar(cts, "x_cont_mask")
-  lst <- create_idx_expand(components, x_cat, x_cont_mask)
-  idx_expand <- dollar(lst, "idx_expand")
-  caseid_map <- dollar(lst, "map")
-  num_bt <- length(unique(idx_expand[idx_expand > 1]))
   num_ns <- sum(components[, 5] != 0)
   num_vm <- sum(components[, 6] != 0)
 
-  to_stan <- list(
+  # Return
+  list(
     components = components,
-    idx_expand = idx_expand,
-    num_bt = num_bt,
     num_ell = sum(components[, 1] != 0),
     num_heter = sum(components[, 4] != 0),
     num_ns = num_ns,
@@ -205,14 +193,34 @@ stan_data_components <- function(model_formula, covariates) {
     num_uncrt = sum(components[, 7] != 0),
     num_comps = dim(components)[1]
   )
+}
+
+
+#' Create mapping from observation index to index of beta or teff parameter
+#'
+#' @description Creates the following Stan data input list fields:
+#' \itemize{
+#'   \item \code{num_bt}
+#'   \item \code{idx_expand} (\code{_PRED})
+#' }
+#' @param covariates a covariates information list returned by
+#' \code{\link{stan_data_covariates}}
+#' @param components a components information list returned by
+#' \code{\link{stan_data_components}}
+#' @returns a list
+stan_data_expanding <- function(covariates, components) {
+  x_cat <- dollar(covariates, "x_cat")
+  x_cont_mask <- dollar(covariates, "x_cont_mask")
+  lst <- create_idx_expand(components, x_cat, x_cont_mask)
+  idx_expand <- dollar(lst, "idx_expand")
+  num_bt <- length(unique(idx_expand[idx_expand > 1]))
 
   # Return
   list(
-    to_stan = to_stan,
-    caseid_map = caseid_map
+    to_stan = list(idx_expand = idx_expand, num_bt = num_bt),
+    caseid_map = dollar(lst, "map")
   )
 }
-
 
 #' Create the components integer array
 #'

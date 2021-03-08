@@ -26,8 +26,26 @@ pred_input_x <- function(fit, x) {
       idx_expand_PRED = dollar(si, "idx_expand")
     )
   } else {
-    num_pred <- nrow(x)
-    stop("create_pred_stan_input.x_pred not implemented when x != NULL")
+    m <- fit@model
+    x_names <- unique(rhs_variables(m@model_formula@terms))
+    check_df_with(x, x_names)
+    x_cont_scl <- dollar(m@var_scalings, "x_cont")
+    covariates <- stan_data_covariates(x, x_names, x_cont_scl)
+    covs_stan <- dollar(covariates, "to_stan")
+    comp_info <- get_component_info(m)
+    expanding <- stan_data_expanding(covs_stan, comp_info)
+    si <- c(
+      covs_stan,
+      dollar(expanding, "to_stan")
+    )
+    out <- list(
+      num_pred = nrow(x),
+      x_cont_PRED = dollar(si, "x_cont"),
+      x_cont_unnorm_PRED = dollar(si, "x_cont_unnorm"),
+      x_cont_mask_PRED = dollar(si, "x_cont_mask"),
+      x_cat_PRED = dollar(si, "x_cat"),
+      idx_expand_PRED = dollar(si, "idx_expand")
+    )
   }
   return(out)
 }

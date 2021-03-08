@@ -89,7 +89,7 @@ pred.marginal <- function(fit, x, reduce, draws, verbose) {
   if (verbose) cat("Creating Stan input...\n")
   stan_data <- pred_input(fit, x, reduce, draws)
   stan_model <- dollar(stanmodels, "lgp_predict")
-  utils::capture.output({
+  capture.output({
     stan_fit <- rstan::sampling(
       object = stan_model,
       data = stan_data,
@@ -97,7 +97,7 @@ pred.marginal <- function(fit, x, reduce, draws, verbose) {
       algorithm = "Fixed_param",
       iter = 1,
       chains = 1,
-      show_messages = FALSE
+      show_messages = verbose
     )
   })
   f_pred <- rstan::extract(stan_fit, pars = "F_POST")$F_POST[1, 1, , ]

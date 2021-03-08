@@ -31,11 +31,22 @@ test_that("predictions can be computed (f marginalized)", {
     )
   })
 
-  # Create test points
-  # x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5))
-  x_pred <- NULL
+  # Try with misformatted x
+  x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5))
+  expect_error(
+    pred(fit, x_pred, verbose = FALSE),
+    "variable 'dis_age' not found in <x>!"
+  )
+
+  # Compute predictions with proper x
+  x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
   p <- pred(fit, x_pred, verbose = FALSE)
-  expect_equal(dim(p), c(6, 24)) #
+  expect_equal(dim(p), c(6, 324))
+
+  # Compute predictions with same x as in data
+  p1 <- pred(fit, DAT, verbose = FALSE)
+  p2 <- pred(fit, NULL, verbose = FALSE)
+  expect_equal(p1, p2)
 
   # TODO: make pred return (scaled!) y_pred and test it!!
 })
