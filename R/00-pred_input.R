@@ -79,11 +79,17 @@ pred_input_draws.latent <- function(fit, reduce, draws) {
   num_sigma <- as.numeric(LH == 1)
   num_phi <- as.numeric(LH == 3)
   num_gamma <- as.numeric(LH == 5)
-  num_f <- 1
-
 
   # Get draws
-  return(NULL)
+  list(
+    num_sigma = num_sigma,
+    num_phi = num_phi,
+    num_gamma = num_gamma,
+    d_f_latent = get_draws(fit, pars = "f_latent"), # S x (num_comps*num_obs)
+    d_sigma = get_draw_arr(fit, draws, reduce, "sigma", S, num_sigma),
+    d_phi = get_draw_arr(fit, draws, reduce, "phi", S, num_phi),
+    d_gamma = get_draw_arr(fit, draws, reduce, "phi", S, num_gamma)
+  )
 }
 
 #' @rdname pred_input

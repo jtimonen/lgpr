@@ -2,10 +2,10 @@
 % Please edit documentation in R/03-pred.R
 \name{pred}
 \alias{pred}
-\alias{pred.marginal}
-\alias{pred.marginal_old}
-\alias{pred.latent}
-\title{Computing out-of-sample predictions}
+\alias{pred_marginal}
+\alias{pred_marginal.create}
+\alias{pred_latent}
+\title{Computing model predictions}
 \usage{
 pred(
   fit,
@@ -13,14 +13,15 @@ pred(
   c_hat_pred = NULL,
   reduce = function(x) base::mean(x),
   draws = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  STREAM = NULL
 )
 
-pred.marginal(fit, x, reduce, draws, verbose)
+pred_marginal(fit, x, reduce, draws, verbose)
 
-pred.marginal_old(fit, x, reduce, draws, verbose)
+pred_marginal.create(fit, x, reduce, draws, verbose)
 
-pred.latent(fit, x, c_hat_pred, reduce, draws, verbose, STREAM = get_stream())
+pred_latent(fit, x, c_hat_pred, reduce, draws, verbose)
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
@@ -44,35 +45,16 @@ draws.}
 
 \item{verbose}{Should more information and a progress bar be printed?}
 
-\item{STREAM}{External pointer. By default obtained with
-\code{\link[rstan]{get_stream}}.}
+\item{STREAM}{Deprecated argument, has no effect.}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or
 \linkS4class{Prediction}.
 }
 \description{
-\itemize{
-  \item \code{pred} calls either \code{pred.marginal} or
-  \code{pred.latent} depending on whether \code{fit} is for a model
-  that marginalized or sampled the latent signal \code{f}
-  \item \code{pred.marginal} computes analytic posterior or prior
-  predictive distribution and returns an object of class
-  \linkS4class{GaussianPrediction}
-  \item \code{pred.latent} computes predictions using kernel regression for
-  the samples of \code{f} and returns an object of class
-  \linkS4class{Prediction}
-}
-These also compute the predicted (distribution of the) total signal
+Computes the predicted (distribution of the) total signal
 \code{f} and its additive components. All these are computed for
 each parameter draw (defined by \code{draws}), or other parameter set
 (obtained by a reduction defined by \code{reduce}).
-}
-\seealso{
-Other prediction functions: 
-\code{\link{kernel_matrices}()},
-\code{\link{pred.latent_compute}()},
-\code{\link{pred.marginal_compute}()},
-\code{\link{pred_kernels}()}
 }
 \concept{prediction functions}

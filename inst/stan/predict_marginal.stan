@@ -1,7 +1,6 @@
 #include _common/licence.stan
 
 functions{
-#include _common/functions-utils.stan
 #include _common/functions-kernels.stan
 #include _common/functions-posterior.stan
 }
@@ -21,7 +20,10 @@ transformed data{
 }
 
 generated quantities {
-  vector[num_pred] F_POST[S, 2*(num_comps+1)];
+  vector[num_pred] f_comp_mean[S, num_comps];
+  vector[num_pred] f_comp_std[S, num_comps];
+  vector[num_pred] f_mean[S];
+  vector[num_pred] f_std[S];
   for (is in 1:S) {
     vector[num_pred] f_post[2*(num_comps+1)];
     
@@ -45,9 +47,11 @@ generated quantities {
       vm_params, idx_expand_PRED, idx_expand_PRED, teff_zero
     );
     
-    // Compute the posterior means and variances
-    F_POST[is] = STAN_gp_posterior(
-      KX, KX_s, KX_ss, y_norm, delta, d_sigma[is, 1]
-    );
+    // Compute the posterior means and stds
+    f_post = STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, d_sigma[is, 1]);
+    f_comp_mean[S] = f_post[1:num_comps];
+    f_mean[S] = f_post[num_comps+1];
+    f_comp_std[S] = f_post[(num_comps+2):(2*num_comps+1)];
+    f_std[S] = f_post[2*num_comps+2];
   }
 }
