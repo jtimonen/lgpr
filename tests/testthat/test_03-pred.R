@@ -41,7 +41,7 @@ test_that("predictions can be computed (f marginalized)", {
 
   # Compute predictions with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
-  p <- pred(fit, x_pred, verbose = FALSE)
+  p <- pred(fit, x_pred, verbose = FALSE, reduce = NULL)
   expect_equal(length(p), 4)
 
   # Compute predictions with same x as in data
@@ -56,12 +56,6 @@ test_that("predictions can be computed (f marginalized)", {
 context("Computing predictions (f latent)")
 
 test_that("predictions can be computed (f latent)", {
-  my_prior <- list(effect_time_info = list(
-    lower = 20,
-    upper = 30,
-    backwards = FALSE,
-    zero = 0
-  ))
   NEWDAT <- DAT
   NEWDAT$y <- round(exp(NEWDAT$y))
 

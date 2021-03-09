@@ -47,15 +47,15 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(419, 0, "start", "_common/data-draws.stan");
     reader.add_event(426, 7, "end", "_common/data-draws.stan");
     reader.add_event(426, 12, "restart", "model_predict_marginal");
-    reader.add_event(431, 17, "include", "_common/tdata.stan");
-    reader.add_event(431, 0, "start", "_common/tdata.stan");
-    reader.add_event(439, 8, "end", "_common/tdata.stan");
-    reader.add_event(439, 18, "restart", "model_predict_marginal");
-    reader.add_event(439, 18, "include", "_common/tdata-pred.stan");
-    reader.add_event(439, 0, "start", "_common/tdata-pred.stan");
-    reader.add_event(450, 11, "end", "_common/tdata-pred.stan");
-    reader.add_event(450, 19, "restart", "model_predict_marginal");
-    reader.add_event(490, 57, "end", "model_predict_marginal");
+    reader.add_event(432, 18, "include", "_common/tdata.stan");
+    reader.add_event(432, 0, "start", "_common/tdata.stan");
+    reader.add_event(440, 8, "end", "_common/tdata.stan");
+    reader.add_event(440, 19, "restart", "model_predict_marginal");
+    reader.add_event(440, 19, "include", "_common/tdata-pred.stan");
+    reader.add_event(440, 0, "start", "_common/tdata-pred.stan");
+    reader.add_event(451, 11, "end", "_common/tdata-pred.stan");
+    reader.add_event(451, 20, "restart", "model_predict_marginal");
+    reader.add_event(498, 65, "end", "model_predict_marginal");
     return reader;
 }
 template <typename T0__, typename T1__>
@@ -1248,6 +1248,7 @@ private:
         std::vector<std::vector<vector_d> > d_teff;
         std::vector<std::vector<double> > d_sigma;
         vector_d y_norm;
+        int refresh;
         std::vector<matrix_d> K_const;
         vector_d delta_vec;
         std::vector<matrix_d> K_const_s;
@@ -1747,27 +1748,34 @@ public:
             for (size_t j_1__ = 0; j_1__ < y_norm_j_1_max__; ++j_1__) {
                 y_norm(j_1__) = vals_r__[pos__++];
             }
+            current_statement_begin__ = 429;
+            context__.validate_dims("data initialization", "refresh", "int", context__.to_vec());
+            refresh = int(0);
+            vals_i__ = context__.vals_i("refresh");
+            pos__ = 0;
+            refresh = vals_i__[pos__++];
+            check_greater_or_equal(function__, "refresh", refresh, 0);
             // initialize transformed data variables
-            current_statement_begin__ = 433;
+            current_statement_begin__ = 434;
             validate_non_negative_index("K_const", "num_obs", num_obs);
             validate_non_negative_index("K_const", "num_obs", num_obs);
             validate_non_negative_index("K_const", "num_comps", num_comps);
             K_const = std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >(num_comps, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(num_obs, num_obs));
             stan::math::fill(K_const, DUMMY_VAR__);
             stan::math::assign(K_const,STAN_kernel_const_all(num_obs, num_obs, x_cat, x_cat, x_cont_mask, x_cont_mask, x_cat_num_levels, components, pstream__));
-            current_statement_begin__ = 439;
+            current_statement_begin__ = 440;
             validate_non_negative_index("delta_vec", "num_obs", num_obs);
             delta_vec = Eigen::Matrix<double, Eigen::Dynamic, 1>(num_obs);
             stan::math::fill(delta_vec, DUMMY_VAR__);
             stan::math::assign(delta_vec,rep_vector(delta, num_obs));
-            current_statement_begin__ = 441;
+            current_statement_begin__ = 442;
             validate_non_negative_index("K_const_s", "num_pred", num_pred);
             validate_non_negative_index("K_const_s", "num_obs", num_obs);
             validate_non_negative_index("K_const_s", "num_comps", num_comps);
             K_const_s = std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >(num_comps, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(num_pred, num_obs));
             stan::math::fill(K_const_s, DUMMY_VAR__);
             stan::math::assign(K_const_s,STAN_kernel_const_all(num_pred, num_obs, x_cat_PRED, x_cat, x_cont_mask_PRED, x_cont_mask, x_cat_num_levels, components, pstream__));
-            current_statement_begin__ = 447;
+            current_statement_begin__ = 448;
             validate_non_negative_index("K_const_ss", "num_pred", num_pred);
             validate_non_negative_index("K_const_ss", "num_pred", num_pred);
             validate_non_negative_index("K_const_ss", "num_comps", num_comps);
@@ -1846,6 +1854,7 @@ public:
         names__.push_back("f_comp_std");
         names__.push_back("f_mean");
         names__.push_back("f_std");
+        names__.push_back("counter");
     }
     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
         dimss__.resize(0);
@@ -1867,6 +1876,8 @@ public:
         dims__.resize(0);
         dims__.push_back(S);
         dims__.push_back(num_pred);
+        dimss__.push_back(dims__);
+        dims__.resize(0);
         dimss__.push_back(dims__);
     }
     template <typename RNG>
@@ -1893,43 +1904,53 @@ public:
             if (!include_gqs__ && !include_tparams__) return;
             if (!include_gqs__) return;
             // declare and define generated quantities
-            current_statement_begin__ = 454;
+            current_statement_begin__ = 455;
             validate_non_negative_index("f_comp_mean", "num_pred", num_pred);
             validate_non_negative_index("f_comp_mean", "S", S);
             validate_non_negative_index("f_comp_mean", "num_comps", num_comps);
             std::vector<std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > > f_comp_mean(S, std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(num_comps, Eigen::Matrix<double, Eigen::Dynamic, 1>(num_pred)));
             stan::math::initialize(f_comp_mean, DUMMY_VAR__);
             stan::math::fill(f_comp_mean, DUMMY_VAR__);
-            current_statement_begin__ = 455;
+            current_statement_begin__ = 456;
             validate_non_negative_index("f_comp_std", "num_pred", num_pred);
             validate_non_negative_index("f_comp_std", "S", S);
             validate_non_negative_index("f_comp_std", "num_comps", num_comps);
             std::vector<std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > > f_comp_std(S, std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(num_comps, Eigen::Matrix<double, Eigen::Dynamic, 1>(num_pred)));
             stan::math::initialize(f_comp_std, DUMMY_VAR__);
             stan::math::fill(f_comp_std, DUMMY_VAR__);
-            current_statement_begin__ = 456;
+            current_statement_begin__ = 457;
             validate_non_negative_index("f_mean", "num_pred", num_pred);
             validate_non_negative_index("f_mean", "S", S);
             std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > f_mean(S, Eigen::Matrix<double, Eigen::Dynamic, 1>(num_pred));
             stan::math::initialize(f_mean, DUMMY_VAR__);
             stan::math::fill(f_mean, DUMMY_VAR__);
-            current_statement_begin__ = 457;
+            current_statement_begin__ = 458;
             validate_non_negative_index("f_std", "num_pred", num_pred);
             validate_non_negative_index("f_std", "S", S);
             std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > f_std(S, Eigen::Matrix<double, Eigen::Dynamic, 1>(num_pred));
             stan::math::initialize(f_std, DUMMY_VAR__);
             stan::math::fill(f_std, DUMMY_VAR__);
+            current_statement_begin__ = 459;
+            int counter;
+            (void) counter;  // dummy to suppress unused var warning
+            stan::math::fill(counter, std::numeric_limits<int>::min());
+            stan::math::assign(counter,0);
             // generated quantities statements
-            current_statement_begin__ = 458;
+            current_statement_begin__ = 460;
+            if (pstream__) {
+                stan_print(pstream__," ");
+                *pstream__ << std::endl;
+            }
+            current_statement_begin__ = 461;
             for (int is = 1; is <= S; ++is) {
                 {
-                current_statement_begin__ = 459;
+                current_statement_begin__ = 462;
                 validate_non_negative_index("f_post", "num_pred", num_pred);
                 validate_non_negative_index("f_post", "(2 * (num_comps + 1))", (2 * (num_comps + 1)));
                 std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>  > f_post((2 * (num_comps + 1)), Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(num_pred));
                 stan::math::initialize(f_post, DUMMY_VAR__);
                 stan::math::fill(f_post, DUMMY_VAR__);
-                current_statement_begin__ = 462;
+                current_statement_begin__ = 465;
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_comps", num_comps);
@@ -1937,7 +1958,7 @@ public:
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
                 stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, get_base1(d_alpha, is, "d_alpha", 1), get_base1(d_ell, is, "d_ell", 1), get_base1(d_wrp, is, "d_wrp", 1), get_base1(d_beta, is, "d_beta", 1), get_base1(d_teff, is, "d_teff", 1), vm_params, idx_expand, idx_expand, teff_zero, pstream__));
-                current_statement_begin__ = 468;
+                current_statement_begin__ = 471;
                 validate_non_negative_index("KX_s", "num_pred", num_pred);
                 validate_non_negative_index("KX_s", "num_obs", num_obs);
                 validate_non_negative_index("KX_s", "num_comps", num_comps);
@@ -1945,7 +1966,7 @@ public:
                 stan::math::initialize(KX_s, DUMMY_VAR__);
                 stan::math::fill(KX_s, DUMMY_VAR__);
                 stan::math::assign(KX_s,STAN_kernel_all(num_pred, num_obs, K_const_s, components, x_cont_PRED, x_cont, x_cont_unnorm_PRED, x_cont_unnorm, get_base1(d_alpha, is, "d_alpha", 1), get_base1(d_ell, is, "d_ell", 1), get_base1(d_wrp, is, "d_wrp", 1), get_base1(d_beta, is, "d_beta", 1), get_base1(d_teff, is, "d_teff", 1), vm_params, idx_expand_PRED, idx_expand, teff_zero, pstream__));
-                current_statement_begin__ = 474;
+                current_statement_begin__ = 477;
                 validate_non_negative_index("KX_ss", "num_pred", num_pred);
                 validate_non_negative_index("KX_ss", "num_pred", num_pred);
                 validate_non_negative_index("KX_ss", "num_comps", num_comps);
@@ -1953,32 +1974,47 @@ public:
                 stan::math::initialize(KX_ss, DUMMY_VAR__);
                 stan::math::fill(KX_ss, DUMMY_VAR__);
                 stan::math::assign(KX_ss,STAN_kernel_all(num_pred, num_pred, K_const_ss, components, x_cont_PRED, x_cont_PRED, x_cont_unnorm_PRED, x_cont_unnorm_PRED, get_base1(d_alpha, is, "d_alpha", 1), get_base1(d_ell, is, "d_ell", 1), get_base1(d_wrp, is, "d_wrp", 1), get_base1(d_beta, is, "d_beta", 1), get_base1(d_teff, is, "d_teff", 1), vm_params, idx_expand_PRED, idx_expand_PRED, teff_zero, pstream__));
-                current_statement_begin__ = 482;
-                stan::math::assign(f_post, STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, get_base1(get_base1(d_sigma, is, "d_sigma", 1), 1, "d_sigma", 2), pstream__));
                 current_statement_begin__ = 483;
+                stan::math::assign(counter, (counter + 1));
+                current_statement_begin__ = 486;
+                stan::math::assign(f_post, STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, get_base1(get_base1(d_sigma, is, "d_sigma", 1), 1, "d_sigma", 2), pstream__));
+                current_statement_begin__ = 487;
                 stan::model::assign(f_comp_mean, 
-                            stan::model::cons_list(stan::model::index_uni(S), stan::model::nil_index_list()), 
+                            stan::model::cons_list(stan::model::index_uni(is), stan::model::nil_index_list()), 
                             stan::model::rvalue(f_post, stan::model::cons_list(stan::model::index_min_max(1, num_comps), stan::model::nil_index_list()), "f_post"), 
                             "assigning variable f_comp_mean");
-                current_statement_begin__ = 484;
+                current_statement_begin__ = 488;
                 stan::model::assign(f_mean, 
-                            stan::model::cons_list(stan::model::index_uni(S), stan::model::nil_index_list()), 
+                            stan::model::cons_list(stan::model::index_uni(is), stan::model::nil_index_list()), 
                             get_base1(f_post, (num_comps + 1), "f_post", 1), 
                             "assigning variable f_mean");
-                current_statement_begin__ = 485;
+                current_statement_begin__ = 489;
                 stan::model::assign(f_comp_std, 
-                            stan::model::cons_list(stan::model::index_uni(S), stan::model::nil_index_list()), 
+                            stan::model::cons_list(stan::model::index_uni(is), stan::model::nil_index_list()), 
                             stan::model::rvalue(f_post, stan::model::cons_list(stan::model::index_min_max((num_comps + 2), ((2 * num_comps) + 1)), stan::model::nil_index_list()), "f_post"), 
                             "assigning variable f_comp_std");
-                current_statement_begin__ = 486;
+                current_statement_begin__ = 490;
                 stan::model::assign(f_std, 
-                            stan::model::cons_list(stan::model::index_uni(S), stan::model::nil_index_list()), 
+                            stan::model::cons_list(stan::model::index_uni(is), stan::model::nil_index_list()), 
                             get_base1(f_post, ((2 * num_comps) + 2), "f_post", 1), 
                             "assigning variable f_std");
+                current_statement_begin__ = 491;
+                if (as_bool(logical_eq(counter, refresh))) {
+                    current_statement_begin__ = 492;
+                    stan::math::assign(counter, 0);
+                    current_statement_begin__ = 493;
+                    if (pstream__) {
+                        stan_print(pstream__,"progress = ");
+                        stan_print(pstream__,is);
+                        stan_print(pstream__,"/");
+                        stan_print(pstream__,S);
+                        *pstream__ << std::endl;
+                    }
+                }
                 }
             }
             // validate, write generated quantities
-            current_statement_begin__ = 454;
+            current_statement_begin__ = 455;
             size_t f_comp_mean_j_1_max__ = num_pred;
             size_t f_comp_mean_k_0_max__ = S;
             size_t f_comp_mean_k_1_max__ = num_comps;
@@ -1989,7 +2025,7 @@ public:
                     }
                 }
             }
-            current_statement_begin__ = 455;
+            current_statement_begin__ = 456;
             size_t f_comp_std_j_1_max__ = num_pred;
             size_t f_comp_std_k_0_max__ = S;
             size_t f_comp_std_k_1_max__ = num_comps;
@@ -2000,7 +2036,7 @@ public:
                     }
                 }
             }
-            current_statement_begin__ = 456;
+            current_statement_begin__ = 457;
             size_t f_mean_j_1_max__ = num_pred;
             size_t f_mean_k_0_max__ = S;
             for (size_t j_1__ = 0; j_1__ < f_mean_j_1_max__; ++j_1__) {
@@ -2008,7 +2044,7 @@ public:
                     vars__.push_back(f_mean[k_0__](j_1__));
                 }
             }
-            current_statement_begin__ = 457;
+            current_statement_begin__ = 458;
             size_t f_std_j_1_max__ = num_pred;
             size_t f_std_k_0_max__ = S;
             for (size_t j_1__ = 0; j_1__ < f_std_j_1_max__; ++j_1__) {
@@ -2016,6 +2052,8 @@ public:
                     vars__.push_back(f_std[k_0__](j_1__));
                 }
             }
+            current_statement_begin__ = 459;
+            vars__.push_back(counter);
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
             // Next line prevents compiler griping about no return
@@ -2092,6 +2130,9 @@ public:
                 param_names__.push_back(param_name_stream__.str());
             }
         }
+        param_name_stream__.str(std::string());
+        param_name_stream__ << "counter";
+        param_names__.push_back(param_name_stream__.str());
     }
     void unconstrained_param_names(std::vector<std::string>& param_names__,
                                    bool include_tparams__ = true,
@@ -2143,6 +2184,9 @@ public:
                 param_names__.push_back(param_name_stream__.str());
             }
         }
+        param_name_stream__.str(std::string());
+        param_name_stream__ << "counter";
+        param_names__.push_back(param_name_stream__.str());
     }
 }; // model
 }  // namespace

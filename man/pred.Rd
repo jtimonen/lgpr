@@ -3,8 +3,8 @@
 \name{pred}
 \alias{pred}
 \alias{pred_marginal}
-\alias{pred_marginal.create}
 \alias{pred_latent}
+\alias{pred_marginal.create}
 \title{Computing model predictions}
 \usage{
 pred(
@@ -14,14 +14,15 @@ pred(
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
-  STREAM = NULL
+  STREAM = NULL,
+  refresh = NULL
 )
 
-pred_marginal(fit, x, reduce, draws, verbose)
+pred_marginal(fit, x, reduce, draws, refresh)
 
-pred_marginal.create(fit, x, reduce, draws, verbose)
+pred_latent(fit, x, c_hat_pred, reduce, draws, refresh)
 
-pred_latent(fit, x, c_hat_pred, reduce, draws, verbose)
+pred_marginal.create(fit, x, reduce, draws)
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
@@ -43,9 +44,12 @@ NULL (no reduction). Has no effect if \code{draws} is specified.}
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more information and a progress bar be printed?}
+\item{verbose}{Should more information be printed?}
 
 \item{STREAM}{Deprecated argument, has no effect.}
+
+\item{refresh}{How often to print progress? Has no effect if \code{verbose}
+is \code{FALSE}.}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or

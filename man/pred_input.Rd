@@ -11,17 +11,17 @@
 \alias{get_draw_arr_vec}
 \title{Create input for Stan model that computes predictions}
 \usage{
-pred_input(fit, x, reduce, draws)
+pred_input(fit, x, reduce, draws, refresh)
 
 pred_input_x(fit, x)
 
-pred_input_draws(fit, reduce, draws)
+pred_input_draws(fit, reduce, draws, refresh)
 
 pred_input_draws.marginal(fit, reduce, draws)
 
 pred_input_draws.latent(fit, reduce, draws)
 
-pred_input_draws.common(fit, reduce, draws)
+pred_input_draws.common(fit, reduce, draws, refresh)
 
 get_draw_arr(fit, draws, reduce, par_name, S, D)
 
@@ -39,6 +39,9 @@ NULL (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
+
+\item{refresh}{How often to print progress? Has no effect if \code{verbose}
+is \code{FALSE}.}
 }
 \value{
 a list that can be used as data for \code{lgp_predict.stan}

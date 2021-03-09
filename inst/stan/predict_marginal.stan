@@ -12,6 +12,7 @@ data {
 #include _common/data-draws.stan
   real<lower=0> d_sigma[S, 1];
   vector[num_obs] y_norm;
+  int<lower=0> refresh;
 }
 
 transformed data{
@@ -24,6 +25,8 @@ generated quantities {
   vector[num_pred] f_comp_std[S, num_comps];
   vector[num_pred] f_mean[S];
   vector[num_pred] f_std[S];
+  int counter = 0;
+  print(" ");
   for (is in 1:S) {
     vector[num_pred] f_post[2*(num_comps+1)];
     
@@ -46,12 +49,17 @@ generated quantities {
       d_alpha[is], d_ell[is], d_wrp[is], d_beta[is], d_teff[is],
       vm_params, idx_expand_PRED, idx_expand_PRED, teff_zero
     );
+    counter += 1;
     
     // Compute the posterior means and stds
     f_post = STAN_gp_posterior(KX, KX_s, KX_ss, y_norm, delta, d_sigma[is, 1]);
-    f_comp_mean[S] = f_post[1:num_comps];
-    f_mean[S] = f_post[num_comps+1];
-    f_comp_std[S] = f_post[(num_comps+2):(2*num_comps+1)];
-    f_std[S] = f_post[2*num_comps+2];
+    f_comp_mean[is] = f_post[1:num_comps];
+    f_mean[is] = f_post[num_comps+1];
+    f_comp_std[is] = f_post[(num_comps+2):(2*num_comps+1)];
+    f_std[is] = f_post[2*num_comps+2];
+    if (counter == refresh) {
+      counter = 0;
+      print("progress = ", is,  "/", S);
+    }
   }
 }

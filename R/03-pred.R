@@ -22,7 +22,9 @@
 #' @param STREAM Deprecated argument, has no effect.
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
-#' @param verbose Should more information and a progress bar be printed?
+#' @param verbose Should more information be printed?
+#' @param refresh How often to print progress? Has no effect if \code{verbose}
+#' is \code{FALSE}.
 #' @family prediction functions
 #' @name pred
 NULL
@@ -35,26 +37,60 @@ pred <- function(fit,
                  reduce = function(x) base::mean(x),
                  draws = NULL,
                  verbose = TRUE,
-                 STREAM = NULL) {
-  # check_type(x, "data.frame")
+                 STREAM = NULL,
+                 refresh = NULL) {
   f_sampled <- is_f_sampled(fit)
+  if (!verbose) refresh <- 0
   if (!is.null(draws)) reduce <- NULL
   if (f_sampled) {
-    out <- pred_latent(fit, x, c_hat_pred, reduce, draws, verbose)
+    out <- pred_latent(fit, x, c_hat_pred, reduce, draws, refresh)
   } else {
-    out <- pred_marginal(fit, x, reduce, draws, verbose)
+    out <- pred_marginal(fit, x, reduce, draws, refresh)
   }
   return(out)
 }
 
 #' @rdname pred
-pred_marginal <- function(fit, x, reduce, draws, verbose) {
+pred_marginal <- function(fit, x, reduce, draws, refresh) {
 
   # Compute f_pred
-  if (verbose) cat("Creating Stan input...\n")
-  stan_data <- pred_input(fit, x, reduce, draws)
+  stan_data <- pred_input(fit, x, reduce, draws, refresh)
   stan_model <- dollar(stanmodels, "predict_marginal")
-  capture.output({
+  stan_fit <- rstan::sampling(
+    object = stan_model,
+    data = stan_data,
+    check_data = TRUE,
+    algorithm = "Fixed_param",
+    iter = 1,
+    chains = 1,
+    refresh = dollar(stan_data, "refresh")
+  )
+
+  # Extract and format (TODO: format to long data frame)
+  pars <- c("f_comp_mean", "f_mean", "f_comp_std", "f_std")
+  ext <- rstan::extract(stan_fit, pars = pars)
+  fcm <- dollar(ext, "f_comp_mean")
+  S <- dim(fcm)[2] # number of param sets
+  D <- dim(fcm)[3] # number of components
+  P <- dim(fcm)[4] # number of prediction points
+  #cn <- component_names(fit)
+  #params <- rep(seq_len(S), P)
+  #comp <- rep(rep(cn, each = S), P)
+  
+  return(ext)
+
+  # pred_marginal.create(f_post)
+}
+
+#' @rdname pred
+pred_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
+
+  # Compute f_pred which has dim = c(S, num_pred*num_comps)
+  if (is.null(x)) {
+    f_pred <- get_draws(fit, draws, reduce, pars = "f_latent")
+  } else {
+    stan_data <- pred_input(fit, x, reduce, draws, refresh)
+    stan_model <- dollar(stanmodels, "predict_latent")
     stan_fit <- rstan::sampling(
       object = stan_model,
       data = stan_data,
@@ -62,27 +98,30 @@ pred_marginal <- function(fit, x, reduce, draws, verbose) {
       algorithm = "Fixed_param",
       iter = 1,
       chains = 1,
-      show_messages = verbose
+      refresh = 0
     )
-  })
+    f_pred <- rstan::extract(stan_fit, pars = "F_KR")$F_KR[1, 1, , ]
+  }
 
-  # Extract and format (TODO: format to long data frame)
-  pars <- c("f_comp_mean", "f_mean", "f_comp_std", "f_std")
-  out <- rstan::extract(stan_fit, pars = pars)
-  return(out)
-
-  # pred_marginal.create(f_post)
+  # Create the prediction
+  # h <- pred.latent_h(fit, f_pred, c_hat_pred, verbose)
+  #
+  ## Return
+  # new("Prediction",
+  #    f_comp = arr3_to_list(dollar(kr, "f_comp")),
+  #    f = f,
+  #    h = h
+  # )
+  return(f_pred)
 }
 
 #' @rdname pred
-pred_marginal.create <- function(fit, x, reduce, draws, verbose) {
-  if (verbose) cat("Computing predictive distribution...\n")
+pred_marginal.create <- function(fit, x, reduce, draws) {
   f_mean <- dollar(post, "f_mean")
   f_std <- dollar(post, "f_std")
   y_scl <- dollar(fit@model@var_scalings, "y")
   y_pred <- pred_marginal.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
 
-  if (verbose) cat("Done.\n")
   new("GaussianPrediction",
     f_comp_mean = arr3_to_list(dollar(post, "f_comp_mean")),
     f_comp_std = arr3_to_list(dollar(post, "f_comp_std")),
@@ -114,42 +153,6 @@ pred_marginal.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
 
   # Return
   list(mean = y_mean, std = y_std)
-}
-
-#' @rdname pred
-pred_latent <- function(fit, x, c_hat_pred, reduce, draws, verbose) {
-
-  # Compute f_pred which has dim = c(S, num_pred*num_comps)
-  if (is.null(x)) {
-    f_pred <- get_draws(fit, draws, reduce, pars = "f_latent")
-  } else {
-    if (verbose) cat("Creating Stan input...\n")
-    stan_data <- pred_input(fit, x, reduce, draws)
-    stan_model <- dollar(stanmodels, "predict_latent")
-    capture.output({
-      stan_fit <- rstan::sampling(
-        object = stan_model,
-        data = stan_data,
-        check_data = TRUE,
-        algorithm = "Fixed_param",
-        iter = 1,
-        chains = 1,
-        show_messages = verbose
-      )
-    })
-    f_pred <- rstan::extract(stan_fit, pars = "F_KR")$F_KR[1, 1, , ]
-  }
-
-  # Create the prediction
-  # h <- pred.latent_h(fit, f_pred, c_hat_pred, verbose)
-  #
-  ## Return
-  # new("Prediction",
-  #    f_comp = arr3_to_list(dollar(kr, "f_comp")),
-  #    f = f,
-  #    h = h
-  # )
-  return(f_pred)
 }
 
 #' Map the sum f from pred.latent_compute to h

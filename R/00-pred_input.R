@@ -6,10 +6,10 @@
 NULL
 
 #' @rdname pred_input
-pred_input <- function(fit, x, reduce, draws) {
+pred_input <- function(fit, x, reduce, draws, refresh) {
   si <- get_stan_input(fit)
   si_x_pred <- pred_input_x(fit, x)
-  si_draws <- pred_input_draws(fit, reduce, draws)
+  si_draws <- pred_input_draws(fit, reduce, draws, refresh)
   c(si, si_x_pred, si_draws)
 }
 
@@ -51,10 +51,10 @@ pred_input_x <- function(fit, x) {
 }
 
 #' @rdname pred_input
-pred_input_draws <- function(fit, reduce, draws) {
+pred_input_draws <- function(fit, reduce, draws, refresh) {
 
   # Get param sets
-  d_common <- pred_input_draws.common(fit, reduce, draws)
+  d_common <- pred_input_draws.common(fit, reduce, draws, refresh)
   if (is_f_sampled(fit)) {
     d_add <- pred_input_draws.latent(fit, reduce, draws)
   } else {
@@ -93,10 +93,13 @@ pred_input_draws.latent <- function(fit, reduce, draws) {
 }
 
 #' @rdname pred_input
-pred_input_draws.common <- function(fit, reduce, draws) {
+pred_input_draws.common <- function(fit, reduce, draws, refresh) {
 
   # Get dimensions
   S <- get_num_paramsets(fit, draws, reduce)
+  if (is.null(refresh)) {
+    refresh <- round(S / 10)
+  }
   si <- get_stan_input(fit)
   num_comps <- dollar(si, "num_comps")
   num_ell <- dollar(si, "num_ell")
@@ -112,7 +115,8 @@ pred_input_draws.common <- function(fit, reduce, draws) {
     d_ell = get_draw_arr(fit, draws, reduce, "ell", S, num_ell),
     d_wrp = get_draw_arr(fit, draws, reduce, "wrp", S, num_ns),
     d_beta = get_draw_arr_vec(fit, draws, reduce, "beta", S, HETER, num_bt),
-    d_teff = get_draw_arr_vec(fit, draws, reduce, "teff", S, UNCRT, num_bt)
+    d_teff = get_draw_arr_vec(fit, draws, reduce, "teff", S, UNCRT, num_bt),
+    refresh = refresh
   )
 }
 

@@ -18,7 +18,7 @@ the number of prediction points. If original \code{c_hat} was constant,
 then \code{c_hat_pred} can be ignored, in which case this will by default
 use the same constant.}
 
-\item{verbose}{Should more information and a progress bar be printed?}
+\item{verbose}{Should more information be printed?}
 }
 \value{
 an array with same shape as \code{f}
