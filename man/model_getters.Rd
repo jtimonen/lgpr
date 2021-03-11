@@ -10,7 +10,7 @@
 \alias{is_f_sampled}
 \alias{get_obs_model}
 \alias{get_num_trials}
-\title{Functions that access model properties}
+\title{Internal functions that access model properties}
 \usage{
 get_stan_model(object)
 
@@ -45,5 +45,5 @@ get_num_trials(object)
 }
 }
 \description{
-Functions that access model properties
+Internal functions that access model properties
 }

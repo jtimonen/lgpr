@@ -61,23 +61,18 @@ check_lgpscaling <- function(object) {
 #' @rdname validate
 check_GaussianPrediction <- function(object) {
   errors <- c()
-  f_comp_mean <- object@f_comp_mean
-  f_comp_std <- object@f_comp_std
-  errors <- c(errors, validate_lengths(f_comp_mean, f_comp_std))
-  D1 <- dim(object@f_mean)
-  D2 <- dim(object@f_std)
-  D3 <- dim(object@y_mean)
-  D4 <- dim(object@y_std)
-  D <- list(D1, D2, D3, D4)
-  L <- length(f_comp_mean)
-  for (j in seq_len(L)) {
-    m <- object@f_comp_mean[[j]]
-    s <- object@f_comp_std[[j]]
-    D <- c(D, list(dim(m), dim(s)))
+  cn1 <- colnames(object@components)
+  cn2 <- colnames(object@total)
+  tgt1  <- c("paramset", "component", "mean", "std")
+  tgt2 <- c("paramset", "mean", "std", "sigma")
+  
+  if (!all.equal(cn1, tgt1)) {
+    errors <- c(errors, "invalid components data frame!")
   }
-  errors <- c(errors, validate_dimension_list(D))
-  out <- if (length(errors) > 0) errors else TRUE
-  return(out)
+  if (!all.equal(cn2, tgt2))  {
+    errors <- c(errors, "invalid total data frame!")
+  }
+  return(errors)
 }
 
 #' @rdname validate
@@ -256,24 +251,24 @@ lgpsim <- setClass("lgpsim",
   )
 )
 
-#' An S4 class to represent an analytically computed posterior or prior
-#' predictive distribution (Gaussian) of an additive GP model
+#' An S4 class to represent posterior distributions of an additive GP
 #'
-#' @slot f_comp_mean component means
-#' @slot f_comp_std component standard deviations
-#' @slot f_mean signal mean (on normalized scale)
+#' @slot component data frame representing the posterior distribution of
+#' each model component
+#' @slot data frame representing the posterior distribution of the sum of
+#' the components
 #' @slot f_std signal standard deviation (on normalized scale)
 #' @slot y_mean predictive mean (on original data scale)
 #' @slot y_std predictive standard deviation (on original data scale)
 #' @seealso \linkS4class{Prediction}
 GaussianPrediction <- setClass("GaussianPrediction",
   representation = representation(
-    f_comp_mean = "list",
-    f_comp_std = "list",
-    f_mean = "matrix",
-    f_std = "matrix",
-    y_mean = "matrix",
-    y_std = "matrix"
+    components = "data.frame",
+    total = "data.frame",
+    reduce = "character",
+    draws = "character",
+    x = "data.frame",
+    model = "lgpmodel"
   ),
   validity = check_GaussianPrediction
 )

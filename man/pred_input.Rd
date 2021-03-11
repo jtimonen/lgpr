@@ -7,8 +7,6 @@
 \alias{pred_input_draws.marginal}
 \alias{pred_input_draws.latent}
 \alias{pred_input_draws.common}
-\alias{get_draw_arr}
-\alias{get_draw_arr_vec}
 \title{Create input for Stan model that computes predictions}
 \usage{
 pred_input(fit, x, reduce, draws, refresh)
@@ -22,10 +20,6 @@ pred_input_draws.marginal(fit, reduce, draws)
 pred_input_draws.latent(fit, reduce, draws)
 
 pred_input_draws.common(fit, reduce, draws, refresh)
-
-get_draw_arr(fit, draws, reduce, par_name, S, D)
-
-get_draw_arr_vec(fit, draws, reduce, par_name, S, B, V)
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}

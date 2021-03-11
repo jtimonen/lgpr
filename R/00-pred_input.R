@@ -120,7 +120,15 @@ pred_input_draws.common <- function(fit, reduce, draws, refresh) {
   )
 }
 
-#' @rdname pred_input
+#' Get an array of draws formatted suitably for Stan input
+#' 
+#' @inheritParams pred_input
+#' @param par_name name of parameter (group)
+#' @param S number of parameter sets (first dimension of output array)
+#' @param D number of parameters (second dimension of output array)
+#' @param V vector length for vector params (possible third dimension of
+#' output array)
+#' @return an array
 get_draw_arr <- function(fit, draws, reduce, par_name, S, D) {
   out <- array(0.0, dim = c(S, D))
   if (D > 0) {
@@ -129,7 +137,7 @@ get_draw_arr <- function(fit, draws, reduce, par_name, S, D) {
   return(out)
 }
 
-#' @rdname pred_input
+#' @rdname get_draw_arr
 get_draw_arr_vec <- function(fit, draws, reduce, par_name, S, B, V) {
   D <- as.numeric(B)
   out <- array(0.0, dim = c(S, D, V))

@@ -28,9 +28,7 @@ See the documentation of
  \item \code{\link{ppc}} for prior and posterior predictive checks
  \item \code{\link{relevances}} for component/covariate relevance assessment
  \item \code{\link{select}} for component/covariate selection
- \item \code{\link{get_pred}} for model predictions and inferred components
- at data points
- \item \code{\link{pred}} for computing out-of-sample predictions and
+ \item \code{\link{pred}} for computing model predictions and
  inferred components
  \item \code{\link{plot_pred}} and \code{\link{plot_f}} for visualizing
  predictions and inferred components

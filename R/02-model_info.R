@@ -1,16 +1,32 @@
-#' Print a model summary
+#' Methods to access and print information about a model
 #'
+#' @name lgpmodel_methods
+NULL
+
 #' @export
+#' @describeIn lgpmodel_methods Print a model summary. Returns \code{object}
+#' invisibly.
 #' @inheritParams object_to_model
-#' @return
-#' \itemize{
-#'   \item \code{\link{model_summary.brief}} returns a string
-#'   \item \code{\link{model_summary}} prints the summary and
-#' returns \code{object} invisibly
-#' }
 model_summary <- function(object) {
   model <- object_to_model(object)
-  brief <- model_summary.brief(object)
+
+  # Helper function
+  model_info <- function(object) {
+    model <- object_to_model(object)
+    stan_list <- get_stan_input(object)
+    str1 <- as.character(model@model_formula)
+    str2 <- likelihood_as_str(dollar(stan_list, "obs_model"))
+    dat <- get_data(object)
+    N <- nrow(dat)
+    D <- ncol(dat)
+    line1 <- paste0("Formula: ", str1)
+    line2 <- paste0("Likelihood: ", str2)
+    line3 <- paste0("Data: ", N, " observations, ", D, " variables")
+    out <- paste0(line1, "\n", line2, "\n", line3, "\n")
+    return(out)
+  }
+
+  brief <- model_info(object)
   cat(brief)
   cat("\n")
   print(component_info(object))
@@ -30,63 +46,14 @@ model_summary <- function(object) {
   invisible(object)
 }
 
-#' @rdname model_summary
-model_summary.brief <- function(object) {
-  model <- object_to_model(object)
-  stan_list <- get_stan_input(object)
-  str1 <- as.character(model@model_formula)
-  str2 <- likelihood_as_str(dollar(stan_list, "obs_model"))
-  dat <- get_data(object)
-  N <- nrow(dat)
-  D <- ncol(dat)
-  line1 <- paste0("Formula: ", str1)
-  line2 <- paste0("Likelihood: ", str2)
-  line3 <- paste0("Data: ", N, " observations, ", D, " variables")
-  out <- paste0(line1, "\n", line2, "\n", line3, "\n")
-  return(out)
-}
-
-#' Parameter summary (priors etc.)
-#'
 #' @export
+#' @describeIn lgpmodel_methods Parameter summary (bounds and priors). Returns
+#' a \code{data.frame}.
 #' @inheritParams object_to_model
 #' @param digits number of digits to show for floating point numbers
-#' @return data frame
 param_summary <- function(object, digits = 3) {
   model <- object_to_model(object)
   prior_to_df(model@stan_input, digits = digits)
-}
-
-#' @export
-#' @rdname param_summary
-prior_summary <- function(object, digits = 3) {
-  param_summary(object, digits)
-}
-
-#' Helper function for plots
-#'
-#' @inheritParams object_to_model
-#' @param x x-axis variable name
-#' @param group_by grouping variable name (use \code{NULL} for no grouping)
-#' @return a data frame
-create_plot_df <- function(object, x = "age", group_by = "id") {
-
-  # Get x-axis variable
-  dat <- get_data(object)
-  x_name <- x
-  x <- dollar(dat, x_name)
-  check_type(x, "numeric")
-
-  # Get grouping factor
-  x_grp <- create_grouping_factor(dat, group_by) # util
-
-  # Get response
-  y <- get_y(object, original = TRUE)
-  y_name <- get_y_name(object)
-  df <- data.frame(x_grp, x, y)
-  group_by <- if (is.na(group_by)) "group__" else group_by
-  colnames(df) <- c(group_by, x_name, y_name)
-  return(df)
 }
 
 #' Information about covariates used in a model
@@ -213,7 +180,7 @@ get_y_name <- function(object) {
 }
 
 
-#' Functions that access model properties
+#' Internal functions that access model properties
 #'
 #' @name model_getters
 #' @inheritParams object_to_model
@@ -281,4 +248,32 @@ get_obs_model <- function(object) {
 get_num_trials <- function(object) {
   num_trials <- dollar(get_stan_input(object), "y_num_trials")
   as.vector(num_trials)
+}
+
+
+
+#' Helper function for plots
+#'
+#' @inheritParams object_to_model
+#' @param x x-axis variable name
+#' @param group_by grouping variable name (use \code{NULL} for no grouping)
+#' @return a data frame
+create_plot_df <- function(object, x = "age", group_by = "id") {
+
+  # Get x-axis variable
+  dat <- get_data(object)
+  x_name <- x
+  x <- dollar(dat, x_name)
+  check_type(x, "numeric")
+
+  # Get grouping factor
+  x_grp <- create_grouping_factor(dat, group_by) # util
+
+  # Get response
+  y <- get_y(object, original = TRUE)
+  y_name <- get_y_name(object)
+  df <- data.frame(x_grp, x, y)
+  group_by <- if (is.na(group_by)) "group__" else group_by
+  colnames(df) <- c(group_by, x_name, y_name)
+  return(df)
 }

@@ -1,5 +1,12 @@
 library(lgpr)
-source("helpers/SW.R")
+tryCatch(
+  {
+    source("helpers/SW.R")
+  },
+  error = function(e) {
+    cat("unable to source test helpers\n")
+  }
+)
 
 
 # -------------------------------------------------------------------------
@@ -42,7 +49,7 @@ test_that("predictions can be computed (f marginalized)", {
   # Compute predictions with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
   p <- pred(fit, x_pred, verbose = FALSE, reduce = NULL)
-  expect_equal(length(p), 4)
+  expect_s4_class(p, "GaussianPrediction")
 
   # Compute predictions with same x as in data
   p1 <- pred(fit, DAT, verbose = FALSE)

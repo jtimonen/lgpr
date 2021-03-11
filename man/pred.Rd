@@ -4,7 +4,6 @@
 \alias{pred}
 \alias{pred_marginal}
 \alias{pred_latent}
-\alias{pred_marginal.create}
 \title{Computing model predictions}
 \usage{
 pred(
@@ -21,8 +20,6 @@ pred(
 pred_marginal(fit, x, reduce, draws, refresh)
 
 pred_latent(fit, x, c_hat_pred, reduce, draws, refresh)
-
-pred_marginal.create(fit, x, reduce, draws)
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}

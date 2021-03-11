@@ -4,20 +4,18 @@
 \name{GaussianPrediction-class}
 \alias{GaussianPrediction-class}
 \alias{GaussianPrediction}
-\title{An S4 class to represent an analytically computed posterior or prior
-predictive distribution (Gaussian) of an additive GP model}
+\title{An S4 class to represent posterior distributions of an additive GP}
 \description{
-An S4 class to represent an analytically computed posterior or prior
-predictive distribution (Gaussian) of an additive GP model
+An S4 class to represent posterior distributions of an additive GP
 }
 \section{Slots}{
 
 \describe{
-\item{\code{f_comp_mean}}{component means}
+\item{\code{component}}{data frame representing the posterior distribution of
+each model component}
 
-\item{\code{f_comp_std}}{component standard deviations}
-
-\item{\code{f_mean}}{signal mean (on normalized scale)}
+\item{\code{data}}{frame representing the posterior distribution of the sum of
+the components}
 
 \item{\code{f_std}}{signal standard deviation (on normalized scale)}
 

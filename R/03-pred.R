@@ -39,6 +39,7 @@ pred <- function(fit,
                  verbose = TRUE,
                  STREAM = NULL,
                  refresh = NULL) {
+  if (is.null(x)) x <- get_data(fit)
   f_sampled <- is_f_sampled(fit)
   if (!verbose) refresh <- 0
   if (!is.null(draws)) reduce <- NULL
@@ -66,20 +67,72 @@ pred_marginal <- function(fit, x, reduce, draws, refresh) {
     refresh = dollar(stan_data, "refresh")
   )
 
-  # Extract and format (TODO: format to long data frame)
+  # Helper function 1
+  format_pred_comp <- function(m, s, comp_names) {
+    S <- dim(m)[2] # number of param sets
+    D <- dim(m)[3] # number of components
+    P <- dim(m)[4] # number of prediction points
+    paramset <- as.factor(rep(1:S, D * P))
+    component <- as.factor(rep(rep(comp_names, each = S), P))
+    m <- as.vector(m)
+    s <- as.vector(s)
+    check_lengths(m, s)
+    check_lengths(m, paramset)
+    check_lengths(m, component)
+    df <- data.frame(paramset, component, m, s)
+    colnames(df) <- c("paramset", "component", "mean", "std")
+    return(df)
+  }
+
+  # Helper function 2
+  format_pred_total <- function(m, s, sigma) {
+    S <- dim(m)[2] # number of param sets
+    P <- dim(m)[3] # number of prediction points
+    paramset <- as.factor(rep(1:S, P))
+    sigma <- rep(sigma, P)
+    m <- as.vector(m)
+    s <- as.vector(s)
+    check_lengths(m, s)
+    check_lengths(m, paramset)
+    check_lengths(m, sigma)
+    df <- data.frame(paramset, m, s, sigma)
+    colnames(df) <- c("paramset", "mean", "std", "sigma")
+    return(df)
+  }
+
+  # Extract
   pars <- c("f_comp_mean", "f_mean", "f_comp_std", "f_std")
   ext <- rstan::extract(stan_fit, pars = pars)
-  fcm <- dollar(ext, "f_comp_mean")
-  S <- dim(fcm)[2] # number of param sets
-  D <- dim(fcm)[3] # number of components
-  P <- dim(fcm)[4] # number of prediction points
-  #cn <- component_names(fit)
-  #params <- rep(seq_len(S), P)
-  #comp <- rep(rep(cn, each = S), P)
-  
-  return(ext)
 
-  # pred_marginal.create(f_post)
+  # Format components
+  comp_names <- component_names(fit)
+  mc <- dollar(ext, "f_comp_mean")
+  sc <- dollar(ext, "f_comp_std")
+  df_comp <- format_pred_comp(mc, sc, comp_names)
+
+  # Format total
+  m <- dollar(ext, "f_mean")
+  s <- dollar(ext, "f_std")
+  sigma <- as.vector(dollar(stan_data, "d_sigma"))
+  df_total <- format_pred_total(m, s, sigma)
+
+  # TODO: need to scale, need to store scaling mean ad variance instead of
+  # a function
+
+  # Return
+  if (is.function(reduce)) {
+    reduce_name <- deparse(substitute(reduce))
+  } else {
+    reduce_name <- as.character(reduce)
+  }
+  new("GaussianPrediction",
+    components = df_comp,
+    total = df_total,
+    reduce = reduce_name,
+    draws = as.character(draws),
+    x = x,
+    model = fit@model
+  )
 }
 
 #' @rdname pred
@@ -113,23 +166,6 @@ pred_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
   #    h = h
   # )
   return(f_pred)
-}
-
-#' @rdname pred
-pred_marginal.create <- function(fit, x, reduce, draws) {
-  f_mean <- dollar(post, "f_mean")
-  f_std <- dollar(post, "f_std")
-  y_scl <- dollar(fit@model@var_scalings, "y")
-  y_pred <- pred_marginal.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
-
-  new("GaussianPrediction",
-    f_comp_mean = arr3_to_list(dollar(post, "f_comp_mean")),
-    f_comp_std = arr3_to_list(dollar(post, "f_comp_std")),
-    f_mean = f_mean,
-    f_std = f_std,
-    y_mean = dollar(y_pred, "mean"),
-    y_std = dollar(y_pred, "std")
-  )
 }
 
 #' Transform distribution of f to distribution of y
