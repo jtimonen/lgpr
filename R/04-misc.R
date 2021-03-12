@@ -129,22 +129,25 @@ setMethod("show", "lgpfit", function(object) {
 })
 
 #' @rdname show
-setMethod("show", "GaussianPrediction", function(object) {
+setMethod("show", "GPPosterior", function(object) {
   comps <- levels(dollar(object@components, "component"))
   paramsets <- levels(dollar(object@total, "paramset"))
   eval_points <- levels(dollar(object@total, "eval_point"))
   num_comps <- length(comps)
   DIMS <- c(length(paramsets), length(eval_points))
-  desc <- class_info_pred("GaussianPrediction", num_comps, DIMS)
+  desc <- class_info_pred("GPPosterior", num_comps, DIMS)
   cat(desc)
 })
 
 #' @rdname show
-setMethod("show", "Prediction", function(object) {
-  fm <- object@f_comp
-  num_comps <- length(fm)
-  D <- dim(fm[[1]])
-  desc <- class_info_pred("Prediction", num_comps, D)
+setMethod("show", "GPDraws", function(object) {
+  df <- object@components
+  comps <- levels(dollar(df, "component"))
+  paramsets <- levels(dollar(df, "paramset"))
+  eval_points <- levels(dollar(df, "eval_point"))
+  num_comps <- length(comps)
+  DIMS <- c(length(paramsets), length(eval_points))
+  desc <- class_info_pred("GPDraws", num_comps, DIMS)
   cat(desc)
 })
 

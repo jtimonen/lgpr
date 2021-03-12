@@ -5,8 +5,8 @@
 \alias{check_lgpexpr}
 \alias{check_lgpformula}
 \alias{check_lgpscaling}
-\alias{check_GaussianPrediction}
-\alias{check_Prediction}
+\alias{check_GPPosterior}
+\alias{check_GPDraws}
 \title{Validate S4 class objects}
 \usage{
 check_lgpexpr(object)
@@ -15,9 +15,9 @@ check_lgpformula(object)
 
 check_lgpscaling(object)
 
-check_GaussianPrediction(object)
+check_GPPosterior(object)
 
-check_Prediction(object)
+check_GPDraws(object)
 }
 \arguments{
 \item{object}{an object to validate}

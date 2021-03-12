@@ -49,7 +49,7 @@ test_that("predictions can be computed (f marginalized)", {
   # Compute predictions with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
   p <- pred(fit, x_pred, verbose = FALSE, reduce = NULL)
-  expect_s4_class(p, "GaussianPrediction")
+  expect_s4_class(p, "GPPosterior")
 
   # Compute predictions with same x as in data
   p1 <- pred(fit, DAT, verbose = FALSE)

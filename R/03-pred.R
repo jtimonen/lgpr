@@ -20,8 +20,8 @@
 #' @param draws Indices of parameter draws to use, or \code{NULL} to use all
 #' draws.
 #' @param STREAM Deprecated argument, has no effect.
-#' @return An object of class \linkS4class{GaussianPrediction} or
-#' \linkS4class{Prediction}.
+#' @return An object of class \linkS4class{GPPosterior} or
+#' \linkS4class{GPDraws}.
 #' @param verbose Should more information be printed?
 #' @param refresh How often to print progress? Has no effect if \code{verbose}
 #' is \code{FALSE}.
@@ -120,20 +120,10 @@ pred_marginal <- function(fit, x, reduce, draws, refresh) {
   sigma <- as.vector(dollar(stan_data, "d_sigma"))
   df_total <- format_pred_total(m, s, sigma)
 
-  # TODO: need to scale, need to store scaling mean ad variance instead of
-  # a function
-
   # Return
-  if (is.function(reduce)) {
-    reduce_name <- deparse(substitute(reduce))
-  } else {
-    reduce_name <- as.character(reduce)
-  }
-  new("GaussianPrediction",
+  new("GPPosterior",
     components = df_comp,
     total = df_total,
-    reduce = reduce_name,
-    draws = as.character(draws),
     x = x,
     model = fit@model
   )

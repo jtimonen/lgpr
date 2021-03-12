@@ -67,7 +67,7 @@ check_lgpscaling <- function(object) {
 }
 
 #' @rdname validate
-check_GaussianPrediction <- function(object) {
+check_GPPosterior <- function(object) {
   errors <- c()
   cn1 <- colnames(object@components)
   cn2 <- colnames(object@total)
@@ -85,17 +85,13 @@ check_GaussianPrediction <- function(object) {
 }
 
 #' @rdname validate
-check_Prediction <- function(object) {
-  L <- length(object@f_comp)
+check_GPDraws <- function(object) {
   errors <- c()
-  D1 <- dim(object@f)
-  D2 <- dim(object@h)
-  D <- list(D1, D2)
-  for (j in seq_len(L)) {
-    fj <- object@f_comp[[j]]
-    D <- c(D, list(dim(fj)))
+  cn <- colnames(object@components)
+  tgt <- c("paramset", "component", "eval_point", "value")
+  if (!all.equal(cn, tgt)) {
+    errors <- c(errors, "invalid components data frame!")
   }
-  errors <- c(errors, validate_dimension_list(D))
   out <- if (length(errors) > 0) errors else TRUE
   return(out)
 }
@@ -252,79 +248,43 @@ lgpsim <- setClass("lgpsim",
   )
 )
 
-#' An S4 class to represent posterior distributions of an additive GP
+#' An S4 class to represent posterior distributions of an additive marginal GP
 #'
-#' @slot component data frame representing the posterior distribution of
-#' each model component
-#' @slot data frame representing the posterior distribution of the sum of
-#' the components
-#' @slot f_std signal standard deviation (on normalized scale)
-#' @slot y_mean predictive mean (on original data scale)
-#' @slot y_std predictive standard deviation (on original data scale)
-#' @seealso \linkS4class{Prediction}
-GaussianPrediction <- setClass("GaussianPrediction",
+#' @slot components Data frame representing the posterior distribution of
+#' each model component (on normalized scale).
+#' @slot total Data frame representing the posterior distribution of the sum of
+#' the components (on normalized scale).
+#' @slot x The evaluation points (values of covariates) where the posteriors
+#' are evaluated.
+#' @slot model The \linkS4class{lgpmodel} for which these posteriors are
+#' computed. Contains important information about how to scale the total
+#' posterior from normalized scale to the original scale.
+#' @seealso \linkS4class{GPDraws}
+GPPosterior <- setClass("GPPosterior",
   representation = representation(
     components = "data.frame",
     total = "data.frame",
-    reduce = "character",
-    draws = "character",
     x = "data.frame",
     model = "lgpmodel"
   ),
-  validity = check_GaussianPrediction
+  validity = check_GPPosterior
 )
 
-#' An S4 class to represent general additive model predictions
+#' An S4 class to represent posterior or prior function (component)
+#' draws of an additive latent GP model
 #'
-#' @slot f_comp component predictions
-#' @slot f signal prediction
-#' @slot h prediction (signal prediction transformed through inverse link
-#' function)
-#' @seealso \linkS4class{GaussianPrediction}
-Prediction <- setClass("Prediction",
+#' @slot components Data frame representing the draws of each model component.
+#' @slot x The evaluation points (values of covariates) where the function
+#' draws are evaluated.
+#' @slot model The \linkS4class{lgpmodel} for which these draws are
+#' computed. Contains important information about how to transform the
+#' total draws through an inverse link function.
+#' @seealso \linkS4class{GPPosterior}
+GPDraws <- setClass("GPDraws",
   representation = representation(
-    f_comp = "list",
-    f = "matrix",
-    h = "matrix"
+    components = "data.frame",
+    x = "data.frame",
+    model = "lgpmodel"
   ),
-  validity = check_Prediction
+  validity = check_GPDraws
 )
-
-
-#' Check that all listed dimensions are equal
-#'
-#' @param dims a list of dimensions
-#' @return list of errors or NULL
-validate_dimension_list <- function(dims) {
-  errors <- c()
-  L <- length(dims)
-  d1 <- dims[[1]]
-  K <- length(d1)
-  for (j in seq_len(L)) {
-    dj <- dims[[j]]
-    for (k in seq_len(K)) {
-      if (dj[k] != d1[k]) {
-        msg <- paste0(k, "th dimensions of elements 1 and ", j, " differ!")
-        errors <- c(errors, msg)
-      }
-    }
-  }
-  return(errors)
-}
-
-
-#' Check that arguments have equal lengths
-#'
-#' @param a first argument
-#' @param b second argument
-#' @return list of errors or NULL
-validate_lengths <- function(a, b) {
-  errors <- c()
-  L1 <- length(a)
-  L2 <- length(b)
-  if (L1 != L2) {
-    msg <- "lengths do not agree!"
-    errors <- c(errors, msg)
-  }
-  return(errors)
-}

@@ -49,8 +49,8 @@ draws.}
 is \code{FALSE}.}
 }
 \value{
-An object of class \linkS4class{GaussianPrediction} or
-\linkS4class{Prediction}.
+An object of class \linkS4class{GPPosterior} or
+\linkS4class{GPDraws}.
 }
 \description{
 Computes the predicted (distribution of the) total signal
