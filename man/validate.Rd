@@ -2,22 +2,22 @@
 % Please edit documentation in R/00-all_classes.R
 \name{validate}
 \alias{validate}
-\alias{check_lgpexpr}
-\alias{check_lgpformula}
-\alias{check_lgpscaling}
-\alias{check_GPPosterior}
-\alias{check_GPDraws}
+\alias{validate_lgpexpr}
+\alias{validate_lgpformula}
+\alias{validate_lgpscaling}
+\alias{validate_FunctionPosterior}
+\alias{validate_FunctionDraws}
 \title{Validate S4 class objects}
 \usage{
-check_lgpexpr(object)
+validate_lgpexpr(object)
 
-check_lgpformula(object)
+validate_lgpformula(object)
 
-check_lgpscaling(object)
+validate_lgpscaling(object)
 
-check_GPPosterior(object)
+validate_FunctionPosterior(object)
 
-check_GPDraws(object)
+validate_FunctionDraws(object)
 }
 \arguments{
 \item{object}{an object to validate}

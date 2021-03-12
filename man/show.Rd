@@ -8,8 +8,8 @@
 \alias{show,lgpsim-method}
 \alias{show,lgpmodel-method}
 \alias{show,lgpfit-method}
-\alias{show,GPPosterior-method}
-\alias{show,GPDraws-method}
+\alias{show,FunctionPosterior-method}
+\alias{show,FunctionDraws-method}
 \title{Printing S4 object info using the show generic}
 \usage{
 \S4method{show}{lgpformula}(object)
@@ -24,9 +24,9 @@
 
 \S4method{show}{lgpfit}(object)
 
-\S4method{show}{GPPosterior}(object)
+\S4method{show}{FunctionPosterior}(object)
 
-\S4method{show}{GPDraws}(object)
+\S4method{show}{FunctionDraws}(object)
 }
 \arguments{
 \item{object}{an object of some S4 class}

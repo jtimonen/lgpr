@@ -1,3 +1,7 @@
+return_true_or_errors <- function(errors) {
+  if (length(errors) > 0) errors else TRUE
+}
+
 #' Validate S4 class objects
 #'
 #' @param object an object to validate
@@ -6,7 +10,7 @@
 NULL
 
 #' @rdname validate
-check_lgpexpr <- function(object) {
+validate_lgpexpr <- function(object) {
   errors <- character()
   v0 <- nchar(object@covariate) > 0
   valid_funs <- c(
@@ -24,11 +28,11 @@ check_lgpexpr <- function(object) {
     )
     errors <- c(errors, msg)
   }
-  if (length(errors) == 0) TRUE else errors
+  return_true_or_errors(errors)
 }
 
 #' @rdname validate
-check_lgpformula <- function(object) {
+validate_lgpformula <- function(object) {
   covs <- rhs_variables(object@terms)
   r <- object@y_name
   errors <- character()
@@ -36,11 +40,11 @@ check_lgpformula <- function(object) {
     msg <- "the response variable cannot be also a covariate"
     errors <- c(errors, msg)
   }
-  if (length(errors) == 0) TRUE else errors
+  return_true_or_errors(errors)
 }
 
 #' @rdname validate
-check_lgpscaling <- function(object) {
+validate_lgpscaling <- function(object) {
   loc <- object@loc
   scale <- object@scale
   L1 <- length(loc)
@@ -62,12 +66,11 @@ check_lgpscaling <- function(object) {
     err <- paste0("scale must be positive, found = ", scale)
     errors <- c(errors, err)
   }
-  out <- if (length(errors) > 0) errors else TRUE
-  return(out)
+  return_true_or_errors(errors)
 }
 
 #' @rdname validate
-check_GPPosterior <- function(object) {
+validate_FunctionPosterior <- function(object) {
   errors <- c()
   cn1 <- colnames(object@components)
   cn2 <- colnames(object@total)
@@ -80,20 +83,18 @@ check_GPPosterior <- function(object) {
   if (!all.equal(cn2, tgt2)) {
     errors <- c(errors, "invalid total data frame!")
   }
-  out <- if (length(errors) > 0) errors else TRUE
-  return(out)
+  return_true_or_errors(errors)
 }
 
 #' @rdname validate
-check_GPDraws <- function(object) {
+validate_FunctionDraws <- function(object) {
   errors <- c()
   cn <- colnames(object@components)
   tgt <- c("paramset", "component", "eval_point", "value")
   if (!all.equal(cn, tgt)) {
     errors <- c(errors, "invalid components data frame!")
   }
-  out <- if (length(errors) > 0) errors else TRUE
-  return(out)
+  return_true_or_errors(errors)
 }
 
 #' An S4 class to represent an lgp expression
@@ -109,7 +110,7 @@ lgpexpr <- setClass("lgpexpr",
     fun = "character"
   ),
   prototype(covariate = "", fun = ""),
-  validity = check_lgpexpr
+  validity = validate_lgpexpr
 )
 
 #' An S4 class to represent one formula term
@@ -142,7 +143,7 @@ lgpformula <- setClass("lgpformula",
     y_name = "character",
     terms = "lgprhs"
   ),
-  validity = check_lgpformula
+  validity = validate_lgpformula
 )
 
 #' An S4 class to represent variable scaling
@@ -157,7 +158,7 @@ lgpscaling <- setClass("lgpscaling",
     var_name = "character"
   ),
   prototype = prototype(loc = 1.0, scale = 1.0, var_name = "unknown"),
-  validity = check_lgpscaling
+  validity = validate_lgpscaling
 )
 
 #' An S4 class to represent an lgp model
@@ -259,15 +260,15 @@ lgpsim <- setClass("lgpsim",
 #' @slot model The \linkS4class{lgpmodel} for which these posteriors are
 #' computed. Contains important information about how to scale the total
 #' posterior from normalized scale to the original scale.
-#' @seealso \linkS4class{GPDraws}
-GPPosterior <- setClass("GPPosterior",
+#' @seealso \linkS4class{FunctionDraws}
+FunctionPosterior <- setClass("FunctionPosterior",
   representation = representation(
     components = "data.frame",
     total = "data.frame",
     x = "data.frame",
     model = "lgpmodel"
   ),
-  validity = check_GPPosterior
+  validity = validate_FunctionPosterior
 )
 
 #' An S4 class to represent posterior or prior function (component)
@@ -279,12 +280,12 @@ GPPosterior <- setClass("GPPosterior",
 #' @slot model The \linkS4class{lgpmodel} for which these draws are
 #' computed. Contains important information about how to transform the
 #' total draws through an inverse link function.
-#' @seealso \linkS4class{GPPosterior}
-GPDraws <- setClass("GPDraws",
+#' @seealso \linkS4class{FunctionPosterior}
+FunctionDraws <- setClass("FunctionDraws",
   representation = representation(
     components = "data.frame",
     x = "data.frame",
     model = "lgpmodel"
   ),
-  validity = check_GPDraws
+  validity = validate_FunctionDraws
 )

@@ -6,23 +6,23 @@ context("Validation of expr, formula and scaling objects")
 
 test_that("lgpexpr validation works correctly", {
   a <- lgpexpr(fun = "gp", covariate = "x")
-  expect_true(check_lgpexpr(a))
+  expect_true(validate_lgpexpr(a))
   b <- a
   b@fun <- "moi"
-  msg <- check_lgpexpr(b)
+  msg <- validate_lgpexpr(b)
   expect_error(stop(msg), "<fun> must be one of")
   c <- a
   c@covariate <- ""
-  msg <- check_lgpexpr(c)
+  msg <- validate_lgpexpr(c)
   expect_error(stop(msg), "covariate name cannot be empty")
 })
 
 test_that("lgpformula validation works correctly", {
   a <- parse_formula(as.formula("y ~ gp(x) + zs(a)"), NULL)
-  expect_true(check_lgpformula(a))
+  expect_true(validate_lgpformula(a))
   b <- a
   b@y_name <- "x"
-  msg <- check_lgpformula(b)
+  msg <- validate_lgpformula(b)
   expect_error(stop(msg), "response variable cannot be also")
 })
 
@@ -31,10 +31,10 @@ test_that("lgpscaling and its validation work correctly", {
   x <- stats::rnorm(1000, mean = -300, sd = 2)
   x[1:500] <- NA
   a <- create_scaling(x, "test_var")
-  expect_true(check_lgpscaling(a))
+  expect_true(validate_lgpscaling(a))
   b <- a
   b@var_name <- ""
-  msg <- check_lgpscaling(b)
+  msg <- validate_lgpscaling(b)
   expect_error(stop(msg), "variable name length must be at least 1")
 
   # Test that scaling works correctly
