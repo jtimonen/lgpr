@@ -74,13 +74,15 @@ pred_marginal <- function(fit, x, reduce, draws, refresh) {
     P <- dim(m)[4] # number of prediction points
     paramset <- as.factor(rep(1:S, D * P))
     component <- as.factor(rep(rep(comp_names, each = S), P))
+    eval_point <- as.factor(rep(1:P, each = D * S))
     m <- as.vector(m)
     s <- as.vector(s)
     check_lengths(m, s)
     check_lengths(m, paramset)
     check_lengths(m, component)
-    df <- data.frame(paramset, component, m, s)
-    colnames(df) <- c("paramset", "component", "mean", "std")
+    check_lengths(m, eval_point)
+    df <- data.frame(paramset, component, eval_point, m, s)
+    colnames(df) <- c("paramset", "component", "eval_point", "mean", "std")
     return(df)
   }
 
@@ -89,14 +91,16 @@ pred_marginal <- function(fit, x, reduce, draws, refresh) {
     S <- dim(m)[2] # number of param sets
     P <- dim(m)[3] # number of prediction points
     paramset <- as.factor(rep(1:S, P))
+    eval_point <- as.factor(rep(1:P, each = S))
     sigma <- rep(sigma, P)
     m <- as.vector(m)
     s <- as.vector(s)
     check_lengths(m, s)
     check_lengths(m, paramset)
+    check_lengths(m, eval_point)
     check_lengths(m, sigma)
-    df <- data.frame(paramset, m, s, sigma)
-    colnames(df) <- c("paramset", "mean", "std", "sigma")
+    df <- data.frame(paramset, eval_point, m, s, sigma)
+    colnames(df) <- c("paramset", "eval_point", "mean", "std", "sigma")
     return(df)
   }
 

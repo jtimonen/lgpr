@@ -26,17 +26,26 @@ test_that("lgpformula validation works correctly", {
   expect_error(stop(msg), "response variable cannot be also")
 })
 
-test_that("lgpscaling validation works correctly", {
-  f1 <- function(x) x / 2
-  f2 <- function(x) 2 * x
-  a <- new("lgpscaling", fun = f1, fun_inv = f2, var_name = "x")
+test_that("lgpscaling and its validation work correctly", {
+  # Test validation
+  x <- stats::rnorm(1000, mean = -300, sd = 2)
+  x[1:500] <- NA
+  a <- create_scaling(x, "test_var")
   expect_true(check_lgpscaling(a))
   b <- a
   b@var_name <- ""
   msg <- check_lgpscaling(b)
-  expect_error(stop(msg), "name length must be at least 1")
-  c <- a
-  c@fun <- function(x) 3 * x
-  msg <- check_lgpscaling(c)
-  expect_error(stop(msg), "<f_inv> is not an inverse function of <f>")
+  expect_error(stop(msg), "variable name length must be at least 1")
+
+  # Test that scaling works correctly
+  y <- apply_scaling(a, x)
+  my <- mean(y, na.rm = TRUE)
+  sy <- stats::sd(y, na.rm = TRUE)
+  expect_equal(my, 0.0)
+  expect_equal(sy, 1.0)
+
+  # Test that inverse scaling works correctly
+  x_rec <- apply_scaling(a, y, inverse = TRUE)
+  max_err <- max(abs(x - x_rec), na.rm = TRUE)
+  expect_lt(max_err, 1e-6)
 })

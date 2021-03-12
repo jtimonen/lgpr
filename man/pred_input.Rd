@@ -41,5 +41,7 @@ is \code{FALSE}.}
 a list that can be used as data for \code{lgp_predict.stan}
 }
 \description{
-Create input for Stan model that computes predictions
+Gives a warning if \code{x} is \code{NULL}, but in that
+case \code{x} are taken from the Stan input of the original model. This
+option is just for debugging purposes.
 }

@@ -1,5 +1,8 @@
 #' Create input for Stan model that computes predictions
 #'
+#' @description Gives a warning if \code{x} is \code{NULL}, but in that
+#' case \code{x} are taken from the Stan input of the original model. This
+#' option is just for debugging purposes.
 #' @inheritParams pred
 #' @return a list that can be used as data for \code{lgp_predict.stan}
 #' @name pred_input
@@ -17,6 +20,8 @@ pred_input <- function(fit, x, reduce, draws, refresh) {
 pred_input_x <- function(fit, x) {
   si <- get_stan_input(fit)
   if (is.null(x)) {
+    # This is just for debugging
+    warning("<x> is null in pred_input_x, this is meant just for debugging!")
     out <- list(
       num_pred = dollar(si, "num_obs"),
       x_cont_PRED = dollar(si, "x_cont"),
@@ -121,7 +126,7 @@ pred_input_draws.common <- function(fit, reduce, draws, refresh) {
 }
 
 #' Get an array of draws formatted suitably for Stan input
-#' 
+#'
 #' @inheritParams pred_input
 #' @param par_name name of parameter (group)
 #' @param S number of parameter sets (first dimension of output array)

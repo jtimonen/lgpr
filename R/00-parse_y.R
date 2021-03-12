@@ -74,8 +74,8 @@ NULL
 #' @rdname parse_y_helper
 parse_y.marginal <- function(Y_RAW, y_name) {
   num_obs <- length(Y_RAW)
-  normalizer <- create_scaling(Y_RAW, y_name) # create scaling and inverse
-  y_norm <- call_fun(normalizer@fun, Y_RAW) # standardize the response
+  normalizer <- create_scaling(Y_RAW, y_name) # create scaling
+  y_norm <- apply_scaling(normalizer, Y_RAW) # standardize the response
 
   # Return Stan inputs and also the scaling and its inverse
   list(

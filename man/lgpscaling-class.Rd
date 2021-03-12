@@ -4,16 +4,16 @@
 \name{lgpscaling-class}
 \alias{lgpscaling-class}
 \alias{lgpscaling}
-\title{An S4 class to represent variable scaling and its inverse}
+\title{An S4 class to represent variable scaling}
 \description{
-An S4 class to represent variable scaling and its inverse
+An S4 class to represent variable scaling
 }
 \section{Slots}{
 
 \describe{
-\item{\code{fun}}{function that performs normalization}
+\item{\code{loc}}{original location (mean)}
 
-\item{\code{fun_inv}}{inverse function of \code{fun}}
+\item{\code{scale}}{original scale (standard deviation)}
 
 \item{\code{var_name}}{variable name}
 }}

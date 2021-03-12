@@ -130,10 +130,12 @@ setMethod("show", "lgpfit", function(object) {
 
 #' @rdname show
 setMethod("show", "GaussianPrediction", function(object) {
-  fm <- object@f_comp_mean
-  num_comps <- length(fm)
-  D <- dim(fm[[1]])
-  desc <- class_info_pred("GaussianPrediction", num_comps, D)
+  comps <- levels(dollar(object@components, "component"))
+  paramsets <- levels(dollar(object@total, "paramset"))
+  eval_points <- levels(dollar(object@total, "eval_point"))
+  num_comps <- length(comps)
+  DIMS <- c(length(paramsets), length(eval_points))
+  desc <- class_info_pred("GaussianPrediction", num_comps, DIMS)
   cat(desc)
 })
 
@@ -169,7 +171,7 @@ class_info_pred <- function(class_name, num_comps, D) {
   desc <- paste0("An object of S4 class '", class_name, "'. ")
   desc <- paste0(desc, "\n - ", num_comps, " components")
   desc <- paste0(desc, "\n - ", D[1], " parameter sets")
-  desc <- paste0(desc, "\n - ", D[2], " prediction points")
+  desc <- paste0(desc, "\n - ", D[2], " evaluation points")
   return(desc)
 }
 
@@ -189,7 +191,7 @@ plot_inputwarp <- function(wrp,
   S <- length(wrp)
   W <- matrix(0, S, L)
   for (i in seq_len(S)) {
-    w <- STAN_warp_input(x, a = wrp[i], get_stream())
+    w <- STAN_warp_input(x, a = wrp[i], get_stream()) # TODO: FIX
     W[i, ] <- w
   }
   af <- as.factor(rep(1:S, each = L))

@@ -41,17 +41,25 @@ check_lgpformula <- function(object) {
 
 #' @rdname validate
 check_lgpscaling <- function(object) {
-  a <- 1.2321
-  a_mapped <- call_fun(object@fun, a)
-  b <- call_fun(object@fun_inv, a_mapped)
-  diff <- abs(a - b)
+  loc <- object@loc
+  scale <- object@scale
+  L1 <- length(loc)
+  L2 <- length(scale)
   errors <- character()
-  if (diff > 1e-6) {
-    err <- paste("<f_inv> is not an inverse function of <f>, diff = ", diff)
+  if (L1 != 1) {
+    err <- paste("length(loc) should be 1, found = ", L1)
+    errors <- c(errors, err)
+  }
+  if (L2 != 1) {
+    err <- paste("length(scale) should be 1, found = ", L2)
     errors <- c(errors, err)
   }
   if (nchar(object@var_name) < 1) {
     err <- "variable name length must be at least 1 character"
+    errors <- c(errors, err)
+  }
+  if (scale <= 0) {
+    err <- paste0("scale must be positive, found = ", scale)
     errors <- c(errors, err)
   }
   out <- if (length(errors) > 0) errors else TRUE
@@ -63,16 +71,17 @@ check_GaussianPrediction <- function(object) {
   errors <- c()
   cn1 <- colnames(object@components)
   cn2 <- colnames(object@total)
-  tgt1  <- c("paramset", "component", "mean", "std")
-  tgt2 <- c("paramset", "mean", "std", "sigma")
-  
+  tgt1 <- c("paramset", "component", "eval_point", "mean", "std")
+  tgt2 <- c("paramset", "eval_point", "mean", "std", "sigma")
+
   if (!all.equal(cn1, tgt1)) {
     errors <- c(errors, "invalid components data frame!")
   }
-  if (!all.equal(cn2, tgt2))  {
+  if (!all.equal(cn2, tgt2)) {
     errors <- c(errors, "invalid total data frame!")
   }
-  return(errors)
+  out <- if (length(errors) > 0) errors else TRUE
+  return(out)
 }
 
 #' @rdname validate
@@ -140,26 +149,18 @@ lgpformula <- setClass("lgpformula",
   validity = check_lgpformula
 )
 
-#' An S4 class to represent variable scaling and its inverse
+#' An S4 class to represent variable scaling
 #'
-#' @slot fun function that performs normalization
-#' @slot fun_inv inverse function of \code{fun}
+#' @slot loc original location (mean)
+#' @slot scale original scale (standard deviation)
 #' @slot var_name variable name
 lgpscaling <- setClass("lgpscaling",
   representation = representation(
-    fun = "function",
-    fun_inv = "function",
+    loc = "numeric",
+    scale = "numeric",
     var_name = "character"
   ),
-  prototype = prototype(
-    fun = function(x) {
-      x
-    },
-    fun_inv = function(x) {
-      x
-    },
-    var_name = "unknown"
-  ),
+  prototype = prototype(loc = 1.0, scale = 1.0, var_name = "unknown"),
   validity = check_lgpscaling
 )
 

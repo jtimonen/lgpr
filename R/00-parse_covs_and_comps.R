@@ -114,16 +114,18 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
       x_cat_names[num_cat] <- name
     } else if (c_x == "numeric") {
 
-      # A continuous covariate
+      # Continuous covariate, Masking
       num_cont <- num_cont + 1
       is_na <- is.na(X_RAW)
-      x_cont_mask[[num_cont]] <- as.numeric(is_na)
+      x_cont_mask[[num_cont]] <- as.numeric(is_na) # store locations of NA, NaN
       X_NONAN <- X_RAW
-      X_NONAN[is_na] <- 0
-      new_normalizer <- create_scaling(X_NONAN, name)
+      X_NONAN[is_na] <- 0 # create version where NA, NaN are replaced by 0
+
+      # Applying existing normalization or creating new
+      new_normalizer <- create_scaling(X_RAW, name)
       x_cont_scl_new[[num_cont]] <- new_normalizer
       normalizer <- if (scl_exists) x_cont_scl[[num_cont]] else new_normalizer
-      x_cont[[num_cont]] <- call_fun(normalizer@fun, X_NONAN)
+      x_cont[[num_cont]] <- apply_scaling(normalizer, X_NONAN)
       x_cont_unnorm[[num_cont]] <- X_NONAN
       x_cont_names[num_cont] <- name
     } else {
@@ -495,30 +497,6 @@ reduce_factors_gp <- function(factors) {
   list(factors = factors, covariate = covariate, kernel = kernel)
 }
 
-
-
-
-#' Create the function that does a standardizing transform and its inverse
-#'
-#' @param y variable measurements
-#' @param name variable name
-#' @return an object of class \linkS4class{lgpscaling}
-create_scaling <- function(y, name) {
-  check_length_geq(y, 2)
-  m <- mean(y)
-  std <- stats::sd(y)
-  if (std == 0) {
-    msg <- paste0("the variable <", name, "> has zero variance!")
-    stop(msg)
-  }
-  fun <- function(x) {
-    (x - m) / std
-  }
-  fun_inv <- function(x) {
-    x * std + m
-  }
-  new("lgpscaling", fun = fun, fun_inv = fun_inv, var_name = name)
-}
 
 
 #' Creating the idx_expand input for Stan
