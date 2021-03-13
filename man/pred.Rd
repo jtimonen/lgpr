@@ -4,7 +4,7 @@
 \alias{pred}
 \alias{pred_marginal}
 \alias{pred_latent}
-\title{Computing model predictions}
+\title{Function posterior distributions}
 \usage{
 pred(
   fit,

@@ -2,12 +2,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp ;
-#include "stanExports_predict_latent.h"
+#include "stanExports_fp_latent.h"
 
-RCPP_MODULE(stan_fit4predict_latent_mod) {
+RCPP_MODULE(stan_fit4fp_latent_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_predict_latent")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_fp_latent")
 
     .constructor<SEXP,SEXP,SEXP>()
 

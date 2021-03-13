@@ -1,14 +1,14 @@
 #' Model summary
-#' 
+#'
 #' @param object a model or fit
 #' @name model_summaries
 NULL
 
-#' @describeIn model_summaries Prints a model summary. Returns \code{object} 
+#' @describeIn model_summaries Prints a model summary. Returns \code{object}
 #' invisibly.
 model_summary <- function(object) {
   model <- object_to_model(object)
-  
+
   # Helper function
   model_info <- function(object) {
     model <- object_to_model(object)
@@ -24,7 +24,7 @@ model_summary <- function(object) {
     out <- paste0(line1, "\n", line2, "\n", line3, "\n")
     return(out)
   }
-  
+
   brief <- model_info(model)
   cat(brief)
   cat("\n")

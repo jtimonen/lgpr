@@ -23,7 +23,7 @@ transformed data{
 }
 
 generated quantities {
-  vector[num_pred] F_KR[S, num_comps];
+  vector[num_pred] f_draws[S, num_comps];
   for (is in 1:S) {
     
     // Compute kernel matrices
@@ -47,6 +47,6 @@ generated quantities {
     );
     
     // Compute the posterior means and variances
-    F_KR[is] = STAN_kr(d_f_latent[is], KX, KX_s, KX_ss, delta);
+    f_draws[is] = STAN_kr(d_f_latent[is], KX, KX_s, KX_ss, delta);
   }
 }

@@ -74,8 +74,10 @@ validate_lgpfit <- function(object) {
   errors <- character()
   N1 <- nrow(get_draws(object, NULL, NULL, pars = c("alpha")))
   N2 <- object@num_draws
-  msg <- paste0("invalid num_draws in lgpfit (", N1, " vs. ", N2 ,
-                ")! please report a bug!")
+  msg <- paste0(
+    "invalid num_draws in lgpfit (", N1, " vs. ", N2,
+    ")! please report a bug!"
+  )
   if (N1 != N2) {
     errors <- c(errors, msg)
   }

@@ -7,46 +7,17 @@
 
 using namespace Rcpp;
 
-// STAN_vectorsum
-Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_vectorsum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& vecs, const int& L, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_vectorsum(SEXP vecsSEXP, SEXP LSEXP, SEXP pstream__SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type vecs(vecsSEXP);
-    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
-    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_vectorsum(vecs, L, pstream__));
-    return rcpp_result_gen;
-END_RCPP
-}
-// STAN_log_prior
-double STAN_log_prior(const double& x, const std::vector<int>& types, const std::vector<double>& p, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_log_prior(SEXP xSEXP, SEXP typesSEXP, SEXP pSEXP, SEXP pstream__SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const double& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const std::vector<int>& >::type types(typesSEXP);
-    Rcpp::traits::input_parameter< const std::vector<double>& >::type p(pSEXP);
-    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_log_prior(x, types, p, pstream__));
-    return rcpp_result_gen;
-END_RCPP
-}
 
+RcppExport SEXP _rcpp_module_boot_stan_fit4fp_latent_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4fp_marginal_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_marginal_mod();
-RcppExport SEXP _rcpp_module_boot_stan_fit4predict_latent_mod();
-RcppExport SEXP _rcpp_module_boot_stan_fit4predict_marginal_mod();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
-    {"_lgpr_STAN_log_prior", (DL_FUNC) &_lgpr_STAN_log_prior, 4},
+    {"_rcpp_module_boot_stan_fit4fp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4fp_latent_mod, 0},
+    {"_rcpp_module_boot_stan_fit4fp_marginal_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4fp_marginal_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_marginal_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_marginal_mod, 0},
-    {"_rcpp_module_boot_stan_fit4predict_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4predict_latent_mod, 0},
-    {"_rcpp_module_boot_stan_fit4predict_marginal_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4predict_marginal_mod, 0},
     {NULL, NULL, 0}
 };
 

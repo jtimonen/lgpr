@@ -1,4 +1,4 @@
-#' Computing model predictions
+#' Function posterior distributions
 #'
 #' @description Computes the predicted (distribution of the) total signal
 #' \code{f} and its additive components. All these are computed for
@@ -56,7 +56,7 @@ pred_marginal <- function(fit, x, reduce, draws, refresh) {
 
   # Compute f_pred
   stan_data <- pred_input(fit, x, reduce, draws, refresh)
-  stan_model <- dollar(stanmodels, "predict_marginal")
+  stan_model <- dollar(stanmodels, "fp_marginal")
   stan_fit <- rstan::sampling(
     object = stan_model,
     data = stan_data,
@@ -137,7 +137,7 @@ pred_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
     f_pred <- get_draws(fit, draws, reduce, pars = "f_latent")
   } else {
     stan_data <- pred_input(fit, x, reduce, draws, refresh)
-    stan_model <- dollar(stanmodels, "predict_latent")
+    stan_model <- dollar(stanmodels, "fp_latent")
     stan_fit <- rstan::sampling(
       object = stan_model,
       data = stan_data,
@@ -147,7 +147,7 @@ pred_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
       chains = 1,
       refresh = 0
     )
-    f_pred <- rstan::extract(stan_fit, pars = "F_KR")$F_KR[1, 1, , ]
+    f_pred <- rstan::extract(stan_fit, pars = "f_draws")$f_draws[1, 1, , ]
   }
 
   # Create the prediction

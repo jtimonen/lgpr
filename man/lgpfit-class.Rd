@@ -31,7 +31,7 @@ An S4 class to represent the output of the \code{lgp} function
 
 \item \code{get_draws}: Extract parameter draws. Uses \code{\link[rstan]{extract}} with
 \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the return
-value is always a 2-dimensional array of shape 
+value is always a 2-dimensional array of shape
 \code{num_param_sets} x \code{num_params}.
 }}
 

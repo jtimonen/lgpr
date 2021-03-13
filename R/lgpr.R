@@ -54,7 +54,7 @@
 #'   \item Carpenter, B. et al. (2017).
 #'   \emph{Stan: A probabilistic programming language}. Journal of Statistical
 #'    Software 76(1).
-#'    
+#'
 #' }
 #'
 NULL

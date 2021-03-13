@@ -2,12 +2,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp ;
-#include "stanExports_predict_marginal.h"
+#include "stanExports_fp_marginal.h"
 
-RCPP_MODULE(stan_fit4predict_marginal_mod) {
+RCPP_MODULE(stan_fit4fp_marginal_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_predict_marginal")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_fp_marginal")
 
     .constructor<SEXP,SEXP,SEXP>()
 

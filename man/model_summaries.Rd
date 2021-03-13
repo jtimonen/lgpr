@@ -20,7 +20,7 @@ Model summary
 }
 \section{Functions}{
 \itemize{
-\item \code{model_summary}: Prints a model summary. Returns \code{object} 
+\item \code{model_summary}: Prints a model summary. Returns \code{object}
 invisibly.
 
 \item \code{param_summary}: Get parameter summary (bounds and priors).
