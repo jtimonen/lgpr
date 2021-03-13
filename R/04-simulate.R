@@ -545,7 +545,7 @@ sim.kernels <- function(X,
     } else if (types[j] == 3) {
       j_ell <- j_ell + 1
       ell_ns <- ell[j_ell]
-      Kj <- kernel_bin(X_affected, X_affected) * 
+      Kj <- kernel_bin(X_affected, X_affected) *
         kernel_ns(xj, xj, ell = ell_ns, a = steepness)
       if (useMaskedVarianceKernel) {
         M <- kernel_var_mask(xj, xj, vm_params, a = steepness)

@@ -13,7 +13,7 @@
 #' instructions on how to specify the model terms.
 #' @inheritParams parse_y
 #' @return an object of class \linkS4class{lgpformula}
-#' @family model formula functions
+#' @family internal model creation functions
 parse_formula <- function(formula, data, verbose = FALSE) {
   if (verbose) cat("Parsing formula...\n")
   advanced <- is_advanced_formula(formula)
@@ -24,12 +24,7 @@ parse_formula <- function(formula, data, verbose = FALSE) {
   parse_formula_advanced(formula)
 }
 
-#' Check if formula is in advanced format.
-#'
-#' @description Checks if right-hand side contains opening parentheses.
-#' @inheritParams parse_formula
-#' @return TRUE or FALSE
-#' @family model formula functions
+# Check if formula is in advanced format
 is_advanced_formula <- function(formula) {
   f <- split_formula(formula)
   rhs <- dollar(f, "right")
@@ -37,9 +32,7 @@ is_advanced_formula <- function(formula) {
   return(out)
 }
 
-#' Split formula into left and right-hand side
-#'
-#' @inheritParams parse_formula
+# Split formula into left and right-hand side
 split_formula <- function(formula) {
   check_type(formula, "formula")
   f_str <- as.character(formula)
@@ -48,16 +41,7 @@ split_formula <- function(formula) {
   return(out)
 }
 
-#' Parse a model formula that uses the common formula syntax
-#'
-#' @description Translates formula to advanced syntax format.
-#' @inheritParams is_advanced_formula
-#' @inheritParams parse_formula
-#' @return an object of class \linkS4class{lgpformula}
-#' @name formula_to_advanced
-NULL
-
-#' @rdname formula_to_advanced
+# Translate formula to advanced syntax format
 formula_to_advanced <- function(formula, data) {
   f <- split_formula(formula)
   rhs <- dollar(f, "right")
@@ -68,8 +52,7 @@ formula_to_advanced <- function(formula, data) {
   return(out)
 }
 
-#' @rdname formula_to_advanced
-#' @inheritParams rhs_to_terms
+# Translate formula right-hand side
 rhs_to_advanced <- function(rhs, data) {
   types <- data_types(data)
   terms <- rhs_to_terms(rhs)
@@ -98,23 +81,15 @@ rhs_to_advanced <- function(rhs, data) {
   return(rhs_adv)
 }
 
-
-#' Split a formula to terms
-#'
-#' @param rhs the formula right-hand side in text format
-#' @return a character vector
-#' @family model formula functions
+# Split a formula right-hand side to terms
 rhs_to_terms <- function(rhs) {
   x <- simplify_str(rhs)
   out <- strsplit(x, split = "+", fixed = TRUE)[[1]]
   return(out)
 }
 
-#' Parse a model formula that uses the advanced formula syntax
-#'
-#' @inheritParams parse_formula
-#' @return an object of class \linkS4class{lgpformula}
-#' @family advanced formula parsers
+# Parse a model formula that uses the advanced formula syntax and
+# return an object of class \linkS4class{lgpformula}
 parse_formula_advanced <- function(formula) {
   f <- split_formula(formula)
   rhs <- dollar(f, "right")
@@ -127,11 +102,7 @@ parse_formula_advanced <- function(formula) {
   )
 }
 
-#' Parse a string representation of the right-hand side of a formula
-#'
-#' @inheritParams rhs_to_terms
-#' @return an object of class \linkS4class{lgprhs}
-#' @family advanced formula parsers
+# Parse a string representation of the right-hand side of an advanced formula
 parse_rhs <- function(rhs) {
   terms <- rhs_to_terms(rhs)
   D <- length(terms)
@@ -147,11 +118,7 @@ parse_rhs <- function(rhs) {
   }
 }
 
-#' Parse a string representation of one formula term
-#'
-#' @param term a term without any plus signs, e.g. \code{b*c}
-#' @return an object of class \linkS4class{lgpterm}
-#' @family advanced formula parsers
+# Parse a string representation of one advanced formula term
 parse_term <- function(term) {
   factors <- strsplit(term, split = "*", fixed = TRUE)[[1]] # split to factors
   D <- length(factors)
@@ -171,11 +138,7 @@ parse_term <- function(term) {
   }
 }
 
-#' Parse a string representation of one formula expression
-#'
-#' @param expr the expression as a string, e.g. \code{"gp(x)"}
-#' @return an object of class \linkS4class{lgpexpr}
-#' @family advanced formula parsers
+# Parse a string representation of one advanced formula expression
 parse_expr <- function(expr) {
   num_open <- lengths(regmatches(expr, gregexpr("[(]", expr)))
   num_close <- lengths(regmatches(expr, gregexpr("[)]", expr)))
@@ -202,11 +165,7 @@ parse_expr <- function(expr) {
   return(out)
 }
 
-#' Get names of all variables appearing in a term
-#'
-#' @param term an object of class \linkS4class{lgpterm}
-#' @return a list of variable names
-#' @family advanced formula parsers
+# Get names of all variables appearing in a term of advanced formula
 term_variables <- function(term) {
   a <- character()
   for (f in term@factors) {
@@ -215,11 +174,7 @@ term_variables <- function(term) {
   return(a)
 }
 
-#' Get names of all variables appearing on formula right-hand side
-#'
-#' @param rhs an object of class \linkS4class{lgprhs}
-#' @return a list of variable names
-#' @family advanced formula parsers
+# Get names of all variables appearing on advanced formula right-hand side
 rhs_variables <- function(rhs) {
   a <- character()
   for (s in rhs@summands) {

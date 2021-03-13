@@ -34,8 +34,9 @@ an object of class \linkS4class{lgpformula}
 Checks if formula is in advanced format and translates if not.
 }
 \seealso{
-Other model formula functions: 
-\code{\link{is_advanced_formula}()},
-\code{\link{rhs_to_terms}()}
+Other internal model creation functions: 
+\code{\link{parse_covs_and_comps}()},
+\code{\link{parse_prior}()},
+\code{\link{parse_y}()}
 }
-\concept{model formula functions}
+\concept{internal model creation functions}

@@ -62,11 +62,11 @@ Compute a kernel matrix (covariance matrix)
 \item \code{kernel_ns}: Use the nonstationary kernel (input warping + squared
 exponential).
 
-\item \code{kernel_zerosum}: Uses the zero-sum kernel. Here, \code{x1} and 
+\item \code{kernel_zerosum}: Uses the zero-sum kernel. Here, \code{x1} and
 \code{x2} must be integer vectors (integers denoting different categories).
 Returns a binary matrix.
 
-\item \code{kernel_bin}: Uses the binary (mask) kernel. Here, \code{x1} and 
+\item \code{kernel_bin}: Uses the binary (mask) kernel. Here, \code{x1} and
 \code{x2} must be integer vectors (integers denoting different categories).
 Returns a binary matrix.
 

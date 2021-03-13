@@ -9,7 +9,8 @@
 #'   \item \code{NA}, in which case such list is created by computing mean
 #'   and standard deviation from \code{data}
 #' }
-#' @return parsed input to stan and covariate scaling
+#' @return parsed input to stan and covariate scaling, and other info
+#' @family internal model creation functions
 parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
 
   # Check that data is a data.frame and that all covariates exist in it
@@ -49,33 +50,7 @@ parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
   )
 }
 
-#' Create covariate data for Stan input
-#'
-#' @description Creates the following Stan data input list fields:
-#' \itemize{
-#'   \item \code{num_cov_cat}
-#'   \item \code{num_cov_cont}
-#'   \item \code{x_cat_num_levels}
-#'   \item \code{x_cat} (\code{_PRED})
-#'   \item \code{x_cont} (\code{_PRED})
-#'   \item \code{x_cont_unnorm} (\code{_PRED})
-#'   \item \code{x_cont_mask} (\code{_PRED})
-#' }
-#' This is used without an existing scaling in
-#' \code{\link{parse_covs_and_comps}} and with one in \code{\link{pred_input}}.
-#'
-#' @param data a data frame
-#' @param x_names unique covariate names
-#' @param x_cont_scl Possible existing continuous covariate scaling (list) or
-#' \code{NA}.
-#' @return a named list with fields
-#' \itemize{
-#'   \item \code{to_stan}: a list of stan data
-#'   \item \code{x_cont_scaling}: normalization function and inverse for each
-#'   continuous covariate
-#'   \item \code{x_cat_levels}: names of the levels of each categorical
-#'   covariate before conversion from factor to numeric
-#' }
+# Create covariate data for Stan input
 stan_data_covariates <- function(data, x_names, x_cont_scl) {
   check_unique(x_names)
   check_not_null(x_cont_scl)
@@ -174,12 +149,7 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
   )
 }
 
-
-#' Create model components data for Stan input
-#'
-#' @param model_formula an object of class \linkS4class{lgpformula}
-#' @param covariates a list returned by \code{\link{stan_data_covariates}}
-#' @return a named list
+# Create model components data for Stan input
 stan_data_components <- function(model_formula, covariates) {
   components <- create_components_encoding(model_formula, covariates)
   num_ns <- sum(components[, 5] != 0)
@@ -197,19 +167,7 @@ stan_data_components <- function(model_formula, covariates) {
   )
 }
 
-
-#' Create mapping from observation index to index of beta or teff parameter
-#'
-#' @description Creates the following Stan data input list fields:
-#' \itemize{
-#'   \item \code{num_bt}
-#'   \item \code{idx_expand} (\code{_PRED})
-#' }
-#' @param covariates a covariates information list returned by
-#' \code{\link{stan_data_covariates}}
-#' @param components a components information list returned by
-#' \code{\link{stan_data_components}}
-#' @returns a list
+# Create mapping from observation index to index of beta or teff parameter
 stan_data_expanding <- function(covariates, components) {
   x_cat <- dollar(covariates, "x_cat")
   x_cont_mask <- dollar(covariates, "x_cont_mask")
@@ -224,10 +182,7 @@ stan_data_expanding <- function(covariates, components) {
   )
 }
 
-#' Create the components integer array
-#'
-#' @inheritParams stan_data_components
-#' @return a matrix of integers
+# Create an integer matrix that encodes component type info
 create_components_encoding <- function(model_formula, covariates) {
   terms <- model_formula@terms@summands
   J <- length(terms)
@@ -244,10 +199,7 @@ create_components_encoding <- function(model_formula, covariates) {
   as.matrix(comps)
 }
 
-#' Map a list of terms to their "names"
-#'
-#' @param rhs an object of class \linkS4class{lgprhs}
-#' @return a character vector
+# Map a list of terms to their "names"
 term_names <- function(rhs) {
   terms <- rhs@summands
   J <- length(terms)
@@ -259,12 +211,7 @@ term_names <- function(rhs) {
   return(names)
 }
 
-
-#' An lgpterm to numeric representation for Stan
-#'
-#' @param term an object of class \linkS4class{lgpterm}
-#' @param covariates a list returned by \code{\link{stan_data_covariates}}
-#' @return a vector of 9 integers
+# An lgpterm to numeric representation (9 integers) for Stan
 term_to_numeric <- function(term, covariates) {
   out <- rep(0, 9)
 
@@ -304,21 +251,16 @@ term_to_numeric <- function(term, covariates) {
   out[5] <- as.numeric(is_warped)
   out[6] <- as.numeric(is_vm)
 
-  # Check covariate types
+  # Check covariate types and return
   cidx <- check_term_covariates(covariates, parsed)
   out[4] <- cidx[1]
   out[7] <- cidx[2]
   out[8] <- cidx[3]
   out[9] <- cidx[4]
-
   return(out)
 }
 
-#' Helper for converting an lgpterm to numeric representation for Stan
-#'
-#' @param covariates a list returned by \code{\link{stan_data_covariates}}
-#' @param pf a list returned by \code{\link{check_term_factors}}
-#' @return two integers
+# Helper for converting an lgpterm to numeric representation for Stan
 check_term_covariates <- function(covariates, pf) {
   cts <- dollar(covariates, "to_stan")
   cat_names <- rownames(dollar(cts, "x_cat"))
@@ -362,13 +304,10 @@ check_term_covariates <- function(covariates, pf) {
   }
 
   # Return
-  out
+  return(out)
 }
 
-#' Helper for converting an lgpterm to numeric representation for Stan
-#'
-#' @param term an object of class \linkS4class{lgpterm}
-#' @return a named list
+# Helper for converting an lgpterm to numeric representation for Stan
 check_term_factors <- function(term) {
 
   # Check for het() expressions
@@ -429,12 +368,7 @@ check_term_factors <- function(term) {
   )
 }
 
-#' Check for certain expressions in a term
-#'
-#' @param factors list of \linkS4class{lgpexpr} objects
-#' @param expr the expression name to check
-#' @return an updated list with no \code{expr} expressions, and name of
-#' the covariate in the original \code{expr} expression
+# Check for certain expressions in a formula term
 reduce_factors_expr <- function(factors, expr) {
   fun <- function(x) {
     x@fun == expr
@@ -464,11 +398,7 @@ reduce_factors_expr <- function(factors, expr) {
   list(factors = factors, covariate = covariate)
 }
 
-#' Check for gp expressions in a term
-#'
-#' @param factors list of \linkS4class{lgpexpr} objects
-#' @return an updated list with no \code{gp*} expressions, and name of
-#' the covariate in the original \code{gp*} expression
+# Check for gp, gp_ns and gp_vm expressions in a term
 reduce_factors_gp <- function(factors) {
   fun <- function(x) {
     gp_names <- c("gp", "gp_ns", "gp_vm")
@@ -497,20 +427,7 @@ reduce_factors_gp <- function(factors) {
   list(factors = factors, covariate = covariate, kernel = kernel)
 }
 
-
-
-#' Creating the idx_expand input for Stan
-#'
-#' @name idx_expand
-#' @param components the \code{components} input for Stan
-#' @param x_cat the \code{x_cat} input for Stan
-#' @param x_cont_mask the \code{x_cont_mask} input for Stan
-#' @param x_fac object returned by \code{\link{create_idx_expand_picker}}
-#' @param map object returned by \code{\link{map_factor_to_caseid}}
-#' @return the \code{idx_expand} input for Stan and a mapping data frame
-NULL
-
-#' @rdname idx_expand
+# Creating the idx_expand input for Stan
 create_idx_expand <- function(components, x_cat, x_cont_mask) {
   pick <- create_idx_expand_picker(components, x_cat)
   x_fac <- dollar(pick, "x_fac")
@@ -536,7 +453,7 @@ create_idx_expand <- function(components, x_cat, x_cont_mask) {
   list(map = map, idx_expand = idx_expand)
 }
 
-#' @rdname idx_expand
+# Helper for creating the idx_expand input for Stan
 create_idx_expand_picker <- function(components, x_cat) {
   n_obs <- dim(x_cat)[2]
   inds <- c(components[, 4], components[, 7])
@@ -565,8 +482,8 @@ create_idx_expand_picker <- function(components, x_cat) {
   list(x_fac = x_fac, factor_name = name)
 }
 
-#' @rdname idx_expand
-#' @param factor_name factor name
+
+# Helper for creating the idx_expand input for Stan
 map_factor_to_caseid <- function(x_fac, x_cont_mask, factor_name) {
   id <- c()
   case_id <- c()
@@ -597,7 +514,7 @@ map_factor_to_caseid <- function(x_fac, x_cont_mask, factor_name) {
   return(out)
 }
 
-#' @rdname idx_expand
+# Helper for creating the idx_expand input for Stan
 map_caseid_to_row <- function(x_fac, map) {
   out <- rep(0, length(x_fac))
   num_levels <- dim(map)[1]

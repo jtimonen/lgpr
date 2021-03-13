@@ -53,3 +53,10 @@ a list of parsed options
 \description{
 Parse the response variable and its likelihood model
 }
+\seealso{
+Other internal model creation functions: 
+\code{\link{parse_covs_and_comps}()},
+\code{\link{parse_formula}()},
+\code{\link{parse_prior}()}
+}
+\concept{internal model creation functions}

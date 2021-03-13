@@ -6,6 +6,7 @@
 #' (\code{\link{lgp}}).
 #' @param stan_input a list of stan input fields
 #' @return a named list of parsed options
+#' @family internal model creation functions
 parse_prior <- function(prior, stan_input, verbose) {
   if (verbose) cat("Parsing prior...\n")
   num_uncrt <- dollar(stan_input, "num_uncrt")
@@ -37,11 +38,7 @@ parse_prior <- function(prior, stan_input, verbose) {
   )
 }
 
-#' Fill a partially defined prior
-#'
-#' @inheritParams parse_prior
-#' @param num_uncrt number of uncertain components
-#' @return a named list
+# Fill a partially defined prior
 fill_prior <- function(prior, num_uncrt) {
   par_names <- c("alpha", "ell", "wrp", "sigma", "phi", "beta", "gamma")
   par_names <- c(par_names, "effect_time", "effect_time_info")
@@ -66,10 +63,7 @@ fill_prior <- function(prior, num_uncrt) {
   )
 }
 
-#' Names of allowed  prior types
-#'
-#' @param idx an integer or NULL
-#' @return a character vector
+# Names of allowed prior types
 prior_type_names <- function(idx = NULL) {
   names <- c(
     "Uniform",
@@ -84,15 +78,7 @@ prior_type_names <- function(idx = NULL) {
   return(out)
 }
 
-#' Convert the Stan input encoding of a prior to a human-readable format
-#'
-#' @param stan_input a list of stan input fields
-#' @inheritParams prior_to_str
-#' @name prior_df
-#' @return a data frame
-NULL
-
-#' @rdname prior_df
+# Convert the Stan input encoding of a prior to a human-readable data frame
 prior_to_df <- function(stan_input, digits = 3) {
 
   # Positive parameters
@@ -127,8 +113,7 @@ prior_to_df <- function(stan_input, digits = 3) {
   return(df)
 }
 
-#' @rdname prior_df
-#' @param parname parameter name
+# Helper function for converting prior representation to human readable df
 prior_to_df_pos <- function(stan_input, parname, digits) {
   prior <- dollar(stan_input, paste0("prior_", parname))
   hyper <- dollar(stan_input, paste0("hyper_", parname))
@@ -149,30 +134,7 @@ prior_to_df_pos <- function(stan_input, parname, digits) {
   return(df)
 }
 
-#' @rdname prior_df
-#' @param parname parameter name
-prior_to_df_unit <- function(stan_input, parname, digits) {
-  prior <- dollar(stan_input, paste0("prior_", parname))
-  hyper <- dollar(stan_input, paste0("hyper_", parname))
-  D <- dim(prior)[1]
-  pnames <- rep("foo", D)
-  dnames <- rep("foo", D)
-  bounds <- rep("foo", D)
-  for (j in seq_len(D)) {
-    par <- paste0(parname, "[", j, "]")
-    out <- prior_to_str(par, prior[j, ], hyper[j, ], digits)
-    tpar <- dollar(out, "parname")
-    pnames[j] <- par
-    dnames[j] <- paste0(tpar, " ~ ", dollar(out, "distribution"))
-    bounds[j] <- "[0, Inf)"
-  }
-  df <- data.frame(pnames, bounds, dnames)
-  colnames(df) <- c("Parameter", "Bounds", "Prior")
-  return(df)
-}
-
-#' @rdname prior_df
-#' @param num number of parameters of the type
+# Helper function for converting prior representation to human readable df
 prior_to_df_unit <- function(stan_input, parname, num, digits) {
   hyper <- dollar(stan_input, paste0("hyper_", parname))
   a <- round(hyper[1], digits = digits)
@@ -188,7 +150,7 @@ prior_to_df_unit <- function(stan_input, parname, num, digits) {
   return(df)
 }
 
-#' @rdname prior_df
+# Helper function for converting prior representation to human readable df
 prior_to_df_teff <- function(stan_input, digits) {
   num_bt <- dollar(stan_input, "num_bt")
   prior <- dollar(stan_input, "prior_teff")
@@ -216,33 +178,19 @@ prior_to_df_teff <- function(stan_input, digits) {
   return(df)
 }
 
-#' Add minus to a string depending on options
-#'
-#' @param str a string
-#' @param val a value to append with minus (will not be appended if value
-#' is zero)
-#' @param prepend should a minus be prepended (true if this is not zero)
-#' @name minus
-
-#' @rdname minus
+#' Append minus and val to a string if val is not zero
 minus.append <- function(str, val) {
   if (val != 0) str <- paste0(str, " - ", val)
   return(str)
 }
 
-#' @rdname minus
+#' Prepend minus to a string
 minus.prepend <- function(str, prepend) {
   if (prepend != 0) str <- paste0(" - (", str, ")")
   return(str)
 }
 
-#' Human-readable prior statement
-#'
-#' @param parname parameter name
-#' @param prior two integers
-#' @param hyper three real numbers
-#' @param digits number of digits to show for floats
-#' @return A list.
+# Human-readable prior statement
 prior_to_str <- function(parname, prior, hyper, digits) {
   hyper <- round(hyper, digits)
 
@@ -271,15 +219,7 @@ prior_to_str <- function(parname, prior, hyper, digits) {
 }
 
 
-#' Parse a fully defined prior
-#'
-#' @inheritParams parse_prior
-#' @name parse_prior_full
-#' @return a named list to be given to Stan
-#' @family prior parsers
-NULL
-
-#' @name parse_prior_full
+# Parse a fully defined prior
 parse_prior_full <- function(prior, stan_input) {
   list_pos <- parse_prior_full_pos(prior, stan_input)
   list_unit <- parse_prior_full_unit(prior, stan_input)
@@ -287,7 +227,7 @@ parse_prior_full <- function(prior, stan_input) {
   c(list_pos, list_unit, list_teff)
 }
 
-#' @rdname parse_prior_full
+# Parse a fully defined prior (positive parameters)
 parse_prior_full_pos <- function(prior, stan_input) {
   obs_model <- dollar(stan_input, "obs_model")
   par_names <- c("alpha", "ell", "wrp", "sigma", "phi")
@@ -310,7 +250,7 @@ parse_prior_full_pos <- function(prior, stan_input) {
 }
 
 
-#' @rdname parse_prior_full
+# Parse a fully defined prior (unit interval parameters)
 parse_prior_full_unit <- function(prior, stan_input) {
   obs_model <- dollar(stan_input, "obs_model")
   par_names <- c("beta", "gamma")
@@ -330,7 +270,7 @@ parse_prior_full_unit <- function(prior, stan_input) {
   return(parsed)
 }
 
-#' @rdname parse_prior_full
+# Parse a fully defined prior (effect time parameters)
 parse_prior_full_teff <- function(prior, stan_input) {
   num_bt <- dollar(stan_input, "num_bt")
   num_uncrt <- dollar(stan_input, "num_uncrt")
@@ -361,12 +301,7 @@ parse_prior_full_teff <- function(prior, stan_input) {
   )
 }
 
-#' Parse the given prior for a single parameter type
-#'
-#' @param desc An unnamed list of prior descriptions.
-#' @param num number of parameters of this type
-#' @return a named list of parsed options
-#' @family prior parsers
+# Parse given prior for a single parameter type
 parse_prior_single <- function(desc, num) {
   check_not_named(desc)
   L <- length(desc)
@@ -400,7 +335,7 @@ parse_prior_single <- function(desc, num) {
   )
 }
 
-#' Parse the given prior to numeric format
+#' Convert given prior to numeric format
 #'
 #' @param desc Prior description as a named list, containing fields
 #' \itemize{
@@ -411,7 +346,6 @@ parse_prior_single <- function(desc, num) {
 #' }
 #' Other list fields are interpreted as hyperparameters.
 #' @return a named list of parsed options
-#' @family prior parsers
 prior_to_num <- function(desc) {
   types <- prior_type_names()
   distribution_name <- dollar(desc, "dist")
@@ -427,11 +361,7 @@ prior_to_num <- function(desc) {
   )
 }
 
-#' Position the hyper parameters from a list to a vector that goes to Stan
-#'
-#' @param desc Hyperparameters as a named list
-#' @return three real numbers
-#' @family prior parsers
+# Position the hyper parameters from a list to a vector that goes to Stan
 position_hyper_params <- function(desc) {
   hyper <- c(0, 0, 0)
   NAMES <- names(desc)

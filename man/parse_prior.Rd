@@ -21,3 +21,10 @@ a named list of parsed options
 \description{
 Parse given prior
 }
+\seealso{
+Other internal model creation functions: 
+\code{\link{parse_covs_and_comps}()},
+\code{\link{parse_formula}()},
+\code{\link{parse_y}()}
+}
+\concept{internal model creation functions}

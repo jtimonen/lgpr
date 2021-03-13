@@ -35,7 +35,7 @@ kernel_ns <- function(x1, x2, alpha = 1.0, ell, a) {
 }
 
 
-#' @describeIn kernel Uses the zero-sum kernel. Here, \code{x1} and 
+#' @describeIn kernel Uses the zero-sum kernel. Here, \code{x1} and
 #' \code{x2} must be integer vectors (integers denoting different categories).
 #' Returns a binary matrix.
 #' @param M number of categories
@@ -56,7 +56,7 @@ kernel_zerosum <- function(x1, x2, M, alpha = 1.0) {
   return(alpha^2 * K)
 }
 
-#' @describeIn kernel Uses the binary (mask) kernel. Here, \code{x1} and 
+#' @describeIn kernel Uses the binary (mask) kernel. Here, \code{x1} and
 #' \code{x2} must be integer vectors (integers denoting different categories).
 #' Returns a binary matrix.
 #' @param pos_class the positive class label (integer)
@@ -93,7 +93,7 @@ kernel_var_mask <- function(x1, x2, vm_params,
 
 
 #' @describeIn kernel Computes the heterogeneity multiplier matrix.
-#' 
+#'
 #' @param beta a parameter vector (row vector) of length \code{N_cases}
 #' @param row_to_caseID_1 mapinf from row index to case ID (integer vector of
 #' length \eqn{n})

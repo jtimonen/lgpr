@@ -1,19 +1,4 @@
-#' Default priors and parameter values
-#'
-#' @description
-#' \itemize{
-#'   \item \code{default_prior} returns a named list that defines a prior
-#'   \item \code{default_ppc_fun} returns a function to be used as argument
-#'   of \code{\link{ppc}}
-#' }
-#' @param name parameter name
-#' @param num_uncrt number of uncertain components
-#' @param object an object of class \linkS4class{lgpfit} or \code{lgpmodel}
-#' @return see description
-#' @name defaults
-NULL
-
-#' @rdname defaults
+# Default prior, given parameter name and number of uncertain components
 default_prior <- function(name, num_uncrt = NULL) {
   if (name == "effect_time_info") {
     desc <- default_prior_effect_time_info(num_uncrt)
@@ -23,7 +8,6 @@ default_prior <- function(name, num_uncrt = NULL) {
   return(desc)
 }
 
-#' @rdname defaults
 default_prior_common <- function(name) {
   allowed <- c(
     "alpha", # 1
@@ -56,7 +40,6 @@ default_prior_common <- function(name) {
   return(prior)
 }
 
-#' @rdname defaults
 default_prior_effect_time_info <- function(num_uncrt) {
   check_not_null(num_uncrt)
   if (num_uncrt > 0) {
@@ -71,7 +54,7 @@ default_prior_effect_time_info <- function(num_uncrt) {
   return(desc)
 }
 
-#' @rdname defaults
+# Default bayesplot function for ppc
 default_ppc_fun <- function(object) {
   likelihood <- get_obs_model(object)
   f1 <- bayesplot::ppc_dens_overlay

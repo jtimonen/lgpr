@@ -34,6 +34,7 @@
 #' @param y_name Name of response variable
 #' @param verbose Should some informative messages be printed?
 #' @return a list of parsed options
+#' @family internal model creation functions
 parse_y <- function(data, likelihood, c_hat, num_trials,
                     y_name, sample_f, verbose) {
   if (verbose) cat("Parsing response and likelihood...\n")
@@ -63,15 +64,7 @@ parse_y <- function(data, likelihood, c_hat, num_trials,
   return(y_info)
 }
 
-#' Subroutines for parsing the response variable and its likelihood model
-#'
-#' @param Y_RAW raw response variable taken from the user-supplied data frame
-#' @param LH integer encoding of likelihood
-#' @inheritParams parse_y
-#' @name parse_y_helper
-NULL
-
-#' @rdname parse_y_helper
+# Parse raw response taken from input data frame (marginal GP model)
 parse_y.marginal <- function(Y_RAW, y_name) {
   num_obs <- length(Y_RAW)
   normalizer <- create_scaling(Y_RAW, y_name) # create scaling
@@ -88,7 +81,7 @@ parse_y.marginal <- function(Y_RAW, y_name) {
   )
 }
 
-#' @rdname parse_y_helper
+# Parse raw response taken from input data frame (latent GP model)
 parse_y.latent <- function(Y_RAW, y_name, LH, c_hat, num_trials) {
   num_obs <- length(Y_RAW)
   if (LH == 1) {
@@ -115,14 +108,7 @@ parse_y.latent <- function(Y_RAW, y_name, LH, c_hat, num_trials) {
   list(to_stan = to_stan, scaling = new("lgpscaling", var_name = y_name))
 }
 
-#' Set c_hat
-#'
-#' @param c_hat the \code{c_hat} argument given as input to
-#' \code{\link{create_model}}
-#' @param response response variable data
-#' @param LH likelihood as int
-#' @param num_trials the num_trials data (binomial likelihood)
-#' @return a real number
+# Convert given c_hat input to Stan input format
 set_c_hat <- function(c_hat, response, LH, num_trials) {
   nb_or_pois <- LH %in% c(2, 3)
   binomial <- LH %in% c(4, 5)
@@ -156,12 +142,7 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
   return(c_hat)
 }
 
-#' Set num_trials (binomial and beta-binomial observation models)
-#'
-#' @param num_trials the \code{num_trials} argument
-#' @param y response variable observations
-#' @param LH likelihood as integer encoding
-#' @return a numeric vector
+# Convert given num_trials input to Stan input format
 set_num_trials <- function(num_trials, y, LH) {
   num_obs <- length(y)
   is_binom <- LH %in% c(4, 5)
@@ -190,14 +171,11 @@ set_num_trials <- function(num_trials, y, LH) {
   return(num_trials)
 }
 
-#' Check that the response is numeric and compatible with observation model
-#'
-#' @param y the response variable measurements
-#' @param obs_model observation model (integer encoding)
-check_response <- function(y, obs_model) {
+# Check that the response is numeric and compatible with observation model
+check_response <- function(y, LH) {
   response <- y
   check_type(response, "numeric")
-  if (obs_model != 1) {
+  if (LH != 1) {
     check_non_negative_all(response)
     check_integer_all(response)
   }

@@ -27,8 +27,15 @@ This can either be
 \item{verbose}{Should some informative messages be printed?}
 }
 \value{
-parsed input to stan and covariate scaling
+parsed input to stan and covariate scaling, and other info
 }
 \description{
 Parse the covariates and model components from given data and formula
 }
+\seealso{
+Other internal model creation functions: 
+\code{\link{parse_formula}()},
+\code{\link{parse_prior}()},
+\code{\link{parse_y}()}
+}
+\concept{internal model creation functions}
