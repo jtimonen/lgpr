@@ -2,7 +2,7 @@
 #'
 #' @description
 #' \itemize{
-#'   \item Predictions at data points can be visualized using \code{plot_pred}.
+#'   \item FunctionDrawss at data points can be visualized using \code{plot_pred}.
 #'     Out-of-sample predictions can be visualized by giving the \code{pred}
 #'     and \code{x} arguments.
 #'   \item The total signal \code{f} or any of its
@@ -12,8 +12,8 @@
 #' @param x A data frame of prediction points, containing at least the
 #' variables used as covariates in the model. This must be specified if
 #' \code{pred} is not \code{NULL}.
-#' @param pred An object of class \linkS4class{GaussianPrediction} or
-#' \linkS4class{Prediction}.
+#' @param pred An object of class \linkS4class{FunctionPosterior} or
+#' \linkS4class{FunctionDraws}.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable (use \code{group_by=NA}
 #' to avoid grouping)

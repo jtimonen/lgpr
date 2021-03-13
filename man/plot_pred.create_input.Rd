@@ -9,8 +9,8 @@ plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{pred}{An object of class \linkS4class{GaussianPrediction} or
-\linkS4class{Prediction}.}
+\item{pred}{An object of class \linkS4class{FunctionPosterior} or
+\linkS4class{FunctionDraws}.}
 
 \item{x}{A data frame of prediction points, containing at least the
 variables used as covariates in the model. This must be specified if

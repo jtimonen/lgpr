@@ -1,8 +1,8 @@
-#' Posterior into posterior predictive
+#' Get posterior predictive distribution (draws) from function posterior (draws)
 #'
-#' @param post an object of class \linkS4class{gpposterior}
+#' @param post an object of class \linkS4class{FunctionPosterior}
 #' @return TODO
-get_pred <- function(post) {
-  check_type(fit, "gpposterior")
+post_pred <- function(post) {
+  check_type(post, "FunctionPosterior")
   return("not implemented!")
 }

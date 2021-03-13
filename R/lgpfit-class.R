@@ -1,3 +1,25 @@
+#' Print a fit summary. 
+#' 
+#' @export
+#' @param fit an object of class \linkS4class{lgpfit}
+#' @param ignore_pars parameters and generated quantities to ignore from output
+#' @returns \code{object} invisibly.
+fit_summary <- function(fit, 
+                        ignore_pars = c("f_latent", "eta", "teff_raw", "lp__")
+                        ) {
+  check_type(fit, "lgpfit")
+  print(fit@stan_fit, pars = ignore_pars, include = FALSE)
+}
+
+#' @describeIn lgpfit Print information and summary about the fit object.
+setMethod("show", "lgpfit", function(object) {
+  msg <- class_info("lgpfit")
+  cat(msg)
+  cat("\n")
+  fit_summary(object)
+})
+
+
 #' Visualize the distribution of the obtained parameter draws
 #'
 #' @description
@@ -12,7 +34,6 @@
 #'   \item \code{plot_warp} visualizes the input warping function for
 #'   different draws of the warping steepness parameter
 #' }
-#' @inheritParams get_draws
 #' @param type plot type, allowed options are "intervals", "dens",
 #' "areas", and "trace"
 #' @param regex_pars regex for parameter names to plot
@@ -106,35 +127,23 @@ plot_effect_times <- function(fit, type = "areas", ...) {
   return(h)
 }
 
-
-#' Extract posterior draws
-#'
-#' @description These functions use \code{\link[rstan]{extract}} with
-#' \code{permuted = FALSE} and \code{inc_warmup = FALSE}. Chains are stacked
-#' so that the return value is always a 2-dimensional array.
-#' \itemize{
-#'  \item \code{get_draws} extracts posterior draws after warmup
-#'   \item \code{get_draws.catch} function calls \code{get_draws} but catches
-#' errors and returns NULL if an error occurs.
-#'   \item \code{get_num_draws} returns totals number of post-warmup draws
-#' }
-#' @param fit an object of class \linkS4class{lgpfit}
-#' @param draws Indices of parameter draws to return use. All post-warmup
-#' draws are returned if this is \code{NULL}.
+#' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}} with
+#' \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the return
+#' value is always a 2-dimensional array of shape 
+#' \code{num_param_sets} x \code{num_params}.
+#' 
+#' @param draws Indices of the parameter draws. \code{NULL} corresponds to
+#' all post-warmup draws.
 #' @param reduce Function used to reduce all parameter draws into
 #' one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 #' \code{NULL}.
-#' @param ... additional keyword arguments to \code{rstan::extract}
-#' @return an array of shape \code{num_param_sets} x \code{num_params}
-#' @family fit postprocessing functions
-#' @name get_draws
-NULL
-
-#' @export
-#' @rdname get_draws
-get_draws <- function(fit, draws = NULL, reduce = NULL, ...) {
-  check_type(fit, "lgpfit")
-  s <- rstan::extract(fit@stan_fit, permuted = FALSE, inc_warmup = FALSE, ...)
+#' @param ... additional keyword arguments to \code{\link[rstan]{extract}}
+setMethod("get_draws", "lgpfit", 
+          function(object, draws = NULL, reduce = NULL, ...) {
+  s <- rstan::extract(object@stan_fit, 
+                      permuted = FALSE, 
+                      inc_warmup = FALSE, 
+                      ...)
   param_names <- dimnames(s)[[3]]
   s <- squeeze_second_dim(s) # squeeze the 'chains' dimension
   if (!is.null(draws)) {
@@ -144,71 +153,20 @@ get_draws <- function(fit, draws = NULL, reduce = NULL, ...) {
   }
   colnames(s) <- param_names
   return(s)
-}
+})
 
-#' @rdname get_draws
-get_draws.catch <- function(fit, draws = NULL, reduce = NULL, ...) {
-  tryCatch(
-    {
-      get_draws(fit, draws, reduce, ...)
-    },
-    error = function(e) {
-      NULL
-    }
-  )
-}
-
-#' @export
-#' @rdname get_draws
-get_num_draws <- function(fit) {
-  # TODO: should be optimized
-  draws <- get_draws(fit, draws = NULL, reduce = NULL, pars = "alpha")
-  nrow(draws)
-}
-
-#' Decide number of output param sets
-#'
-#' @description Decide number of output param sets based on total number of
-#' posterior draws, possible reduction and subset of draw indices
-#' @inheritParams get_draws
-#' @return an integer
-get_num_paramsets <- function(fit, draws, reduce) {
-  S <- get_num_draws(fit)
+determine_num_paramsets <- function(fit, draws, reduce) {
+  # Decide number of output param sets based on total number of
+  # posterior draws, possible reduction and subset of draw indices
+  S <- fit@num_draws
   if (!is.null(reduce)) S <- 1
   if (!is.null(draws)) S <- length(draws)
   return(S)
 }
 
-#' Get the stanfit object from an lgpfit
-#'
-#' @export
-#' @inheritParams get_draws
-#' @family fit postprocessing functions
-get_stan_fit <- function(fit) {
-  fit@stan_fit
-}
-
-#' Posterior summary
-#'
-#' @export
-#' @inheritParams get_draws
-#' @param ignore_pars names of parameters and generated quantities to ingore
-#' @return a character representation
-#' @family fit postprocessing functions
-fit_summary <- function(fit,
-                        ignore_pars = c(
-                          "f_latent", "eta",
-                          "teff_raw", "lp__"
-                        )) {
-  check_type(fit, "lgpfit")
-  sf <- get_stan_fit(fit)
-  print(sf, pars = ignore_pars, include = FALSE)
-}
-
 #' Graphical posterior or prior predictive checks
 #'
 #' @export
-#' @inheritParams get_draws
 #' @param data the original data frame
 #' @param fun \code{bayesplot} function name
 #' @param ... additional arguments passed to the default

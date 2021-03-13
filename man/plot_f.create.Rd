@@ -16,8 +16,8 @@ plot_f.create.line_arr(fit, pred, comp_idx)
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{pred}{An object of class \linkS4class{GaussianPrediction} or
-\linkS4class{Prediction}.}
+\item{pred}{An object of class \linkS4class{FunctionPosterior} or
+\linkS4class{FunctionDraws}.}
 
 \item{df_base}{a data frame with two columns}
 

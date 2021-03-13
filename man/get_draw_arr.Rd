@@ -25,6 +25,8 @@ NULL (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{D}{number of parameters (second dimension of output array)}
 
+\item{B}{boolean value determining if parameter exists}
+
 \item{V}{vector length for vector params (possible third dimension of
 output array)}
 }

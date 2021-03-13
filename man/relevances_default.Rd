@@ -13,8 +13,8 @@ relevances.default.comp(fit, pred)
 \arguments{
 \item{fit}{an object of class \code{lgpfit}}
 
-\item{pred}{an object of class \linkS4class{Prediction} or
-\linkS4class{GaussianPrediction}}
+\item{pred}{an object of class \linkS4class{FunctionDraws} or
+\linkS4class{FunctionPosterior}}
 }
 \value{
 an array or vector

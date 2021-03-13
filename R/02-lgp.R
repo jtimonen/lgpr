@@ -143,7 +143,8 @@ sample_model <- function(model, ...) {
     print(stan_fit)
     stop("Failed to create stanfit.")
   }
-  new("lgpfit", model = model, stan_fit = stan_fit)
+  num_draws <- nrow(as.matrix(stan_fit))
+  new("lgpfit", model = model, stan_fit = stan_fit, num_draws = num_draws)
 }
 
 #' @rdname sample_model

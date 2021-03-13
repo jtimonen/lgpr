@@ -6,8 +6,6 @@
 \alias{show,lgprhs-method}
 \alias{show,lgpterm-method}
 \alias{show,lgpsim-method}
-\alias{show,lgpmodel-method}
-\alias{show,lgpfit-method}
 \alias{show,FunctionPosterior-method}
 \alias{show,FunctionDraws-method}
 \title{Printing S4 object info using the show generic}
@@ -19,10 +17,6 @@
 \S4method{show}{lgpterm}(object)
 
 \S4method{show}{lgpsim}(object)
-
-\S4method{show}{lgpmodel}(object)
-
-\S4method{show}{lgpfit}(object)
 
 \S4method{show}{FunctionPosterior}(object)
 

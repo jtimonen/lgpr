@@ -1,15 +1,14 @@
-#' Methods to access and print information about a model
-#'
-#' @name lgpmodel_methods
+#' Model summary
+#' 
+#' @param object a model or fit
+#' @name model_summaries
 NULL
 
-#' @export
-#' @describeIn lgpmodel_methods Print a model summary. Returns \code{object}
+#' @describeIn model_summaries Prints a model summary. Returns \code{object} 
 #' invisibly.
-#' @inheritParams object_to_model
 model_summary <- function(object) {
   model <- object_to_model(object)
-
+  
   # Helper function
   model_info <- function(object) {
     model <- object_to_model(object)
@@ -25,13 +24,13 @@ model_summary <- function(object) {
     out <- paste0(line1, "\n", line2, "\n", line3, "\n")
     return(out)
   }
-
-  brief <- model_info(object)
+  
+  brief <- model_info(model)
   cat(brief)
   cat("\n")
-  print(component_info(object))
+  print(component_info(model))
   cat("\n")
-  ci <- covariate_info(object)
+  ci <- covariate_info(model)
   info_cont <- dollar(ci, "continuous")
   info_cat <- dollar(ci, "categorical")
   if (!is.null(info_cont)) {
@@ -46,15 +45,23 @@ model_summary <- function(object) {
   invisible(object)
 }
 
-#' @export
-#' @describeIn lgpmodel_methods Parameter summary (bounds and priors). Returns
-#' a \code{data.frame}.
-#' @inheritParams object_to_model
+#' @describeIn model_summaries Get parameter summary (bounds and priors).
+#' Returns a \code{data.frame}.
 #' @param digits number of digits to show for floating point numbers
 param_summary <- function(object, digits = 3) {
-  model <- object_to_model(object)
-  prior_to_df(model@stan_input, digits = digits)
+  prior_to_df(object@stan_input, digits = digits)
 }
+
+
+#' @describeIn lgpmodel Print information and summary about the object.
+#' Returns \code{object} invisibly.
+setMethod("show", "lgpmodel", function(object) {
+  msg <- class_info("lgpmodel")
+  cat(msg)
+  cat("\n")
+  model_summary(object)
+})
+
 
 #' Information about covariates used in a model
 #'

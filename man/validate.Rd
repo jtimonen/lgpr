@@ -5,6 +5,7 @@
 \alias{validate_lgpexpr}
 \alias{validate_lgpformula}
 \alias{validate_lgpscaling}
+\alias{validate_lgpfit}
 \alias{validate_FunctionPosterior}
 \alias{validate_FunctionDraws}
 \title{Validate S4 class objects}
@@ -14,6 +15,8 @@ validate_lgpexpr(object)
 validate_lgpformula(object)
 
 validate_lgpscaling(object)
+
+validate_lgpfit(object)
 
 validate_FunctionPosterior(object)
 

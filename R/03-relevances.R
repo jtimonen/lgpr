@@ -57,8 +57,8 @@ relevances.default.all <- function(fit) {
 #'   each component in each draw, and returns a data frame with
 #'   \code{num_draws} rows and \code{num_comps} colums
 #' }
-#' @param pred an object of class \linkS4class{Prediction} or
-#' \linkS4class{GaussianPrediction}
+#' @param pred an object of class \linkS4class{FunctionDraws} or
+#' \linkS4class{FunctionPosterior}
 #' @inheritParams relevances
 #' @name relevances_default
 #' @return an array or vector
@@ -67,7 +67,7 @@ NULL
 #' @rdname relevances_default
 relevances.default.noise <- function(fit, pred) {
   typ <- class(pred)
-  h <- if (typ == "Prediction") pred@h else pred@y_mean
+  h <- if (typ == "FunctionDraws") pred@h else pred@y_mean
   num_obs <- ncol(h)
   num_draws <- nrow(h)
   y <- get_y(fit, original = TRUE)
@@ -82,7 +82,7 @@ relevances.default.noise <- function(fit, pred) {
 #' @rdname relevances_default
 relevances.default.comp <- function(fit, pred) {
   typ <- class(pred)
-  f_comp <- if (typ == "Prediction") pred@f_comp else pred@f_comp_mean
+  f_comp <- if (typ == "FunctionDraws") pred@f_comp else pred@f_comp_mean
   v_list <- lapply(f_comp, row_vars)
   nam <- names(v_list)
   df <- data.frame(v_list)

@@ -46,24 +46,15 @@
 #' @name lgpr-package
 #' @aliases lgpr
 #' @useDynLib lgpr, .registration = TRUE
-#' @import methods
-#' @import Rcpp
-#' @import rstantools
-#' @importFrom rstan get_rng get_stream
+#' @import methods rstantools
+#' @importClassesFrom rstan stanfit
 #'
 #' @references
 #' \enumerate{
 #'   \item Carpenter, B. et al. (2017).
 #'   \emph{Stan: A probabilistic programming language}. Journal of Statistical
 #'    Software 76(1).
-#'   \item Jonah Gabry, Ben Goodrich and Martin Lysy (2019).
-#'   \emph{rstantools: Tools for Developing R Packages Interfacing with 'Stan'}.
-#'   R package version 2.0.0.
-#'   \item Gabry, J. and Mahr, T. (2019).
-#'   \emph{bayesplot: Plotting for Bayesian Models}. R package version 1.7.0,
-#'    http://mc-stan.org/bayesplot.
-#'   \item Stan Development Team (2019). \emph{RStan: the R interface to Stan.}
-#'   R package version 2.19.2. http://mc-stan.org/.
+#'    
 #' }
 #'
 NULL

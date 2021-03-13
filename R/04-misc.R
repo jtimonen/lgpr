@@ -113,22 +113,6 @@ setMethod("show", "lgpsim", function(object) {
 })
 
 #' @rdname show
-setMethod("show", "lgpmodel", function(object) {
-  msg <- class_info("lgpmodel")
-  cat(msg)
-  cat("\n")
-  model_summary(object)
-})
-
-#' @rdname show
-setMethod("show", "lgpfit", function(object) {
-  msg <- class_info("lgpfit")
-  cat(msg)
-  cat("\n")
-  fit_summary(object)
-})
-
-#' @rdname show
 setMethod("show", "FunctionPosterior", function(object) {
   comps <- levels(dollar(object@components, "component"))
   paramsets <- levels(dollar(object@total, "paramset"))

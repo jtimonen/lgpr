@@ -70,6 +70,19 @@ validate_lgpscaling <- function(object) {
 }
 
 #' @rdname validate
+validate_lgpfit <- function(object) {
+  errors <- character()
+  N1 <- nrow(get_draws(object, NULL, NULL, pars = c("alpha")))
+  N2 <- object@num_draws
+  msg <- paste0("invalid num_draws in lgpfit (", N1, " vs. ", N2 ,
+                ")! please report a bug!")
+  if (N1 != N2) {
+    errors <- c(errors, msg)
+  }
+  return_true_or_errors(errors)
+}
+
+#' @rdname validate
 validate_FunctionPosterior <- function(object) {
   errors <- c()
   cn1 <- colnames(object@components)
@@ -203,17 +216,17 @@ lgpmodel <- setClass("lgpmodel",
 #'
 #' @slot stan_fit An object of class \code{stanfit}.
 #' @slot model An object of class \code{lgpmodel}.
-#' @family model fit vizualization functions
-#' @seealso  All methods that work on \linkS4class{lgpmodel}
-#' objects work also on \linkS4class{lgpfit} objects.
+#' @slot num_draws Total number of parameter draws.
 #' @seealso For complete info on accessing the properties of the
 #' \code{stan_fit} slot, see
 #' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
-    model = "lgpmodel"
-  )
+    model = "lgpmodel",
+    num_draws = "numeric"
+  ),
+  validity = validate_lgpfit
 )
 
 #' An S4 class to represent a data set simulated using the additive GP

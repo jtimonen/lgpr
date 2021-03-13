@@ -70,7 +70,7 @@ pred_input_draws <- function(fit, reduce, draws, refresh) {
 
 #' @rdname pred_input
 pred_input_draws.marginal <- function(fit, reduce, draws) {
-  S <- get_num_paramsets(fit, draws, reduce)
+  S <- determine_num_paramsets(fit, draws, reduce)
   list(
     d_sigma = get_draw_arr(fit, draws, reduce, "sigma", S, 1)
   )
@@ -78,7 +78,7 @@ pred_input_draws.marginal <- function(fit, reduce, draws) {
 
 #' @rdname pred_input
 pred_input_draws.latent <- function(fit, reduce, draws) {
-  S <- get_num_paramsets(fit, draws, reduce)
+  S <- determine_num_paramsets(fit, draws, reduce)
   si <- get_stan_input(fit)
   LH <- dollar(si, "obs_model")
   num_sigma <- as.numeric(LH == 1)
@@ -101,7 +101,7 @@ pred_input_draws.latent <- function(fit, reduce, draws) {
 pred_input_draws.common <- function(fit, reduce, draws, refresh) {
 
   # Get dimensions
-  S <- get_num_paramsets(fit, draws, reduce)
+  S <- determine_num_paramsets(fit, draws, reduce)
   if (is.null(refresh)) {
     refresh <- round(S / 10)
   }
@@ -131,6 +131,7 @@ pred_input_draws.common <- function(fit, reduce, draws, refresh) {
 #' @param par_name name of parameter (group)
 #' @param S number of parameter sets (first dimension of output array)
 #' @param D number of parameters (second dimension of output array)
+#' @param B boolean value determining if parameter exists
 #' @param V vector length for vector params (possible third dimension of
 #' output array)
 #' @return an array

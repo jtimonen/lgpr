@@ -49,8 +49,7 @@ test_that("lgp() can do posterior sampling (f marginalized)", {
   expect_error(plot_warp(fit), "the model does not have warping parameters")
   expect_error(plot_beta(fit), "there are no heterogeneous effects")
   expect_error(plot_effect_times(fit), "there are no uncertain effect times")
-  expect_output(fit_summary(fit))
-  expect_output(model_summary(fit))
+  expect_output(show(fit))
   expect_true(!is_f_sampled(fit))
 })
 
