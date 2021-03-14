@@ -178,13 +178,13 @@ prior_to_df_teff <- function(stan_input, digits) {
   return(df)
 }
 
-#' Append minus and val to a string if val is not zero
+# Append minus and val to a string if val is not zero
 minus.append <- function(str, val) {
   if (val != 0) str <- paste0(str, " - ", val)
   return(str)
 }
 
-#' Prepend minus to a string
+# Prepend minus to a string
 minus.prepend <- function(str, prepend) {
   if (prepend != 0) str <- paste0(" - (", str, ")")
   return(str)

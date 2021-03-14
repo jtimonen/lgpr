@@ -198,6 +198,8 @@ lgpscaling <- setClass("lgpscaling",
 #' @slot info Other info in text format.
 #' @slot sample_f Whether the signal \code{f} is sampled or marginalized.
 #' @slot full_prior Complete prior information.
+#' @param object \linkS4class{lgpmodel} object for which to apply a class
+#' method.
 #' @seealso
 #' \code{\link{model_getters}}
 lgpmodel <- setClass("lgpmodel",
@@ -219,6 +221,7 @@ lgpmodel <- setClass("lgpmodel",
 #' @slot stan_fit An object of class \code{stanfit}.
 #' @slot model An object of class \code{lgpmodel}.
 #' @slot num_draws Total number of parameter draws.
+#' @param object \linkS4class{lgpfit} object for which to apply a class method.
 #' @seealso For complete info on accessing the properties of the
 #' \code{stan_fit} slot, see
 #' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
@@ -251,8 +254,6 @@ lgpfit <- setClass("lgpfit",
 #'   effect
 #'   \item \code{observed} possible observed effect times
 #' }
-#' @seealso
-#' For visualizing, see \code{\link{plot_sim}}.
 lgpsim <- setClass("lgpsim",
   representation = representation(
     data = "data.frame",
@@ -275,6 +276,8 @@ lgpsim <- setClass("lgpsim",
 #' @slot model The \linkS4class{lgpmodel} for which these posteriors are
 #' computed. Contains important information about how to scale the total
 #' posterior from normalized scale to the original scale.
+#' @param object \linkS4class{FunctionPosterior} object for which to apply a
+#' class method.
 #' @seealso \linkS4class{FunctionDraws}
 FunctionPosterior <- setClass("FunctionPosterior",
   representation = representation(
@@ -295,6 +298,8 @@ FunctionPosterior <- setClass("FunctionPosterior",
 #' @slot model The \linkS4class{lgpmodel} for which these draws are
 #' computed. Contains important information about how to transform the
 #' total draws through an inverse link function.
+#' @param object \linkS4class{FunctionDraws} object for which to apply a class
+#' method.
 #' @seealso \linkS4class{FunctionPosterior}
 FunctionDraws <- setClass("FunctionDraws",
   representation = representation(
@@ -304,3 +309,22 @@ FunctionDraws <- setClass("FunctionDraws",
   ),
   validity = validate_FunctionDraws
 )
+
+
+# Class info for show methods
+class_info <- function(class_name) {
+  str <- paste0(
+    "An object of class ", class_name, ". See ?",
+    class_name, " for more info."
+  )
+  return(str)
+}
+
+# Class info for show methods of function posterior objects
+class_info_fp <- function(class_name, num_comps, D) {
+  desc <- class_info(class_name)
+  desc <- paste0(desc, "\n - ", num_comps, " components")
+  desc <- paste0(desc, "\n - ", D[1], " parameter sets")
+  desc <- paste0(desc, "\n - ", D[2], " evaluation points")
+  return(desc)
+}

@@ -2,7 +2,7 @@
 #'
 #' @description
 #' \itemize{
-#'   \item FunctionDrawss at data points can be visualized using \code{plot_pred}.
+#'   \item Function draws at data points can be visualized using \code{plot_pred}.
 #'     Out-of-sample predictions can be visualized by giving the \code{pred}
 #'     and \code{x} arguments.
 #'   \item The total signal \code{f} or any of its

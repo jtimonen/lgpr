@@ -1,7 +1,8 @@
-#' Function posterior distributions
+#' Evaluate or extract function posterior distributions
 #'
-#' @description Computes the predicted (distribution of the) total signal
-#' \code{f} and its additive components. All these are computed for
+#' @description Evaluates (or extracts) the posterior distribution of the
+#' total signal \code{f} and its additive components (or draws from these
+#' distributions). All these are computed for
 #' each parameter draw (defined by \code{draws}), or other parameter set
 #' (obtained by a reduction defined by \code{reduce}).
 #'
@@ -19,43 +20,35 @@
 #' NULL (no reduction). Has no effect if \code{draws} is specified.
 #' @param draws Indices of parameter draws to use, or \code{NULL} to use all
 #' draws.
-#' @param STREAM Deprecated argument, has no effect.
 #' @return An object of class \linkS4class{FunctionPosterior} or
 #' \linkS4class{FunctionDraws}.
 #' @param verbose Should more information be printed?
 #' @param refresh How often to print progress? Has no effect if \code{verbose}
 #' is \code{FALSE}.
-#' @family prediction functions
-#' @name pred
-NULL
-
-#' @export
-#' @rdname pred
-pred <- function(fit,
-                 x = NULL,
-                 c_hat_pred = NULL,
-                 reduce = function(x) base::mean(x),
-                 draws = NULL,
-                 verbose = TRUE,
-                 STREAM = NULL,
-                 refresh = NULL) {
+posterior_f <- function(fit,
+                        x = NULL,
+                        c_hat_pred = NULL,
+                        reduce = function(x) base::mean(x),
+                        draws = NULL,
+                        verbose = TRUE,
+                        refresh = NULL) {
   if (is.null(x)) x <- get_data(fit)
   f_sampled <- is_f_sampled(fit)
   if (!verbose) refresh <- 0
   if (!is.null(draws)) reduce <- NULL
   if (f_sampled) {
-    out <- pred_latent(fit, x, c_hat_pred, reduce, draws, refresh)
+    out <- fp_latent(fit, x, c_hat_pred, reduce, draws, refresh)
   } else {
-    out <- pred_marginal(fit, x, reduce, draws, refresh)
+    out <- fp_marginal(fit, x, reduce, draws, refresh)
   }
   return(out)
 }
 
-#' @rdname pred
-pred_marginal <- function(fit, x, reduce, draws, refresh) {
+# Analytic function posteriors
+fp_marginal <- function(fit, x, reduce, draws, refresh) {
 
   # Compute f_pred
-  stan_data <- pred_input(fit, x, reduce, draws, refresh)
+  stan_data <- fp_input(fit, x, reduce, draws, refresh)
   stan_model <- dollar(stanmodels, "fp_marginal")
   stan_fit <- rstan::sampling(
     object = stan_model,
@@ -129,14 +122,14 @@ pred_marginal <- function(fit, x, reduce, draws, refresh) {
   )
 }
 
-#' @rdname pred
-pred_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
+# Function posterior draws
+fp_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
 
   # Compute f_pred which has dim = c(S, num_pred*num_comps)
   if (is.null(x)) {
     f_pred <- get_draws(fit, draws, reduce, pars = "f_latent")
   } else {
-    stan_data <- pred_input(fit, x, reduce, draws, refresh)
+    stan_data <- fp_input(fit, x, reduce, draws, refresh)
     stan_model <- dollar(stanmodels, "fp_latent")
     stan_fit <- rstan::sampling(
       object = stan_model,
@@ -162,14 +155,7 @@ pred_latent <- function(fit, x, c_hat_pred, reduce, draws, refresh) {
   return(f_pred)
 }
 
-#' Transform distribution of f to distribution of y
-#'
-#' @param f_mean an array of shape \code{num_draws} x \code{num_points}
-#' @param f_std an array of shape \code{num_draws} x \code{num_points}
-#' @param sigma a vector of length \code{num_draws}
-#' @param y_norm_inv inverse normalization function for y
-#' @return a list with names \code{mean} and \code{std}, both of which are
-#' arrays of shape \code{num_draws} x \code{num_points}
+# Transform distribution of f to distribution of y
 pred_marginal.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
   y_mean <- f_mean
   y_var <- add_to_columns(f_std^2, sigma^2)
@@ -185,11 +171,7 @@ pred_marginal.f_to_y <- function(f_mean, f_std, sigma, y_norm_inv) {
   list(mean = y_mean, std = y_std)
 }
 
-#' Map the sum f from pred.latent_compute to h
-#'
-#' @inheritParams pred
-#' @param f an array of shape (num_draws, num_pred_points)
-#' @return an array with same shape as \code{f}
+# Map the sum f from pred.latent_compute to h
 pred.latent_h <- function(fit, f, c_hat_pred, verbose) {
 
   # helper function

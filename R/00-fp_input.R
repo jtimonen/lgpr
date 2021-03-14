@@ -1,27 +1,23 @@
-#' Create input for Stan model that computes predictions
+#' Create input for Stan model that evaluates function posteriors
 #'
 #' @description Gives a warning if \code{x} is \code{NULL}, but in that
 #' case \code{x} are taken from the Stan input of the original model. This
 #' option is just for debugging purposes.
-#' @inheritParams pred
-#' @return a list that can be used as data for \code{lgp_predict.stan}
-#' @name pred_input
-NULL
-
-#' @rdname pred_input
-pred_input <- function(fit, x, reduce, draws, refresh) {
+#' @inheritParams posterior_f
+#' @return a list that can be used as data for a stan model
+fp_input <- function(fit, x, reduce, draws, refresh) {
   si <- get_stan_input(fit)
-  si_x_pred <- pred_input_x(fit, x)
-  si_draws <- pred_input_draws(fit, reduce, draws, refresh)
+  si_x_pred <- fp_input_x(fit, x)
+  si_draws <- fp_input_draws(fit, reduce, draws, refresh)
   c(si, si_x_pred, si_draws)
 }
 
-#' @rdname pred_input
-pred_input_x <- function(fit, x) {
+# covariate input
+fp_input_x <- function(fit, x) {
   si <- get_stan_input(fit)
   if (is.null(x)) {
     # This is just for debugging
-    warning("<x> is null in pred_input_x, this is meant just for debugging!")
+    warning("<x> is null in fp_input_x, this is meant just for debugging!")
     out <- list(
       num_pred = dollar(si, "num_obs"),
       x_cont_PRED = dollar(si, "x_cont"),
@@ -55,29 +51,29 @@ pred_input_x <- function(fit, x) {
   return(out)
 }
 
-#' @rdname pred_input
-pred_input_draws <- function(fit, reduce, draws, refresh) {
+# parameter draws input
+fp_input_draws <- function(fit, reduce, draws, refresh) {
 
   # Get param sets
-  d_common <- pred_input_draws.common(fit, reduce, draws, refresh)
+  d_common <- fp_input_draws.common(fit, reduce, draws, refresh)
   if (is_f_sampled(fit)) {
-    d_add <- pred_input_draws.latent(fit, reduce, draws)
+    d_add <- fp_input_draws.latent(fit, reduce, draws)
   } else {
-    d_add <- pred_input_draws.marginal(fit, reduce, draws)
+    d_add <- fp_input_draws.marginal(fit, reduce, draws)
   }
   c(d_common, d_add)
 }
 
-#' @rdname pred_input
-pred_input_draws.marginal <- function(fit, reduce, draws) {
+# parameter draws input (marginal gp)
+fp_input_draws.marginal <- function(fit, reduce, draws) {
   S <- determine_num_paramsets(fit, draws, reduce)
   list(
     d_sigma = get_draw_arr(fit, draws, reduce, "sigma", S, 1)
   )
 }
 
-#' @rdname pred_input
-pred_input_draws.latent <- function(fit, reduce, draws) {
+# parameter draws input (latent gp)
+fp_input_draws.latent <- function(fit, reduce, draws) {
   S <- determine_num_paramsets(fit, draws, reduce)
   si <- get_stan_input(fit)
   LH <- dollar(si, "obs_model")
@@ -97,8 +93,8 @@ pred_input_draws.latent <- function(fit, reduce, draws) {
   )
 }
 
-#' @rdname pred_input
-pred_input_draws.common <- function(fit, reduce, draws, refresh) {
+# parameter draws input (common fields)
+fp_input_draws.common <- function(fit, reduce, draws, refresh) {
 
   # Get dimensions
   S <- determine_num_paramsets(fit, draws, reduce)
@@ -125,16 +121,7 @@ pred_input_draws.common <- function(fit, reduce, draws, refresh) {
   )
 }
 
-#' Get an array of draws formatted suitably for Stan input
-#'
-#' @inheritParams pred_input
-#' @param par_name name of parameter (group)
-#' @param S number of parameter sets (first dimension of output array)
-#' @param D number of parameters (second dimension of output array)
-#' @param B boolean value determining if parameter exists
-#' @param V vector length for vector params (possible third dimension of
-#' output array)
-#' @return an array
+# Get an array of draws formatted suitably for Stan input
 get_draw_arr <- function(fit, draws, reduce, par_name, S, D) {
   out <- array(0.0, dim = c(S, D))
   if (D > 0) {
@@ -143,7 +130,7 @@ get_draw_arr <- function(fit, draws, reduce, par_name, S, D) {
   return(out)
 }
 
-#' @rdname get_draw_arr
+# Get an array of vector draws formatted suitably for Stan input
 get_draw_arr_vec <- function(fit, draws, reduce, par_name, S, B, V) {
   D <- as.numeric(B)
   out <- array(0.0, dim = c(S, D, V))

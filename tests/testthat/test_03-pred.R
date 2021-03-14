@@ -42,18 +42,18 @@ test_that("predictions can be computed (f marginalized)", {
   # Try with misformatted x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5))
   expect_error(
-    pred(fit, x_pred, verbose = FALSE),
+    posterior_f(fit, x_pred, verbose = FALSE),
     "variable 'dis_age' not found in <x>!"
   )
 
   # Compute predictions with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
-  p <- pred(fit, x_pred, verbose = FALSE, reduce = NULL)
+  p <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
   expect_s4_class(p, "FunctionPosterior")
 
   # Compute predictions with same x as in data
-  p1 <- pred(fit, DAT, verbose = FALSE)
-  p2 <- pred(fit, NULL, verbose = FALSE)
+  p1 <- posterior_f(fit, DAT, verbose = FALSE)
+  p2 <- posterior_f(fit, NULL, verbose = FALSE)
   expect_equal(p1, p2)
 
   # TODO: make pred return (scaled!) y_pred and test it!!

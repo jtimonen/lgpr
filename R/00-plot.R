@@ -377,14 +377,13 @@ add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
 
 
 
-#' Plot colors to use
+#' Plot colors
 #'
 #' @param main Color name. Must be a valid scheme name for
 #' \code{\link[bayesplot]{color_scheme_get}}.
 #' @param variant Must be one of {"light", "light_highlight", "mid",
 #' "mid_highlight", "dark", "dark_highlight"}.
 #' @return A hex value of the color.
-#' @family color utilities
 colorset <- function(main, variant = "mid") {
   scheme <- bayesplot::color_scheme_get(scheme = main)
   col <- scheme[[variant]]
@@ -394,14 +393,7 @@ colorset <- function(main, variant = "mid") {
   return(col)
 }
 
-#' A color palettes
-#'
-#' @param n an integer from 1 to 5
-#' @return an array of \code{n} hex values
-#' @family color utilities
-#' @name color_palette
-
-#' @rdname color_palette
+# A color palette for lines etc
 color_palette <- function(n) {
   c1 <- colorset("brightblue", "mid_highlight")
   c2 <- colorset("red", "mid_highlight")
@@ -412,7 +404,7 @@ color_palette <- function(n) {
   palette[1:n]
 }
 
-#' @rdname color_palette
+# A color palette for fills
 fill_palette <- function(n) {
   c1 <- colorset("brightblue", "mid")
   c2 <- colorset("red", "mid")
@@ -423,11 +415,7 @@ fill_palette <- function(n) {
   palette[1:n]
 }
 
-#' Visualize a color palette
-#'
-#' @inheritParams color_palette
-#' @return a \code{ggplot} object
-#' @family color utilities
+# Visualize color palette
 plot_color_palette <- function(n) {
   colors <- color_palette(n)
   x <- rep(c(0, 1), n)
@@ -449,14 +437,7 @@ plot_color_palette <- function(n) {
   return(h)
 }
 
-#' A color scale.
-#'
-#' @inheritParams color_palette
-#' @return a \code{ggplot} object (if \code{n <= 5}) or NULL (if \code{n > 5})
-#' @family color utilities
-#' @name scale_color
-
-#' @rdname scale_color
+# A color scale for lines etc
 scale_color <- function(n) {
   if (n > 5) {
     return(NULL)
@@ -465,11 +446,49 @@ scale_color <- function(n) {
   ggplot2::scale_color_manual(values = values)
 }
 
-#' @rdname scale_color
+# A color scale for fills
 scale_fill <- function(n) {
   if (n > 5) {
     return(NULL)
   }
   values <- fill_palette(n)
   ggplot2::scale_fill_manual(values = values)
+}
+
+
+#' Visualize input warping function with several steepness parameter values
+#'
+#' @param wrp a vector of values of the warping steepness parameter
+#' @param x a vector of input values
+#' @param color line color
+#' @param alpha line alpha
+#' @return a \code{ggplot} object
+plot_inputwarp <- function(wrp,
+                           x,
+                           color = colorset("red", "dark"),
+                           alpha = 0.5) {
+  x <- sort(x)
+  L <- length(x)
+  S <- length(wrp)
+  W <- matrix(0, S, L)
+  for (i in seq_len(S)) {
+    w <- warp_input(x, a = wrp[i])
+    W[i, ] <- w
+  }
+  af <- as.factor(rep(1:S, each = L))
+  df <- data.frame(rep(x, S), as.vector(t(W)), af)
+  colnames(df) <- c("x", "w", "idx")
+
+  # Create ggplot object
+  aes <- ggplot2::aes_string(x = "x", y = "w", group = "idx")
+  plt <- ggplot2::ggplot(df, aes)
+
+  # Add titles and labels
+  plt <- plt + ggplot2::labs(x = "Input", y = "Warped input") +
+    ggplot2::ggtitle("Input-warping function")
+  plt <- plt + ggplot2::ylim(-1.0, 1.0)
+
+  # Plot the actual lines of interest
+  plt <- plt + ggplot2::geom_line(color = color, alpha = alpha)
+  return(plt)
 }

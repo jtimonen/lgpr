@@ -2,7 +2,7 @@
 % Please edit documentation in R/00-plot.R
 \name{colorset}
 \alias{colorset}
-\title{Plot colors to use}
+\title{Plot colors}
 \usage{
 colorset(main, variant = "mid")
 }
@@ -17,12 +17,5 @@ colorset(main, variant = "mid")
 A hex value of the color.
 }
 \description{
-Plot colors to use
+Plot colors
 }
-\seealso{
-Other color utilities: 
-\code{\link{color_palette}()},
-\code{\link{plot_color_palette}()},
-\code{\link{scale_color}()}
-}
-\concept{color utilities}
