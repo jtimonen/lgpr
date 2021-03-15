@@ -42,9 +42,4 @@ a \code{\link[ggplot2]{ggplot}} object
 \description{
 Vizualizing longitudinal data
 }
-\seealso{
-Other main plot functions: 
-\code{\link{plot_components}()},
-\code{\link{plot_pred}()}
-}
-\concept{main plot functions}
+\concept{data frame handling}

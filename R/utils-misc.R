@@ -226,6 +226,16 @@ warn_msg_default_prior <- function(desc, name, model_desc) {
   )
 }
 
+# Default bayesplot ppc function
+default_ppc_fun <- function(object) {
+  likelihood <- get_obs_model(object)
+  f1 <- bayesplot::ppc_dens_overlay
+  f2 <- bayesplot::ppc_hist
+  fun <- if (likelihood == "gaussian") f1 else f2
+  check_type(fun, "function")
+  return(fun)
+}
+
 
 #' Get number of nonstationary model components
 #'

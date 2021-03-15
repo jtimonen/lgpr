@@ -6,38 +6,47 @@
 \alias{lgpr}
 \title{The 'lgpr' package.}
 \description{
+Interpretable nonparametric modeling of longitudinal data
+using additive Gaussian process regression. Contains functionality
+for inferring covariate effects and assessing covariate relevances.
+Models are specified using a convenient formula syntax, and can include
+shared, group-specific, non-stationary, heterogeneous and temporally
+uncertain effects. Bayesian inference for model parameters is performed
+using Stan (\code{\link[rstan]{rstan}}).
+}
+\section{Specifying and fitting models}{
+
+Core functionality of the package consists of creating and fitting an
+additive GP model. Main functions are:
 \itemize{
-  \item A package for Bayesian additive Gaussian process (GP) modeling with
-interpretable kernels designed for longitudinal data.
-  \item Features inference of covariate effects
-  and covariate relevance assesment.
-  \item Models can include non-stationary, heterogeneous and temporally
-uncertain effects.
-  \item Bayesian inference of the model (hyper)parameters using
-\code{\link[rstan]{rstan}}.
-  \item  Functions for visualizing longitudinal data,
-posterior draws, model predictions and inferred covariate effects are
-also provided.
+ \item \code{\link{lgp}}: Specify and fit a model with one command.
+ \item \code{\link{create_model}}: Define an \linkS4class{lgpmodel} object.
+ \item \code{\link{sample_model}}: Sample model parameters and create an
+ an \linkS4class{lgpfit} object.
+ \item \code{\link{optimize_model}} (experimental): Optimize model
+ parameters.
 }
 }
-\section{Overview}{
 
-See the documentation of
+\section{Data}{
+
+The data that you wish to analyze with \code{lgpr} should be in an R
+\code{data.frame} where columns correspond to measured variables and rows
+corresponds to obervations. Some functions that can help working with such
+data frames are:
 \itemize{
- \item \code{\link{lgp}} for info on how to specify and fit models
- \item \code{\link{ppc}} for prior and posterior predictive checks
- \item \code{\link{relevances}} for component/covariate relevance assessment
- \item \code{\link{select}} for component/covariate selection
- \item \code{\link{pred}} for computing model predictions and
- inferred components
- \item \code{\link{plot_pred}} and \code{\link{plot_f}} for visualizing
- predictions and inferred components
+ \item \code{\link{plot_data}}: Visualizing data.
+ \item \code{\link{new_x}}: Creating new test points where the posterior
+ distribution of any function component or sum of all components, or the
+ posterior predictive distribution can be computed after model fitting.
+ \item Other functions: \code{\link{add_factor}}, \code{\link{add_dis_age}},
+ \code{\link{adjusted_c_hat}}.
 }
 }
 
-\section{Tutorials}{
+\section{Tutorials and case studies}{
 
-See tutorials at \url{https://jtimonen.github.io/lgpr-usage/index.html}.
+See \url{https://jtimonen.github.io/lgpr-usage/index.html}.
 }
 
 \section{Citation}{

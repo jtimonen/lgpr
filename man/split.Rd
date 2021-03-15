@@ -56,16 +56,10 @@ and \code{i_test}
 }
 }
 \seealso{
-Other data utilities: 
+Other data frame handling functions: 
 \code{\link{add_dis_age}()},
-\code{\link{add_factor_crossing}()},
 \code{\link{add_factor}()},
-\code{\link{data_types}()},
-\code{\link{get_teff_obs}()},
-\code{\link{new_x}()},
-\code{\link{pick_one_row_each}()},
-\code{\link{rep_df}()},
-\code{\link{select_factors_and}()},
-\code{\link{to_long_format}()}
+\code{\link{adjusted_c_hat}()},
+\code{\link{new_x}()}
 }
-\concept{data utilities}
+\concept{data frame handling functions}

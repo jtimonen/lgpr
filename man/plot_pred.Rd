@@ -74,7 +74,6 @@ a \code{\link[ggplot2]{ggplot}} object
 }
 \seealso{
 Other main plot functions: 
-\code{\link{plot_components}()},
-\code{\link{plot_data}()}
+\code{\link{plot_components}()}
 }
 \concept{main plot functions}

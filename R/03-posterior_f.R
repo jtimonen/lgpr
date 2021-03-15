@@ -102,7 +102,7 @@ fp_marginal <- function(fit, x, reduce, draws, refresh) {
   ext <- rstan::extract(stan_fit, pars = pars)
 
   # Format components
-  comp_names <- component_names(fit)
+  comp_names <- component_names(fit@model)
   mc <- dollar(ext, "f_comp_mean")
   sc <- dollar(ext, "f_comp_std")
   df_comp <- format_pred_comp(mc, sc, comp_names)

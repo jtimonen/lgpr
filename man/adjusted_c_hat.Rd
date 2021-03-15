@@ -21,3 +21,11 @@ Creates the \code{c_hat} input for \code{lgp},
 so that it accounts for normalization between data points in the
 \code{"poisson"} or \code{"nb"} observation model
 }
+\seealso{
+Other data frame handling functions: 
+\code{\link{add_dis_age}()},
+\code{\link{add_factor}()},
+\code{\link{new_x}()},
+\code{\link{split}()}
+}
+\concept{data frame handling functions}

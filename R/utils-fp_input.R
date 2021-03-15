@@ -33,7 +33,7 @@ fp_input_x <- function(fit, x) {
     x_cont_scl <- dollar(m@var_scalings, "x_cont")
     covariates <- stan_data_covariates(x, x_names, x_cont_scl)
     covs_stan <- dollar(covariates, "to_stan")
-    comp_info <- get_component_info(m)
+    comp_info <- get_component_encoding(m)
     expanding <- stan_data_expanding(covs_stan, comp_info)
     si <- c(
       covs_stan,

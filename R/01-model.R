@@ -6,8 +6,7 @@
 #' @inheritParams parse_covs_and_comps
 #' @inheritParams parse_y
 #' @inheritParams parse_options
-#' @param prior_only Should sampling be done in prior mode,
-#' where likelihood is ignored?.
+#' @param prior_only Should likelihood be ignored?
 #' @family main functions
 create_model <- function(formula,
                          data,

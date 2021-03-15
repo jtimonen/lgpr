@@ -10,6 +10,7 @@
 #' @param norm_factors normalization factors, vector of length \code{n}
 #' @return a vector of length \code{n}, which can be used as
 #' the \code{c_hat} input to the \code{lgp} function
+#' @family data frame handling functions
 adjusted_c_hat <- function(y, norm_factors) {
   check_lengths(y, norm_factors)
   check_non_negative_all(y)
@@ -30,7 +31,7 @@ adjusted_c_hat <- function(y, norm_factors) {
 #' @param id_var name of the id variable in \code{data}
 #' @return A data frame with one column added. The new column will
 #' have same name as the variable passed as input \code{x}.
-#' @family data utilities
+#' @family data frame handling functions
 add_factor <- function(data, x, id_var = "id") {
   check_type(data, "data.frame")
   name <- deparse(substitute(x))
@@ -63,7 +64,7 @@ add_factor <- function(data, x, id_var = "id") {
 #' @param time_var name of the time variable in \code{data}
 #' @return A data frame with one column added. The new column will
 #' be called \code{dis_age}. For controls, its value will be \code{NaN}.
-#' @family data utilities
+#' @family data frame handling functions
 add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
   check_type(data, "data.frame")
   bad <- "dis_age" %in% colnames(data)
@@ -100,7 +101,7 @@ add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
 #' }
 #' @return a named list with names \code{train}, \code{test}, \code{i_train}
 #' and \code{i_test}
-#' @family data utilities
+#' @family data frame handling functions
 NULL
 
 #' @rdname split
@@ -200,18 +201,18 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #'  \item \code{x_ns} (unless it is NULL)
 #' }
 #'
-#' @family data utilities
+#' @family data frame handling functions
 new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   check_type(data, "data.frame")
   check_not_null(x)
   check_not_null(x_values)
-  check_in_data(x, data)
+  check_in_data(x, data, "data")
   if (is.na(group_by)) {
     x_grp <- create_grouping_factor(data, group_by) # util
     data["group__"] <- x_grp
     group_by <- "group__"
   } else {
-    check_in_data(group_by, data)
+    check_in_data(group_by, data, "data")
   }
   df <- pick_one_row_each(data, group_by)
   k <- length(x_values)
@@ -231,12 +232,7 @@ new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   return(df)
 }
 
-#' Get observed effect times from a data frame
-#'
-#' @inheritParams new_x
-#' @param group_by name of the grouping factor, must be found in \code{data}
-#' @return a named vector, where the names are the levels of \code{group_by}
-#' @family data utilities
+# Get observed effect times from a data frame
 get_teff_obs <- function(data, group_by = "id", x = "age",
                          x_ns = "diseaseAge") {
   check_type(data, "data.frame")
@@ -246,12 +242,7 @@ get_teff_obs <- function(data, group_by = "id", x = "age",
   return(times)
 }
 
-#' For each unique value of a factor, pick one row from data
-#'
-#' @param data a data frame
-#' @param fac name of a factor in \code{data}
-#' @return a data frame
-#' @family data utilities
+# For each unique value of a factor fac, pick one row from data
 pick_one_row_each <- function(data, fac) {
   check_type(data, "data.frame")
   z <- dollar(data, fac)
@@ -264,12 +255,7 @@ pick_one_row_each <- function(data, fac) {
   data[rows, ]
 }
 
-#' Select data columns which are factors or have a certain name
-#'
-#' @param data a data frame
-#' @param valid names of variables that do not need to be factors
-#' @return a data frame
-#' @family data utilities
+# Select data columns which are factors or have name specified by valid
 select_factors_and <- function(data, valid) {
   check_type(data, "data.frame")
   col_inds <- c()
@@ -299,7 +285,7 @@ select_factors_and <- function(data, valid) {
 #' @param main main plot title
 #' @param sub plot subtitle
 #' @return a \code{\link[ggplot2]{ggplot}} object
-#' @family main plot functions
+#' @family data frame handling
 plot_data <- function(data,
                       x_name = "age",
                       y_name = "y",
@@ -340,10 +326,7 @@ plot_data <- function(data,
   return(h)
 }
 
-#' Create aes for plot_data
-#'
-#' @inheritParams plot_data
-#' @return an \code{aes} object
+# Create aes for plot_data
 plot_data_aes <- function(x_name, y_name, group_by, color_by) {
   if (is.null(color_by)) {
     aes <- ggplot2::aes_string(x = x_name, y = y_name, group = group_by)
@@ -356,10 +339,7 @@ plot_data_aes <- function(x_name, y_name, group_by, color_by) {
   return(aes)
 }
 
-#' Create titles for plot_data
-#'
-#' @inheritParams plot_data
-#' @return a list
+# Create titles for plot_data
 plot_data_titles <- function(main, sub, data, group_by) {
   g <- data[[group_by]]
   N <- length(unique(g))
@@ -376,10 +356,7 @@ plot_data_titles <- function(main, sub, data, group_by) {
   list(main = main, sub = sub, N = N, n = n)
 }
 
-#' Get number of distinct colors needed by plot_data
-#'
-#' @inheritParams plot_data
-#' @return a list
+# Get number of distinct colors needed by plot_data
 plot_data_num_colors <- function(data, color_by) {
   if (is.null(color_by)) {
     N <- 1
@@ -390,11 +367,7 @@ plot_data_num_colors <- function(data, color_by) {
   return(N)
 }
 
-#' Add factor to data frame for highlighting in plot
-#'
-#' @inheritParams plot_data
-#' @param df data frame
-#' @return a list
+# Add factor to data frame for highlighting in plot
 plot_data_add_highlight_factor <- function(df, group_by, highlight) {
   if (!is.null(highlight)) {
     check_length(highlight, 1)

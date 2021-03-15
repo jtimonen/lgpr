@@ -75,8 +75,7 @@ If \code{options} is \code{NULL}, default options are used. The defaults
 are equivalent to
 \code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
 
-\item{prior_only}{Should sampling be done in prior mode,
-where likelihood is ignored?.}
+\item{prior_only}{Should likelihood be ignored?}
 
 \item{verbose}{Should some informative messages be printed?}
 

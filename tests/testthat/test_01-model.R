@@ -280,25 +280,25 @@ test_that("response variable cannot be also a covariate", {
 
 test_that("advanced formula parsing works with a single lgpexpr", {
   m <- create_model(y ~ gp(age), testdata_001)
-  ci <- get_component_info(m)
-  expect_equal(rownames(ci), c("gp(age)"))
-  types <- as.numeric(ci[, 1])
+  types <- as.numeric(component_info(m)$type)
+  cn <- component_names(m)
+  expect_equal(cn, c("gp(age)"))
   expect_equal(types, 1)
 })
 
 test_that("two lgpterms can be summed", {
   m <- create_model(age ~ gp(y) * categ(sex) + gp(y) * zs(id), testdata_001)
-  ci <- get_component_info(m)
-  expect_equal(rownames(ci), c("gp(y)*categ(sex)", "gp(y)*zs(id)"))
-  types <- as.numeric(ci[, 1])
+  types <- as.numeric(component_info(m)$type)
+  cn <- component_names(m)
+  expect_equal(cn, c("gp(y)*categ(sex)", "gp(y)*zs(id)"))
   expect_equal(types, c(2, 2))
 })
 
 test_that("lgpterm and lgpexpr can be summed", {
   m <- create_model(y ~ gp(age) * zs(sex) + categ("id"), testdata_001)
-  ci <- get_component_info(m)
-  expect_equal(rownames(ci), c("gp(age)*zs(sex)", "categ(id)"))
-  types <- as.numeric(ci[, 1])
+  types <- as.numeric(component_info(m)$type)
+  cn <- component_names(m)
+  expect_equal(cn, c("gp(age)*zs(sex)", "categ(id)"))
   expect_equal(types, c(2, 0))
 })
 
@@ -306,10 +306,11 @@ test_that("lgpexpr and lgpterm can be summed", {
   m <- create_model(y ~ gp(age) + categ(sex) * gp_ns(dis_age), testdata_001,
     prior = list(wrp = normal(1, 0.1))
   )
-  ci <- get_component_info(m)
-  expect_equal(rownames(ci), c("gp(age)", "categ(sex)*gp_ns(dis_age)"))
-  types <- as.numeric(ci[, 1])
-  ns <- as.numeric(ci[, 5])
+  types <- as.numeric(component_info(m)$type)
+  ns <- as.numeric(component_info(m)$ns)
+  cn <- component_names(m)
+  expect_equal(cn, c("gp(age)", "categ(sex)*gp_ns(dis_age)"))
+  expect_equal(types, c(1, 2))
   expect_equal(ns, c(0, 1))
 })
 

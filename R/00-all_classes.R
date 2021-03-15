@@ -180,7 +180,7 @@ lgpscaling <- setClass("lgpscaling",
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot data The original unmodified data.
-#' @slot stan_dat The data to be given as input to \code{rstan::sampling}
+#' @slot stan_input The data to be given as input to \code{rstan::sampling}
 #' @slot var_names List of variable names grouped by type.
 #' @slot var_scalings A named list with fields
 #' \itemize{
@@ -200,8 +200,6 @@ lgpscaling <- setClass("lgpscaling",
 #' @slot full_prior Complete prior information.
 #' @param object \linkS4class{lgpmodel} object for which to apply a class
 #' method.
-#' @seealso
-#' \code{\link{model_getters}}
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
@@ -225,6 +223,7 @@ lgpmodel <- setClass("lgpmodel",
 #' @seealso For complete info on accessing the properties of the
 #' \code{stan_fit} slot, see
 #' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
+#' @seealso See \code{\link{plot_draws}}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",

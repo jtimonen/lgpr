@@ -46,13 +46,12 @@ test_that("lgp() can do posterior sampling (f marginalized)", {
   p2 <- plot_draws(fit, type = "trace")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
-  expect_error(plot_warp(fit), "the model does not have warping parameters")
+  expect_error(plot_warp(fit), "model does not have input warping parameters")
   expect_error(plot_beta(fit), "there are no heterogeneous effects")
   expect_error(plot_effect_times(fit), "there are no uncertain effect times")
   expect_output(show(fit))
   expect_true(!is_f_sampled(fit))
 })
-
 
 
 test_that("verbose mode can be used in lgp()", {
@@ -157,7 +156,7 @@ test_that("f can be sampled with beta-binomial likelihood", {
       num_trials = 10
     )
   })
-  ci <- get_component_info(fit)
+  ci <- get_component_encoding(fit)
   expect_equal(as.numeric(ci[, 1]), c(1, 2, 0)) # types
   expect_equal(as.numeric(ci[, 2]), c(0, 1, 1)) # kernels
   expect_s4_class(fit, "lgpfit")

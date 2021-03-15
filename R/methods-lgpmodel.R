@@ -1,11 +1,52 @@
-#' Model summary
-#'
-#' @param object a model or fit
-#' @name model_summaries
-NULL
+#' @describeIn lgpmodel Print information and summary about the object.
+#' Returns \code{object} invisibly.
+setMethod("show", "lgpmodel", function(object) {
+  msg <- class_info("lgpmodel")
+  cat(msg)
+  cat("\n")
+  model_summary(object)
+})
 
-#' @describeIn model_summaries Prints a model summary. Returns \code{object}
-#' invisibly.
+#' @describeIn lgpmodel Get a parameter summary (bounds and
+#' priors). Returns a \code{data.frame}.
+#' @param digits number of digits to show for floating point numbers
+setMethod("parameter_info", "lgpmodel", function(object, digits = 3) {
+  si <- get_stan_input(object)
+  prior_to_df(si, digits = digits)
+})
+
+#' @describeIn lgpmodel Get a data frame with information about each model
+#' component.
+setMethod("component_info", "lgpmodel", function(object) {
+  comps <- get_component_encoding(object)
+  nams <- colnames(comps)
+  p1 <- ensure_2dim(comps[, 1:2])
+  p2 <- ensure_2dim(comps[, 4:9])
+  a <- cbind(p1, p2)
+  Component <- rownames(comps)
+  a <- cbind(Component, a)
+  colnames(a) <- c("Component", nams[1:2], nams[4:9])
+  rownames(a) <- NULL
+  data.frame(a)
+})
+
+#' @describeIn lgpmodel Get covariate information.
+setMethod("covariate_info", "lgpmodel", function(object) {
+  info1 <- covariate_info.cont(object)
+  info2 <- covariate_info.cat(object)
+  list(continuous = info1, categorical = info2)
+})
+
+#' @describeIn lgpmodel Get names of model components.
+setMethod("component_names", "lgpmodel", function(object) {
+  rownames(get_component_encoding(object))
+})
+
+#' Print a model summary.
+#'
+#' @export
+#' @param object a model or fit
+#' @return \code{object} invisibly.
 model_summary <- function(object) {
   model <- object_to_model(object)
 
@@ -41,46 +82,12 @@ model_summary <- function(object) {
     print(info_cat)
     cat("\n")
   }
-  print(param_summary(model))
+  print(parameter_info(model))
   invisible(object)
 }
 
-#' @describeIn model_summaries Get parameter summary (bounds and priors).
-#' Returns a \code{data.frame}.
-#' @param digits number of digits to show for floating point numbers
-param_summary <- function(object, digits = 3) {
-  prior_to_df(object@stan_input, digits = digits)
-}
 
-
-#' @describeIn lgpmodel Print information and summary about the object.
-#' Returns \code{object} invisibly.
-setMethod("show", "lgpmodel", function(object) {
-  msg <- class_info("lgpmodel")
-  cat(msg)
-  cat("\n")
-  model_summary(object)
-})
-
-
-#' Information about covariates used in a model
-#'
-#' @inheritParams object_to_model
-#' @return a list or a string
-#' @name covariate_info
-NULL
-
-#' @rdname covariate_info
-covariate_info <- function(object) {
-  info1 <- covariate_info.cont(object)
-  info2 <- covariate_info.cat(object)
-  list(
-    continuous = info1,
-    categorical = info2
-  )
-}
-
-#' @rdname covariate_info
+# Categorial covariate information
 covariate_info.cat <- function(object) {
   model <- object_to_model(object)
   vn <- model@var_names
@@ -103,7 +110,7 @@ covariate_info.cat <- function(object) {
   return(df)
 }
 
-#' @rdname covariate_info
+# Continuous covariate information
 covariate_info.cont <- function(object) {
   model <- object_to_model(object)
   vn <- model@var_names
@@ -119,53 +126,13 @@ covariate_info.cont <- function(object) {
   return(df)
 }
 
-
-#' Information about the model components
-#'
-#' @inheritParams object_to_model
-#' @return a list or a string
-#' @name component_info
-NULL
-
-#' @export
-#' @rdname component_info
-component_info <- function(object) {
-  comps <- dollar(get_stan_input(object), "components")
-  nams <- colnames(comps)
-  p1 <- ensure_2dim(comps[, 1:2])
-  p2 <- ensure_2dim(comps[, 4:9])
-  a <- cbind(p1, p2)
-  Component <- rownames(comps)
-  a <- cbind(Component, a)
-  colnames(a) <- c("Component", nams[1:2], nams[4:9])
-  rownames(a) <- NULL
-  data.frame(a)
-}
-
-#' @rdname component_info
-component_names <- function(object) {
-  comps <- dollar(get_stan_input(object), "components")
-  rownames(comps)
-}
-
-#' Get the used GP mean vector
-#'
-#' @inheritParams object_to_model
-#' @return a vector with length equal to number of observations
+# Get the c_chat Stan input
 get_chat <- function(object) {
   si <- get_stan_input(object)
   dollar(si, "c_hat")
 }
 
-#' Get response variable measurements
-#'
-#' @inheritParams object_to_model
-#' @param original should the measuments be on their original scale?
-#' @name get_y
-#' @return a vector
-NULL
-
-#' @rdname get_y
+# Get response variable measurements on original or normalized scale
 get_y <- function(object, original = TRUE) {
   if (original) {
     y_name <- get_y_name(object)
@@ -180,32 +147,14 @@ get_y <- function(object, original = TRUE) {
   return(out)
 }
 
-#' @rdname get_y
+# Get response variable name
 get_y_name <- function(object) {
   model <- object_to_model(object)
   dollar(model@var_names, "y")
 }
 
 
-#' Internal functions that access model properties
-#'
-#' @name model_getters
-#' @inheritParams object_to_model
-#' @return
-#' \itemize{
-#'   \item \code{get_stan_model} returns a \code{stanmodel} (rstan)
-#'   \item \code{get_stan_input} returns a list
-#'   \item \code{get_component_info} returns model component info matrix
-#'   \item \code{get_num_obs} returns the number of observations
-#'   \item \code{get_obs_model} returns the obs. model as a string
-#'   \item \code{get_data} returns the original unmodified data frame
-#'   \item \code{get_num_trials} returns the vector of numbers of trials
-#'   \item \code{is_f_sampled} returns a boolean value
-#' }
-NULL
-
-
-#' @rdname model_getters
+# Get the Stan model used by a model
 get_stan_model <- function(object) {
   model <- object_to_model(object)
   if (is_f_sampled(model)) {
@@ -216,47 +165,46 @@ get_stan_model <- function(object) {
   stanmodels[[model_name]] # global variable (list of all pkg models)
 }
 
-#' @rdname model_getters
+# Get Stan input
 get_stan_input <- function(object) {
   model <- object_to_model(object)
   return(model@stan_input)
 }
 
-#' @rdname model_getters
-get_component_info <- function(object) {
+# Get integer matrix encoding component types
+get_component_encoding <- function(object) {
   si <- get_stan_input(object)
   dollar(si, "components")
 }
 
-#' @rdname model_getters
+# Get raw original data
 get_data <- function(object) {
   model <- object_to_model(object)
   return(model@data)
 }
 
-#' @rdname model_getters
+# Get number of observations
 get_num_obs <- function(object) {
   dollar(get_stan_input(object), "num_obs")
 }
 
-#' @rdname model_getters
+# Determine if f is sampled
 is_f_sampled <- function(object) {
   object <- object_to_model(object)
   object@sample_f
 }
 
-#' @rdname model_getters
+# Get observation model (human readable string)
 get_obs_model <- function(object) {
   lh <- dollar(get_stan_input(object), "obs_model")
   likelihood_as_str(lh)
 }
 
-#' @rdname model_getters
+# Get number of trials (binomial or BB model)
 get_num_trials <- function(object) {
   num_trials <- dollar(get_stan_input(object), "y_num_trials")
   as.vector(num_trials)
 }
-
 
 
 #' Helper function for plots
