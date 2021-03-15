@@ -35,11 +35,8 @@ setMethod("get_stanfit", "lgpfit", function(object) {
 setMethod(
   "get_draws", "lgpfit",
   function(object, draws = NULL, reduce = NULL, ...) {
-    s <- rstan::extract(object@stan_fit,
-      permuted = FALSE,
-      inc_warmup = FALSE,
-      ...
-    )
+    sf <- get_stanfit(object)
+    s <- rstan::extract(sf, permuted = FALSE, inc_warmup = FALSE, ...)
     param_names <- dimnames(s)[[3]]
     s <- squeeze_second_dim(s) # squeeze the 'chains' dimension
     if (!is.null(draws)) {
@@ -81,7 +78,8 @@ fit_summary <- function(fit,
                           "teff_raw", "lp__"
                         )) {
   check_type(fit, "lgpfit")
-  print(fit@stan_fit, pars = ignore_pars, include = FALSE)
+  sf <- get_stanfit(fit)
+  print(sf, pars = ignore_pars, include = FALSE)
 }
 
 #' Visualize the distribution of parameter draws
@@ -111,7 +109,7 @@ plot_draws <- function(fit,
   check_type(fit, "lgpfit")
   allowed <- c("intervals", "areas", "trace", "dens")
   check_allowed(type, allowed)
-  sf <- fit@stan_fit
+  sf <- get_stanfit(fit)
   if (type == "dens") {
     h <- bayesplot::mcmc_dens(sf, regex_pars = regex_pars, ...)
   } else if (type == "trace") {
@@ -155,9 +153,10 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
   num_ns <- dollar(get_stan_input(fit), "num_ns")
   dis_age <- seq(-R / 2, R / 2, length.out = num_points)
   out <- list()
+  sf <- get_stanfit(fit)
   for (j in seq_len(num_ns)) {
     par_name <- paste0("wrp[", j, "]")
-    draws <- rstan::extract(fit@stan_fit, pars = c(par_name))
+    draws <- rstan::extract(sf, pars = c(par_name))
     draws <- dollar(draws, par_name)
     out[[j]] <- plot_inputwarp(draws, dis_age, color, alpha)
   }

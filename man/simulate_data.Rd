@@ -32,8 +32,6 @@ simulate_data(
 )
 }
 \arguments{
-\item{N}{Number of individuals.}
-
 \item{t_data}{Measurement times.}
 
 \item{covariates}{Integer vector that defines the types of covariates

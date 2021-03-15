@@ -16,8 +16,6 @@ sim.create_x(
 )
 }
 \arguments{
-\item{N}{Number of individuals.}
-
 \item{covariates}{Integer vector that defines the types of covariates
 (other than id and age). If not given, only the id and age
 covariates are created. Different integers correspond to the following

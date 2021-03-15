@@ -13,6 +13,7 @@ test_that("created model is valid", {
   f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
   m <- create_model(f, testdata_001)
   a <- m@model_formula
+  expect_output(show(a))
   expect_equal(.class2(a), "lgpformula")
   expect_equal(length(a@terms@summands), 3)
   expect_equal(length(rhs_variables(a@terms)), 4)

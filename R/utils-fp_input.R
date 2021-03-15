@@ -27,7 +27,7 @@ fp_input_x <- function(fit, x) {
       idx_expand_PRED = dollar(si, "idx_expand")
     )
   } else {
-    m <- fit@model
+    m <- get_model(fit)
     x_names <- unique(rhs_variables(m@model_formula@terms))
     check_df_with(x, x_names)
     x_cont_scl <- dollar(m@var_scalings, "x_cont")

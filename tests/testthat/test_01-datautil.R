@@ -46,6 +46,12 @@ test_that("adding a factor works correctly", {
   expect_error(add_factor(newdat, country), "already contains")
 })
 
+test_that("adding a factor crossing works correctly", {
+  df_new <- add_factor_crossing(testdata_002, "sex", "group", "xxx")
+  expected <- c("Female*Case", "Male*Case", "Female*Control", "Male*Control")
+  expect_equal(levels(df_new$xxx), expected)
+})
+
 test_that("adding disease age works correctly", {
   t_init <- c(10, 10, 10, 10)
   names(t_init) <- c(1, 2, 3, 4)

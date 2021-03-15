@@ -208,10 +208,35 @@ sim.create_y <- function(noise_type, f, snr, phi, gamma, N_trials) {
 #' Create an input data frame X for simulated data
 #'
 #' @param names Covariate names.
-#' @inheritParams sim.create_x_D
-#' @inheritParams sim.create_x_check
-#' @inheritParams sim.create_x_dis_age
-#' @inheritParams sim.create_x_other
+#' @param covariates Integer vector that defines the types of covariates
+#' (other than id and age). If not given, only the id and age
+#' covariates are created. Different integers correspond to the following
+#' covariate types:
+#' \itemize{
+#'   \item 0 = disease-related age
+#'   \item 1 = other continuous covariate
+#'   \item 2 = a categorical covariate that interacts with age
+#'   \item 3 = a categorical covariate that acts as a group offset
+#'   \item 4 = a categorical covariate that that acts as a group offset AND
+#'   is restricted to have value 0 for controls and 1 for cases
+#' }
+#' @param n_categs An integer vector defining the number of categories
+#' for each categorical covariate, so that \code{length(n_categs)} equals to
+#' the number of 2's and 3's in the \code{covariates} vector.
+#' @param t_data Measurement times.
+#' @param t_effect_range Time interval from which the disease effect times are
+#' sampled uniformly. Alternatively, This can any function that returns the
+#' (possibly randomly generated) real disease effect time for one individual.
+#' @param continuous_info Info for generating continuous covariates. Must be a
+#' list containing fields \code{lambda} and \code{mu}, which have length 3.
+#' The continuous covariates are generated so that \code{x <- sin(a*t + b) + c},
+#' where
+#' \itemize{
+#'   \item \code{t <- seq(0, 2*pi, length.out = k)}
+#'   \item \code{a <- mu[1] + lambda[1]*stats::runif(1)}
+#'   \item \code{b <- mu[2] + lambda[2]*stats::runif(1)}
+#'   \item \code{c <- mu[3] + lambda[3]*stats::runif(1)}
+#' }
 #' @param t_jitter Standard deviation of the jitter added to the given
 #' measurement times.
 #' @return a list
@@ -575,10 +600,10 @@ sim.apply_obs_onset_fun <- function(fun_obs, t0_real, rem) {
   list(idx0 = idx0, t0 = t0)
 }
 
-#' Check if trying to simulate onset happening after measurement interval
-#'
-#' @param idx index of onset point relative to real onset
-#' @param rem measurement points after real onset
+# Check if trying to simulate onset happening after measurement interval
+#
+# @param idx index of onset point relative to real onset
+# @param rem measurement points after real onset
 sim.check_too_far <- function(idx, rem) {
   check_length(idx, 1)
   if (idx > length(rem)) {
@@ -587,11 +612,11 @@ sim.check_too_far <- function(idx, rem) {
   TRUE
 }
 
-#' Sample from the 'truncated geometric' distribution
-#' @param p a number between 0 and 1
-#' @param s an integer
-#' @param n number of samples
-#' @return an integer from the interval 1...n
+# Sample from the 'truncated geometric' distribution
+# @param p a number between 0 and 1
+# @param s an integer
+# @param n number of samples
+# @return an integer from the interval 1...n
 sim.rtgeom <- function(s, p, n = 1) {
   s_seq <- 0:(s - 1)
   prob <- p^s_seq
@@ -698,21 +723,7 @@ sim.disease_effect <- function(X_id, X_disAge, dis_fun) {
   return(F_disAge)
 }
 
-#' Helper function for sim.create_x
-#'
-#' @param covariates Integer vector that defines the types of covariates
-#' (other than id and age). If not given, only the id and age
-#' covariates are created. Different integers correspond to the following
-#' covariate types:
-#' \itemize{
-#'   \item 0 = disease-related age
-#'   \item 1 = other continuous covariate
-#'   \item 2 = a categorical covariate that interacts with age
-#'   \item 3 = a categorical covariate that acts as a group offset
-#'   \item 4 = a categorical covariate that that acts as a group offset AND
-#'   is restricted to have value 0 for controls and 1 for cases
-#' }
-#' @return an array of five integers
+# Helper function for sim.create_x
 sim.create_x_D <- function(covariates) {
   D <- rep(0, 5)
   D[1] <- sum(covariates == 0)
@@ -723,17 +734,7 @@ sim.create_x_D <- function(covariates) {
   return(D)
 }
 
-#' Input check helper function for sim.create_x
-#'
-#' @param n_categs An integer vector defining the number of categories
-#' for each categorical covariate, so that \code{length(n_categs)} equals to
-#' the number of 2's and 3's in the \code{covariates} vector.
-#' @param D covariate type array
-#' @param t_data Measurement times.
-#' @param t_effect_range Time interval from which the disease effect times are
-#' sampled uniformly. Alternatively, This can any function that returns the
-#' (possibly randomly generated) real disease effect time for one individual.
-#' @return a list
+# Input check helper function for sim.create_x (D is covariate type array)
 sim.create_x_check <- function(n_categs, D, t_data, t_effect_range) {
 
   # Check length of n_categs
@@ -779,15 +780,15 @@ sim.create_x_check <- function(n_categs, D, t_data, t_effect_range) {
   )
 }
 
-#' Helper function for sim.create_x
-#'
-#' @param X current covariate matrix
-#' @param k number of time points per individual
-#' @param N Number of individuals.
-#' @param D covariate type array
-#' @param age the age covariate
-#' @param t_effect_range Parsed version of \code{t_effect_range}
-#' @return list
+# Helper function for sim.create_x
+#
+# @param X current covariate matrix
+# @param k number of time points per individual
+# @param N Number of individuals.
+# @param D covariate type array
+# @param age the age covariate
+# @param t_effect_range Parsed version of \code{t_effect_range}
+# @return list
 sim.create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
   if (D[1] > 0) {
     N_cases <- round(N / 2)
@@ -824,22 +825,12 @@ sim.create_x_dis_age <- function(X, k, N, D, age, t_effect_range) {
 
 
 
-#' Helper function for sim.create_x
-#'
-#' @inheritParams sim.create_x_dis_age
-#' @inheritParams sim.create_x_check
-#' @param continuous_info Info for generating continuous covariates. Must be a
-#' list containing fields \code{lambda} and \code{mu}, which have length 3.
-#' The continuous covariates are generated so that \code{x <- sin(a*t + b) + c},
-#' where
-#' \itemize{
-#'   \item \code{t <- seq(0, 2*pi, length.out = k)}
-#'   \item \code{a <- mu[1] + lambda[1]*stats::runif(1)}
-#'   \item \code{b <- mu[2] + lambda[2]*stats::runif(1)}
-#'   \item \code{c <- mu[3] + lambda[3]*stats::runif(1)}
-#' }
-#' @param dis_age a disease-age vector
-#' @return a list
+# Helper function for sim.create_x
+#
+# @inheritParams sim.create_x_dis_age
+# @inheritParams sim.create_x_check
+# @param dis_age a disease-age vector
+# @return a list
 sim.create_x_other <- function(X, k, N, D, n_categs, dis_age, continuous_info) {
   if (D[2] > 0) {
     mu <- dollar(continuous_info, "mu")
