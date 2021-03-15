@@ -1,6 +1,6 @@
 #' Parse the covariates and model components from given data and formula
 #'
-#' @inheritParams parse_y
+#' @inheritParams create_model.likelihood
 #' @param model_formula an object of class \linkS4class{lgpformula}
 #' @param x_cont_scl Information on how to scale the continuous covariates.
 #' This can either be
@@ -11,7 +11,8 @@
 #' }
 #' @return parsed input to stan and covariate scaling, and other info
 #' @family internal model creation functions
-parse_covs_and_comps <- function(data, model_formula, x_cont_scl, verbose) {
+create_model.covs_and_comps <- function(data, model_formula,
+                                        x_cont_scl, verbose) {
 
   # Check that data is a data.frame and that all covariates exist in it
   x_names <- unique(rhs_variables(model_formula@terms))

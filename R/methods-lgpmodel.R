@@ -209,7 +209,7 @@ get_num_trials <- function(object) {
 
 #' Helper function for plots
 #'
-#' @inheritParams object_to_model
+#' @param object model or fit
 #' @param x x-axis variable name
 #' @param group_by grouping variable name (use \code{NULL} for no grouping)
 #' @return a data frame

@@ -1,13 +1,13 @@
 #' Parse given prior
 #'
-#' @inheritParams parse_y
+#' @inheritParams create_model.likelihood
 #' @param prior A named list, defining the prior distribution of model
 #' (hyper)parameters. See the "Defining priors" section below
 #' (\code{\link{lgp}}).
 #' @param stan_input a list of stan input fields
 #' @return a named list of parsed options
 #' @family internal model creation functions
-parse_prior <- function(prior, stan_input, verbose) {
+create_model.prior <- function(prior, stan_input, verbose) {
   if (verbose) cat("Parsing prior...\n")
   num_uncrt <- dollar(stan_input, "num_uncrt")
   num_ns <- dollar(stan_input, "num_ns")

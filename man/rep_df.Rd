@@ -19,8 +19,6 @@ Repeat a data frame vertically
 }
 \seealso{
 Other data utilities: 
-\code{\link{add_factor_crossing}()},
-\code{\link{data_types}()},
 \code{\link{to_long_format}()}
 }
 \concept{data utilities}

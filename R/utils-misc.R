@@ -1,248 +1,26 @@
-#' Helper function for generic functions
+#' A safer alternative for the dollar operator
 #'
-#' @description Helper function for generic functions that work on
-#' both of \linkS4class{lgpmodel} and \linkS4class{lgpfit} class objects.
-#' @param object an object of class \linkS4class{lgpmodel} or
-#' \linkS4class{lgpfit}
-#' @return an object of class \linkS4class{lgpmodel}
-object_to_model <- function(object) {
-  allowed <- c("lgpmodel", "lgpfit")
-  check_type(object, allowed)
-  if (class(object) == "lgpfit") {
-    out <- object@model
-  } else {
-    out <- object
-  }
-  return(out)
-}
-
-#' Integer encoding of likelihod function names
-#'
-#' @description
-#' \itemize{
-#'   \item \code{likelihood_as_int} converts likelihood name to Stan encoding
-#'   \item \code{likelihood_as_str} converts the Stan likelihood encoding
-#'   to a string
-#'   \item \code{likelihood_list} returns the available likelihood names
-#' }
-#' @param likelihood a string
-#' @param index an integer
-#' @name likelihood_encoding
-
-#' @rdname likelihood_encoding
-likelihood_list <- function() {
-  c("gaussian", "poisson", "nb", "binomial", "bb")
-}
-
-#' @rdname likelihood_encoding
-likelihood_as_str <- function(index) {
-  names <- likelihood_list()
-  L <- length(names)
-  check_interval(index, 1, L)
-  name <- names[index]
-  return(name)
-}
-
-#' @rdname likelihood_encoding
-likelihood_as_int <- function(likelihood) {
-  likelihood <- tolower(likelihood)
-  allowed <- likelihood_list()
-  index <- check_allowed(likelihood, allowed)
-  return(index)
-}
-
-#' @rdname likelihood_encoding
-is_bin_or_bb <- function(likelihood) {
-  likelihood %in% c("binomial", "bb")
-}
-
-#' @rdname likelihood_encoding
-is_pois_or_nb <- function(likelihood) {
-  likelihood %in% c("poisson", "nb")
-}
-
-#' Link functions and their inverses
-#'
-#' @param x the input
-#' @param likelihood name of the likelihood model
-#' @param a a vector which should be divided
-#' elementwise by the vector of numbers of trials
-#' @param fit an object of class \linkS4class{lgpfit}
-#' @returns transformed input
-#' @name link
-NULL
-
-#' @rdname link
-link <- function(x, likelihood) {
-  allowed <- likelihood_list()
-  check_allowed(likelihood, allowed)
-  if (is_pois_or_nb(likelihood)) {
-    x <- log(x)
-  } else if (is_bin_or_bb(likelihood)) {
-    x <- log(x) - log(1 - x)
-  }
-  return(x)
-}
-
-#' @rdname link
-link_inv <- function(x, likelihood) {
-  allowed <- likelihood_list()
-  check_allowed(likelihood, allowed)
-  if (is_pois_or_nb(likelihood)) {
-    x <- exp(x)
-  } else if (is_bin_or_bb(likelihood)) {
-    x <- 1 / (1 + exp(-x))
-  }
-  return(x)
-}
-
-#' @rdname link
-divide_by_num_trials <- function(a, fit) {
-  check_type(fit, "lgpfit")
-  likelihood <- get_obs_model(fit)
-  if (!is_bin_or_bb(likelihood)) {
-    return(a)
-  }
-  y_num_trials <- get_num_trials(fit)
-  check_lengths(a, y_num_trials)
-  a / y_num_trials
-}
-
-#' Ensure vector has expected length
-#'
-#' @param len the expected length
-#' @param v original vector or just one value that is replicated
-#' @return a vector of length \code{len}
-ensure_len <- function(v, len) {
-  v_name <- deparse(substitute(v))
-  L <- length(v)
-  if (L == 1) {
-    v <- rep(v, len)
-  } else if (L != len) {
+#' @description Requires exact match and throws an informative error if
+#' \code{var_name} is not in \code{names(object)}.
+#' @param object a list or data frame
+#' @param var_name name of the variable to access
+#' @return Returns \code{object[[var_name, exact = TRUE]]} if variable
+#' exists.
+#' @family list utilities
+dollar <- function(object, var_name) {
+  check_not_null(var_name)
+  obj_name <- deparse(substitute(object))
+  nams <- names(object)
+  if (!(var_name %in% nams)) {
+    valid <- paste(nams, collapse = ", ")
     msg <- paste0(
-      "length of <", v_name, "> was expected to be 1 or ", len,
-      ", but found length ", L
+      "Variable with name '", var_name,
+      "' not found in <", obj_name, ">!"
     )
+    msg <- paste0(msg, " Found: {", valid, "}")
     stop(msg)
   }
-  return(v)
-}
-
-
-#' A linter-friendly way to call a function
-#'
-#' @description This exists just to allow calling a function which is a slot
-#' of an S4 object, without some linter warnings.
-#' @param fun a function which takes one argument
-#' @param arg the argument
-#' @return The value of \code{fun(arg)}
-#' @family function utilities
-call_fun <- function(fun, arg) {
-  check_type(fun, "function")
-  fun(arg)
-}
-
-#' Paste function and argument enclosed in parentheses
-#'
-#' @param s argument name, a string
-#' @param fun function name, a string
-#' @return a string
-#' @family function utilities
-enclose_fun <- function(s, fun) {
-  paste0(fun, "(", s, ")")
-}
-
-#' Remove quotes and whitespace from a string
-#'
-#' @param s a string
-#' @return a string
-simplify_str <- function(s) {
-  x <- gsub("[[:space:]]", "", s) # remove whitespace
-  x <- gsub("[\",\']", "", x) # remove quotes
-  return(x)
-}
-
-#' Display a runtime estimation message if starting to analyse a large data set
-#'
-#' @param num_obs number of observations
-#' @param threshold threshold for number of observations
-#' @return nothing
-large_data_msg <- function(num_obs, threshold) {
-  msg <- paste0(
-    "WARNING: Number of observations is >= ", threshold,
-    ", so sampling can take a long time. See the",
-    " 'gradient computation took X seconds' information show by",
-    " Stan to estimate total runtime."
-  )
-  msg <- if (num_obs >= threshold) cat(msg)
-}
-
-#' Progress bar printing
-#'
-#' \itemize{
-#'   \item \code{progbar_header} creates header for a progress bar
-#'   \item \code{progbar_print} prints part of the bar depending on iteration
-#'   index
-#' }
-#' @name progbar
-NULL
-
-#' @rdname progbar
-#' @param L length of bar
-progbar_header <- function(L) {
-  str <- paste0(seq(10, 100, by = 10))
-  a <- formatC(str, width = 3)
-  str <- paste0("|  ", a, "%")
-  top <- paste(formatC(str, width = 3), collapse = "")
-  top <- paste0(top, "|")
-  barlen <- nchar(top) - 1
-  list(
-    header = top,
-    idx_print = ceiling(seq(1, L, length.out = barlen))
-  )
-}
-
-#' @rdname progbar
-#' @param idx_print indices of iterations to print a bar block
-#' @param idx current iteration index
-progbar_print <- function(idx, idx_print) {
-  N <- length(which(idx_print == idx))
-  str <- paste(rep("=", N), collapse = "")
-  cat(str)
-}
-
-
-#' Warning message about using a default prior
-#'
-#' @param desc parameter description
-#' @param name parameter name
-#' @param model_desc model description
-warn_msg_default_prior <- function(desc, name, model_desc) {
-  paste0(
-    "Using a default prior for ", desc, " (", name, "), in a model",
-    " that ", model_desc, ".",
-    " This is not recommended. See the 'Basic usage' tutorial",
-    " at https://jtimonen.github.io/lgpr-usage/index.html."
-  )
-}
-
-# Default bayesplot ppc function
-default_ppc_fun <- function(object) {
-  likelihood <- get_obs_model(object)
-  f1 <- bayesplot::ppc_dens_overlay
-  f2 <- bayesplot::ppc_hist
-  fun <- if (likelihood == "gaussian") f1 else f2
-  check_type(fun, "function")
-  return(fun)
-}
-
-
-#' Get number of nonstationary model components
-#'
-#' @param stan_input a list containing an element named \code{components}
-#' @return an integer
-get_num_ns <- function(stan_input) {
-  dollar(stan_input, "num_ns")
+  object[[var_name, exact = TRUE]]
 }
 
 #' Repeat a vector as a rows of an array
@@ -277,37 +55,6 @@ ensure_2dim <- function(v) {
   return(out)
 }
 
-#' Compute row variances for a 2-dimensional array
-#'
-#' @param x an array of size \code{n} x \code{m}
-#' @return returns a vector
-#' @family array utilities
-row_vars <- function(x) {
-  check_not_null(x)
-  check_dim(x, 2)
-  apply(x, 1, stats::var)
-}
-
-#' Normalize matrix or data frame rows so that they sum to 1
-#'
-#' @param x an array of size \code{n} x \code{m}
-#' @return an array of size \code{n} x \code{m}
-#' @family array utilities
-normalize_rows <- function(x) {
-  s <- rowSums(x)
-  x / s
-}
-
-#' Select named row of an array
-#'
-#' @param x an array of shape \code{n} x \code{m}
-#' @param name name of the row
-#' @return a vector of length \code{m}
-#' @family array utilities
-select_row <- function(x, name) {
-  df <- data.frame(t(x))
-  dollar(df, name)
-}
 
 #' Squeeze the second dimension of an array
 #'
@@ -353,154 +100,19 @@ array_to_arraylist <- function(x, L) {
   return(out)
 }
 
-#' Add a vector to each column of an array
-#'
-#' @param x an array of shape \code{n} x \code{m}
-#' @param v a vector of length \code{n}
-#' @return an array of shape \code{n} x \code{m}
-#' @family array utilities
-add_to_columns <- function(x, v) {
-  check_dim(x, 2)
-  check_length(v, nrow(x))
-  D <- ncol(x)
-  for (j in seq_len(D)) x[, j] <- x[, j] + v
-  return(x)
-}
-
-#' Apply possible reduction to rows of an array
-#'
-#' @param x an array of shape \code{n} x \code{m}
-#' @param reduce a function or \code{NULL}
-#' @return an array of shape \code{1} x \code{m} if \code{reduce} is not
-#' \code{NULL}, otherwise the original array \code{x}
-#' @family array utilities
-apply_reduce <- function(x, reduce) {
-  if (!is.null(reduce)) {
-    check_type(reduce, "function")
-    x <- apply(x, 2, reduce)
-    x <- ensure_2dim(x)
-  }
-  return(x)
-}
-
-#' Return NULL if vector contains only NaN values
-#'
-#' @param x a vector
-#' @return \code{x} unchanged or \code{NULL}
-#' @family array utilities
-null_if_all_nan <- function(x) {
-  L <- length(x)
-  S <- sum(is.nan(x))
-  out <- if (S < L) x else NULL
-  return(out)
-}
-
-#' Check that each row of array is identical
-#'
-#' @param rows rows
-#' @return the indentical row
-#' @family array utilities
-reduce_rows <- function(rows) {
-  nam <- rownames(rows)
-  R <- dim(rows)[1]
-  r1 <- as.numeric(rows[1, ])
-  nam1 <- nam[1]
-  n <- length(r1)
-  if (R == 1) {
-    return(r1)
-  }
-  for (j in 2:R) {
-    rj <- as.numeric(rows[j, ])
-    namj <- nam[j]
-    s <- sum(rj == r1)
-    if (s != n) {
-      msg <- paste0(
-        "For each term with uncrt() or heter() expressions, ",
-        "NaNs of the continuous covariate must be on the same",
-        " rows. Found discrepancy between ",
-        nam1, " and ", namj, "."
-      )
-      stop(msg)
-    }
-  }
-  return(r1)
-}
-
-#' Helper function for creating plot data frames from prediction objects
-#'
-#' @param x an array with \code{num_draws} rows
-#' @return a data frame with \code{num_draws} columns
-#' @family array utilities
-make_draw_df <- function(x) {
-  num_draws <- nrow(x)
-  x <- data.frame(t(x))
-  colnames(x) <- paste("draw", seq_len(num_draws), sep = "_")
-  rownames(x) <- NULL
-  return(x)
-}
-
-#' Format a 3-dimensional array into a list of 2-dimensional arrays
-#'
-#' @param x an array
-#' @return a list of arrays
-#' @family array utilities
-arr3_to_list <- function(x) {
-  out <- list()
-  d <- dim(x)[1]
-  for (j in seq_len(d)) {
-    out[[j]] <- arr3_select(x, j)
+# Ensure that input is model or fit and return a model
+object_to_model <- function(object) {
+  allowed <- c("lgpmodel", "lgpfit")
+  check_type(object, allowed)
+  if (class(object) == "lgpfit") {
+    out <- object@model
+  } else {
+    out <- object
   }
   return(out)
 }
 
-#' Select an element along the first dimension of an array, and only drop
-#' the first dimension
-#'
-#' @param x an array of shape\code{d1} x \code{d2} x \code{d3}
-#' @param idx the index to select
-#' @return an array of shape \code{d2} x \code{d3}
-#' @family array utilities
-arr3_select <- function(x, idx) {
-  DIM <- dim(x)
-  array(x[idx, , ], dim = DIM[2:3])
-}
 
-#' A safer alternative for the dollar operator
-#'
-#' @description Requires exact match and throws error if \code{var_name} is
-#' not in \code{names(object)}.
-#' @param object a list or data frame
-#' @param var_name name of the variable to access
-#' @return Returns \code{object[[var_name, exact = TRUE]]} if variable
-#' exists.
-#' @family list utilities
-dollar <- function(object, var_name) {
-  check_not_null(var_name)
-  obj_name <- deparse(substitute(object))
-  nams <- names(object)
-  if (!(var_name %in% nams)) {
-    valid <- paste(nams, collapse = ", ")
-    msg <- paste0(
-      "Variable with name '", var_name,
-      "' not found in <", obj_name, ">!"
-    )
-    msg <- paste0(msg, " Found: {", valid, "}")
-    stop(msg)
-  }
-  object[[var_name, exact = TRUE]]
-}
-
-#' Wrap list into a list of length 1 if the original list is named
-#'
-#' @param x a list
-#' @return a list with no names
-#' @family list utilities
-list_if_named <- function(x) {
-  check_type(x, "list")
-  is_named <- !is.null(names(x))
-  if (is_named) x <- list(x)
-  return(x)
-}
 
 #' List elements to matrix rows
 #'
@@ -533,70 +145,16 @@ matrix_to_list <- function(x) {
   return(L)
 }
 
-#' Return first list element if the list has length is one
-#'
-#' @param x a list
-#' @return the original list or just its first element if its length is one
-#' @family list utilities
-simplify_list <- function(x) {
-  check_type(x, "list")
-  L <- length(x)
-  if (L == 1) x <- x[[1]]
-  return(x)
-}
-
-#' Create grouping factor that can be added to a data frame
-#'
-#' @description used e.g. by \code{\link{plot_pred}} and
-#' \code{\link{new_x}}
-#' @inheritParams plot_pred
-#' @return a factor
-create_grouping_factor <- function(x, group_by) {
-  n <- nrow(x)
-  if (is.na(group_by)) {
-    x_grp <- as.factor(rep("no grouping", n))
-  } else {
-    x_grp <- dollar(x, group_by)
-    check_type(x_grp, "factor")
-  }
-  return(x_grp)
-}
-
-#' Get type of each data column
-#'
-#' @param data a data frame
-#' @return a named list
-#' @family data utilities
-data_types <- function(data) {
-  check_type(data, "data.frame")
-  allowed <- c("factor", "numeric")
-  D <- ncol(data)
-  nams <- names(data)
-  types <- list()
-  for (j in seq_len(D)) {
-    check_allowed(class(data[, j])[1], allowed)
-    types[[j]] <- class(data[, j])[1]
-  }
-  names(types) <- nams
-  return(types)
-}
-
-#' Add a crossing of two factors to a data frame
+#' Repeat a data frame vertically
 #'
 #' @param df a data frame
-#' @param fac1 name of first factor, must be found in \code{df}
-#' @param fac2 name of second factor, must be found in \code{df}
-#' @param new_name name of the new factor
+#' @param times number of times to repeat
 #' @return a data frame
 #' @family data utilities
-add_factor_crossing <- function(df, fac1, fac2, new_name) {
-  a <- dollar(df, fac1)
-  b <- dollar(df, fac2)
-  check_not_null(new_name)
-  check_type(a, "factor")
-  check_type(b, "factor")
-  df[[new_name]] <- interaction(a, b, sep = "*")
-  return(df)
+rep_df <- function(df, times) {
+  out <- c()
+  for (j in seq_len(times)) out <- rbind(out, df)
+  return(out)
 }
 
 #' Data frame and additional information to long format
@@ -619,14 +177,315 @@ to_long_format <- function(df) {
   return(out)
 }
 
-#' Repeat a data frame vertically
+# List available likelihood names
+likelihood_list <- function() {
+  c("gaussian", "poisson", "nb", "binomial", "bb")
+}
+
+# Convert Stan likelihood encoding to a string
+likelihood_as_str <- function(index) {
+  names <- likelihood_list()
+  L <- length(names)
+  check_interval(index, 1, L)
+  name <- names[index]
+  return(name)
+}
+
+# Convert likelihood name to Stan encoding
+likelihood_as_int <- function(likelihood) {
+  likelihood <- tolower(likelihood)
+  allowed <- likelihood_list()
+  index <- check_allowed(likelihood, allowed)
+  return(index)
+}
+
+# Check if likelihood is binomial or beta-binomial
+is_bin_or_bb <- function(likelihood) {
+  likelihood %in% c("binomial", "bb")
+}
+
+# Check if likelihood is Poisson or negative binomial
+is_pois_or_nb <- function(likelihood) {
+  likelihood %in% c("poisson", "nb")
+}
+
+# Map x through link function
+link <- function(x, likelihood) {
+  allowed <- likelihood_list()
+  check_allowed(likelihood, allowed)
+  if (is_pois_or_nb(likelihood)) {
+    x <- log(x)
+  } else if (is_bin_or_bb(likelihood)) {
+    x <- log(x) - log(1 - x)
+  }
+  return(x)
+}
+
+# Map x through inverse link function
+link_inv <- function(x, likelihood) {
+  allowed <- likelihood_list()
+  check_allowed(likelihood, allowed)
+  if (is_pois_or_nb(likelihood)) {
+    x <- exp(x)
+  } else if (is_bin_or_bb(likelihood)) {
+    x <- 1 / (1 + exp(-x))
+  }
+  return(x)
+}
+
+# Divide vector a elementwise by the vector of numbers of trials
+divide_by_num_trials <- function(a, fit) {
+  check_type(fit, "lgpfit")
+  likelihood <- get_obs_model(fit)
+  if (!is_bin_or_bb(likelihood)) {
+    return(a)
+  }
+  y_num_trials <- get_num_trials(fit)
+  check_lengths(a, y_num_trials)
+  a / y_num_trials
+}
+
+# Ensure vector has expected length (len) or replicate value to such vector
+ensure_len <- function(v, len) {
+  v_name <- deparse(substitute(v))
+  L <- length(v)
+  if (L == 1) {
+    v <- rep(v, len)
+  } else if (L != len) {
+    msg <- paste0(
+      "length of <", v_name, "> was expected to be 1 or ", len,
+      ", but found length ", L
+    )
+    stop(msg)
+  }
+  return(v)
+}
+
+# A linter-friendly way to call a function (fun) with one argument (arg)
+call_fun <- function(fun, arg) {
+  check_type(fun, "function")
+  fun(arg)
+}
+
+# Paste function (fun) name and argument (s) name enclosed in parentheses
+enclose_fun <- function(s, fun) {
+  paste0(fun, "(", s, ")")
+}
+
+# Remove quotes and whitespace from a string
+simplify_str <- function(s) {
+  x <- gsub("[[:space:]]", "", s) # remove whitespace
+  x <- gsub("[\",\']", "", x) # remove quotes
+  return(x)
+}
+
+# Display a runtime estimation message if starting to analyse a large data set
+large_data_msg <- function(num_obs, threshold) {
+  msg <- paste0(
+    "WARNING: Number of observations is >= ", threshold,
+    ", so sampling can take a long time. See the",
+    " 'gradient computation took X seconds' information show by",
+    " Stan to estimate total runtime."
+  )
+  msg <- if (num_obs >= threshold) cat(msg)
+}
+
+# Print progress bar header
+progbar_header <- function(L) {
+  str <- paste0(seq(10, 100, by = 10))
+  a <- formatC(str, width = 3)
+  str <- paste0("|  ", a, "%")
+  top <- paste(formatC(str, width = 3), collapse = "")
+  top <- paste0(top, "|")
+  barlen <- nchar(top) - 1
+  list(
+    header = top,
+    idx_print = ceiling(seq(1, L, length.out = barlen))
+  )
+}
+
+# Prints par of progress bar depending on iteration (idx)
+progbar_print <- function(idx, idx_print) {
+  N <- length(which(idx_print == idx))
+  str <- paste(rep("=", N), collapse = "")
+  cat(str)
+}
+
+
+# Warning message about using a default prior for (name) when not recommended
+warn_msg_default_prior <- function(desc, name, model_desc) {
+  paste0(
+    "Using a default prior for ", desc, " (", name, "), in a model",
+    " that ", model_desc, ".",
+    " This is not recommended. See the 'Basic usage' tutorial",
+    " at https://jtimonen.github.io/lgpr-usage/index.html."
+  )
+}
+
+# Default bayesplot ppc function
+default_ppc_fun <- function(object) {
+  likelihood <- get_obs_model(object)
+  f1 <- bayesplot::ppc_dens_overlay
+  f2 <- bayesplot::ppc_hist
+  fun <- if (likelihood == "gaussian") f1 else f2
+  check_type(fun, "function")
+  return(fun)
+}
+
+# Get number of nonstationary model components
+get_num_ns <- function(stan_input) {
+  dollar(stan_input, "num_ns")
+}
+
+# Compute row variances for a 2-dimensional array
+row_vars <- function(x) {
+  check_not_null(x)
+  check_dim(x, 2)
+  apply(x, 1, stats::var)
+}
+
+# Normalize matrix or data frame rows so that they sum to 1
+normalize_rows <- function(x) {
+  s <- rowSums(x)
+  x / s
+}
+
+# Select named row of an array (x)
+select_row <- function(x, name) {
+  df <- data.frame(t(x))
+  dollar(df, name)
+}
+
+
+# Add vector (v) to each column of 2d array (x)
+add_to_columns <- function(x, v) {
+  check_dim(x, 2)
+  check_length(v, nrow(x))
+  D <- ncol(x)
+  for (j in seq_len(D)) x[, j] <- x[, j] + v
+  return(x)
+}
+
+#' Apply possible reduction to rows of an array
 #'
-#' @param df a data frame
-#' @param times number of times to repeat
-#' @return a data frame
-#' @family data utilities
-rep_df <- function(df, times) {
-  out <- c()
-  for (j in seq_len(times)) out <- rbind(out, df)
+#' @param x an array of shape \code{n} x \code{m}
+#' @param reduce a function or \code{NULL}
+#' @return an array of shape \code{1} x \code{m} if \code{reduce} is not
+#' \code{NULL}, otherwise the original array \code{x}
+#' @family array utilities
+apply_reduce <- function(x, reduce) {
+  if (!is.null(reduce)) {
+    check_type(reduce, "function")
+    x <- apply(x, 2, reduce)
+    x <- ensure_2dim(x)
+  }
+  return(x)
+}
+
+# Return NULL if vector contains only NaN values, else original vector (x)
+null_if_all_nan <- function(x) {
+  L <- length(x)
+  S <- sum(is.nan(x))
+  out <- if (S < L) x else NULL
   return(out)
+}
+
+# Check that each row of array (rows) is identical, an return the row
+# Throw error otherwise
+reduce_rows <- function(rows) {
+  nam <- rownames(rows)
+  R <- dim(rows)[1]
+  r1 <- as.numeric(rows[1, ])
+  nam1 <- nam[1]
+  n <- length(r1)
+  if (R == 1) {
+    return(r1)
+  }
+  for (j in 2:R) {
+    rj <- as.numeric(rows[j, ])
+    namj <- nam[j]
+    s <- sum(rj == r1)
+    if (s != n) {
+      msg <- paste0(
+        "For each term with uncrt() or heter() expressions, ",
+        "NaNs of the continuous covariate must be on the same",
+        " rows. Found discrepancy between ",
+        nam1, " and ", namj, "."
+      )
+      stop(msg)
+    }
+  }
+  return(r1)
+}
+
+# Helper function for creating plot data frames from prediction objects
+make_draw_df <- function(x) {
+  num_draws <- nrow(x)
+  x <- data.frame(t(x))
+  colnames(x) <- paste("draw", seq_len(num_draws), sep = "_")
+  rownames(x) <- NULL
+  return(x)
+}
+
+# Format a 3-dimensional array into a list of 2-dimensional arrays
+# List length is specified by first dimension of x
+arr3_to_list <- function(x) {
+  out <- list()
+  d <- dim(x)[1]
+  for (j in seq_len(d)) {
+    out[[j]] <- arr3_select(x, j)
+  }
+  return(out)
+}
+
+# Select an element along the first dimension of an array, and only drop
+# the first dimension (always returns 2d array)
+arr3_select <- function(x, idx) {
+  DIM <- dim(x)
+  array(x[idx, , ], dim = DIM[2:3])
+}
+
+
+# Wrap list into a list of length 1 if the original list is named
+list_if_named <- function(x) {
+  check_type(x, "list")
+  is_named <- !is.null(names(x))
+  if (is_named) x <- list(x)
+  return(x)
+}
+
+# Return first list element if the list has length is one. Else return the
+# whole list unchanged.
+simplify_list <- function(x) {
+  check_type(x, "list")
+  L <- length(x)
+  if (L == 1) x <- x[[1]]
+  return(x)
+}
+
+# Create grouping factor that can be added to a data frame (x)
+create_grouping_factor <- function(x, group_by) {
+  n <- nrow(x)
+  if (is.na(group_by)) {
+    x_grp <- as.factor(rep("no grouping", n))
+  } else {
+    x_grp <- dollar(x, group_by)
+    check_type(x_grp, "factor")
+  }
+  return(x_grp)
+}
+
+# Get type of each data frame column
+data_types <- function(data) {
+  check_type(data, "data.frame")
+  allowed <- c("factor", "numeric")
+  D <- ncol(data)
+  nams <- names(data)
+  types <- list()
+  for (j in seq_len(D)) {
+    check_allowed(class(data[, j])[1], allowed)
+    types[[j]] <- class(data[, j])[1]
+  }
+  names(types) <- nams
+  return(types)
 }

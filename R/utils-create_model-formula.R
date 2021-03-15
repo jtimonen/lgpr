@@ -11,10 +11,10 @@
 #' }
 #' See the "Model formula syntax" section below (\code{\link{lgp}}) for
 #' instructions on how to specify the model terms.
-#' @inheritParams parse_y
+#' @inheritParams create_model.likelihood
 #' @return an object of class \linkS4class{lgpformula}
 #' @family internal model creation functions
-parse_formula <- function(formula, data, verbose = FALSE) {
+create_model.formula <- function(formula, data, verbose = FALSE) {
   if (verbose) cat("Parsing formula...\n")
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data)

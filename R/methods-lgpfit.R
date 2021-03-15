@@ -6,17 +6,32 @@ setMethod("show", "lgpfit", function(object) {
   fit_summary(object)
 })
 
+#' @describeIn lgpfit Get the stored \linkS4class{lgpmodel} object.
+#' Various properties of the returned object can be accessed as explained
+#' in the documentation of \linkS4class{lgpmodel}.
+setMethod("get_model", "lgpfit", function(object) {
+  object@model
+})
+
+#' @describeIn lgpfit Get the stored \code{\link[rstan]{stanfit}} object.
+#' Various properties of the returned object can be accessed or plotted
+#' as explained
+#' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}
+#' or in the documentation of \code{\link[rstan]{stanfit}}.
+setMethod("get_stanfit", "lgpfit", function(object) {
+  object@stan_fit
+})
+
 #' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}} with
 #' \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the return
 #' value is always a 2-dimensional array of shape
-#' \code{num_param_sets} x \code{num_params}.
-#'
+#' \code{num_param_sets} x \code{num_params}. Optional arguments
+#' (\code{...}) are passed to \code{\link[rstan]{extract}}.
 #' @param draws Indices of the parameter draws. \code{NULL} corresponds to
 #' all post-warmup draws.
 #' @param reduce Function used to reduce all parameter draws into
 #' one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 #' \code{NULL}.
-#' @param ... additional keyword arguments to \code{\link[rstan]{extract}}
 setMethod(
   "get_draws", "lgpfit",
   function(object, draws = NULL, reduce = NULL, ...) {
@@ -37,17 +52,20 @@ setMethod(
   }
 )
 
-#' Visualize parameter draws or model fit.
-#'
+#' @describeIn lgpfit Visualize parameter draws. Optional arguments
+#' (\code{...}) are passed to  \code{plotfun}.
 #' @param x an \linkS4class{lgpfit} object to visualize
-#' @param y not used
-#' @param plotfun name of plotting function
-#' @param ... optional arguments to \code{plotfun}
+#' @param y unused argument
+#' @param plotfun plotting function to use
+#' @seealso For different plotting functions, see \code{\link{plot_draws}},
+#' \code{\link{plot_beta}}, \code{\link{plot_warp}},
+#' \code{\link{plot_effect_times}}
 setMethod(
   "plot",
   signature = c("lgpfit", "missing"),
-  function(x, y, plotfun = "plot_draws", ...) {
-    plot_draws(fit = x)
+  function(x, y, plotfun = plot_draws, ...) {
+    check_type(plotfun, "function")
+    plotfun(x, ...)
   }
 )
 
@@ -66,8 +84,9 @@ fit_summary <- function(fit,
   print(fit@stan_fit, pars = ignore_pars, include = FALSE)
 }
 
-#' Visualize the distribution of the obtained parameter draws
+#' Visualize the distribution of parameter draws
 #'
+#' @param fit an object of class \linkS4class{lgpfit}
 #' @param type plot type, allowed options are "intervals", "dens",
 #' "areas", and "trace"
 #' @param regex_pars regex for parameter names to plot
@@ -127,6 +146,7 @@ plot_beta <- function(fit, type = "dens", ...) {
 #'   different draws of the warping steepness parameter
 #' @param num_points number of plot points
 #' @param window_size width of time window
+#' @param color line color
 #' @param alpha line alpha
 plot_warp <- function(fit, num_points = 300, window_size = 48,
                       color = colorset("red", "dark"), alpha = 0.5) {

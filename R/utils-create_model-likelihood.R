@@ -35,8 +35,8 @@
 #' @param verbose Should some informative messages be printed?
 #' @return a list of parsed options
 #' @family internal model creation functions
-parse_y <- function(data, likelihood, c_hat, num_trials,
-                    y_name, sample_f, verbose) {
+create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
+                                    y_name, sample_f, verbose) {
   if (verbose) cat("Parsing response and likelihood...\n")
   LH <- likelihood_as_int(likelihood)
 

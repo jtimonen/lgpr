@@ -42,7 +42,7 @@ test_that("lgp() can do posterior sampling (f marginalized)", {
   })
 
   expect_s4_class(fit, "lgpfit")
-  p1 <- plot_draws(fit)
+  p1 <- plot(fit)
   p2 <- plot_draws(fit, type = "trace")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
@@ -119,7 +119,7 @@ test_that("f can be sampled with nb likelihood", {
     )
   })
   expect_s4_class(fit, "lgpfit")
-  p1 <- plot_draws(fit)
+  p1 <- plot(fit, type = "areas")
   p2 <- plot_draws(fit, regex_pars = "f_latent")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")

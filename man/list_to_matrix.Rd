@@ -21,8 +21,6 @@ List elements to matrix rows
 \seealso{
 Other list utilities: 
 \code{\link{dollar}()},
-\code{\link{list_if_named}()},
-\code{\link{matrix_to_list}()},
-\code{\link{simplify_list}()}
+\code{\link{matrix_to_list}()}
 }
 \concept{list utilities}

@@ -5,12 +5,21 @@
 \alias{lgpfit-class}
 \alias{lgpfit}
 \alias{show,lgpfit-method}
+\alias{get_model,lgpfit-method}
+\alias{get_stanfit,lgpfit-method}
 \alias{get_draws,lgpfit-method}
+\alias{plot,lgpfit,missing-method}
 \title{An S4 class to represent the output of the \code{lgp} function}
 \usage{
 \S4method{show}{lgpfit}(object)
 
+\S4method{get_model}{lgpfit}(object)
+
+\S4method{get_stanfit}{lgpfit}(object)
+
 \S4method{get_draws}{lgpfit}(object, draws = NULL, reduce = NULL, ...)
+
+\S4method{plot}{lgpfit,missing}(x, y, plotfun = plot_draws, ...)
 }
 \arguments{
 \item{object}{\linkS4class{lgpfit} object for which to apply a class method.}
@@ -22,7 +31,13 @@ all post-warmup draws.}
 one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 \code{NULL}.}
 
-\item{...}{additional keyword arguments to \code{\link[rstan]{extract}}}
+\item{...}{optional arguments passed to a subroutine}
+
+\item{x}{an \linkS4class{lgpfit} object to visualize}
+
+\item{y}{unused argument}
+
+\item{plotfun}{plotting function to use}
 }
 \description{
 An S4 class to represent the output of the \code{lgp} function
@@ -31,10 +46,24 @@ An S4 class to represent the output of the \code{lgp} function
 \itemize{
 \item \code{show}: Print information and summary about the fit object.
 
+\item \code{get_model}: Get the stored \linkS4class{lgpmodel} object.
+Various properties of the returned object can be accessed as explained
+in the documentation of \linkS4class{lgpmodel}.
+
+\item \code{get_stanfit}: Get the stored \code{\link[rstan]{stanfit}} object.
+Various properties of the returned object can be accessed or plotted
+as explained
+\href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}
+or in the documentation of \code{\link[rstan]{stanfit}}.
+
 \item \code{get_draws}: Extract parameter draws. Uses \code{\link[rstan]{extract}} with
 \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the return
 value is always a 2-dimensional array of shape
-\code{num_param_sets} x \code{num_params}.
+\code{num_param_sets} x \code{num_params}. Optional arguments
+(\code{...}) are passed to \code{\link[rstan]{extract}}.
+
+\item \code{plot}: Visualize parameter draws. Optional arguments
+(\code{...}) are passed to  \code{plotfun}.
 }}
 
 \section{Slots}{
@@ -48,9 +77,7 @@ value is always a 2-dimensional array of shape
 }}
 
 \seealso{
-For complete info on accessing the properties of the
-\code{stan_fit} slot, see
-\href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
-
-See \code{\link{plot_draws}}.
+For different plotting functions, see \code{\link{plot_draws}},
+\code{\link{plot_beta}}, \code{\link{plot_warp}},
+\code{\link{plot_effect_times}}
 }

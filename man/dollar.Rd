@@ -16,14 +16,12 @@ Returns \code{object[[var_name, exact = TRUE]]} if variable
 exists.
 }
 \description{
-Requires exact match and throws error if \code{var_name} is
-not in \code{names(object)}.
+Requires exact match and throws an informative error if
+\code{var_name} is not in \code{names(object)}.
 }
 \seealso{
 Other list utilities: 
-\code{\link{list_if_named}()},
 \code{\link{list_to_matrix}()},
-\code{\link{matrix_to_list}()},
-\code{\link{simplify_list}()}
+\code{\link{matrix_to_list}()}
 }
 \concept{list utilities}

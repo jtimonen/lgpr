@@ -1,9 +1,4 @@
 setGeneric(
-  "get_draws",
-  function(object, draws, reduce, ...) standardGeneric("get_draws")
-)
-
-setGeneric(
   "parameter_info",
   function(object, digits) standardGeneric("parameter_info")
 )
@@ -18,4 +13,19 @@ setGeneric(
 
 setGeneric(
   "component_names", function(object) standardGeneric("component_names")
+)
+
+setGeneric(
+  "get_model",
+  function(object) standardGeneric("get_model")
+)
+
+setGeneric(
+  "get_stanfit",
+  function(object) standardGeneric("get_stanfit")
+)
+
+setGeneric(
+  "get_draws",
+  function(object, draws = NULL, reduce = NULL, ...) standardGeneric("get_draws")
 )

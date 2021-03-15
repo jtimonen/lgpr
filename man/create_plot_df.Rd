@@ -7,8 +7,7 @@
 create_plot_df(object, x = "age", group_by = "id")
 }
 \arguments{
-\item{object}{an object of class \linkS4class{lgpmodel} or
-\linkS4class{lgpfit}}
+\item{object}{model or fit}
 
 \item{x}{x-axis variable name}
 

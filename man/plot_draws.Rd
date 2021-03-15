@@ -5,7 +5,7 @@
 \alias{plot_beta}
 \alias{plot_warp}
 \alias{plot_effect_times}
-\title{Visualize the distribution of the obtained parameter draws}
+\title{Visualize the distribution of parameter draws}
 \usage{
 plot_draws(
   fit,
@@ -27,6 +27,8 @@ plot_warp(
 plot_effect_times(fit, type = "areas", ...)
 }
 \arguments{
+\item{fit}{an object of class \linkS4class{lgpfit}}
+
 \item{type}{plot type, allowed options are "intervals", "dens",
 "areas", and "trace"}
 
@@ -40,13 +42,15 @@ plot_effect_times(fit, type = "areas", ...)
 
 \item{window_size}{width of time window}
 
+\item{color}{line color}
+
 \item{alpha}{line alpha}
 }
 \value{
 a \code{ggplot} object or list of them
 }
 \description{
-Visualize the distribution of the obtained parameter draws
+Visualize the distribution of parameter draws
 }
 \section{Functions}{
 \itemize{

@@ -11,7 +11,7 @@ tryCatch(
 
 # -------------------------------------------------------------------------
 
-context("Computing predictions (f marginalized)")
+context("Computing analytical posterior distribution of f")
 
 N_ITER <- 20
 N_CHAINS <- 1
@@ -24,7 +24,7 @@ my_prior <- list(effect_time_info = list(
   zero = 0
 ))
 
-test_that("predictions can be computed (f marginalized)", {
+test_that("posterior_f works (f marginalized)", {
 
 
   # Fit a model
@@ -60,9 +60,11 @@ test_that("predictions can be computed (f marginalized)", {
 })
 
 
-context("Computing predictions (f latent)")
+# -------------------------------------------------------------------------
 
-test_that("predictions can be computed (f latent)", {
+context("Getting draws from posterior of f")
+
+test_that("posterior_f works (f latent)", {
   NEWDAT <- DAT
   NEWDAT$y <- round(exp(NEWDAT$y))
 

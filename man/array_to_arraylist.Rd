@@ -20,18 +20,9 @@ Array transformation utility
 }
 \seealso{
 Other array utilities: 
-\code{\link{add_to_columns}()},
 \code{\link{apply_reduce}()},
-\code{\link{arr3_select}()},
-\code{\link{arr3_to_list}()},
 \code{\link{ensure_2dim}()},
-\code{\link{make_draw_df}()},
-\code{\link{normalize_rows}()},
-\code{\link{null_if_all_nan}()},
-\code{\link{reduce_rows}()},
 \code{\link{repvec}()},
-\code{\link{row_vars}()},
-\code{\link{select_row}()},
 \code{\link{squeeze_second_dim}()}
 }
 \concept{array utilities}

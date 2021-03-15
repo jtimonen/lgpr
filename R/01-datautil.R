@@ -51,6 +51,24 @@ add_factor <- function(data, x, id_var = "id") {
   return(data)
 }
 
+#' Add a crossing of two factors to a data frame
+#'
+#' @param df a data frame
+#' @param fac1 name of first factor, must be found in \code{df}
+#' @param fac2 name of second factor, must be found in \code{df}
+#' @param new_name name of the new factor
+#' @return a data frame
+#' @family data frame handling functions
+add_factor_crossing <- function(df, fac1, fac2, new_name) {
+  a <- dollar(df, fac1)
+  b <- dollar(df, fac2)
+  check_not_null(new_name)
+  check_type(a, "factor")
+  check_type(b, "factor")
+  df[[new_name]] <- interaction(a, b, sep = "*")
+  return(df)
+}
+
 #' Easily add the disease-related age variable to a data frame
 #'
 #' @export

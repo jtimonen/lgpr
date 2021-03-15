@@ -24,6 +24,7 @@ so that it accounts for normalization between data points in the
 \seealso{
 Other data frame handling functions: 
 \code{\link{add_dis_age}()},
+\code{\link{add_factor_crossing}()},
 \code{\link{add_factor}()},
 \code{\link{new_x}()},
 \code{\link{split}()}

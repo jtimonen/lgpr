@@ -220,10 +220,7 @@ lgpmodel <- setClass("lgpmodel",
 #' @slot model An object of class \code{lgpmodel}.
 #' @slot num_draws Total number of parameter draws.
 #' @param object \linkS4class{lgpfit} object for which to apply a class method.
-#' @seealso For complete info on accessing the properties of the
-#' \code{stan_fit} slot, see
-#' \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}.
-#' @seealso See \code{\link{plot_draws}}.
+#' @param ... optional arguments passed to a subroutine
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",

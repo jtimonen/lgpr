@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc-simulate.R
 \name{sim.create_x}
 \alias{sim.create_x}
-\title{Simulate an input data frame X}
+\title{Create an input data frame X for simulated data}
 \usage{
 sim.create_x(
   N,
@@ -61,5 +61,5 @@ where
 a list
 }
 \description{
-Simulate an input data frame X
+Create an input data frame X for simulated data
 }

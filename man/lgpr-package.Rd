@@ -39,7 +39,8 @@ data frames are:
  \item \code{\link{new_x}}: Creating new test points where the posterior
  distribution of any function component or sum of all components, or the
  posterior predictive distribution can be computed after model fitting.
- \item Other functions: \code{\link{add_factor}}, \code{\link{add_dis_age}},
+ \item Other functions: \code{\link{add_factor}},
+ \code{\link{add_factor_crossing}}, \code{\link{add_dis_age}},
  \code{\link{adjusted_c_hat}}.
 }
 }

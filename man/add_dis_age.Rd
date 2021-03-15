@@ -27,6 +27,7 @@ disease initiation times and adds it to the data frame
 }
 \seealso{
 Other data frame handling functions: 
+\code{\link{add_factor_crossing}()},
 \code{\link{add_factor}()},
 \code{\link{adjusted_c_hat}()},
 \code{\link{new_x}()},

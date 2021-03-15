@@ -19,8 +19,6 @@ Data frame and additional information to long format
 }
 \seealso{
 Other data utilities: 
-\code{\link{add_factor_crossing}()},
-\code{\link{data_types}()},
 \code{\link{rep_df}()}
 }
 \concept{data utilities}
