@@ -7,11 +7,11 @@ setMethod("show", "lgpsim", function(object) {
 })
 
 #' @describeIn lgpsim Plot the data and generating process. For more
-#' informataion see \code{\link{plot_sim}}.
+#' information see \code{\link{plot_sim}}.
 #' @param x an \linkS4class{lgpsim} object to plot
 #' @param y not used
 #' @param ... optional arguments passed to \code{\link{plot_sim}}
-setMethod("plot", "lgpsim", function(x, y, ...) {
+setMethod("plot", signature = c("lgpsim", "missing"), function(x, y, ...) {
   plot_sim(simdata = x, ...)
 })
 

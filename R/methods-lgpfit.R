@@ -22,9 +22,9 @@ setMethod("get_stanfit", "lgpfit", function(object) {
   object@stan_fit
 })
 
-#' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}} with
-#' \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the return
-#' value is always a 2-dimensional array of shape
+#' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}}
+#' with \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the
+#' return value is always a 2-dimensional array of shape
 #' \code{num_param_sets} x \code{num_params}. Optional arguments
 #' (\code{...}) are passed to \code{\link[rstan]{extract}}.
 #' @param draws Indices of the parameter draws. \code{NULL} corresponds to

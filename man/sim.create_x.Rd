@@ -16,6 +16,8 @@ sim.create_x(
 )
 }
 \arguments{
+\item{N}{Number of individuals.}
+
 \item{covariates}{Integer vector that defines the types of covariates
 (other than id and age). If not given, only the id and age
 covariates are created. Different integers correspond to the following
@@ -35,7 +37,8 @@ covariate types:
 for each categorical covariate, so that \code{length(n_categs)} equals to
 the number of 2's and 3's in the \code{covariates} vector.}
 
-\item{t_data}{Measurement times.}
+\item{t_data}{Measurement times (same for each individual, unless
+\code{t_jitter > 0} in which case they are perturbed).}
 
 \item{t_jitter}{Standard deviation of the jitter added to the given
 measurement times.}

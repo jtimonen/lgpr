@@ -207,7 +207,9 @@ sim.create_y <- function(noise_type, f, snr, phi, gamma, N_trials) {
 
 #' Create an input data frame X for simulated data
 #'
-#' @param names Covariate names.
+#' @param N Number of individuals.
+#' @param t_data Measurement times (same for each individual, unless
+#' \code{t_jitter > 0} in which case they are perturbed).
 #' @param covariates Integer vector that defines the types of covariates
 #' (other than id and age). If not given, only the id and age
 #' covariates are created. Different integers correspond to the following
@@ -220,10 +222,10 @@ sim.create_y <- function(noise_type, f, snr, phi, gamma, N_trials) {
 #'   \item 4 = a categorical covariate that that acts as a group offset AND
 #'   is restricted to have value 0 for controls and 1 for cases
 #' }
+#' @param names Covariate names.
 #' @param n_categs An integer vector defining the number of categories
 #' for each categorical covariate, so that \code{length(n_categs)} equals to
 #' the number of 2's and 3's in the \code{covariates} vector.
-#' @param t_data Measurement times.
 #' @param t_effect_range Time interval from which the disease effect times are
 #' sampled uniformly. Alternatively, This can any function that returns the
 #' (possibly randomly generated) real disease effect time for one individual.

@@ -32,7 +32,10 @@ simulate_data(
 )
 }
 \arguments{
-\item{t_data}{Measurement times.}
+\item{N}{Number of individuals.}
+
+\item{t_data}{Measurement times (same for each individual, unless
+\code{t_jitter > 0} in which case they are perturbed).}
 
 \item{covariates}{Integer vector that defines the types of covariates
 (other than id and age). If not given, only the id and age
