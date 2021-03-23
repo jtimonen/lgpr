@@ -217,7 +217,7 @@ new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
 get_teff_obs <- function(data, group_by = "id", x = "age",
                          x_ns = "diseaseAge") {
   check_type(data, "data.frame")
-  df <- pick_one_row_each(data, "id")
+  df <- pick_one_row_each(data, group_by)
   times <- dollar(df, x) - dollar(df, x_ns)
   names(times) <- dollar(df, group_by)
   return(times)

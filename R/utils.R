@@ -131,7 +131,7 @@ ensure_len <- function(v, len) {
 #' Density and quantile functions of the inverse gamma distribution
 #'
 #' @description Using the same parametrization as Stan. More info
-#' \href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{here}.
+#' \href{https://mc-stan.org/docs/2_26/functions-reference/inverse-gamma-distribution.html}{here}.
 #' @param alpha positive real number
 #' @param beta positive real number
 #' @param x point where to compute the density

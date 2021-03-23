@@ -42,7 +42,8 @@ NULL
 
 #' @export
 #' @rdname pred
-pred <- function(fit, x, c_hat_pred = NULL, reduce = function(x) base::mean(x), draws = NULL,
+pred <- function(fit, x, c_hat_pred = NULL,
+                 reduce = function(x) base::mean(x), draws = NULL,
                  verbose = TRUE, STREAM = get_stream()) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
