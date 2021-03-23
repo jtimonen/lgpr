@@ -1,5 +1,10 @@
 # lgpr 1.0
 
+## 1.0.13
+  * Fix bug that ignored the `group_by` argument in `get_teff_obs()` and
+  caused at least `new_x()` to not work if the subject identifier variable
+  was called something else than `id` (see [issue #22](https://github.com/jtimonen/lgpr/issues/22)).
+  
 ## 1.0.12
   * Add more informative error message if trying to specify a model like
   `y ~ age + id | age`, which should be `y ~ age + age | id`, i.e. the
@@ -45,12 +50,12 @@
  
 ## 1.0.5
  * Make `plot_pred()` work with any response variable name (fixes 
- [#12](https://github.com/jtimonen/lgpr/issues/12)).
+ [issue #12](https://github.com/jtimonen/lgpr/issues/12)).
  * Avoid adding `ggplot2::color_scale_manual()` if number of colors > 5 
- (fixes [#11](https://github.com/jtimonen/lgpr/issues/11)).
+ (fixes [issue #11](https://github.com/jtimonen/lgpr/issues/11)).
  
 ## 1.0.4
-Edit type checking to work more generally on all systems (fixes [#5](https://github.com/jtimonen/lgpr/issues/5)).
+Edit type checking to work more generally on all systems (fixes [issue #5](https://github.com/jtimonen/lgpr/issues/5)).
 
 ## 1.0.3
 Fix CITATION to point to new preprint.
@@ -84,7 +89,7 @@ have to be numeric.
 
 ### Automated testing
 * Thorough unit tests using [test_that](https://testthat.r-lib.org/).
-* C++ versions of the stan model functions are
+* C++ versions of the Stan model functions are
   now exposed to package namespace and also tested.
 
 # lgpr 0.33
