@@ -57,6 +57,7 @@
 #' @aliases lgpr
 #' @useDynLib lgpr, .registration = TRUE
 #' @import methods rstantools
+#' @importFrom rstan get_stream
 #' @importClassesFrom rstan stanfit
 #'
 #' @references

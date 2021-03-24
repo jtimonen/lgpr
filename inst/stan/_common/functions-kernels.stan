@@ -30,7 +30,7 @@
   }
   
   // Categorical zero-sum kernel
-  matrix STAN_kernel_base_zerosum(data int[] x1, data int[] x2, data int ncat) {
+  matrix STAN_kernel_zerosum(data int[] x1, data int[] x2, data int ncat) {
     int n1 = size(x1); 
     int n2 = size(x2);
     matrix[n1, n2] K;
@@ -47,7 +47,7 @@
   }
   
   // Categorical kernel
-  matrix STAN_kernel_base_cat(data int[] x1, data int[] x2) {
+  matrix STAN_kernel_cat(data int[] x1, data int[] x2) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1,n2] K;
@@ -60,7 +60,7 @@
   }
   
   // BINARY MASK KERNEL
-  matrix STAN_kernel_base_bin_mask(data int[] x1, data int[] x2) {
+  matrix STAN_kernel_bin(data int[] x1, data int[] x2) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1,n2] K;
@@ -81,12 +81,12 @@
     int n2 = num_elements(x2);
     matrix[n1, n2] K;
     if (kernel_type == 1) {
-      K = STAN_kernel_base_cat(x1, x2);
+      K = STAN_kernel_cat(x1, x2);
     } else if (kernel_type == 2) {
-      K = STAN_kernel_base_bin_mask(x1, x2);
+      K = STAN_kernel_bin(x1, x2);
     } else {
       // kernel_type should be 0
-      K = STAN_kernel_base_zerosum(x1, x2, ncat);
+      K = STAN_kernel_zerosum(x1, x2, ncat);
     }
     return(K);
   }
@@ -127,17 +127,23 @@
   }
   
   // Multiplier matrix to enable variance masking
-  matrix STAN_kernel_base_var_mask(vector x1, vector x2, 
+  matrix STAN_kernel_var_mask(vector x1, vector x2, 
     real steepness, data real[] vm_params) 
   {
-    int n1 = num_elements(x1);
-    int n2 = num_elements(x2);
     real a = steepness * vm_params[2];
     real r = inv(a)*logit(vm_params[1]);
-    matrix[n1, 1] s1 = to_matrix(STAN_var_mask(x1 - r, a));
-    matrix[n2, 1] s2 = to_matrix(STAN_var_mask(x2 - r, a));
-    matrix[n1, n2] K = s1 * transpose(s2);
-    return(K);
+    return(
+      to_matrix(to_matrix(STAN_var_mask(x1 - r, a))) *
+      transpose(to_matrix(STAN_var_mask(x2 - r, a)))
+    );
+  }
+  
+  // Multiplier matrix to enable heterogeneous effects
+  matrix STAN_kernel_beta(vector beta, int[] idx1_expand, int[] idx2_expand) {
+    return(
+      to_matrix(STAN_expand(sqrt(beta), idx1_expand)) *
+      transpose(to_matrix(STAN_expand(sqrt(beta), idx2_expand)))
+    );
   }
   
   /* 
@@ -211,7 +217,7 @@
         // 4.2 Variance masking
         s = wrp[idx_wrp];
         if(is_var_masked){
-          K = K .* STAN_kernel_base_var_mask(X1, X2, s, vm_params);
+          K = K .* STAN_kernel_var_mask(X1, X2, s, vm_params);
         }
         
         // 4.3 Input warping
@@ -231,10 +237,7 @@
       
       // Possible heterogeneity
       if(is_heter){
-        vector[n1] b1 = STAN_expand(sqrt(beta[1]), idx1_expand);
-        vector[n2] b2 = STAN_expand(sqrt(beta[1]), idx2_expand);
-        matrix[n1, n2] K_beta = to_matrix(b1) * transpose(to_matrix(b2));
-        K = K .* K_beta;
+        K = K .* STAN_kernel_beta(beta[1], idx1_expand, idx2_expand);
       }
       
       KX[j] = K; // store kernel matrix

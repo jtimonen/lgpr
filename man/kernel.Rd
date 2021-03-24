@@ -43,7 +43,7 @@ kernel_beta(beta, row_to_caseID_1, row_to_caseID_2)
 
 \item{beta}{a parameter vector (row vector) of length \code{N_cases}}
 
-\item{row_to_caseID_1}{mapinf from row index to case ID (integer vector of
+\item{row_to_caseID_1}{mapping from row index to case ID (integer vector of
 length \eqn{n})}
 
 \item{row_to_caseID_2}{mapping from row index to case ID (integer vector of

@@ -95,7 +95,7 @@ kernel_var_mask <- function(x1, x2, vm_params,
 #' @describeIn kernel Computes the heterogeneity multiplier matrix.
 #'
 #' @param beta a parameter vector (row vector) of length \code{N_cases}
-#' @param row_to_caseID_1 mapinf from row index to case ID (integer vector of
+#' @param row_to_caseID_1 mapping from row index to case ID (integer vector of
 #' length \eqn{n})
 #' @param row_to_caseID_2 mapping from row index to case ID (integer vector of
 #' length \eqn{m})

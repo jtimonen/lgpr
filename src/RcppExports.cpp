@@ -61,9 +61,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_kernel_base_zerosum
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_base_zerosum(const std::vector<int>& x1, const std::vector<int>& x2, const int& ncat, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_kernel_base_zerosum(SEXP x1SEXP, SEXP x2SEXP, SEXP ncatSEXP, SEXP pstream__SEXP) {
+// STAN_kernel_zerosum
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_zerosum(const std::vector<int>& x1, const std::vector<int>& x2, const int& ncat, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_zerosum(SEXP x1SEXP, SEXP x2SEXP, SEXP ncatSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -71,33 +71,33 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<int>& >::type x2(x2SEXP);
     Rcpp::traits::input_parameter< const int& >::type ncat(ncatSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_kernel_base_zerosum(x1, x2, ncat, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_zerosum(x1, x2, ncat, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_kernel_base_cat
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_base_cat(const std::vector<int>& x1, const std::vector<int>& x2, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_kernel_base_cat(SEXP x1SEXP, SEXP x2SEXP, SEXP pstream__SEXP) {
+// STAN_kernel_cat
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_cat(const std::vector<int>& x1, const std::vector<int>& x2, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_cat(SEXP x1SEXP, SEXP x2SEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<int>& >::type x1(x1SEXP);
     Rcpp::traits::input_parameter< const std::vector<int>& >::type x2(x2SEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_kernel_base_cat(x1, x2, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_cat(x1, x2, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_kernel_base_bin_mask
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_base_bin_mask(const std::vector<int>& x1, const std::vector<int>& x2, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_kernel_base_bin_mask(SEXP x1SEXP, SEXP x2SEXP, SEXP pstream__SEXP) {
+// STAN_kernel_bin
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_bin(const std::vector<int>& x1, const std::vector<int>& x2, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_bin(SEXP x1SEXP, SEXP x2SEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<int>& >::type x1(x1SEXP);
     Rcpp::traits::input_parameter< const std::vector<int>& >::type x2(x2SEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_kernel_base_bin_mask(x1, x2, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_bin(x1, x2, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -135,9 +135,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_kernel_base_var_mask
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_base_var_mask(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x1, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x2, const double& steepness, const std::vector<double>& vm_params, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_kernel_base_var_mask(SEXP x1SEXP, SEXP x2SEXP, SEXP steepnessSEXP, SEXP vm_paramsSEXP, SEXP pstream__SEXP) {
+// STAN_kernel_var_mask
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_var_mask(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x1, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x2, const double& steepness, const std::vector<double>& vm_params, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_var_mask(SEXP x1SEXP, SEXP x2SEXP, SEXP steepnessSEXP, SEXP vm_paramsSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -146,7 +146,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double& >::type steepness(steepnessSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type vm_params(vm_paramsSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_kernel_base_var_mask(x1, x2, steepness, vm_params, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_var_mask(x1, x2, steepness, vm_params, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_kernel_beta
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_beta(const Eigen::Matrix<double, Eigen::Dynamic, 1>& beta, const std::vector<int>& idx1_expand, const std::vector<int>& idx2_expand, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_beta(SEXP betaSEXP, SEXP idx1_expandSEXP, SEXP idx2_expandSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, 1>& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type idx1_expand(idx1_expandSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type idx2_expand(idx2_expandSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_beta(beta, idx1_expand, idx2_expand, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -187,12 +201,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_var_mask", (DL_FUNC) &_lgpr_STAN_var_mask, 3},
     {"_lgpr_STAN_expand", (DL_FUNC) &_lgpr_STAN_expand, 3},
     {"_lgpr_STAN_edit_x_cont", (DL_FUNC) &_lgpr_STAN_edit_x_cont, 5},
-    {"_lgpr_STAN_kernel_base_zerosum", (DL_FUNC) &_lgpr_STAN_kernel_base_zerosum, 4},
-    {"_lgpr_STAN_kernel_base_cat", (DL_FUNC) &_lgpr_STAN_kernel_base_cat, 3},
-    {"_lgpr_STAN_kernel_base_bin_mask", (DL_FUNC) &_lgpr_STAN_kernel_base_bin_mask, 3},
+    {"_lgpr_STAN_kernel_zerosum", (DL_FUNC) &_lgpr_STAN_kernel_zerosum, 4},
+    {"_lgpr_STAN_kernel_cat", (DL_FUNC) &_lgpr_STAN_kernel_cat, 3},
+    {"_lgpr_STAN_kernel_bin", (DL_FUNC) &_lgpr_STAN_kernel_bin, 3},
     {"_lgpr_STAN_kernel_const", (DL_FUNC) &_lgpr_STAN_kernel_const, 5},
     {"_lgpr_STAN_kernel_const_all", (DL_FUNC) &_lgpr_STAN_kernel_const_all, 9},
-    {"_lgpr_STAN_kernel_base_var_mask", (DL_FUNC) &_lgpr_STAN_kernel_base_var_mask, 5},
+    {"_lgpr_STAN_kernel_var_mask", (DL_FUNC) &_lgpr_STAN_kernel_var_mask, 5},
+    {"_lgpr_STAN_kernel_beta", (DL_FUNC) &_lgpr_STAN_kernel_beta, 4},
     {"_lgpr_STAN_kernel_all", (DL_FUNC) &_lgpr_STAN_kernel_all, 18},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_marginal_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_marginal_mod, 0},
