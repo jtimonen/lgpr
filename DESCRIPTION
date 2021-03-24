@@ -1,27 +1,23 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 1.0.13
+Version: 1.1.0.9000
 Authors@R:
     c(person(given = "Juho",
            family = "Timonen",
            role = c("aut", "cre"),
            email = "juho.timonen@iki.fi",
            comment = c(ORCID = "0000-0003-2341-6765")),
-    person(given = "Henrik",
-           family = "Mannerström",
-           role = c("ctb")),
-    person(given = "Aki",
-           family = "Vehtari",
-           role = c("ctb")),
-    person(given = "Harri",
-           family = "Lähdesmäki",
-           role = c("ctb"))
+      person(given = "Henrik", family = "Mannerström",role = c("ctb")),
+      person(given = "Aki", family = "Vehtari", role = c("ctb")),
+      person(given = "Harri", family = "Lähdesmäki", role = c("ctb"))
     )
-Description: Implements interpretable nonparametric analysis and
-             covariate selection for longitudinal data using additive
-             Gaussian process regression. Includes specialized non-stationary
-             disease effect modeling features for biomedical studies. Bayesian
-             inference for model parameters is performed using Stan.
+Description: Interpretable nonparametric modeling of longitudinal data
+  using additive Gaussian process regression. Contains functionality
+  for inferring covariate effects and assessing covariate relevances.
+  Models are specified using a convenient formula syntax, and can include
+  shared, group-specific, non-stationary, heterogeneous and temporally
+  uncertain effects. Bayesian inference for model parameters is performed
+  using Stan.
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
@@ -32,20 +28,20 @@ Depends:
 Imports:
     Rcpp (>= 0.12.0),
     RcppParallel (>= 5.0.2),
-    rstan (>= 2.18.1),
-    rstantools (>= 2.0.0),
+    rstan (>= 2.21.2),
+    rstantools (>= 2.1.1),
     bayesplot (>= 1.7.0),
     MASS (>= 7.3-50),
     stats (>= 3.4),
     ggplot2 (>= 3.1.0),
     gridExtra (>= 0.3.0)
 LinkingTo: 
-    BH (>= 1.72.0-2),
-    Rcpp (>= 0.12.0),
-    RcppEigen (>= 0.3.3.3.0),
+    BH (>= 1.75.0-0),
+    Rcpp (>= 1.0.6),
+    RcppEigen (>= 0.3.3.9.1),
     RcppParallel (>= 5.0.2),
-    rstan (>= 2.18.1),
-    StanHeaders (>= 2.18.0)
+    rstan (>= 2.21.2),
+    StanHeaders (>= 2.21.0-7)
 SystemRequirements: GNU make
 RoxygenNote: 7.1.1
 Suggests: 
