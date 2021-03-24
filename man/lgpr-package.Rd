@@ -57,16 +57,19 @@ Run \code{citation("lgpr")} to get citation information.
 
 \section{Feedback}{
 
-Bug reports, PRs, enchancement ideas or user experiences in general are
+Bug reports, PRs, enhancement ideas or user experiences in general are
 welcome and appreciated. Create an issue in Github or email the author.
 }
 
 \references{
 \enumerate{
+  \item Timonen, J. et al. (2021).
+  \emph{lgpr: an interpretable non-parametric method for inferring covariate
+  effects from longitudinal data}. Bioinformatics,
+  \href{https://doi.org/10.1093/bioinformatics/btab021}{url}.
   \item Carpenter, B. et al. (2017).
   \emph{Stan: A probabilistic programming language}. Journal of Statistical
    Software 76(1).
-
 }
 }
 \author{

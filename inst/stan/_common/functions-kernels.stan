@@ -231,8 +231,8 @@
       
       // Possible heterogeneity
       if(is_heter){
-        vector[n1] b1 = STAN_expand(beta[1], idx1_expand);
-        vector[n2] b2 = STAN_expand(beta[1], idx2_expand);
+        vector[n1] b1 = STAN_expand(sqrt(beta[1]), idx1_expand);
+        vector[n2] b2 = STAN_expand(sqrt(beta[1]), idx2_expand);
         matrix[n1, n2] K_beta = to_matrix(b1) * transpose(to_matrix(b2));
         K = K .* K_beta;
       }

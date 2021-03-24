@@ -56,10 +56,8 @@ a named list
 \description{
 These use the same parametrizations as defined in the Stan
 documentation. See the docs for
-\href{https://mc-stan.org/docs/2_26/functions-reference/gamma-distribution.html}{gamma}
-and
-\href{https://mc-stan.org/docs/2_26/functions-reference/inverse-gamma-distribution.html}{inverse gamma}
-distributions.
+\href{https://mc-stan.org/docs/2_24/functions-reference/gamma-distribution.html}{gamma} and
+\href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{inverse gamma} distributions.
 }
 \examples{
 # Log-normal prior

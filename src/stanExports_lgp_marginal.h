@@ -933,13 +933,13 @@ STAN_kernel_all(const int& n1,
                 Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> b1(n1);
                 stan::math::initialize(b1, DUMMY_VAR__);
                 stan::math::fill(b1, DUMMY_VAR__);
-                stan::math::assign(b1,STAN_expand(get_base1(beta, 1, "beta", 1), idx1_expand, pstream__));
+                stan::math::assign(b1,STAN_expand(stan::math::sqrt(get_base1(beta, 1, "beta", 1)), idx1_expand, pstream__));
                 current_statement_begin__ = 287;
                 validate_non_negative_index("b2", "n2", n2);
                 Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> b2(n2);
                 stan::math::initialize(b2, DUMMY_VAR__);
                 stan::math::fill(b2, DUMMY_VAR__);
-                stan::math::assign(b2,STAN_expand(get_base1(beta, 1, "beta", 1), idx2_expand, pstream__));
+                stan::math::assign(b2,STAN_expand(stan::math::sqrt(get_base1(beta, 1, "beta", 1)), idx2_expand, pstream__));
                 current_statement_begin__ = 288;
                 validate_non_negative_index("K_beta", "n1", n1);
                 validate_non_negative_index("K_beta", "n2", n2);

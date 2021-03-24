@@ -25,7 +25,7 @@ density/quantile value
 }
 \description{
 Using the same parametrization as Stan. More info
-\href{https://mc-stan.org/docs/2_26/functions-reference/inverse-gamma-distribution.html}{here}.
+\href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{here}.
 }
 \seealso{
 Other functions related to the inverse-gamma distribution: 

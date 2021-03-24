@@ -1,6 +1,8 @@
 # Set paths
 STAN_HOME <- file.path("inst", "stan")
-FILES <- c()
+FILES <- c(
+  "_common/functions-kernels.stan"
+)
 
 if (length(FILES) > 0) {
   # Create stan model containing only a functions block with all the functions
