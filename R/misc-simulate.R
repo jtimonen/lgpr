@@ -20,7 +20,7 @@
 #' # Generate Gaussian data
 #' dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 #'
-#' # Generate negative binomially distributed count data
+#' # Generate negative binomially (NB) distributed count data
 #' dat <- simulate_data(
 #'   N = 6, t_data = seq(2, 10, by = 2), noise_type = "nb",
 #'   phi = 2
@@ -396,7 +396,7 @@ sim.create_f <- function(X,
 #' @param lengthscales vector of lengthscales
 #' @param X_affected which individuals are affected by the disease
 #' @param bin_kernel whether or not binary (mask) kernel should be used for
-#' categorical covariates
+#' categorical covariates (if not, the zerosum kernel is used)
 #' @param useMaskedVarianceKernel should the masked variance kernel be used
 #' for drawing the disease component
 #' @param steepness steepness of the input warping function
@@ -410,6 +410,7 @@ sim.kernels <- function(X,
                         useMaskedVarianceKernel,
                         steepness,
                         vm_params) {
+  pos_class <- 1 # bin kernel thing
   n <- dim(X)[1]
   d <- length(types)
   KK <- array(0, c(n, n, d))
@@ -427,33 +428,33 @@ sim.kernels <- function(X,
     if (types[j] == 1) {
       j_ell <- j_ell + 1
       N_tot <- length(unique(xj))
-      Kj <- kernel_zerosum(id, id, N_tot) * kernel_se(t, t, ell = ell[j_ell])
+      Kj <- kernel_zerosum(id, id, N_tot) * kernel_eq(t, t, ell = ell[j_ell])
     } else if (types[j] == 2) {
       j_ell <- j_ell + 1
-      Kj <- kernel_se(t, t, ell = ell[j_ell])
+      Kj <- kernel_eq(t, t, ell = ell[j_ell])
     } else if (types[j] == 3) {
       j_ell <- j_ell + 1
       ell_ns <- ell[j_ell]
-      Kj <- kernel_bin(X_affected, X_affected) *
+      Kj <- kernel_bin(X_affected, X_affected, pos_class) *
         kernel_ns(xj, xj, ell = ell_ns, a = steepness)
       if (useMaskedVarianceKernel) {
-        M <- kernel_var_mask(xj, xj, vm_params, a = steepness)
+        M <- kernel_varmask(xj, xj, vm_params, a = steepness)
         Kj <- Kj * M
       }
     } else if (types[j] == 4) {
       j_ell <- j_ell + 1
-      Kj <- kernel_se(xj, xj, ell = ell[j_ell])
+      Kj <- kernel_eq(xj, xj, ell = ell[j_ell])
     } else if (types[j] == 5) {
       j_ell <- j_ell + 1
       if (bin_kernel) {
-        Kj <- kernel_bin(xj, xj) * kernel_se(t, t, ell = ell[j_ell])
+        Kj <- kernel_bin(xj, xj, pos_class) * kernel_eq(t, t, ell = ell[j_ell])
       } else {
         N_cat <- length(unique(xj))
-        Kj <- kernel_zerosum(xj, xj, N_cat) * kernel_se(t, t, ell = ell[j_ell])
+        Kj <- kernel_zerosum(xj, xj, N_cat) * kernel_eq(t, t, ell = ell[j_ell])
       }
     } else if (types[j] == 6) {
       if (bin_kernel) {
-        Kj <- kernel_bin(xj, xj)
+        Kj <- kernel_bin(xj, xj, pos_class)
       } else {
         N_cat <- length(unique(xj))
         Kj <- kernel_zerosum(xj, xj, N_cat)
@@ -467,7 +468,7 @@ sim.kernels <- function(X,
 }
 
 
-# Input check for the covariates-related arguments of simulate_data
+# Input check for the covariate-related arguments of simulate_data
 sim.check_covariates <- function(covariates, relevances, names, n_cat) {
 
   # Validity check

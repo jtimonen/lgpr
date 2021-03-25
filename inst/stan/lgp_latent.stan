@@ -28,9 +28,9 @@ transformed data{
 
 parameters {
 #include _common/params.stan
-  real<lower=0> sigma[obs_model==1];
-  real<lower=0> phi[obs_model==3];
-  real<lower=0, upper=1> gamma[obs_model==5];
+  real<lower=1e-12> sigma[obs_model==1];
+  real<lower=1e-12> phi[obs_model==3];
+  real<lower=1e-12, upper=1-1e-12> gamma[obs_model==5];
   vector[num_obs] eta[num_comps]; // isotropic versions of func components
 }
 

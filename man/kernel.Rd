@@ -2,25 +2,28 @@
 % Please edit documentation in R/utils-kernel.R
 \name{kernel}
 \alias{kernel}
-\alias{kernel_se}
+\alias{kernel_eq}
 \alias{kernel_ns}
 \alias{kernel_zerosum}
 \alias{kernel_bin}
-\alias{kernel_var_mask}
+\alias{kernel_cat}
+\alias{kernel_varmask}
 \alias{kernel_beta}
 \title{Compute a kernel matrix (covariance matrix)}
 \usage{
-kernel_se(x1, x2, alpha = 1, ell)
+kernel_eq(x1, x2, alpha = 1, ell)
 
 kernel_ns(x1, x2, alpha = 1, ell, a)
 
-kernel_zerosum(x1, x2, M, alpha = 1)
+kernel_zerosum(x1, x2, M)
 
-kernel_bin(x1, x2 = NULL, alpha = 1, pos_class = 1)
+kernel_bin(x1, x2, pos_class = 0)
 
-kernel_var_mask(x1, x2, vm_params, a, nan_replace = 0)
+kernel_cat(x1, x2)
 
-kernel_beta(beta, row_to_caseID_1, row_to_caseID_2)
+kernel_varmask(x1, x2, vm_params, a)
+
+kernel_beta(beta, idx1_expand, idx2_expand)
 }
 \arguments{
 \item{x1}{vector of length \eqn{n}}
@@ -35,31 +38,30 @@ kernel_beta(beta, row_to_caseID_1, row_to_caseID_2)
 
 \item{M}{number of categories}
 
-\item{pos_class}{the positive class label (integer)}
+\item{pos_class}{binary (mask) kernel function has value one if both inputs
+have this value, other wise it is zero}
 
-\item{vm_params}{vector of two mask function parameters}
-
-\item{nan_replace}{value to replace \code{NaN}s in \code{x1} and \code{x2}}
+\item{vm_params}{vector of two mask function parameters.}
 
 \item{beta}{a parameter vector (row vector) of length \code{N_cases}}
 
-\item{row_to_caseID_1}{mapping from row index to case ID (integer vector of
-length \eqn{n})}
+\item{idx1_expand}{integer vector of length \eqn{n}}
 
-\item{row_to_caseID_2}{mapping from row index to case ID (integer vector of
-length \eqn{m})}
+\item{idx2_expand}{integer vector of length \eqn{m}}
 }
 \value{
 A matrix of size \eqn{n} x \eqn{m}.
 }
 \description{
-Compute a kernel matrix (covariance matrix)
+These have \code{STAN_kernel_*} counterparts. These R versions
+are provided for reference and are not optimized for speed. These are
+used when generating simulated data, and not during model inference.
 }
 \section{Functions}{
 \itemize{
-\item \code{kernel_se}: Use the squared exponential kernel.
+\item \code{kernel_eq}: Uses the exponentiated quadratic kernel.
 
-\item \code{kernel_ns}: Use the nonstationary kernel (input warping + squared
+\item \code{kernel_ns}: Uses the non-stationary kernel (input warping + squared
 exponential).
 
 \item \code{kernel_zerosum}: Uses the zero-sum kernel. Here, \code{x1} and
@@ -70,8 +72,17 @@ Returns a binary matrix.
 \code{x2} must be integer vectors (integers denoting different categories).
 Returns a binary matrix.
 
-\item \code{kernel_var_mask}: Computes variance mask multiplier matrix.
+\item \code{kernel_cat}: Uses the categorical kernel. Here, \code{x1} and
+\code{x2} must be integer vectors (integers denoting different categories).
+Returns a binary matrix.
+
+\item \code{kernel_varmask}: Computes variance mask multiplier matrix. \code{NaN}'s
+in \code{x1} and \code{x2} will be replaced by 0.
 
 \item \code{kernel_beta}: Computes the heterogeneity multiplier matrix.
+\emph{NOTE:} \code{idx_expand} needs to be given so that
+\code{idx_expand[j]-1} tells the index of the beta parameter that should be
+used for the \eqn{j}th observation. If observation \eqn{j} doesn't
+correspond to any beta parameter, then \code{idx_expand[j]} should be 1.
 }}
 

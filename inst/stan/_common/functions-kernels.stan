@@ -30,7 +30,7 @@
   }
   
   // Categorical zero-sum kernel
-  matrix STAN_kernel_zerosum(data int[] x1, data int[] x2, data int ncat) {
+  matrix STAN_kernel_zerosum(data int[] x1, data int[] x2, data int num_cat) {
     int n1 = size(x1); 
     int n2 = size(x2);
     matrix[n1, n2] K;
@@ -39,7 +39,7 @@
         if (x1[i] == x2[j]) {
           K[i,j] = 1;
         } else {
-          K[i,j] = - inv(ncat - 1); 
+          K[i,j] = - inv(num_cat - 1); 
         }
       }
     }
@@ -124,6 +124,11 @@
       K_const[j] = K;
     }
     return(K_const);
+  }
+  
+  // Exponentiated quadratic kernel (with vector inputs)
+  matrix STAN_kernel_eq(vector x1, vector x2, real alpha, real ell) {
+    return(cov_exp_quad(to_array_1d(x1), to_array_1d(x2), alpha, ell));
   }
   
   // Multiplier matrix to enable variance masking
@@ -229,8 +234,7 @@
       idx_alpha += 1;
       if(ctype != 0){
         idx_ell += 1;
-        K = K .* cov_exp_quad(to_array_1d(X1), to_array_1d(X2), 
-                    alpha[idx_alpha], ell[idx_ell]);
+        K = K .* STAN_kernel_eq(X1, X2, alpha[idx_alpha], ell[idx_ell]);
       } else {
         K = square(alpha[idx_alpha]) * K;
       }

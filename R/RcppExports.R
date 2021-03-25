@@ -17,8 +17,8 @@ STAN_edit_x_cont <- function(x_cont, idx_expand, teff_obs, teff, pstream__ = 0L)
     .Call(`_lgpr_STAN_edit_x_cont`, x_cont, idx_expand, teff_obs, teff, pstream__)
 }
 
-STAN_kernel_zerosum <- function(x1, x2, ncat, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_zerosum`, x1, x2, ncat, pstream__)
+STAN_kernel_zerosum <- function(x1, x2, num_cat, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_zerosum`, x1, x2, num_cat, pstream__)
 }
 
 STAN_kernel_cat <- function(x1, x2, pstream__ = 0L) {
@@ -35,6 +35,10 @@ STAN_kernel_const <- function(x1, x2, kernel_type, ncat, pstream__ = 0L) {
 
 STAN_kernel_const_all <- function(n1, n2, x1, x2, x1_mask, x2_mask, num_levels, components, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_const_all`, n1, n2, x1, x2, x1_mask, x2_mask, num_levels, components, pstream__)
+}
+
+STAN_kernel_eq <- function(x1, x2, alpha, ell, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_eq`, x1, x2, alpha, ell, pstream__)
 }
 
 STAN_kernel_var_mask <- function(x1, x2, steepness, vm_params, pstream__ = 0L) {

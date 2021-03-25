@@ -138,7 +138,7 @@ Generate an artificial longitudinal data set.
 # Generate Gaussian data
 dat <- simulate_data(N = 4, t_data = c(6, 12, 24, 36, 48), snr = 3)
 
-# Generate negative binomially distributed count data
+# Generate negative binomially (NB) distributed count data
 dat <- simulate_data(
   N = 6, t_data = seq(2, 10, by = 2), noise_type = "nb",
   phi = 2

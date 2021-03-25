@@ -22,7 +22,7 @@ transformed data{
 
 parameters {
 #include _common/params.stan
-  real<lower=0> sigma[1];
+  real<lower=1e-12> sigma[1];
 }
 
 transformed parameters {

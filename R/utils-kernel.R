@@ -1,5 +1,8 @@
 #' Compute a kernel matrix (covariance matrix)
 #'
+#' @description These have \code{STAN_kernel_*} counterparts. These R versions
+#' are provided for reference and are not optimized for speed. These are
+#' used when generating simulated data, and not during model inference.
 #' @param x1 vector of length \eqn{n}
 #' @param x2 vector of length \eqn{m}
 #' @param alpha marginal std (default = 1)
@@ -8,8 +11,8 @@
 #' @name kernel
 NULL
 
-#' @describeIn kernel Use the squared exponential kernel.
-kernel_se <- function(x1, x2, alpha = 1.0, ell) {
+#' @describeIn kernel Uses the exponentiated quadratic kernel.
+kernel_eq <- function(x1, x2, alpha = 1.0, ell) {
   check_positive(ell)
   check_non_negative(alpha)
   n1 <- length(x1)
@@ -20,7 +23,7 @@ kernel_se <- function(x1, x2, alpha = 1.0, ell) {
   return(K)
 }
 
-#' @describeIn kernel Use the nonstationary kernel (input warping + squared
+#' @describeIn kernel Uses the non-stationary kernel (input warping + squared
 #' exponential).
 #' @param a steepness of the warping function rise
 kernel_ns <- function(x1, x2, alpha = 1.0, ell, a) {
@@ -30,7 +33,7 @@ kernel_ns <- function(x1, x2, alpha = 1.0, ell, a) {
   x2[is.nan(x2)] <- nan_replace
   w1 <- warp_input(x1, a)
   w2 <- warp_input(x2, a)
-  K <- kernel_se(w1, w2, alpha, ell)
+  K <- kernel_eq(w1, w2, alpha, ell)
   return(K)
 }
 
@@ -39,47 +42,53 @@ kernel_ns <- function(x1, x2, alpha = 1.0, ell, a) {
 #' \code{x2} must be integer vectors (integers denoting different categories).
 #' Returns a binary matrix.
 #' @param M number of categories
-kernel_zerosum <- function(x1, x2, M, alpha = 1.0) {
+kernel_zerosum <- function(x1, x2, M) {
   check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
   K <- matrix(0, n1, n2)
   for (i in 1:n1) {
     for (j in 1:n2) {
-      if (x1[i] == x2[j]) {
-        K[i, j] <- 1.0
-      } else {
-        K[i, j] <- -1.0 / (M - 1)
-      }
+      K[i, j] <- if (x1[i] == x2[j]) 1.0 else -1.0 / (M - 1)
     }
   }
-  return(alpha^2 * K)
+  return(K)
 }
 
 #' @describeIn kernel Uses the binary (mask) kernel. Here, \code{x1} and
 #' \code{x2} must be integer vectors (integers denoting different categories).
 #' Returns a binary matrix.
-#' @param pos_class the positive class label (integer)
-kernel_bin <- function(x1, x2 = NULL, alpha = 1.0, pos_class = 1) {
-  check_non_negative(alpha)
+#' @param pos_class binary (mask) kernel function has value one if both inputs
+#' have this value, other wise it is zero
+kernel_bin <- function(x1, x2, pos_class = 0) {
   n1 <- length(x1)
   n2 <- length(x2)
   X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
   X2 <- matrix(rep(x2, n1), n1, n2, byrow = T)
   K1 <- matrix(as.numeric(X1 == pos_class), n1, n2)
   K2 <- matrix(as.numeric(X2 == pos_class), n1, n2)
-  return(alpha^2 * K1 * K2)
+  return(K1 * K2)
 }
 
+#' @describeIn kernel Uses the categorical kernel. Here, \code{x1} and
+#' \code{x2} must be integer vectors (integers denoting different categories).
+#' Returns a binary matrix.
+kernel_cat <- function(x1, x2) {
+  n1 <- length(x1)
+  n2 <- length(x2)
+  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
+  X2 <- matrix(rep(x2, n1), n1, n2, byrow = T)
+  K <- 1.0 * (X1 == X2)
+  return(K)
+}
 
-#' @describeIn kernel Computes variance mask multiplier matrix.
+#' @describeIn kernel Computes variance mask multiplier matrix. \code{NaN}'s
+#' in \code{x1} and \code{x2} will be replaced by 0.
 #'
-#' @param vm_params vector of two mask function parameters
-#' @param nan_replace value to replace \code{NaN}s in \code{x1} and \code{x2}
-kernel_var_mask <- function(x1, x2, vm_params,
-                            a, nan_replace = 0) {
-  x1[is.nan(x1)] <- nan_replace
-  x2[is.nan(x2)] <- nan_replace
+#' @param vm_params vector of two mask function parameters.
+kernel_varmask <- function(x1, x2, vm_params, a) {
+  x1[is.nan(x1)] <- 0.0
+  x2[is.nan(x2)] <- 0.0
   check_interval(vm_params[1], 0, 1)
   check_positive(vm_params[1])
   check_positive(vm_params[2])
@@ -93,30 +102,24 @@ kernel_var_mask <- function(x1, x2, vm_params,
 
 
 #' @describeIn kernel Computes the heterogeneity multiplier matrix.
+#' \emph{NOTE:} \code{idx_expand} needs to be given so that
+#' \code{idx_expand[j]-1} tells the index of the beta parameter that should be
+#' used for the \eqn{j}th observation. If observation \eqn{j} doesn't
+#' correspond to any beta parameter, then \code{idx_expand[j]} should be 1.
 #'
 #' @param beta a parameter vector (row vector) of length \code{N_cases}
-#' @param row_to_caseID_1 mapping from row index to case ID (integer vector of
-#' length \eqn{n})
-#' @param row_to_caseID_2 mapping from row index to case ID (integer vector of
-#' length \eqn{m})
-kernel_beta <- function(beta, row_to_caseID_1, row_to_caseID_2) {
-  n1 <- length(row_to_caseID_1)
-  n2 <- length(row_to_caseID_2)
+#' @param idx1_expand integer vector of length \eqn{n}
+#' @param idx2_expand integer vector of length \eqn{m}
+kernel_beta <- function(beta, idx1_expand, idx2_expand) {
+  n1 <- length(idx1_expand)
+  n2 <- length(idx2_expand)
   BETA <- matrix(0, n1, n2)
   for (i in 1:n1) {
-    i_case <- row_to_caseID_1[i]
-    if (i_case > 0) {
-      b1 <- beta[i_case]
-    } else {
-      b1 <- 0
-    }
+    i_bet <- idx1_expand[i] - 1
+    b1 <- if (i_bet > 0) beta[i_bet] else 0
     for (j in 1:n2) {
-      j_case <- row_to_caseID_2[j]
-      if (j_case > 0) {
-        b2 <- beta[j_case]
-      } else {
-        b2 <- 0
-      }
+      j_bet <- idx2_expand[j] - 1
+      b2 <- if (j_bet > 0) beta[j_bet] else 0
       BETA[i, j] <- sqrt(b1 * b2)
     }
   }

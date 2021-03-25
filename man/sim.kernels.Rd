@@ -33,7 +33,7 @@ sim.kernels(
 \item{X_affected}{which individuals are affected by the disease}
 
 \item{bin_kernel}{whether or not binary (mask) kernel should be used for
-categorical covariates}
+categorical covariates (if not, the zerosum kernel is used)}
 
 \item{useMaskedVarianceKernel}{should the masked variance kernel be used
 for drawing the disease component}
