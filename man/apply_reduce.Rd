@@ -18,11 +18,4 @@ an array of shape \code{1} x \code{m} if \code{reduce} is not
 \description{
 Apply possible reduction to rows of an array
 }
-\seealso{
-Other array utilities: 
-\code{\link{array_to_arraylist}()},
-\code{\link{ensure_2dim}()},
-\code{\link{repvec}()},
-\code{\link{squeeze_second_dim}()}
-}
 \concept{array utilities}

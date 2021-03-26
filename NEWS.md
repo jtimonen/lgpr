@@ -1,3 +1,8 @@
+# lgpr 1.1
+
+## 1.1.0
+  * TODO: WRITE BEFORE RELEASE
+
 # lgpr 1.0
 
 ## 1.0.13

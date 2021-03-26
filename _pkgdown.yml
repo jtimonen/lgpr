@@ -6,18 +6,13 @@ reference:
 - title: "Public API"
   desc: "Functions that are exported from the package namespace."
 - contents: 
-  - add_dis_age
+  - add_dis_age 
   - add_factor 
   - adjusted_c_hat 
   - bet 
-  - component_info 
   - create_model 
   - fit_summary 
   - gam 
-  - get_draws 
-  - get_num_draws 
-  - get_pred 
-  - get_y_rng 
   - igam 
   - lgp 
   - log_normal 
@@ -25,7 +20,6 @@ reference:
   - new_x 
   - normal 
   - optimize_model 
-  - param_summary 
   - plot_beta 
   - plot_components 
   - plot_data 
@@ -36,8 +30,6 @@ reference:
   - plot_sim 
   - plot_warp 
   - ppc 
-  - pred 
-  - prior_summary 
   - relevances 
   - sample_model 
   - select 
@@ -47,7 +39,7 @@ reference:
   - simulate_data 
   - student_t 
   - uniform
-  
+
 - title: "Data"
   desc: ~
 - contents:

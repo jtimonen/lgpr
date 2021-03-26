@@ -121,3 +121,11 @@ test_that("kernel_varmask works similarly in R and Stan code", {
   expect_equal(K1, K2)
   expect_equal(dim(K1), c(n1, n2))
 })
+
+test_that("input warping function works similarly in R and Stan code", {
+  x <- sort(rnorm(n = n1))
+  a <- 0.3 + runif(1)
+  w1 <- warp_input(x, a)
+  w2 <- STAN_warp_input(x, a, get_stream())
+  expect_equal(w1, w2)
+})

@@ -1,12 +1,11 @@
-#' A safer alternative for the dollar operator
-#'
-#' @description Requires exact match and throws an informative error if
-#' \code{var_name} is not in \code{names(object)}.
-#' @param object a list or data frame
-#' @param var_name name of the variable to access
-#' @return Returns \code{object[[var_name, exact = TRUE]]} if variable
-#' exists.
-#' @family list utilities
+# A safer alternative for the dollar operator
+#
+# @description Requires exact match and throws an informative error if
+# \code{var_name} is not in \code{names(object)}.
+# @param object a list or data frame
+# @param var_name name of the variable to access
+# @return Returns \code{object[[var_name, exact = TRUE]]} if variable
+# exists.
 dollar <- function(object, var_name) {
   check_not_null(var_name)
   obj_name <- deparse(substitute(object))
@@ -23,13 +22,12 @@ dollar <- function(object, var_name) {
   object[[var_name, exact = TRUE]]
 }
 
-#' Repeat a vector as a rows of an array
-#'
-#' @description Throws an error if \code{v} is \code{NULL}.
-#' @param v a vector of length \code{m}
-#' @param n number of times to repeat
-#' @return returns an array of size \code{n} x \code{m}
-#' @family array utilities
+# Repeat a vector as a rows of an array
+#
+# @description Throws an error if \code{v} is \code{NULL}.
+# @param v a vector of length \code{m}
+# @param n number of times to repeat
+# @return returns an array of size \code{n} x \code{m}
 repvec <- function(v, n) {
   check_not_null(v)
   m <- length(v)
@@ -37,11 +35,10 @@ repvec <- function(v, n) {
   return(as.array(A))
 }
 
-#' Ensure that v is 2-dimensional
-#'
-#' @param v a vector of length \code{m} or an array of size \code{n} x \code{m}
-#' @return returns a 2-dimensional array
-#' @family array utilities
+# Ensure that v is 2-dimensional
+#
+# @param v a vector of length \code{m} or an array of size \code{n} x \code{m}
+# @return returns a 2-dimensional array
 ensure_2dim <- function(v) {
   check_not_null(v)
   L <- length(dim(v))
@@ -56,11 +53,11 @@ ensure_2dim <- function(v) {
 }
 
 
-#' Squeeze the second dimension of an array
-#'
-#' @param x an array of shape \code{n1} x \code{n2} x \code{n3}
-#' @return an array of shape \code{n1*n2} x \code{n3}
-#' @family array utilities
+# Squeeze the second dimension of an array
+#
+# @param x an array of shape \code{n1} x \code{n2} x \code{n3}
+# @return an array of shape \code{n1*n2} x \code{n3}
+# @family array utilities
 squeeze_second_dim <- function(x) {
   D_in <- dim(x)
   L <- length(D_in)
@@ -82,13 +79,12 @@ squeeze_second_dim <- function(x) {
   return(out)
 }
 
-#' Array transformation utility
-#'
-#' @param x an array of shape \code{n} x \code{m}
-#' @param L an integer
-#' @return a list of length \code{L}, where each element is an array of
-#' shape \code{h} x (\code{m}/\code{L}), where \code{h = nrow(x)}
-#' @family array utilities
+# Array transformation utility
+#
+# @param x an array of shape \code{n} x \code{m}
+# @param L an integer
+# @return a list of length \code{L}, where each element is an array of
+# shape \code{h} x (\code{m}/\code{L}), where \code{h = nrow(x)}
 array_to_arraylist <- function(x, L) {
   m <- dim(x)[2]
   if (m %% L) stop("Second dimension of <x> must be a multiple of <L>!")
@@ -114,13 +110,12 @@ object_to_model <- function(object) {
 
 
 
-#' List elements to matrix rows
-#'
-#' @param x a list of length \code{m} where each element is a vector of
-#' length \code{n}
-#' @param n length of each vector
-#' @return a matrix with shape \code{m} x \code{n}
-#' @family list utilities
+# List elements to matrix rows
+#
+# @param x a list of length \code{m} where each element is a vector of
+# length \code{n}
+# @param n length of each vector
+# @return a matrix with shape \code{m} x \code{n}
 list_to_matrix <- function(x, n) {
   m <- length(x)
   A <- array(0, dim = c(m, n))
@@ -130,12 +125,11 @@ list_to_matrix <- function(x, n) {
   as.matrix(A)
 }
 
-#' Matrix rows to a list
-#'
-#' @param x a matrix or array with \code{m} rows and \code{n} columns
-#' @return an unnamed list of length \code{m} where each element is a
-#' vector of length \code{n}
-#' @family list utilities
+# Matrix rows to a list
+#
+# @param x a matrix or array with \code{m} rows and \code{n} columns
+# @return an unnamed list of length \code{m} where each element is a
+# vector of length \code{n}
 matrix_to_list <- function(x) {
   m <- dim(x)[1]
   L <- list()
@@ -145,25 +139,23 @@ matrix_to_list <- function(x) {
   return(L)
 }
 
-#' Repeat a data frame vertically
-#'
-#' @param df a data frame
-#' @param times number of times to repeat
-#' @return a data frame
-#' @family data utilities
+# Repeat a data frame vertically
+#
+# @param df a data frame
+# @param times number of times to repeat
+# @return a data frame
 rep_df <- function(df, times) {
   out <- c()
   for (j in seq_len(times)) out <- rbind(out, df)
   return(out)
 }
 
-#' Data frame and additional information to long format
-#'
-#' @param df a data frame in wide format
-#' @return a data frame where first column is a factor that determines the
-#' column variable name in the original data and second column contains
-#' the actual values
-#' @family data utilities
+# Data frame and additional information to long format
+#
+# @param df a data frame in wide format
+# @return a data frame where first column is a factor that determines the
+# column variable name in the original data and second column contains
+# the actual values
 to_long_format <- function(df) {
   nam <- colnames(df)
   x <- c()
