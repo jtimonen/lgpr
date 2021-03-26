@@ -28,6 +28,7 @@ kernel_eq <- function(x1, x2, alpha = 1.0, ell) {
 #' @param a steepness of the warping function rise
 kernel_ns <- function(x1, x2, alpha = 1.0, ell, a) {
   nan_replace <- 0
+  check_non_negative(alpha)
   check_positive(a)
   x1[is.nan(x1)] <- nan_replace
   x2[is.nan(x2)] <- nan_replace
@@ -43,7 +44,6 @@ kernel_ns <- function(x1, x2, alpha = 1.0, ell, a) {
 #' Returns a binary matrix.
 #' @param M number of categories
 kernel_zerosum <- function(x1, x2, M) {
-  check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
   K <- matrix(0, n1, n2)
@@ -86,7 +86,7 @@ kernel_cat <- function(x1, x2) {
 #' in \code{x1} and \code{x2} will be replaced by 0.
 #'
 #' @param vm_params vector of two mask function parameters.
-kernel_varmask <- function(x1, x2, vm_params, a) {
+kernel_varmask <- function(x1, x2, a, vm_params) {
   x1[is.nan(x1)] <- 0.0
   x2[is.nan(x2)] <- 0.0
   check_interval(vm_params[1], 0, 1)

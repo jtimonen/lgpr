@@ -150,9 +150,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// STAN_kernel_var_mask
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_var_mask(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x1, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x2, const double& steepness, const std::vector<double>& vm_params, std::ostream* pstream__);
-RcppExport SEXP _lgpr_STAN_kernel_var_mask(SEXP x1SEXP, SEXP x2SEXP, SEXP steepnessSEXP, SEXP vm_paramsSEXP, SEXP pstream__SEXP) {
+// STAN_kernel_varmask
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_kernel_varmask(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x1, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x2, const double& steepness, const std::vector<double>& vm_params, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_kernel_varmask(SEXP x1SEXP, SEXP x2SEXP, SEXP steepnessSEXP, SEXP vm_paramsSEXP, SEXP pstream__SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -161,7 +161,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double& >::type steepness(steepnessSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type vm_params(vm_paramsSEXP);
     Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
-    rcpp_result_gen = Rcpp::wrap(STAN_kernel_var_mask(x1, x2, steepness, vm_params, pstream__));
+    rcpp_result_gen = Rcpp::wrap(STAN_kernel_varmask(x1, x2, steepness, vm_params, pstream__));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -222,7 +222,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_kernel_const", (DL_FUNC) &_lgpr_STAN_kernel_const, 5},
     {"_lgpr_STAN_kernel_const_all", (DL_FUNC) &_lgpr_STAN_kernel_const_all, 9},
     {"_lgpr_STAN_kernel_eq", (DL_FUNC) &_lgpr_STAN_kernel_eq, 5},
-    {"_lgpr_STAN_kernel_var_mask", (DL_FUNC) &_lgpr_STAN_kernel_var_mask, 5},
+    {"_lgpr_STAN_kernel_varmask", (DL_FUNC) &_lgpr_STAN_kernel_varmask, 5},
     {"_lgpr_STAN_kernel_beta", (DL_FUNC) &_lgpr_STAN_kernel_beta, 4},
     {"_lgpr_STAN_kernel_all", (DL_FUNC) &_lgpr_STAN_kernel_all, 18},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},

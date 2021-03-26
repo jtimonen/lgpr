@@ -715,10 +715,10 @@ struct STAN_kernel_eq_functor__ {
 };
 template <typename T0__, typename T1__, typename T2__, typename T3__>
 Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__>::type, Eigen::Dynamic, Eigen::Dynamic>
-STAN_kernel_var_mask(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x1,
-                         const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& x2,
-                         const T2__& steepness,
-                         const std::vector<T3__>& vm_params, std::ostream* pstream__) {
+STAN_kernel_varmask(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x1,
+                        const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& x2,
+                        const T2__& steepness,
+                        const std::vector<T3__>& vm_params, std::ostream* pstream__) {
     typedef typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__>::type local_scalar_t__;
     typedef local_scalar_t__ fun_return_scalar_t__;
     const static bool propto__ = true;
@@ -749,14 +749,14 @@ STAN_kernel_var_mask(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x1,
         throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
     }
 }
-struct STAN_kernel_var_mask_functor__ {
+struct STAN_kernel_varmask_functor__ {
     template <typename T0__, typename T1__, typename T2__, typename T3__>
         Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__>::type, Eigen::Dynamic, Eigen::Dynamic>
     operator()(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x1,
-                         const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& x2,
-                         const T2__& steepness,
-                         const std::vector<T3__>& vm_params, std::ostream* pstream__) const {
-        return STAN_kernel_var_mask(x1, x2, steepness, vm_params, pstream__);
+                        const Eigen::Matrix<T1__, Eigen::Dynamic, 1>& x2,
+                        const T2__& steepness,
+                        const std::vector<T3__>& vm_params, std::ostream* pstream__) const {
+        return STAN_kernel_varmask(x1, x2, steepness, vm_params, pstream__);
     }
 };
 template <typename T0__>
@@ -936,7 +936,7 @@ STAN_kernel_all(const int& n1,
                 current_statement_begin__ = 276;
                 if (as_bool(is_var_masked)) {
                     current_statement_begin__ = 277;
-                    stan::math::assign(K, elt_multiply(K, STAN_kernel_var_mask(X1, X2, s, vm_params, pstream__)));
+                    stan::math::assign(K, elt_multiply(K, STAN_kernel_varmask(X1, X2, s, vm_params, pstream__)));
                 }
                 current_statement_begin__ = 281;
                 stan::math::assign(X1, STAN_warp_input(X1, s, pstream__));

@@ -41,8 +41,8 @@ STAN_kernel_eq <- function(x1, x2, alpha, ell, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_eq`, x1, x2, alpha, ell, pstream__)
 }
 
-STAN_kernel_var_mask <- function(x1, x2, steepness, vm_params, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_var_mask`, x1, x2, steepness, vm_params, pstream__)
+STAN_kernel_varmask <- function(x1, x2, steepness, vm_params, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_varmask`, x1, x2, steepness, vm_params, pstream__)
 }
 
 STAN_kernel_beta <- function(beta, idx1_expand, idx2_expand, pstream__ = 0L) {

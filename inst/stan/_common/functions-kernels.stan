@@ -132,7 +132,7 @@
   }
   
   // Multiplier matrix to enable variance masking
-  matrix STAN_kernel_var_mask(vector x1, vector x2, 
+  matrix STAN_kernel_varmask(vector x1, vector x2, 
     real steepness, data real[] vm_params) 
   {
     real a = steepness * vm_params[2];
@@ -222,7 +222,7 @@
         // 4.2 Variance masking
         s = wrp[idx_wrp];
         if(is_var_masked){
-          K = K .* STAN_kernel_var_mask(X1, X2, s, vm_params);
+          K = K .* STAN_kernel_varmask(X1, X2, s, vm_params);
         }
         
         // 4.3 Input warping

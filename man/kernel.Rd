@@ -21,7 +21,7 @@ kernel_bin(x1, x2, pos_class = 0)
 
 kernel_cat(x1, x2)
 
-kernel_varmask(x1, x2, vm_params, a)
+kernel_varmask(x1, x2, a, vm_params)
 
 kernel_beta(beta, idx1_expand, idx2_expand)
 }

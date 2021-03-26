@@ -1,3 +1,4 @@
+set.seed(3215)
 library(lgpr)
 
 # -------------------------------------------------------------------------
@@ -56,9 +57,8 @@ test_that("base kernels give errors when supposed to", {
 # -------------------------------------------------------------------------
 
 context("Compare R and Stan versions of kernel functions")
-set.seed(123) # change this now and then
-n1 <- 10
-n2 <- 12
+n1 <- 25
+n2 <- 14
 alpha <- exp(rnorm(1))
 ell <- exp(rnorm(1))
 num_categ <- 3
@@ -107,6 +107,17 @@ test_that("kernel_beta works similarly in R and Stan code", {
   # idx = 1 means control, 2-6 are cases with one beta param each
   K1 <- kernel_beta(beta, idx1_expand, idx2_expand)
   K2 <- STAN_kernel_beta(beta, idx1_expand, idx2_expand, get_stream())
+  expect_equal(K1, K2)
+  expect_equal(dim(K1), c(n1, n2))
+})
+
+test_that("kernel_varmask works similarly in R and Stan code", {
+  x1 <- sort(rnorm(n = n1))
+  x2 <- sort(rnorm(n = n2))
+  a <- 0.3 + runif(1)
+  vm_params <- runif(n = 2)
+  K1 <- kernel_varmask(x1, x2, a, vm_params)
+  K2 <- STAN_kernel_varmask(x1, x2, a, vm_params, get_stream())
   expect_equal(K1, K2)
   expect_equal(dim(K1), c(n1, n2))
 })
