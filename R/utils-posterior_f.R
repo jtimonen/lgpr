@@ -1,15 +1,16 @@
-#' Create input for Stan model that evaluates function posteriors
+#' Create input for code that evaluates function posteriors
 #'
 #' @description Gives a warning if \code{x} is \code{NULL}, but in that
 #' case \code{x} are taken from the Stan input of the original model. This
 #' option is just for debugging purposes.
 #' @inheritParams posterior_f
-#' @return a list that can be used as data for a stan model
-fp_input <- function(fit, x, reduce, draws, refresh) {
-  si <- get_stan_input(fit)
-  si_x_pred <- fp_input_x(fit, x)
-  si_draws <- fp_input_draws(fit, reduce, draws, refresh)
-  c(si, si_x_pred, si_draws)
+#' @return a list of things that will be used as input to the wrapper Stan
+#' kernel computation functions
+fp_input <- function(fit, x, reduce, draws) {
+  si <- get_stan_input(fit) # common
+  si_x_OUT <- fp_input_x(fit, x) # output points (covariate values)
+  si_draws <- fp_input_draws(fit, reduce, draws) # parameter values
+  c(si, si_x_OUT, si_draws)
 }
 
 # covariate input
@@ -19,12 +20,12 @@ fp_input_x <- function(fit, x) {
     # This is just for debugging
     warning("<x> is null in fp_input_x, this is meant just for debugging!")
     out <- list(
-      num_pred = dollar(si, "num_obs"),
-      x_cont_PRED = dollar(si, "x_cont"),
-      x_cont_unnorm_PRED = dollar(si, "x_cont_unnorm"),
-      x_cont_mask_PRED = dollar(si, "x_cont_mask"),
-      x_cat_PRED = dollar(si, "x_cat"),
-      idx_expand_PRED = dollar(si, "idx_expand")
+      num_OUT = dollar(si, "num_obs"),
+      x_cont_OUT = dollar(si, "x_cont"),
+      x_cont_unnorm_OUT = dollar(si, "x_cont_unnorm"),
+      x_cont_mask_OUT = dollar(si, "x_cont_mask"),
+      x_cat_OUT = dollar(si, "x_cat"),
+      idx_expand_OUT = dollar(si, "idx_expand")
     )
   } else {
     m <- get_model(fit)
@@ -40,12 +41,12 @@ fp_input_x <- function(fit, x) {
       dollar(expanding, "to_stan")
     )
     out <- list(
-      num_pred = nrow(x),
-      x_cont_PRED = dollar(si, "x_cont"),
-      x_cont_unnorm_PRED = dollar(si, "x_cont_unnorm"),
-      x_cont_mask_PRED = dollar(si, "x_cont_mask"),
-      x_cat_PRED = dollar(si, "x_cat"),
-      idx_expand_PRED = dollar(si, "idx_expand")
+      num_OUT = nrow(x),
+      x_cont_OUT = dollar(si, "x_cont"),
+      x_cont_unnorm_OUT = dollar(si, "x_cont_unnorm"),
+      x_cont_mask_OUT = dollar(si, "x_cont_mask"),
+      x_cat_OUT = dollar(si, "x_cat"),
+      idx_expand_OUT = dollar(si, "idx_expand")
     )
   }
   return(out)
@@ -98,9 +99,6 @@ fp_input_draws.common <- function(fit, reduce, draws, refresh) {
 
   # Get dimensions
   S <- determine_num_paramsets(fit, draws, reduce)
-  if (is.null(refresh)) {
-    refresh <- round(S / 10)
-  }
   si <- get_stan_input(fit)
   num_comps <- dollar(si, "num_comps")
   num_ell <- dollar(si, "num_ell")
@@ -111,13 +109,12 @@ fp_input_draws.common <- function(fit, reduce, draws, refresh) {
 
   # Get draws
   list(
-    S = S,
+    num_paramsets = S,
     d_alpha = get_draw_arr(fit, draws, reduce, "alpha", S, num_comps),
     d_ell = get_draw_arr(fit, draws, reduce, "ell", S, num_ell),
     d_wrp = get_draw_arr(fit, draws, reduce, "wrp", S, num_ns),
     d_beta = get_draw_arr_vec(fit, draws, reduce, "beta", S, HETER, num_bt),
-    d_teff = get_draw_arr_vec(fit, draws, reduce, "teff", S, UNCRT, num_bt),
-    refresh = refresh
+    d_teff = get_draw_arr_vec(fit, draws, reduce, "teff", S, UNCRT, num_bt)
   )
 }
 

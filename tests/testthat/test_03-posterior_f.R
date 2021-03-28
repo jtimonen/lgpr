@@ -48,7 +48,7 @@ test_that("posterior_f works (f marginalized)", {
 
   # Compute predictions with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
-  # p <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
+  p <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
   # expect_s4_class(p, "FunctionPosterior")
 
   # Compute predictions with same x as in data

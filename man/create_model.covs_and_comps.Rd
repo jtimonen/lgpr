@@ -27,7 +27,7 @@ This can either be
 \item{verbose}{Should some informative messages be printed?}
 }
 \value{
-parsed input to stan and covariate scaling, and other info
+parsed input to Stan and covariate scaling, and other info
 }
 \description{
 Parse the covariates and model components from given data and formula

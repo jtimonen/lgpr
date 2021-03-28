@@ -11,7 +11,7 @@ posterior_f(
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
-  refresh = NULL
+  STREAM = get_stream()
 )
 }
 \arguments{
@@ -34,10 +34,9 @@ NULL (no reduction). Has no effect if \code{draws} is specified.}
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more information be printed?}
+\item{verbose}{Should more some informational messaged be printed?}
 
-\item{refresh}{How often to print progress? Has no effect if \code{verbose}
-is \code{FALSE}.}
+\item{STREAM}{an external pointer}
 }
 \value{
 An object of class \linkS4class{FunctionPosterior} or

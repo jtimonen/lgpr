@@ -9,7 +9,7 @@
 #'   \item \code{NA}, in which case such list is created by computing mean
 #'   and standard deviation from \code{data}
 #' }
-#' @return parsed input to stan and covariate scaling, and other info
+#' @return parsed input to Stan and covariate scaling, and other info
 #' @family internal model creation functions
 create_model.covs_and_comps <- function(data, model_formula,
                                         x_cont_scl, verbose) {
