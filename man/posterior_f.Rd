@@ -11,6 +11,8 @@ posterior_f(
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
+  debug_km = FALSE,
+  debug_dims = FALSE,
   STREAM = get_stream()
 )
 }
@@ -29,12 +31,18 @@ use the same constant.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
-NULL (no reduction). Has no effect if \code{draws} is specified.}
+\code{NULL} (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more some informational messaged be printed?}
+\item{verbose}{Should more some informational messages be printed?}
+
+\item{debug_km}{Should this only return the required kernel matrices.
+Can be used for debugging or testing \code{\link{kernels_fpost}}.}
+
+\item{debug_dims}{Should this print dimensions of some variables.
+Can be used for debugging \code{\link{kernels_fpost}}.}
 
 \item{STREAM}{an external pointer}
 }

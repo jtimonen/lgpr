@@ -481,3 +481,37 @@ data_types <- function(data) {
   names(types) <- nams
   return(types)
 }
+
+# Quick way to create an example lgpfit
+example_fit <- function(
+                        formula = y ~ id + age + age | SEX + age | LOC,
+                        likelihood = "gaussian",
+                        chains = 1,
+                        iter = 30,
+                        num_indiv = 6,
+                        num_timepoints = 5,
+                        ...) {
+  num_trials <- if (is_bin_or_bb(likelihood)) 20 else NULL
+  dat <- simulate_data(
+    N = num_indiv, t_data = seq(12, 96, length.out = num_timepoints),
+    covariates = c(2, 2),
+    relevances = c(0, 1, 0, 1),
+    names = c("SEX", "LOC"),
+    noise_type = likelihood,
+    N_trials = num_trials
+  )
+  lgp(formula, dat@data,
+    likelihood = likelihood,
+    chains = chains,
+    iter = iter,
+    num_trials = num_trials,
+    ...
+  )
+}
+
+# Neat way to print dimension of an array
+print_arr_dim <- function(x) {
+  name <- deparse(substitute(x))
+  dim_str <- paste(dim(x), collapse = ", ")
+  cat(" * dim(", name, ") = c(", dim_str, ")\n", sep = "")
+}

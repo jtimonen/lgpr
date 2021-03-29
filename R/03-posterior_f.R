@@ -17,12 +17,16 @@
 #' use the same constant.
 #' @param reduce Reduction for parameters draws. Can be a function that
 #' is applied to reduce all parameter draws into one parameter set, or
-#' NULL (no reduction). Has no effect if \code{draws} is specified.
+#' \code{NULL} (no reduction). Has no effect if \code{draws} is specified.
 #' @param draws Indices of parameter draws to use, or \code{NULL} to use all
 #' draws.
 #' @return An object of class \linkS4class{FunctionPosterior} or
 #' \linkS4class{FunctionDraws}.
-#' @param verbose Should more some informational messaged be printed?
+#' @param verbose Should more some informational messages be printed?
+#' @param debug_km Should this only return the required kernel matrices.
+#' Can be used for debugging or testing \code{\link{kernels_fpost}}.
+#' @param debug_dims Should this print dimensions of some variables.
+#' Can be used for debugging \code{\link{kernels_fpost}}.
 #' @param STREAM an external pointer
 posterior_f <- function(fit,
                         x = NULL,
@@ -30,26 +34,37 @@ posterior_f <- function(fit,
                         reduce = function(x) base::mean(x),
                         draws = NULL,
                         verbose = TRUE,
+                        debug_km = FALSE,
+                        debug_dims = FALSE,
                         STREAM = get_stream()) {
+
+  # Settings
   if (is.null(x)) x <- get_data(fit)
-  f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
+  f_sampled <- is_f_sampled(fit)
+
+  # Compute all required kernel matrices
+  km <- kernels_fpost(fit, x, reduce, draws, verbose, debug_dims, STREAM)
+  if (debug_km) {
+    return(km)
+  }
+
+  # Compute the function posteriors
   if (f_sampled) {
-    out <- fp_latent(fit, x, c_hat_pred, reduce, draws, verbose, STREAM)
+    chp <- c_hat_pred
+    out <- fp_latent(km, fit, x, chp, reduce, draws, verbose, STREAM)
   } else {
-    out <- fp_marginal(fit, x, reduce, draws, verbose, STREAM)
+    out <- fp_marginal(km, fit, x, reduce, draws, verbose, STREAM)
   }
   return(out)
 }
 
 # Analytic function posteriors
-fp_marginal <- function(fit, x, reduce, draws, verbose, STREAM) {
+fp_marginal <- function(km, fit, x, reduce, draws, verbose, STREAM) {
 
-  fp <- kernels_fpost(fit, x, reduce, draws, verbose, STREAM)
-  
   # Helper function 1
   format_pred_comp <- function(m, s, comp_names) {
-    S <- dim(m)[2] # number of param sets
+    S <- dim(m)[2] # number of parameter sets
     D <- dim(m)[3] # number of components
     P <- dim(m)[4] # number of prediction points
     paramset <- as.factor(rep(1:S, D * P))
@@ -84,8 +99,8 @@ fp_marginal <- function(fit, x, reduce, draws, verbose, STREAM) {
     return(df)
   }
 
-
   # TODO: pred eqs
+  fp <- km
   return(fp)
 
   # Format components
@@ -110,8 +125,7 @@ fp_marginal <- function(fit, x, reduce, draws, verbose, STREAM) {
 }
 
 # Function posterior draws
-fp_latent <- function(fit, x, c_hat_pred, reduce, draws, verbose, STREAM) {
-  input <- fp_input(fit, x, reduce, draws)
+fp_latent <- function(km, fit, x, c_hat_pred, reduce, draws, verbose, STREAM) {
   fpred <- NULL
   stop("FP_LATENT: NOT IMPLEMENTED!") # TODO
 

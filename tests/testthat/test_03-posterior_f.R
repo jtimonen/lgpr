@@ -1,13 +1,6 @@
 library(lgpr)
-tryCatch(
-  {
-    source("helpers/SW.R")
-  },
-  error = function(e) {
-    cat("unable to source test helpers\n")
-  }
-)
-
+source("helpers/SW.R")
+# source("tests/testthat/helpers/SW.R")
 
 # -------------------------------------------------------------------------
 

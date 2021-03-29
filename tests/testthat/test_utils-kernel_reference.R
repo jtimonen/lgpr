@@ -3,7 +3,7 @@ library(lgpr)
 
 # -------------------------------------------------------------------------
 
-context("Kernel functions")
+context("Base kernel functions")
 
 test_that("base kernels work", {
   expect_equal(
