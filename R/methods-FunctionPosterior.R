@@ -7,6 +7,7 @@ setMethod("show", "FunctionPosterior", function(object) {
   cat(desc)
 })
 
+
 #' @describeIn FunctionDraws Print a summary about the object.
 setMethod("show", "FunctionDraws", function(object) {
   df <- object@components

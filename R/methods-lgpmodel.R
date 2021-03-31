@@ -139,7 +139,6 @@ get_y <- function(object, original = TRUE) {
     dat <- get_data(object)
     return(dollar(dat, y_name))
   }
-  model <- object_to_model(object)
   if (is_f_sampled(object)) {
     stop(
       "Response variable is not normalized if f is sampled! Set ",

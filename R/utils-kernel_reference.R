@@ -150,5 +150,3 @@ var_mask <- function(x, stp) {
   y <- 1 / (1 + exp(-stp * x))
   return(y)
 }
-
-

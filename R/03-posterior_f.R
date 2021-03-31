@@ -168,8 +168,8 @@ fp_marginal.compute <- function(K, Ks, Kss, sigma2, delta, y) {
 
 # Format fp_marginal computation results as a data frame
 fp_marginal.format <- function(fp, comp_names) {
-  m <- dollar(fp, "mean") # dim = c(P, J+1)
-  s <- dollar(fp, "sd") # dim = c(P, J+1)
+  m <- dollar(fp, "mean") # shape (P, J+1)
+  s <- dollar(fp, "sd") # shape (P, J+1)
   P <- dim(m)[1]
   J <- dim(m)[2] - 1
   comp_names <- c(comp_names, "f_sum")

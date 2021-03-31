@@ -88,8 +88,8 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   alpha <- dollar(input, "d_alpha")
   ell <- dollar(input, "d_ell")
   wrp <- dollar(input, "d_wrp")
-  beta <- dollar(input, "d_beta") # dim = c(S, num_heter > 1, num_bt)
-  teff <- dollar(input, "d_teff") # dim = c(S, num_uncrt > 1, num_bt)
+  beta <- dollar(input, "d_beta") # shape (S, num_heter > 1, num_bt)
+  teff <- dollar(input, "d_teff") # shape (S, num_uncrt > 1, num_bt)
 
   # Setup
   S <- dollar(input, "num_paramsets")
