@@ -62,45 +62,35 @@ posterior_f <- function(fit,
 # Analytic function posteriors
 fp_marginal <- function(km, fit, x, reduce, draws, verbose, STREAM) {
 
-  # Helper function 1
-  format_pred_comp <- function(m, s, comp_names) {
-    S <- dim(m)[2] # number of parameter sets
-    D <- dim(m)[3] # number of components
-    P <- dim(m)[4] # number of prediction points
-    paramset <- as.factor(rep(1:S, D * P))
-    component <- as.factor(rep(rep(comp_names, each = S), P))
-    eval_point <- as.factor(rep(1:P, each = D * S))
-    m <- as.vector(m)
-    s <- as.vector(s)
-    check_lengths(m, s)
-    check_lengths(m, paramset)
-    check_lengths(m, component)
-    check_lengths(m, eval_point)
-    df <- data.frame(paramset, component, eval_point, m, s)
-    colnames(df) <- c("paramset", "component", "eval_point", "mean", "std")
-    return(df)
-  }
+  # Fetch y_norm, sigma2 and delta
+  y_norm <- get_y(fit, original = FALSE)
+  d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
+  sigma2 <- as.vector(d_sigma^2)
+  delta <- dollar(get_stan_input(fit), "delta")
 
-  # Helper function 2
-  format_pred_total <- function(m, s, sigma) {
-    S <- dim(m)[2] # number of param sets
-    P <- dim(m)[3] # number of prediction points
-    paramset <- as.factor(rep(1:S, P))
-    eval_point <- as.factor(rep(1:P, each = S))
-    sigma <- rep(sigma, P)
-    m <- as.vector(m)
-    s <- as.vector(s)
-    check_lengths(m, s)
-    check_lengths(m, paramset)
-    check_lengths(m, eval_point)
-    check_lengths(m, sigma)
-    df <- data.frame(paramset, eval_point, m, s, sigma)
-    colnames(df) <- c("paramset", "eval_point", "mean", "std", "sigma")
-    return(df)
-  }
+  # Get kernel matrices
+  K <- dollar(km, "K")
+  Ks <- dollar(km, "Ks")
+  Kss <- dollar(km, "Kss")
+  S <- dim(Ks)[1] # number of parameter sets
 
-  # TODO: pred eqs
-  fp <- km
+  # Setup
+  fp <- list()
+  progbar <- verbose && S > 1
+  if (progbar) pb <- txtProgressBar()
+  if (verbose) cat("Computing analytic function posteriors...\n")
+
+  # Loop through parameter sets
+  for (idx in seq_len(S)) {
+
+    # Perform computations for one parameter set and print progress
+    fp[[idx]] <- fp_marginal.compute(
+      K[idx, , , ], Ks[idx, , , ], Kss[idx, , , ], sigma2[idx], delta, y_norm
+    )
+    if (progbar) setTxtProgressBar(pb, idx)
+  }
+  if (progbar) cat("\n")
+
   return(fp)
 
   # Format components
@@ -124,10 +114,95 @@ fp_marginal <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   # )
 }
 
+# Compute componentwise and total function posteriors
+fp_marginal.compute <- function(K, Ks, Kss, sigma2, delta, y) {
+
+  # Helper function
+  gp_posterior_helper <- function(Ly, Ks, Kss_diag, v) {
+    P <- length(Kss_diag)
+    A <- t(forwardsolve(Ly, t(Ks)))
+    f_post <- matrix(0, 2, P)
+    f_post[1, ] <- A %*% v # mean
+    f_post[2, ] <- sqrt(Kss_diag - rowSums(A * A)) # sd
+    return(f_post)
+  }
+
+  # Another helper
+  matsum1 <- function(A) {
+    J <- dim(A)[1]
+    A_sum <- A[1, , ]
+    for (j in 2:J) A_sum <- A_sum + A[j, , ]
+    return(A_sum)
+  }
+  Kss_diag <- t(apply(Kss, 1, diag)) # has the diagonals as rows
+
+  # Setup output arrays
+  J <- dim(Ks)[1] # number of components
+  P <- dim(Ks)[2] # number of output points
+  N <- dim(Ks)[3] # number of data points
+  F_MU <- matrix(0, J + 1, P)
+  F_SD <- matrix(0, J + 1, P)
+
+  # Compute Ky and Cholesky decompose it
+  Ky <- matsum1(K) + (delta + sigma2) * diag(N)
+  Ly <- t(chol(Ky))
+  v <- forwardsolve(Ly, y)
+
+  # Component-wise means and stds
+  for (j in seq_len(J)) {
+    fp_j <- gp_posterior_helper(Ly, Ks[j, , ], Kss_diag[j, ], v)
+    F_MU[j, ] <- fp_j[1, ]
+    F_SD[j, ] <- fp_j[2, ]
+  }
+
+  # Total mean and std
+  Ks_sum <- matsum1(Ks)
+  fp_sum <- gp_posterior_helper(Ly, Ks_sum, colSums(Kss_diag), v)
+  F_MU[J + 1, ] <- fp_sum[1, ]
+  F_SD[J + 1, ] <- fp_sum[2, ]
+
+  # Return
+  list(mean = F_MU, sd = F_SD)
+}
+
+forofroro <- function() {
+  paramset <- as.factor(rep(1:S, D * P))
+  component <- as.factor(rep(rep(comp_names, each = S), P))
+  eval_point <- as.factor(rep(1:P, each = D * S))
+  m <- as.vector(m)
+  s <- as.vector(s)
+  check_lengths(m, s)
+  check_lengths(m, paramset)
+  check_lengths(m, component)
+  check_lengths(m, eval_point)
+  df <- data.frame(paramset, component, eval_point, m, s)
+  colnames(df) <- c("paramset", "component", "eval_point", "mean", "std")
+  return(df)
+}
+
+# Compute total posterior
+fp_marginal.total <- function(km, sigma2, y_norm, delta) {
+  stop("NOT IMPLEMENTED!") # TODO
+  S <- dim(m)[2] # number of param sets
+  P <- dim(m)[3] # number of prediction points
+  paramset <- as.factor(rep(1:S, P))
+  eval_point <- as.factor(rep(1:P, each = S))
+  sigma <- rep(sigma, P)
+  m <- as.vector(m)
+  s <- as.vector(s)
+  check_lengths(m, s)
+  check_lengths(m, paramset)
+  check_lengths(m, eval_point)
+  check_lengths(m, sigma)
+  df <- data.frame(paramset, eval_point, m, s, sigma)
+  colnames(df) <- c("paramset", "eval_point", "mean", "std", "sigma")
+  return(df)
+}
+
 # Function posterior draws
 fp_latent <- function(km, fit, x, c_hat_pred, reduce, draws, verbose, STREAM) {
   fpred <- NULL
-  stop("FP_LATENT: NOT IMPLEMENTED!") # TODO
+  stop("NOT IMPLEMENTED!") # TODO
 
   # Create the prediction
   # h <- pred.latent_h(fit, f_pred, c_hat_pred, verbose)

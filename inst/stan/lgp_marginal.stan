@@ -36,7 +36,6 @@ model {
 
   // Likelihood
   if (is_likelihood_skipped == 0) {
-    vector[num_obs] sigma2_vec = rep_vector(square(sigma[1]), num_obs);
     matrix[num_obs, num_obs] Ky = diag_matrix(delta_vec);
     matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
       K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
@@ -46,7 +45,7 @@ model {
     for(j in 1:num_comps){
       Ky += KX[j];
     }
-    Ky = Ky + diag_matrix(sigma2_vec);
+    Ky = add_diag(Ky, square(sigma[1]));
     y_norm ~ multi_normal_cholesky(m0, cholesky_decompose(Ky));
   }
 }

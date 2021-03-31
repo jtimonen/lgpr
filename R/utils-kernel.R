@@ -24,7 +24,8 @@ kernels_fpost <- function(fit,
   Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
 
   # Return matrices
-  list(K = K, Ks = Ks, Kss = Kss)
+  comp_names <- component_names(fit@model)
+  list(K = K, Ks = Ks, Kss = Kss, comp_names = comp_names)
 }
 
 # Compute all constant kernel matrices of a model

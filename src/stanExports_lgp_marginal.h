@@ -63,7 +63,7 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(414, 0, "start", "_common/priors.stan");
     reader.add_event(444, 30, "end", "_common/priors.stan");
     reader.add_event(444, 34, "restart", "model_lgp_marginal");
-    reader.add_event(464, 52, "end", "model_lgp_marginal");
+    reader.add_event(463, 51, "end", "model_lgp_marginal");
     return reader;
 }
 template <typename T0__>
@@ -1877,19 +1877,13 @@ public:
             if (as_bool(logical_eq(is_likelihood_skipped, 0))) {
                 {
                 current_statement_begin__ = 449;
-                validate_non_negative_index("sigma2_vec", "num_obs", num_obs);
-                Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> sigma2_vec(num_obs);
-                stan::math::initialize(sigma2_vec, DUMMY_VAR__);
-                stan::math::fill(sigma2_vec, DUMMY_VAR__);
-                stan::math::assign(sigma2_vec,rep_vector(square(get_base1(sigma, 1, "sigma", 1)), num_obs));
-                current_statement_begin__ = 450;
                 validate_non_negative_index("Ky", "num_obs", num_obs);
                 validate_non_negative_index("Ky", "num_obs", num_obs);
                 Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic> Ky(num_obs, num_obs);
                 stan::math::initialize(Ky, DUMMY_VAR__);
                 stan::math::fill(Ky, DUMMY_VAR__);
                 stan::math::assign(Ky,diag_matrix(delta_vec));
-                current_statement_begin__ = 451;
+                current_statement_begin__ = 450;
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_obs", num_obs);
                 validate_non_negative_index("KX", "num_comps", num_comps);
@@ -1897,14 +1891,14 @@ public:
                 stan::math::initialize(KX, DUMMY_VAR__);
                 stan::math::fill(KX, DUMMY_VAR__);
                 stan::math::assign(KX,STAN_kernel_all(num_obs, num_obs, K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm, alpha, ell, wrp, beta, teff, vm_params, idx_expand, idx_expand, teff_zero, pstream__));
-                current_statement_begin__ = 456;
+                current_statement_begin__ = 455;
                 for (int j = 1; j <= num_comps; ++j) {
-                    current_statement_begin__ = 457;
+                    current_statement_begin__ = 456;
                     stan::math::assign(Ky, add(Ky, get_base1(KX, j, "KX", 1)));
                 }
+                current_statement_begin__ = 458;
+                stan::math::assign(Ky, add_diag(Ky, square(get_base1(sigma, 1, "sigma", 1))));
                 current_statement_begin__ = 459;
-                stan::math::assign(Ky, add(Ky, diag_matrix(sigma2_vec)));
-                current_statement_begin__ = 460;
                 lp_accum__.add(multi_normal_cholesky_log<propto__>(y_norm, m0, cholesky_decompose(Ky)));
                 }
             }

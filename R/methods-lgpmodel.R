@@ -140,10 +140,14 @@ get_y <- function(object, original = TRUE) {
     return(dollar(dat, y_name))
   }
   model <- object_to_model(object)
-  is_gauss <- get_obs_model(model) == "gaussian"
-  nam <- if (is_gauss) "y_cont" else "y_disc"
+  if (is_f_sampled(object)) {
+    stop(
+      "Response variable is not normalized if f is sampled! Set ",
+      "original = TRUE."
+    )
+  }
   si <- get_stan_input(object)
-  out <- as.vector(dollar(si, nam))
+  out <- as.vector(dollar(si, "y_norm"))
   return(out)
 }
 
@@ -152,7 +156,6 @@ get_y_name <- function(object) {
   model <- object_to_model(object)
   dollar(model@var_names, "y")
 }
-
 
 # Get the Stan model used by a model
 get_stan_model <- function(object) {
