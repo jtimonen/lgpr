@@ -13,14 +13,17 @@ kernels_fpost <- function(fit,
   if (vrb) cat("Creating inputs...\n")
   input <- kernels_fpost.create_input(fit, x, reduce, draws)
 
-  if (vrb) cat("Precomputing constant kernel matrices...\n")
+  if (vrb) cat("Creating constant kernel matrices...\n")
   K_const <- kernel_const_all(input, FALSE, FALSE, STREAM)
   Ks_const <- kernel_const_all(input, TRUE, FALSE, STREAM)
   Kss_const <- kernel_const_all(input, TRUE, TRUE, STREAM)
 
   # Final parameter-dependent kernel matrices
+  if (verbose) cat("Creating final kernel matrices (data vs. data)...\n")
   K <- kernel_all(input, K_const, FALSE, FALSE, vrb, dd, STREAM)
+  if (verbose) cat("Creating final kernel matrices (out vs. data)...\n")
   Ks <- kernel_all(input, Ks_const, TRUE, FALSE, vrb, dd, STREAM)
+  if (verbose) cat("Creating final kernel matrices (out vs. out)...\n")
   Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
 
   # Return matrices
@@ -93,14 +96,6 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   J <- length(K_const) # number of components
   K_out <- array(0, c(S, J, n1, n2))
 
-  # Print info
-  if (verbose) {
-    cat("Computing final kernel matrices (size ",
-      n1, " x ", n2, ") using ", S, " parameter values...\n",
-      sep = ""
-    )
-  }
-
   # Print dimensions
   if (debug_dims) {
     print_arr_dim(alpha)
@@ -112,8 +107,6 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   }
 
   # Loop through parameter sets
-  progbar <- verbose && S > 1
-  if (progbar) pb <- txtProgressBar()
   for (idx in seq_len(S)) {
 
     # Get parameters in correct format
@@ -131,11 +124,9 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
       vm_params, idx1_expand, idx2_expand, teff_zero, STREAM
     )
 
-    # Store result and print progress
+    # Store result
     for (j in seq_len(J)) K_out[idx, j, , ] <- K_idx[[j]]
-    if (progbar) setTxtProgressBar(pb, idx)
   }
-  if (progbar) cat("\n")
   return(K_out)
 }
 

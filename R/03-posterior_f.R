@@ -27,6 +27,8 @@
 #' Can be used for debugging or testing \code{\link{kernels_fpost}}.
 #' @param debug_dims Should this print dimensions of some variables.
 #' Can be used for debugging \code{\link{kernels_fpost}}.
+#' @param force This is by default \code{FALSE} to prevent unnecessarily
+#' large computations that might crash R or take forever.
 #' @param STREAM an external pointer
 posterior_f <- function(fit,
                         x = NULL,
@@ -36,12 +38,16 @@ posterior_f <- function(fit,
                         verbose = TRUE,
                         debug_km = FALSE,
                         debug_dims = FALSE,
+                        force = FALSE,
                         STREAM = get_stream()) {
 
   # Settings
   if (is.null(x)) x <- get_data(fit)
   if (!is.null(draws)) reduce <- NULL
   f_sampled <- is_f_sampled(fit)
+
+  # Stop if potentially going to crash the computer
+  prevent_too_large_mats(fit, x, reduce, draws, verbose, force)
 
   # Compute all required kernel matrices
   km <- kernels_fpost(fit, x, reduce, draws, verbose, debug_dims, STREAM)
@@ -62,8 +68,8 @@ posterior_f <- function(fit,
 # Analytic function posteriors
 fp_marginal <- function(km, fit, x, reduce, draws, verbose, STREAM) {
 
-  # Fetch y_norm, sigma2 and delta
-  y_norm <- get_y(fit, original = FALSE)
+  # Fetch sigma2, delta and normalized y
+  y <- get_y(fit, original = FALSE)
   d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
   sigma2 <- as.vector(d_sigma^2)
   delta <- dollar(get_stan_input(fit), "delta")
@@ -77,57 +83,52 @@ fp_marginal <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   # Setup
   fp <- list()
   progbar <- verbose && S > 1
-  if (progbar) pb <- txtProgressBar()
+  pb <- progbar_setup(L = S)
+  hdr <- dollar(pb, "header")
+  idx_print <- dollar(pb, "idx_print")
   if (verbose) cat("Computing analytic function posteriors...\n")
+  if (progbar) cat(hdr)
 
   # Loop through parameter sets
   for (idx in seq_len(S)) {
 
-    # Perform computations for one parameter set and print progress
-    fp[[idx]] <- fp_marginal.compute(
-      K[idx, , , ], Ks[idx, , , ], Kss[idx, , , ], sigma2[idx], delta, y_norm
-    )
-    if (progbar) setTxtProgressBar(pb, idx)
+    # Perform computations for one parameter set
+    K_i <- K[idx, , , ]
+    Ks_i <- Ks[idx, , , ]
+    Kss_i <- Kss[idx, , , ]
+    fp_i <- fp_marginal.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
+
+    # Format as data.frame and update progress
+    fp[[idx]] <- fp_marginal.format(fp_i, dollar(km, "comp_names"))
+    if (progbar) progbar_print(idx, idx_print)
   }
   if (progbar) cat("\n")
-
-  return(fp)
-
-  # Format components
-  # comp_names <- component_names(fit@model)
-  # mc <- dollar(ext, "f_comp_mean")
-  # sc <- dollar(ext, "f_comp_std")
-  # df_comp <- format_pred_comp(mc, sc, comp_names)
-
-  # Format total
-  # m <- dollar(ext, "f_mean")
-  # s <- dollar(ext, "f_std")
-  ## sigma <- as.vector(dollar(stan_data, "d_sigma"))
-  # df_total <- format_pred_total(m, s, sigma)
+  if (verbose) cat("\n")
 
   # Return
-  # new("FunctionPosterior",
-  #  components = df_comp,
-  #  total = df_total,
-  #  x = x,
-  #  model = fit@model
-  # )
+  new("FunctionPosterior",
+    f = fp,
+    x = x,
+    model = fit@model,
+    num_paramsets = length(fp),
+    sigma2 = sigma2
+  )
 }
 
 # Compute componentwise and total function posteriors
 fp_marginal.compute <- function(K, Ks, Kss, sigma2, delta, y) {
 
-  # Helper function
+  # Helper function for linear algebra
   gp_posterior_helper <- function(Ly, Ks, Kss_diag, v) {
     P <- length(Kss_diag)
     A <- t(forwardsolve(Ly, t(Ks)))
-    f_post <- matrix(0, 2, P)
-    f_post[1, ] <- A %*% v # mean
-    f_post[2, ] <- sqrt(Kss_diag - rowSums(A * A)) # sd
+    f_post <- matrix(0, P, 2)
+    f_post[, 1] <- A %*% v # mean
+    f_post[, 2] <- sqrt(Kss_diag - rowSums(A * A)) # sd
     return(f_post)
   }
 
-  # Another helper
+  # Function that sums along the first dimension of a 3D array
   matsum1 <- function(A) {
     J <- dim(A)[1]
     A_sum <- A[1, , ]
@@ -140,43 +141,47 @@ fp_marginal.compute <- function(K, Ks, Kss, sigma2, delta, y) {
   J <- dim(Ks)[1] # number of components
   P <- dim(Ks)[2] # number of output points
   N <- dim(Ks)[3] # number of data points
-  F_MU <- matrix(0, J + 1, P)
-  F_SD <- matrix(0, J + 1, P)
+  F_MU <- matrix(0, P, J + 1)
+  F_SD <- matrix(0, P, J + 1)
 
   # Compute Ky and Cholesky decompose it
   Ky <- matsum1(K) + (delta + sigma2) * diag(N)
   Ly <- t(chol(Ky))
   v <- forwardsolve(Ly, y)
 
-  # Component-wise means and stds
+  # Component-wise means and sds
   for (j in seq_len(J)) {
     fp_j <- gp_posterior_helper(Ly, Ks[j, , ], Kss_diag[j, ], v)
-    F_MU[j, ] <- fp_j[1, ]
-    F_SD[j, ] <- fp_j[2, ]
+    F_MU[, j] <- fp_j[, 1]
+    F_SD[, j] <- fp_j[, 2]
   }
 
-  # Total mean and std
+  # Total mean and sd
   Ks_sum <- matsum1(Ks)
   fp_sum <- gp_posterior_helper(Ly, Ks_sum, colSums(Kss_diag), v)
-  F_MU[J + 1, ] <- fp_sum[1, ]
-  F_SD[J + 1, ] <- fp_sum[2, ]
+  F_MU[, J + 1] <- fp_sum[, 1]
+  F_SD[, J + 1] <- fp_sum[, 2]
 
   # Return
   list(mean = F_MU, sd = F_SD)
 }
 
-forofroro <- function() {
-  paramset <- as.factor(rep(1:S, D * P))
-  component <- as.factor(rep(rep(comp_names, each = S), P))
-  eval_point <- as.factor(rep(1:P, each = D * S))
+# Format fp_marginal computation results as a data frame
+fp_marginal.format <- function(fp, comp_names) {
+  m <- dollar(fp, "mean") # dim = c(P, J+1)
+  s <- dollar(fp, "sd") # dim = c(P, J+1)
+  P <- dim(m)[1]
+  J <- dim(m)[2] - 1
+  comp_names <- c(comp_names, "f_sum")
+  component <- as.factor(rep(comp_names, each = P))
+  eval_point_idx <- as.factor(rep(1:P, times = J + 1))
   m <- as.vector(m)
   s <- as.vector(s)
   check_lengths(m, s)
-  check_lengths(m, paramset)
   check_lengths(m, component)
-  check_lengths(m, eval_point)
-  df <- data.frame(paramset, component, eval_point, m, s)
-  colnames(df) <- c("paramset", "component", "eval_point", "mean", "std")
+  check_lengths(m, eval_point_idx)
+  df <- data.frame(eval_point_idx, component, m, s)
+  colnames(df) <- c("eval_point_idx", "component", "mean", "sd")
   return(df)
 }
 
@@ -264,4 +269,30 @@ pred.latent_h <- function(fit, f, c_hat_pred, verbose) {
   f <- f + repvec(c_hat_pred, num_draws)
   h <- link_inv(f, get_obs_model(fit))
   return(h)
+}
+
+# Safeguard
+prevent_too_large_mats <- function(fit, x, reduce, draws, verbose, force) {
+  S <- determine_num_paramsets(fit, draws, reduce)
+  J <- length(component_names(fit@model))
+  N <- get_num_obs(fit)
+  P <- nrow(x)
+  msg <- paste0(
+    "Computations will require creating and handling ",
+    P, " x ", N, " matrices ", S, " x ", J + 1,
+    " times. \n"
+  )
+  P_LIMIT <- 6000
+  if (verbose) cat(msg)
+  if (P > P_LIMIT) {
+    if (!force) {
+      msg <- paste0(
+        msg, "Computations might take very long. Give a smaller number of ",
+        "output points (now ", P, "), or set force = TRUE if you are sure ",
+        "you want to do this."
+      )
+      stop(msg)
+    }
+  }
+  TRUE
 }

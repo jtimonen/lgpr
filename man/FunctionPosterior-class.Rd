@@ -25,17 +25,22 @@ An S4 class to represent posterior distributions of an additive marginal GP
 
 \describe{
 \item{\code{components}}{Data frame representing the posterior distribution of
-each model component (on normalized scale).}
-
-\item{\code{total}}{Data frame representing the posterior distribution of the sum of
-the components (on normalized scale).}
+each model component (on normalized scale) and the sum of
+the components (on normalized scale). Is a list with length equal to number
+of parameter sets.}
 
 \item{\code{x}}{The evaluation points (values of covariates) where the posteriors
-are evaluated.}
+have been evaluated. Original scale.}
 
 \item{\code{model}}{The \linkS4class{lgpmodel} for which these posteriors are
 computed. Contains important information about how to scale the total
 posterior from normalized scale to the original scale.}
+
+\item{\code{num_paramsets}}{Number of parameter sets for which the posterior has
+been computed.}
+
+\item{\code{sigma2}}{Vector of \eqn{\sigma^2} values (noise variance parameter),
+with length equal to \code{num_paramsets}.}
 }}
 
 \seealso{

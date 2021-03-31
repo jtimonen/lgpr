@@ -192,16 +192,16 @@ validate_lgpfit <- function(object) {
 #' @rdname validate
 validate_FunctionPosterior <- function(object) {
   errors <- c()
-  cn1 <- colnames(object@components)
-  cn2 <- colnames(object@total)
-  tgt1 <- c("paramset", "component", "eval_point", "mean", "std")
-  tgt2 <- c("paramset", "eval_point", "mean", "std", "sigma")
-
-  if (!all.equal(cn1, tgt1)) {
-    errors <- c(errors, "invalid components data frame!")
+  if (object@num_paramsets != length(object@f)) {
+    errors <- c(errors, "invalid length of f!")
   }
-  if (!all.equal(cn2, tgt2)) {
-    errors <- c(errors, "invalid total data frame!")
+  if (object@num_paramsets != length(object@sigma2)) {
+    errors <- c(errors, "invalid length of sigma2!")
+  }
+  cn <- colnames(object@f[[1]])
+  tgt <- c("eval_point_idx", "component", "mean", "sd")
+  if (!all.equal(cn, tgt)) {
+    errors <- c(errors, "invalid data frame in the FunctionPosterior object!")
   }
   return_true_or_errors(errors)
 }
@@ -374,23 +374,28 @@ lgpsim <- setClass("lgpsim",
 #' An S4 class to represent posterior distributions of an additive marginal GP
 #'
 #' @slot components Data frame representing the posterior distribution of
-#' each model component (on normalized scale).
-#' @slot total Data frame representing the posterior distribution of the sum of
-#' the components (on normalized scale).
+#' each model component (on normalized scale) and the sum of
+#' the components (on normalized scale). Is a list with length equal to number
+#' of parameter sets.
 #' @slot x The evaluation points (values of covariates) where the posteriors
-#' are evaluated.
+#' have been evaluated. Original scale.
 #' @slot model The \linkS4class{lgpmodel} for which these posteriors are
 #' computed. Contains important information about how to scale the total
 #' posterior from normalized scale to the original scale.
+#' @slot num_paramsets Number of parameter sets for which the posterior has
+#' been computed.
+#' @slot sigma2 Vector of \eqn{\sigma^2} values (noise variance parameter),
+#' with length equal to \code{num_paramsets}.
 #' @param object \linkS4class{FunctionPosterior} object for which to apply a
 #' class method.
 #' @seealso \linkS4class{FunctionDraws}
 FunctionPosterior <- setClass("FunctionPosterior",
   representation = representation(
-    components = "data.frame",
-    total = "data.frame",
+    f = "list",
     x = "data.frame",
-    model = "lgpmodel"
+    model = "lgpmodel",
+    num_paramsets = "integer",
+    sigma2 = "numeric"
   ),
   validity = validate_FunctionPosterior
 )
@@ -427,10 +432,12 @@ class_info <- function(class_name) {
 }
 
 # Class info for show methods of function posterior objects
-class_info_fp <- function(class_name, num_comps, D) {
+class_info_fp <- function(class_name, comp_names, D) {
+  num_comps <- length(comp_names)
+  comp_str <- paste(comp_names, collapse = ", ")
   desc <- class_info(class_name)
-  desc <- paste0(desc, "\n - ", num_comps, " components")
-  desc <- paste0(desc, "\n - ", D[1], " parameter sets")
+  desc <- paste0(desc, "\n - ", num_comps, " components: ", comp_str)
+  desc <- paste0(desc, "\n - ", D[1], " parameter set(s)")
   desc <- paste0(desc, "\n - ", D[2], " evaluation points")
   return(desc)
 }

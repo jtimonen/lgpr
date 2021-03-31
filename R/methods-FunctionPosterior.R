@@ -1,11 +1,9 @@
 #' @describeIn FunctionPosterior Print a summary about the object.
 setMethod("show", "FunctionPosterior", function(object) {
-  comps <- levels(dollar(object@components, "component"))
-  paramsets <- levels(dollar(object@total, "paramset"))
-  eval_points <- levels(dollar(object@total, "eval_point"))
-  num_comps <- length(comps)
-  DIMS <- c(length(paramsets), length(eval_points))
-  desc <- class_info_fp("FunctionPosterior", num_comps, DIMS)
+  comp_names <- component_names(object@model)
+  n_eval_points <- nrow(object@x)
+  DIMS <- c(object@num_paramsets, n_eval_points)
+  desc <- class_info_fp("FunctionPosterior", comp_names, DIMS)
   cat(desc)
 })
 

@@ -282,8 +282,8 @@ large_data_msg <- function(num_obs, threshold) {
   msg <- if (num_obs >= threshold) cat(msg)
 }
 
-# Print progress bar header
-progbar_header <- function(L) {
+# Create a progress bar header
+progbar_setup <- function(L) {
   str <- paste0(seq(10, 100, by = 10))
   a <- formatC(str, width = 3)
   str <- paste0("|  ", a, "%")
@@ -291,7 +291,7 @@ progbar_header <- function(L) {
   top <- paste0(top, "|")
   barlen <- nchar(top) - 1
   list(
-    header = top,
+    header = paste0(top, "\n"),
     idx_print = ceiling(seq(1, L, length.out = barlen))
   )
 }

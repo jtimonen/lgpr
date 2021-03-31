@@ -13,6 +13,7 @@ posterior_f(
   verbose = TRUE,
   debug_km = FALSE,
   debug_dims = FALSE,
+  force = FALSE,
   STREAM = get_stream()
 )
 }
@@ -43,6 +44,9 @@ Can be used for debugging or testing \code{\link{kernels_fpost}}.}
 
 \item{debug_dims}{Should this print dimensions of some variables.
 Can be used for debugging \code{\link{kernels_fpost}}.}
+
+\item{force}{This is by default \code{FALSE} to prevent unnecessarily
+large computations that might crash R or take forever.}
 
 \item{STREAM}{an external pointer}
 }
