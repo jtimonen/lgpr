@@ -41,13 +41,23 @@ test_that("posterior_f works (f marginalized)", {
 
   # Compute conditional function posteriors with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
-  p <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
-  expect_s4_class(p, "FunctionPosteriors")
+  fp <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
+  expect_s4_class(fp, "FunctionPosteriors")
+  expect_output(show(fp))
 
-  # Compute predictions with same x as in data
-  # p1 <- posterior_f(fit, DAT, verbose = FALSE)
-  # p2 <- posterior_f(fit, NULL, verbose = FALSE)
-  # expect_equal(p1, p2)
+  # Plotting
+  p1 <- plot(fp)
+  p2 <- plot(fp, group_by = "id", color_by = "sex")
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+
+  # Same thing but with reduce to mean and x_pred = NULL
+  fp <- posterior_f(fit, verbose = FALSE)
+  expect_s4_class(fp, "FunctionPosteriors")
+  p3 <- plot(fp, color_by = "sex")
+  p4 <- plot(fp, group_by = "id", color_by = "dis_age")
+  expect_s3_class(p3, "ggplot")
+  expect_s3_class(p4, "ggplot")
 })
 
 

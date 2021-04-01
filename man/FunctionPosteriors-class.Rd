@@ -5,14 +5,28 @@
 \alias{FunctionPosteriors-class}
 \alias{FunctionPosteriors}
 \alias{show,FunctionPosteriors-method}
+\alias{get_df,FunctionPosteriors-method}
+\alias{plot,FunctionPosteriors,missing-method}
 \title{An S4 class to represent conditional function posterior distributions of an
 additive marginal GP.}
 \usage{
 \S4method{show}{FunctionPosteriors}(object)
+
+\S4method{get_df}{FunctionPosteriors}(object, paramset = NULL, component = NULL, covariates = NULL)
+
+\S4method{plot}{FunctionPosteriors,missing}(x, y, ...)
 }
 \arguments{
 \item{object}{\linkS4class{FunctionPosteriors} object for which to apply a
 class method.}
+
+\item{paramset}{index of parameter set to pick (NULL = all)}
+
+\item{component}{name of component to pick (NULL = all)}
+
+\item{covariates}{covariates to include (NULL = none)}
+
+\item{x}{a \linkS4class{FunctionPosteriors} object to visualize}
 }
 \description{
 An S4 class to represent conditional function posterior distributions of an
@@ -21,15 +35,20 @@ additive marginal GP.
 \section{Methods (by generic)}{
 \itemize{
 \item \code{show}: Print a summary about the object.
+
+\item \code{get_df}: Access the main data frames.
+
+\item \code{plot}: Visualization of function posteriors.
+Optional arguments (\code{...}) are passed to \code{\link{plot_fpost}}.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{components}}{A list with length equal to \code{num_paramsets}.
-Each list element is a data frame representing a multivariate Gaussian
-distribution of each model component (on normalized scale) and the sum of
-the components (on normalized scale).}
+\item{\code{f}}{A data frame representing the conditional posterior (given different
+parameter vectors) distribution of each model component (on normalized scale) and
+the sum of the components (on normalized scale). Number of rows equals to
+\code{num_paramsets} x (\code{num_components+1}) x \code{nrow(x)}.}
 
 \item{\code{x}}{The evaluation points (values of covariates) where the posteriors
 have been evaluated. Original scale.}

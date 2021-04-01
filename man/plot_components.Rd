@@ -33,7 +33,7 @@ variables used as covariates in the model. This must be specified if
 \item{pred}{An object of class \linkS4class{FunctionPosterior} or
 \linkS4class{FunctionDraws}.}
 
-\item{group_by}{name of the grouping variable (use \code{group_by=NA}
+\item{group_by}{name of the grouping factor (use \code{group_by=NA}
 to avoid grouping)}
 
 \item{t_name}{name of the x-axis variable}

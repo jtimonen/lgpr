@@ -44,13 +44,13 @@ posterior_f <- function(fit,
   if (f_sampled) {
     out <- fp_latent(km, fit, x, reduce, draws, verbose, STREAM)
   } else {
-    out <- fp(km, fit, x, reduce, draws, verbose, STREAM)
+    out <- fp_gaussian(km, fit, x, reduce, draws, verbose, STREAM)
   }
   return(out)
 }
 
 # Analytic function posteriors
-fp <- function(km, fit, x, reduce, draws, verbose, STREAM) {
+fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
 
   # Fetch sigma2, delta and normalized y
   y <- get_y(fit, original = FALSE)
@@ -65,7 +65,7 @@ fp <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   S <- dim(Ks)[1] # number of parameter sets
 
   # Setup
-  fp <- list()
+  DF <- NULL
   progbar <- verbose && S > 1
   pb <- progbar_setup(L = S)
   hdr <- dollar(pb, "header")
@@ -80,27 +80,29 @@ fp <- function(km, fit, x, reduce, draws, verbose, STREAM) {
     K_i <- K[idx, , , ]
     Ks_i <- Ks[idx, , , ]
     Kss_i <- Kss[idx, , , ]
-    fp_i <- fp.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
+    fp_i <- fp_gaussian.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
 
     # Format as data.frame and update progress
-    fp[[idx]] <- fp.format(fp_i, dollar(km, "comp_names"))
+    fp_i <- fp_gaussian.format(fp_i, dollar(km, "comp_names"), idx)
+    DF <- rbind(DF, fp_i)
     if (progbar) progbar_print(idx, idx_print)
   }
   if (progbar) cat("\n")
+  colnames(DF) <- c("paramset", "eval_point_idx", "component", "mean", "sd")
   if (verbose) cat("\n")
 
   # Return
   new("FunctionPosteriors",
-    f = fp,
+    f = DF,
     x = x,
     model = fit@model,
-    num_paramsets = length(fp),
+    num_paramsets = S,
     sigma2 = sigma2
   )
 }
 
 # Compute componentwise and total function posteriors
-fp.compute <- function(K, Ks, Kss, sigma2, delta, y) {
+fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
 
   # Helper function for linear algebra
   gp_posterior_helper <- function(Ly, Ks, Kss_diag, v) {
@@ -150,8 +152,8 @@ fp.compute <- function(K, Ks, Kss, sigma2, delta, y) {
   list(mean = F_MU, sd = F_SD)
 }
 
-# Format fp_marginal computation results as a data frame
-fp.format <- function(fp, comp_names) {
+# Format fp computation result (for one parameter set) as a data frame
+fp_gaussian.format <- function(fp, comp_names, paramset_idx) {
   m <- dollar(fp, "mean") # shape (P, J+1)
   s <- dollar(fp, "sd") # shape (P, J+1)
   P <- dim(m)[1]
@@ -164,8 +166,8 @@ fp.format <- function(fp, comp_names) {
   check_lengths(m, s)
   check_lengths(m, component)
   check_lengths(m, eval_point_idx)
-  df <- data.frame(eval_point_idx, component, m, s)
-  colnames(df) <- c("eval_point_idx", "component", "mean", "sd")
+  paramset <- as.factor(rep(paramset_idx, length(m)))
+  df <- data.frame(paramset, eval_point_idx, component, m, s)
   return(df)
 }
 

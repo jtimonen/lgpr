@@ -190,6 +190,11 @@ get_num_obs <- function(object) {
   dollar(get_stan_input(object), "num_obs")
 }
 
+# Get number of components
+get_num_comps <- function(object) {
+  dollar(get_stan_input(object), "num_comps")
+}
+
 # Determine if f is sampled
 is_f_sampled <- function(object) {
   object <- object_to_model(object)

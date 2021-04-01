@@ -145,9 +145,8 @@ matrix_to_list <- function(x) {
 # @param times number of times to repeat
 # @return a data frame
 rep_df <- function(df, times) {
-  out <- c()
-  for (j in seq_len(times)) out <- rbind(out, df)
-  return(out)
+  row_inds <- rep(seq_len(nrow(df)), times)
+  df[row_inds, , drop = FALSE]
 }
 
 # Data frame and additional information to long format

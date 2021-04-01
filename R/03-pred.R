@@ -26,9 +26,8 @@ pred <- function(fit, x, c_hat_pred = NULL,
                  verbose = TRUE, STREAM = get_stream(), ...) {
   check_type(x, "data.frame")
   f_sampled <- is_f_sampled(fit)
-
   if (class(fit) == "lgpfit") {
-    fp <- posterior_f(fit, x, c_hat_pred, reduce, draws, verbose, STREAM, ...)
+    fp <- posterior_f(fit, x, reduce, draws, verbose, STREAM, ...)
     return(fp)
   }
   return("not implemented!")

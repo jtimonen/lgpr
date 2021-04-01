@@ -192,14 +192,11 @@ validate_lgpfit <- function(object) {
 #' @rdname validate
 validate_FunctionPosteriors <- function(object) {
   errors <- c()
-  if (object@num_paramsets != length(object@f)) {
-    errors <- c(errors, "invalid length of f!")
-  }
   if (object@num_paramsets != length(object@sigma2)) {
     errors <- c(errors, "invalid length of sigma2!")
   }
-  cn <- colnames(object@f[[1]])
-  tgt <- c("eval_point_idx", "component", "mean", "sd")
+  cn <- colnames(object@f)
+  tgt <- c("paramset", "eval_point_idx", "component", "mean", "sd")
   if (!all.equal(cn, tgt)) {
     errors <- c(errors, "invalid data frame in the FunctionPosteriors object!")
   }
@@ -374,10 +371,10 @@ lgpsim <- setClass("lgpsim",
 #' An S4 class to represent conditional function posterior distributions of an
 #' additive marginal GP.
 #'
-#' @slot components A list with length equal to \code{num_paramsets}.
-#' Each list element is a data frame representing a multivariate Gaussian
-#' distribution of each model component (on normalized scale) and the sum of
-#' the components (on normalized scale).
+#' @slot f A data frame representing the conditional posterior (given different
+#' parameter vectors) distribution of each model component (on normalized scale) and
+#' the sum of the components (on normalized scale). Number of rows equals to
+#' \code{num_paramsets} x (\code{num_components+1}) x \code{nrow(x)}.
 #' @slot x The evaluation points (values of covariates) where the posteriors
 #' have been evaluated. Original scale.
 #' @slot model The \linkS4class{lgpmodel} for which these posteriors are
@@ -392,7 +389,7 @@ lgpsim <- setClass("lgpsim",
 #' @seealso \linkS4class{FunctionDraws}
 FunctionPosteriors <- setClass("FunctionPosteriors",
   representation = representation(
-    f = "list",
+    f = "data.frame",
     x = "data.frame",
     model = "lgpmodel",
     num_paramsets = "integer",
@@ -464,4 +461,9 @@ setGeneric(
 setGeneric(
   "get_draws",
   function(object, draws = NULL, reduce = NULL, ...) standardGeneric("get_draws")
+)
+
+setGeneric(
+  "get_df",
+  function(object, ...) standardGeneric("get_df")
 )
