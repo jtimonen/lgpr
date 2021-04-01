@@ -18,21 +18,22 @@ kernels_fpost(
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} can help in creating it.}
+The function \code{\link{new_x}} provides an easy way to create it.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
-\code{NULL} (no reduction). Has no effect if \code{draws} is specified.}
+NULL (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more some informational messages be printed?}
+\item{verbose}{Should more information and a progress bar be printed?}
 
 \item{debug_dims}{Should this print dimensions of some variables.
 Can be used for debugging \code{\link{kernels_fpost}}.}
 
-\item{STREAM}{an external pointer}
+\item{STREAM}{External pointer. By default obtained with
+\code{\link[rstan]{get_stream}}.}
 }
 \description{
 Kernel matrices for function posterior computation

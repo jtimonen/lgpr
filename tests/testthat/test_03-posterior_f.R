@@ -39,17 +39,15 @@ test_that("posterior_f works (f marginalized)", {
     "variable 'dis_age' not found in <x>!"
   )
 
-  # Compute predictions with proper x
+  # Compute conditional function posteriors with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
   p <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
-  # expect_s4_class(p, "FunctionPosterior")
+  expect_s4_class(p, "FunctionPosteriors")
 
   # Compute predictions with same x as in data
   # p1 <- posterior_f(fit, DAT, verbose = FALSE)
   # p2 <- posterior_f(fit, NULL, verbose = FALSE)
   # expect_equal(p1, p2)
-
-  # TODO: make pred return (scaled!) y_pred and test it!!
 })
 
 

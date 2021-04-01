@@ -21,10 +21,15 @@ kernels_fpost <- function(fit,
   # Final parameter-dependent kernel matrices
   if (verbose) cat("Creating final kernel matrices (data vs. data)...\n")
   K <- kernel_all(input, K_const, FALSE, FALSE, vrb, dd, STREAM)
-  if (verbose) cat("Creating final kernel matrices (out vs. data)...\n")
-  Ks <- kernel_all(input, Ks_const, TRUE, FALSE, vrb, dd, STREAM)
-  if (verbose) cat("Creating final kernel matrices (out vs. out)...\n")
-  Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
+  if (is.null(x)) {
+    Ks <- K
+    Kss <- K
+  } else {
+    if (verbose) cat("Creating final kernel matrices (out vs. data)...\n")
+    Ks <- kernel_all(input, Ks_const, TRUE, FALSE, vrb, dd, STREAM)
+    if (verbose) cat("Creating final kernel matrices (out vs. out)...\n")
+    Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
+  }
 
   # Return matrices
   comp_names <- component_names(fit@model)
@@ -107,6 +112,11 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   }
 
   # Loop through parameter sets
+  progbar <- verbose && S > 1
+  pb <- progbar_setup(S)
+  idx_print <- dollar(pb, "idx_print")
+  if (progbar) cat(dollar(pb, "header"))
+
   for (idx in seq_len(S)) {
 
     # Get parameters in correct format
@@ -124,9 +134,11 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
       vm_params, idx1_expand, idx2_expand, teff_zero, STREAM
     )
 
-    # Store result
+    # Store result and update progress
     for (j in seq_len(J)) K_out[idx, j, , ] <- K_idx[[j]]
+    if (progbar) progbar_print(idx, idx_print)
   }
+  if (progbar) cat("\n")
   return(K_out)
 }
 
@@ -146,8 +158,6 @@ kernels_fpost.create_input <- function(fit,
 fp_input_x <- function(fit, x) {
   si <- get_stan_input(fit)
   if (is.null(x)) {
-    # This is just for debugging
-    warning("<x> is null in fp_input_x, this is meant just for debugging!")
     out <- list(
       num_OUT = dollar(si, "num_obs"),
       x_cont_OUT = dollar(si, "x_cont"),

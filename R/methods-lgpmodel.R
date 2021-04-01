@@ -162,7 +162,7 @@ get_stan_model <- function(object) {
   if (is_f_sampled(model)) {
     model_name <- "lgp_latent"
   } else {
-    model_name <- "lgp_marginal"
+    model_name <- "lgp"
   }
   stanmodels[[model_name]] # global variable (list of all pkg models)
 }

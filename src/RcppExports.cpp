@@ -208,8 +208,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_mod();
-RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_marginal_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_warp_input", (DL_FUNC) &_lgpr_STAN_warp_input, 3},
@@ -225,8 +225,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_kernel_varmask", (DL_FUNC) &_lgpr_STAN_kernel_varmask, 5},
     {"_lgpr_STAN_kernel_beta", (DL_FUNC) &_lgpr_STAN_kernel_beta, 4},
     {"_lgpr_STAN_kernel_all", (DL_FUNC) &_lgpr_STAN_kernel_all, 18},
+    {"_rcpp_module_boot_stan_fit4lgp_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},
-    {"_rcpp_module_boot_stan_fit4lgp_marginal_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_marginal_mod, 0},
     {NULL, NULL, 0}
 };
 

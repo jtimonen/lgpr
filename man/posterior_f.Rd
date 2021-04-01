@@ -7,37 +7,32 @@
 posterior_f(
   fit,
   x = NULL,
-  c_hat_pred = NULL,
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
+  STREAM = get_stream(),
   debug_km = FALSE,
   debug_dims = FALSE,
-  force = FALSE,
-  STREAM = get_stream()
+  force = FALSE
 )
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} can help in creating it.}
-
-\item{c_hat_pred}{This is only used if the latent signal \code{f} was
-sampled. This input contains the values added to the sum \code{f} before
-passing through inverse link function. Must be a vector with length equal to
-the number of prediction points. If original \code{c_hat} was constant,
-then \code{c_hat_pred} can be ignored, in which case this will by default
-use the same constant.}
+The function \code{\link{new_x}} provides an easy way to create it.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
-\code{NULL} (no reduction). Has no effect if \code{draws} is specified.}
+NULL (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more some informational messages be printed?}
+\item{verbose}{Should more information and a progress bar be printed?}
+
+\item{STREAM}{External pointer. By default obtained with
+\code{\link[rstan]{get_stream}}.}
 
 \item{debug_km}{Should this only return the required kernel matrices.
 Can be used for debugging or testing \code{\link{kernels_fpost}}.}
@@ -47,11 +42,9 @@ Can be used for debugging \code{\link{kernels_fpost}}.}
 
 \item{force}{This is by default \code{FALSE} to prevent unnecessarily
 large computations that might crash R or take forever.}
-
-\item{STREAM}{an external pointer}
 }
 \value{
-An object of class \linkS4class{FunctionPosterior} or
+An object of class \linkS4class{FunctionPosteriors} or
 \linkS4class{FunctionDraws}.
 }
 \description{
