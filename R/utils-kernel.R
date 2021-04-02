@@ -99,7 +99,7 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   # Setup
   S <- dollar(input, "num_paramsets")
   J <- length(K_const) # number of components
-  K_out <- array(0, c(S, J, n1, n2))
+  K_out <- list()
 
   # Print dimensions
   if (debug_dims) {
@@ -127,7 +127,7 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
     teff_idx <- list(teff[idx, , ])
 
     # Compute kernels for each component
-    K_idx <- STAN_kernel_all(
+    K_out[[idx]] <- STAN_kernel_all(
       n1, n2, K_const, components,
       x1, x2, x1_unnorm, x2_unnorm,
       alpha_idx, ell_idx, wrp_idx, beta_idx, teff_idx,
@@ -135,7 +135,6 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
     )
 
     # Store result and update progress
-    for (j in seq_len(J)) K_out[idx, j, , ] <- K_idx[[j]]
     if (progbar) progbar_print(idx, idx_print)
   }
   if (progbar) cat("\n")

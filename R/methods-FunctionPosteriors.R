@@ -78,32 +78,43 @@ setMethod(
 #' Visualize function posterior distributions
 #'
 #' @param fp An object of class \linkS4class{FunctionPosteriors}.
-#' @param paramset index of parameter set to pick (NULL = all, posterior
-#' mean and standard deviation will be averaged over all parameter sets)
+#' @param paramset index of parameter set to pick (NULL = all, but only
+#' posterior means will be plotted)
 #' @param component name of component to pick (NULL = all)
 #' @param t_name name of the x-axis variable
-#' @param group_by name of the grouping factor (use \code{group_by=NA}
+#' @param group_by name of the grouping factor (use \code{group_by=NULL}
 #' to avoid grouping)
-#' @param color_by name of coloring factor
+#' @param color_by name of coloring factor (use \code{color_by=NULL}
+#' to avoid coloring)
 #' @param MULT_STD a multiplier for standard deviation
+#' @param alpha line opacity
+#' @param alpha_err ribbon opacity
+#' @param no_err hide error bar even when it would normally be plotted?
+#' @param no_line hide line even when it would normally be plotted?
 #' @return a \code{\link[ggplot2]{ggplot}} object
+#' @param verbose Can this print any messages?
 #' @family main plot functions
 #' @name plot_pred
-plot_fpost <- function(fp, paramset = NULL, component = NULL,
+plot_fpost <- function(fp,
+                       paramset = NULL,
+                       component = NULL,
                        group_by = "id",
-                       color_by = NA,
-                       t_name = "age", MULT_STD) {
+                       color_by = NULL,
+                       t_name = "age",
+                       MULT_STD = 2.0,
+                       alpha_err = 0.2,
+                       alpha = 1.0,
+                       no_err = FALSE,
+                       no_line = FALSE,
+                       verbose = TRUE) {
 
   # Get data frame for ggplot
-  covariates <- if (is.na(group_by)) t_name else c(group_by, t_name)
-  if (!is.na(color_by)) {
-    covariates <- c(covariates, color_by)
-  }
+  covariates <- c(t_name, group_by, color_by)
   df <- get_df(fp, paramset, component, covariates)
 
   # Add possible factor crossing with paramset
   fac1 <- dollar(df, "paramset")
-  if (is.na(group_by)) {
+  if (is.null(group_by)) {
     df[["GGPLOT_GROUP"]] <- fac1
   } else {
     fac2 <- dollar(df, group_by)
@@ -111,16 +122,39 @@ plot_fpost <- function(fp, paramset = NULL, component = NULL,
   }
 
   # Create aesthetics and add possible coloring factor
-  aes <- ggplot2::aes_string(x = t_name, y = "mean", group = "GGPLOT_GROUP")
-  if (!is.na(color_by)) {
-    aes <- ggplot2::aes_string(
-      x = t_name, y = "mean", group = "GGPLOT_GROUP",
-      color = color_by
-    )
-  }
+  aes <- ggplot2::aes_string(
+    x = t_name, y = "mean", group = "GGPLOT_GROUP", color = color_by
+  )
 
-  # Create and return ggplot object
-  ggplot2::ggplot(df, aes) +
-    ggplot2::geom_line() +
+  # Create ggplot object
+  plt <- ggplot2::ggplot(df, aes) +
     ggplot2::facet_grid(. ~ component)
+  if (!no_err) {
+    S <- length(levels(dollar(df, "paramset")))
+    if (S == 1) {
+      aes_rib <- ggplot2::aes_string(
+        x = t_name,
+        ymin = paste0("mean - ", MULT_STD, " * sd"),
+        ymax = paste0("mean + ", MULT_STD, " * sd"),
+        group = group_by,
+        color = color_by,
+        fill = color_by
+      )
+      plt <- plt + ggplot2::geom_ribbon(
+        mapping = aes_rib,
+        alpha = alpha_err,
+        color = NA # no ribbon edge
+      )
+    } else {
+      msg <- paste0(
+        "Number of parameter sets > 1, so plotting only the ",
+        "conditional mean given each parameter set"
+      )
+      if (verbose) cat(msg, "\n")
+    }
+  }
+  if (!no_line) {
+    plt <- plt + ggplot2::geom_line(alpha = alpha)
+  }
+  return(plt)
 }

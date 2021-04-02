@@ -62,7 +62,7 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   K <- dollar(km, "K")
   Ks <- dollar(km, "Ks")
   Kss <- dollar(km, "Kss")
-  S <- dim(Ks)[1] # number of parameter sets
+  S <- length(Ks) # number of parameter sets
 
   # Setup
   DF <- NULL
@@ -77,9 +77,9 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   for (idx in seq_len(S)) {
 
     # Perform computations for one parameter set
-    K_i <- K[idx, , , ]
-    Ks_i <- Ks[idx, , , ]
-    Kss_i <- Kss[idx, , , ]
+    K_i <- K[[idx]]
+    Ks_i <- Ks[[idx]]
+    Kss_i <- Kss[[idx]]
     fp_i <- fp_gaussian.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
 
     # Format as data.frame and update progress
@@ -114,37 +114,38 @@ fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
     return(f_post)
   }
 
-  # Function that sums along the first dimension of a 3D array
-  matsum1 <- function(A) {
-    J <- dim(A)[1]
-    A_sum <- A[1, , ]
-    for (j in 2:J) A_sum <- A_sum + A[j, , ]
-    return(A_sum)
+  # Function that sums along a list
+  listsum <- function(A) {
+    out <- A[[1]]
+    J <- length(A)
+    if (J > 1) {
+      for (j in 2:length(A)) out <- out + A[[j]]
+    }
+    return(out)
   }
-  Kss_diag <- t(apply(Kss, 1, diag)) # has the diagonals as rows
+  Kss_diag <- lapply(Kss, diag) # has the diagonals as elements now
 
   # Setup output arrays
-  J <- dim(Ks)[1] # number of components
-  P <- dim(Ks)[2] # number of output points
-  N <- dim(Ks)[3] # number of data points
+  J <- length(Ks) # number of components
+  P <- dim(Ks[[1]])[1] # number of output points
+  N <- dim(Ks[[1]])[2] # number of data points
   F_MU <- matrix(0, P, J + 1)
   F_SD <- matrix(0, P, J + 1)
 
   # Compute Ky and Cholesky decompose it
-  Ky <- matsum1(K) + (delta + sigma2) * diag(N)
+  Ky <- listsum(K) + (delta + sigma2) * diag(N)
   Ly <- t(chol(Ky))
   v <- forwardsolve(Ly, y)
 
   # Component-wise means and sds
   for (j in seq_len(J)) {
-    fp_j <- gp_posterior_helper(Ly, Ks[j, , ], Kss_diag[j, ], v)
+    fp_j <- gp_posterior_helper(Ly, Ks[[j]], Kss_diag[[j]], v)
     F_MU[, j] <- fp_j[, 1]
     F_SD[, j] <- fp_j[, 2]
   }
 
   # Total mean and sd
-  Ks_sum <- matsum1(Ks)
-  fp_sum <- gp_posterior_helper(Ly, Ks_sum, colSums(Kss_diag), v)
+  fp_sum <- gp_posterior_helper(Ly, listsum(Ks), listsum(Kss_diag), v)
   F_MU[, J + 1] <- fp_sum[, 1]
   F_SD[, J + 1] <- fp_sum[, 2]
 

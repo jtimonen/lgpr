@@ -20,7 +20,7 @@ variables used as covariates in the model. This must be specified if
 
 \item{reduce}{only has effect if \code{pred} is \code{NULL}}
 
-\item{group_by}{name of the grouping factor (use \code{group_by=NA}
+\item{group_by}{name of the grouping factor (use \code{group_by=NULL}
 to avoid grouping)}
 
 \item{t_name}{name of the x-axis variable}

@@ -38,9 +38,14 @@ plot_fpost(
   paramset = NULL,
   component = NULL,
   group_by = "id",
-  color_by = NA,
+  color_by = NULL,
   t_name = "age",
-  MULT_STD
+  MULT_STD = 2,
+  alpha_err = 0.2,
+  alpha = 1,
+  no_err = FALSE,
+  no_line = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -53,7 +58,7 @@ variables used as covariates in the model. This must be specified if
 \item{pred}{An object of class \linkS4class{FunctionPosterior} or
 \linkS4class{FunctionDraws}.}
 
-\item{group_by}{name of the grouping factor (use \code{group_by=NA}
+\item{group_by}{name of the grouping factor (use \code{group_by=NULL}
 to avoid grouping)}
 
 \item{t_name}{name of the x-axis variable}
@@ -70,14 +75,25 @@ to avoid grouping)}
 \item{comp_idx}{Index of component to plot. The total sum is plotted
 if this is \code{NULL}.}
 
-\item{color_by}{name of coloring factor}
+\item{color_by}{name of coloring factor (use \code{color_by=NULL}
+to avoid coloring)}
 
 \item{fp}{An object of class \linkS4class{FunctionPosteriors}.}
 
-\item{paramset}{index of parameter set to pick (NULL = all, posterior
-mean and standard deviation will be averaged over all parameter sets)}
+\item{paramset}{index of parameter set to pick (NULL = all, but only
+posterior means will be plotted)}
 
 \item{component}{name of component to pick (NULL = all)}
+
+\item{alpha_err}{ribbon opacity}
+
+\item{alpha}{line opacity}
+
+\item{no_err}{hide error bar even when it would normally be plotted?}
+
+\item{no_line}{hide line even when it would normally be plotted?}
+
+\item{verbose}{Can this print any messages?}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object

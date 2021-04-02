@@ -46,8 +46,8 @@ test_that("posterior_f works (f marginalized)", {
   expect_output(show(fp))
 
   # Plotting
-  p1 <- plot(fp)
-  p2 <- plot(fp, group_by = "id", color_by = "sex")
+  p1 <- plot(fp, verbose = FALSE)
+  p2 <- plot(fp, group_by = "id", color_by = "sex", verbose = FALSE)
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
 

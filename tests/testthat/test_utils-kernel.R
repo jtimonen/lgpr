@@ -19,9 +19,10 @@ test_that("matrices have correct shape when model has multiple components", {
 
   # No new x input and no reduce
   mats <- posterior_f(fit, reduce = NULL, debug_km = TRUE, verbose = FALSE)
-  expect_equal(dim(mats$K), c(S, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Ks), c(S, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Kss), c(S, J, N_OBS, N_OBS))
+  expect_equal(length(mats$K), S)
+  tmp <- mats$Ks[[1]]
+  expect_equal(dim(tmp[[1]]), c(N_OBS, N_OBS))
+  expect_equal(length(mats$Kss[[1]]), J)
 
   # With new x input and no reduce
   x_out <- new_x(fit@model@data, x_values = seq(0, 100, by = 2.5))
@@ -30,15 +31,17 @@ test_that("matrices have correct shape when model has multiple components", {
     x = x_out, reduce = NULL, draws = c(1, 3, 5),
     debug_km = TRUE, verbose = FALSE
   )
-  expect_equal(dim(mats$K), c(3, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Ks), c(3, J, N_OUT, N_OBS))
-  expect_equal(dim(mats$Kss), c(3, J, N_OUT, N_OUT))
+  expect_equal(length(mats$K), 3)
+  tmp <- mats$Ks[[1]]
+  expect_equal(dim(tmp[[1]]), c(N_OUT, N_OBS))
+  expect_equal(length(mats$Kss[[1]]), J)
 
   # With new x input and reduce (mean params)
   mats <- posterior_f(fit, x = x_out, debug_km = TRUE, verbose = FALSE)
-  expect_equal(dim(mats$K), c(1, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Ks), c(1, J, N_OUT, N_OBS))
-  expect_equal(dim(mats$Kss), c(1, J, N_OUT, N_OUT))
+  expect_equal(length(mats$K), 1)
+  tmp <- mats$Ks[[1]]
+  expect_equal(dim(tmp[[1]]), c(N_OUT, N_OBS))
+  expect_equal(length(mats$Kss[[1]]), J)
 
   # Expect output in debug mode
   expect_output(
@@ -62,9 +65,10 @@ test_that("matrices have correct shape when model has only one component", {
 
   # No new x input and no reduce
   mats <- posterior_f(fit, reduce = NULL, debug_km = TRUE, verbose = FALSE)
-  expect_equal(dim(mats$K), c(S, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Ks), c(S, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Kss), c(S, J, N_OBS, N_OBS))
+  expect_equal(length(mats$K), S)
+  tmp <- mats$Ks[[1]]
+  expect_equal(dim(tmp[[1]]), c(N_OBS, N_OBS))
+  expect_equal(length(mats$Kss[[1]]), J)
 
   # With new x (only one point) input and no reduce
   x_out <- new_x(fit@model@data, x_values = 3.2)
@@ -73,15 +77,21 @@ test_that("matrices have correct shape when model has only one component", {
     x = x_out, reduce = NULL, draws = c(1, 3, 5),
     debug_km = TRUE, verbose = FALSE
   )
-  expect_equal(dim(mats$K), c(3, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Ks), c(3, J, N_OUT, N_OBS))
-  expect_equal(dim(mats$Kss), c(3, J, N_OUT, N_OUT))
+  expect_equal(length(mats$K), 3)
+  s_idx <- 2
+  j_idx <- sample.int(n = J, size = 1)
+  tmp <- mats$Ks[[s_idx]]
+  expect_equal(dim(tmp[[j_idx]]), c(N_OUT, N_OBS))
+  expect_equal(length(mats$Kss[[s_idx]]), J)
 
   # With new x input and reduce
   x_out <- new_x(fit@model@data, x_values = c(4.5, 7.7, 90.9))
   N_OUT <- nrow(x_out)
   mats <- posterior_f(fit, x = x_out, debug_km = TRUE, verbose = FALSE)
-  expect_equal(dim(mats$K), c(1, J, N_OBS, N_OBS))
-  expect_equal(dim(mats$Ks), c(1, J, N_OUT, N_OBS))
-  expect_equal(dim(mats$Kss), c(1, J, N_OUT, N_OUT))
+  expect_equal(length(mats$K), 1)
+  s_idx <- 1
+  j_idx <- sample.int(n = J, size = 1)
+  tmp <- mats$Ks[[s_idx]]
+  expect_equal(dim(tmp[[j_idx]]), c(N_OUT, N_OBS))
+  expect_equal(length(mats$Kss[[s_idx]]), J)
 })

@@ -16,7 +16,8 @@ plot_f.get_color_fac(fit, pred, x, color_by)
 variables used as covariates in the model. This must be specified if
 \code{pred} is not \code{NULL}.}
 
-\item{color_by}{name of coloring factor}
+\item{color_by}{name of coloring factor (use \code{color_by=NULL}
+to avoid coloring)}
 }
 \value{
 a factor
