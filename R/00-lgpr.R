@@ -283,7 +283,7 @@ lgpscaling <- setClass("lgpscaling",
   validity = validate_lgpscaling
 )
 
-#' An S4 class to represent an lgp model
+#' An S4 class to represent an additive GP model
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot data The original unmodified data.
@@ -368,8 +368,8 @@ lgpsim <- setClass("lgpsim",
   )
 )
 
-#' An S4 class to represent conditional function posterior distributions of an
-#' additive marginal GP.
+#' An S4 class to represent analytic conditional function posterior
+#' distributions of an additive GP
 #'
 #' @slot f A data frame representing the conditional posterior (given different
 #' parameter vectors) distribution of each model component (on normalized scale) and
@@ -386,6 +386,7 @@ lgpsim <- setClass("lgpsim",
 #' with length equal to \code{num_paramsets}.
 #' @param object \linkS4class{FunctionPosteriors} object for which to apply a
 #' class method.
+#' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{FunctionDraws}
 FunctionPosteriors <- setClass("FunctionPosteriors",
   representation = representation(

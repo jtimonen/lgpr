@@ -7,8 +7,8 @@
 \alias{show,FunctionPosteriors-method}
 \alias{get_df,FunctionPosteriors-method}
 \alias{plot,FunctionPosteriors,missing-method}
-\title{An S4 class to represent conditional function posterior distributions of an
-additive marginal GP.}
+\title{An S4 class to represent analytic conditional function posterior
+distributions of an additive GP}
 \usage{
 \S4method{show}{FunctionPosteriors}(object)
 
@@ -27,10 +27,14 @@ class method.}
 \item{covariates}{covariates to include (NULL = none)}
 
 \item{x}{a \linkS4class{FunctionPosteriors} object to visualize}
+
+\item{y}{unused argument}
+
+\item{...}{optional arguments passed to a subroutine}
 }
 \description{
-An S4 class to represent conditional function posterior distributions of an
-additive marginal GP.
+An S4 class to represent analytic conditional function posterior
+distributions of an additive GP
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -39,7 +43,8 @@ additive marginal GP.
 \item \code{get_df}: Access the main data frames.
 
 \item \code{plot}: Visualization of function posteriors.
-Optional arguments (\code{...}) are passed to \code{\link{plot_fpost}}.
+Optional arguments (\code{...}) are passed to
+\code{\link{plot_FunctionPosteriors}}.
 }}
 
 \section{Slots}{

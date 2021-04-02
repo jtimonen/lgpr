@@ -13,7 +13,7 @@ plot_pred.create.df_ribbon(fit, pred, df_base, MULT_STD)
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{pred}{An object of class \linkS4class{FunctionPosterior} or
+\item{pred}{An object of class \linkS4class{FunctionPosteriors} or
 \linkS4class{FunctionDraws}.}
 
 \item{df_base}{a data frame with two columns}

@@ -9,7 +9,7 @@ plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{pred}{An object of class \linkS4class{FunctionPosterior} or
+\item{pred}{An object of class \linkS4class{FunctionPosteriors} or
 \linkS4class{FunctionDraws}.}
 
 \item{x}{A data frame of prediction points, containing at least the
@@ -20,7 +20,7 @@ variables used as covariates in the model. This must be specified if
 
 \item{reduce}{only has effect if \code{pred} is \code{NULL}}
 
-\item{group_by}{name of the grouping factor (use \code{group_by=NULL}
+\item{group_by}{name of the grouping variable (use \code{group_by=NA}
 to avoid grouping)}
 
 \item{t_name}{name of the x-axis variable}

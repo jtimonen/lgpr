@@ -9,7 +9,7 @@
 \alias{component_info,lgpmodel-method}
 \alias{covariate_info,lgpmodel-method}
 \alias{component_names,lgpmodel-method}
-\title{An S4 class to represent an lgp model}
+\title{An S4 class to represent an additive GP model}
 \usage{
 \S4method{show}{lgpmodel}(object)
 
@@ -28,7 +28,7 @@ method.}
 \item{digits}{number of digits to show for floating point numbers}
 }
 \description{
-An S4 class to represent an lgp model
+An S4 class to represent an additive GP model
 }
 \section{Methods (by generic)}{
 \itemize{

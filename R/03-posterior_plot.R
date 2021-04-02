@@ -12,7 +12,7 @@
 #' @param x A data frame of prediction points, containing at least the
 #' variables used as covariates in the model. This must be specified if
 #' \code{pred} is not \code{NULL}.
-#' @param pred An object of class \linkS4class{FunctionPosterior} or
+#' @param pred An object of class \linkS4class{FunctionPosteriors} or
 #' \linkS4class{FunctionDraws}.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable (use \code{group_by=NA}

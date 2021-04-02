@@ -9,15 +9,14 @@ plot_f.get_color_fac(fit, pred, x, color_by)
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{pred}{An object of class \linkS4class{FunctionPosterior} or
+\item{pred}{An object of class \linkS4class{FunctionPosteriors} or
 \linkS4class{FunctionDraws}.}
 
 \item{x}{A data frame of prediction points, containing at least the
 variables used as covariates in the model. This must be specified if
 \code{pred} is not \code{NULL}.}
 
-\item{color_by}{name of coloring factor (use \code{color_by=NULL}
-to avoid coloring)}
+\item{color_by}{name of coloring factor}
 }
 \value{
 a factor

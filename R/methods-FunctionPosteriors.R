@@ -65,13 +65,15 @@ setMethod(
 )
 
 #' @describeIn FunctionPosteriors Visualization of function posteriors.
-#' Optional arguments (\code{...}) are passed to \code{\link{plot_fpost}}.
+#' Optional arguments (\code{...}) are passed to
+#' \code{\link{plot_FunctionPosteriors}}.
 #' @param x a \linkS4class{FunctionPosteriors} object to visualize
+#' @param y unused argument
 setMethod(
   "plot",
   signature = c("FunctionPosteriors", "missing"),
   function(x, y, ...) {
-    plot_fpost(x, ...)
+    plot_FunctionPosteriors(x, ...)
   }
 )
 
@@ -93,20 +95,18 @@ setMethod(
 #' @param no_line hide line even when it would normally be plotted?
 #' @return a \code{\link[ggplot2]{ggplot}} object
 #' @param verbose Can this print any messages?
-#' @family main plot functions
-#' @name plot_pred
-plot_fpost <- function(fp,
-                       paramset = NULL,
-                       component = NULL,
-                       group_by = "id",
-                       color_by = NULL,
-                       t_name = "age",
-                       MULT_STD = 2.0,
-                       alpha_err = 0.2,
-                       alpha = 1.0,
-                       no_err = FALSE,
-                       no_line = FALSE,
-                       verbose = TRUE) {
+plot_FunctionPosteriors <- function(fp,
+                                    paramset = NULL,
+                                    component = NULL,
+                                    group_by = "id",
+                                    color_by = NULL,
+                                    t_name = "age",
+                                    MULT_STD = 2.0,
+                                    alpha_err = 0.2,
+                                    alpha = 1.0,
+                                    no_err = FALSE,
+                                    no_line = FALSE,
+                                    verbose = TRUE) {
 
   # Get data frame for ggplot
   covariates <- c(t_name, group_by, color_by)

@@ -4,7 +4,7 @@ source("helpers/SW.R")
 
 # -------------------------------------------------------------------------
 
-context("Computing analytical posterior distribution of f")
+context("Computing and plotting analytical posterior distributions of f")
 
 N_ITER <- 20
 N_CHAINS <- 1
@@ -17,7 +17,7 @@ my_prior <- list(effect_time_info = list(
   zero = 0
 ))
 
-test_that("posterior_f works (f marginalized)", {
+test_that("posterior_f and FunctionPosteriors class work", {
 
 
   # Fit a model
@@ -55,7 +55,7 @@ test_that("posterior_f works (f marginalized)", {
   fp <- posterior_f(fit, verbose = FALSE)
   expect_s4_class(fp, "FunctionPosteriors")
   p3 <- plot(fp, color_by = "sex")
-  p4 <- plot(fp, group_by = "id", color_by = "dis_age")
+  p4 <- plot(fp, group_by = "id", color_by = "dis_age", verbose = FALSE)
   expect_s3_class(p3, "ggplot")
   expect_s3_class(p4, "ggplot")
 })
