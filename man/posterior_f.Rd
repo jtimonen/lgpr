@@ -19,8 +19,10 @@ posterior_f(
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} provides an easy way to create it.}
+\item{x}{A data frame of points where function posterior distributions
+and predictions should be computed or sampled.
+The function \code{\link{new_x}} provides an easy way to create it.
+If this is NULL, the data points are used.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
@@ -29,7 +31,8 @@ NULL (no reduction). Has no effect if \code{draws} is specified.}
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more information and a progress bar be printed?}
+\item{verbose}{Should more information and a possible progress bar be
+printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}
@@ -44,8 +47,7 @@ Can be used for debugging \code{\link{kernels_fpost}}.}
 large computations that might crash R or take forever.}
 }
 \value{
-An object of class \linkS4class{FunctionPosterior} or
-\linkS4class{FunctionDraws}.
+
 }
 \description{
 Evaluates (or extracts) the posterior distribution of the

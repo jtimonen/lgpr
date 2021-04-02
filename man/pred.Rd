@@ -2,31 +2,26 @@
 % Please edit documentation in R/03-pred.R
 \name{pred}
 \alias{pred}
-\title{Compute posterior predictive distribution or get draws from it}
+\title{Posterior predictions and function posteriors}
 \usage{
 pred(
   fit,
-  x,
-  c_hat_pred = NULL,
+  x = NULL,
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
   STREAM = get_stream(),
+  c_hat_pred = NULL,
   ...
 )
 }
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{x}{A data frame of points where the predictions are computed.
-The function \code{\link{new_x}} provides an easy way to create it.}
-
-\item{c_hat_pred}{This is only used if the latent signal \code{f} was
-sampled. This input contains the values added to the sum \code{f} before
-passing through inverse link function. Must be a vector with length equal to
-the number of prediction points. If original \code{c_hat} was constant,
-then \code{c_hat_pred} can be ignored, in which case this will by default
-use the same constant.}
+\item{x}{A data frame of points where function posterior distributions
+and predictions should be computed or sampled.
+The function \code{\link{new_x}} provides an easy way to create it.
+If this is NULL, the data points are used.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
@@ -35,17 +30,40 @@ NULL (no reduction). Has no effect if \code{draws} is specified.}
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
-\item{verbose}{Should more information and a progress bar be printed?}
+\item{verbose}{Should more information and a possible progress bar be
+printed?}
 
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}
 
-\item{...}{Other optional arguments passed to \code{\link{posterior_f}}.}
+\item{c_hat_pred}{This is only used if the latent signal \code{f} was
+sampled. This input contains the values added to the sum \code{f} before
+passing through inverse link function. Must be a vector with length equal to
+the number of prediction points. If original \code{c_hat} was constant,
+then \code{c_hat_pred} can be ignored, in which case this will by default
+use the same constant.}
+
+\item{...}{optional arguments passed to \code{\link{posterior_f}}}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or
 \linkS4class{Prediction}.
 }
 \description{
-Compute posterior predictive distribution or get draws from it
+\itemize{
+  \item If \code{fit} is for a model that marginalizes the latent
+  signal \code{f}, this computes the analytical conditional posterior
+  distributions of each model component, their sum, and the conditional
+  predictive distribution. All these are computed for
+  each (hyper)parameter draw (defined by \code{draws}), or other parameter
+  set (obtained by a reduction defined by \code{reduce}). Results are stored
+  in a \linkS4class{GaussianPrediction} object which is then returned.
+
+  \item If \code{fit} is for a model that samples the latent
+  signal components (and their sum \code{f}), this will in addition to
+  these function samples, compute versions of the sum \code{f} samples
+  which are transformed through the inverse link function.
+  These are stored in a \linkS4class{Prediction}
+  object which is then returned.
+}
 }

@@ -6,26 +6,21 @@
 \alias{GaussianPrediction}
 \alias{show,GaussianPrediction-method}
 \alias{plot,GaussianPrediction,missing-method}
-\title{An S4 class to represent analytic predictive distributions
-(multivariate Gaussians), conditional on model parameters}
+\title{An S4 class to represent analytically computed predictive distributions
+(conditional on hyperparameters) of an additive GP model}
 \usage{
 \S4method{show}{GaussianPrediction}(object)
 
 \S4method{plot}{GaussianPrediction,missing}(x, y, ...)
 }
 \arguments{
-\item{object}{\linkS4class{GaussianPrediction} object for which to apply a
-class method.}
-
 \item{x}{a \linkS4class{GaussianPrediction} object to visualize}
 
 \item{y}{unused argument}
-
-\item{...}{optional arguments passed to a subroutine}
 }
 \description{
-An S4 class to represent analytic predictive distributions
-(multivariate Gaussians), conditional on model parameters
+An S4 class to represent analytically computed predictive distributions
+(conditional on hyperparameters) of an additive GP model
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -33,15 +28,23 @@ An S4 class to represent analytic predictive distributions
 
 \item \code{plot}: Visualization.
 Optional arguments (\code{...}) are passed to
-\code{\link{plot_GaussianPrediction}}.
+\code{\link{plot_pred}}.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{f_post}}{An object of class \linkS4class{FunctionPosterior}.}
+\item{\code{f_comp_mean}}{component means}
 
-\item{\code{pred}}{A data frame.}
+\item{\code{f_comp_std}}{component standard deviations}
+
+\item{\code{f_mean}}{signal mean (on normalized scale)}
+
+\item{\code{f_std}}{signal standard deviation (on normalized scale)}
+
+\item{\code{y_mean}}{predictive mean (on original data scale)}
+
+\item{\code{y_std}}{predictive standard deviation (on original data scale)}
 }}
 
 \seealso{

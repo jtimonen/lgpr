@@ -335,11 +335,6 @@ plot_data <- function(data,
     f <- stats::as.formula(paste("~", facet_by))
     h <- h + ggplot2::facet_wrap(f, labeller = ggplot2::label_both)
   }
-  num_colors <- plot_data_num_colors(df, color_by)
-  if (num_colors <= 4) {
-    values <- color_palette(num_colors)
-    h <- h + ggplot2::scale_color_manual(values = values)
-  }
 
   return(h)
 }

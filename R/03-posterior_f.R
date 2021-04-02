@@ -6,7 +6,6 @@
 #' each parameter draw (defined by \code{draws}), or other parameter set
 #' (obtained by a reduction defined by \code{reduce}).
 #'
-#' @export
 #' @inheritParams pred
 #' @param debug_km Should this only return the required kernel matrices.
 #' Can be used for debugging or testing \code{\link{kernels_fpost}}.
@@ -14,8 +13,7 @@
 #' Can be used for debugging \code{\link{kernels_fpost}}.
 #' @param force This is by default \code{FALSE} to prevent unnecessarily
 #' large computations that might crash R or take forever.
-#' @return An object of class \linkS4class{FunctionPosterior} or
-#' \linkS4class{FunctionDraws}.
+#' @return
 posterior_f <- function(fit,
                         x = NULL,
                         reduce = function(x) base::mean(x),
@@ -92,13 +90,7 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   if (verbose) cat("\n")
 
   # Return
-  new("FunctionPosterior",
-    f = DF,
-    x = x,
-    model = fit@model,
-    num_paramsets = S,
-    sigma2 = sigma2
-  )
+  return(DF)
 }
 
 # Compute componentwise and total function posteriors

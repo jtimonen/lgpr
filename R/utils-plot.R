@@ -376,7 +376,6 @@ add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
 }
 
 
-
 #' Plot colors
 #'
 #' @param main Color name. Must be a valid scheme name for

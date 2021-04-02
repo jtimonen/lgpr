@@ -189,45 +189,8 @@ validate_lgpfit <- function(object) {
   return_true_or_errors(errors)
 }
 
-#' @rdname validate
-validate_FunctionPosterior <- function(object) {
-  errors <- c()
-  if (object@num_paramsets != length(object@sigma2)) {
-    errors <- c(errors, "invalid length of sigma2!")
-  }
-  cn <- colnames(object@f)
-  tgt <- c("paramset", "eval_point_idx", "component", "mean", "sd")
-  if (!all.equal(cn, tgt)) {
-    errors <- c(errors, "invalid data frame in the FunctionPosterior object!")
-  }
-  return_true_or_errors(errors)
-}
-
-#' @rdname validate
-validate_FunctionDraws <- function(object) {
-  errors <- c()
-  cn <- colnames(object@components)
-  tgt <- c("paramset", "component", "eval_point", "value")
-  if (!all.equal(cn, tgt)) {
-    errors <- c(errors, "invalid components data frame!")
-  }
-  return_true_or_errors(errors)
-}
-
 return_true_or_errors <- function(errors) {
   if (length(errors) > 0) errors else TRUE
-}
-
-#' @rdname validate
-validate_GaussianPrediction <- function(object) {
-  errors <- c()
-  return_true_or_errors(errors)
-}
-
-#' @rdname validate
-validate_Prediction <- function(object) {
-  errors <- c()
-  return_true_or_errors(errors)
 }
 
 #' An S4 class to represent an lgp expression
@@ -293,6 +256,45 @@ lgpscaling <- setClass("lgpscaling",
   prototype = prototype(loc = 1.0, scale = 1.0, var_name = "unknown"),
   validity = validate_lgpscaling
 )
+
+
+#' @rdname validate
+validate_GaussianPrediction <- function(object) {
+  errors <- c()
+  f_comp_mean <- object@f_comp_mean
+  f_comp_std <- object@f_comp_std
+  errors <- c(errors, validate_lengths(f_comp_mean, f_comp_std))
+  D1 <- dim(object@f_mean)
+  D2 <- dim(object@f_std)
+  D3 <- dim(object@y_mean)
+  D4 <- dim(object@y_std)
+  D <- list(D1, D2, D3, D4)
+  L <- length(f_comp_mean)
+  for (j in seq_len(L)) {
+    m <- object@f_comp_mean[[j]]
+    s <- object@f_comp_std[[j]]
+    D <- c(D, list(dim(m), dim(s)))
+  }
+  errors <- c(errors, validate_dimension_list(D))
+  out <- if (length(errors) > 0) errors else TRUE
+  return(out)
+}
+
+#' @rdname validate
+validate_Prediction <- function(object) {
+  L <- length(object@f_comp)
+  errors <- c()
+  D1 <- dim(object@f)
+  D2 <- dim(object@h)
+  D <- list(D1, D2)
+  for (j in seq_len(L)) {
+    fj <- object@f_comp[[j]]
+    D <- c(D, list(dim(fj)))
+  }
+  errors <- c(errors, validate_dimension_list(D))
+  out <- if (length(errors) > 0) errors else TRUE
+  return(out)
+}
 
 #' An S4 class to represent an additive GP model
 #'
@@ -379,89 +381,41 @@ lgpsim <- setClass("lgpsim",
   )
 )
 
-#' An S4 class to represent analytic function posterior
-#' distributions (multivariate Gaussians), conditional on model parameters
-#'
-#' @slot f A data frame representing the conditional posterior (given different
-#' parameter vectors) distribution of each model component (on normalized scale) and
-#' the sum of the components (on normalized scale). Number of rows equals to
-#' \code{num_paramsets} x (\code{num_components+1}) x \code{nrow(x)}.
-#' @slot x The evaluation points (values of covariates) where the posteriors
-#' have been evaluated. Original scale.
-#' @slot model The \linkS4class{lgpmodel} for which these posteriors are
-#' computed. Contains important information about how to scale the total
-#' posterior from normalized scale to the original scale.
-#' @slot num_paramsets Number of parameter sets for which the posteriors have
-#' been computed.
-#' @slot sigma2 Vector of \eqn{\sigma^2} values (noise variance parameter),
-#' with length equal to \code{num_paramsets}.
-#' @param object \linkS4class{FunctionPosterior} object for which to apply a
-#' class method.
-#' @param ... optional arguments passed to a subroutine
-#' @seealso \linkS4class{FunctionDraws}
-FunctionPosterior <- setClass("FunctionPosterior",
-  representation = representation(
-    f = "data.frame",
-    x = "data.frame",
-    model = "lgpmodel",
-    num_paramsets = "integer",
-    sigma2 = "numeric"
-  ),
-  validity = validate_FunctionPosterior
-)
 
-#' An S4 class to represent general additive function (component) draws
+#' An S4 class to represent analytically computed predictive distributions
+#' (conditional on hyperparameters) of an additive GP model
 #'
-#' @slot components Data frame representing the draws of each model component.
-#' @slot x The evaluation points (values of covariates) where the function
-#' draws are evaluated.
-#' @slot model The \linkS4class{lgpmodel} for which these draws are
-#' computed. Contains important information about how to transform the
-#' total draws through an inverse link function.
-#' @param object \linkS4class{FunctionDraws} object for which to apply a class
-#' method.
-#' @seealso \linkS4class{FunctionPosterior}
-FunctionDraws <- setClass("FunctionDraws",
-  representation = representation(
-    components = "data.frame",
-    x = "data.frame",
-    model = "lgpmodel"
-  ),
-  validity = validate_FunctionDraws
-)
-
-
-#' An S4 class to represent analytic predictive distributions
-#' (multivariate Gaussians), conditional on model parameters
-#'
-#' @slot f_post An object of class \linkS4class{FunctionPosterior}.
-#' @slot pred A data frame.
-#' @param object \linkS4class{GaussianPrediction} object for which to apply a
-#' class method.
-#' @param ... optional arguments passed to a subroutine
+#' @slot f_comp_mean component means
+#' @slot f_comp_std component standard deviations
+#' @slot f_mean signal mean (on normalized scale)
+#' @slot f_std signal standard deviation (on normalized scale)
+#' @slot y_mean predictive mean (on original data scale)
+#' @slot y_std predictive standard deviation (on original data scale)
 #' @seealso \linkS4class{Prediction}
 GaussianPrediction <- setClass("GaussianPrediction",
   representation = representation(
-    f_draws = "FunctionPosterior",
-    pred = "data.frame"
+    f_comp_mean = "list",
+    f_comp_std = "list",
+    f_mean = "matrix",
+    f_std = "matrix",
+    y_mean = "matrix",
+    y_std = "matrix"
   ),
   validity = validate_GaussianPrediction
 )
 
-
-#' An S4 class to represent draws from a general
-#' predictive distribution
+#' An S4 class to represent general additive model predictions
 #'
-#' @slot f_draws An object of class \linkS4class{FunctionDraws}.
-#' @slot pred A data frame.
-#' @param object \linkS4class{Prediction} object for which to apply a
-#' class method.
-#' @param ... optional arguments passed to a subroutine
+#' @slot f_comp component predictions
+#' @slot f signal prediction
+#' @slot h prediction (signal predictions transformed through inverse link
+#' function)
 #' @seealso \linkS4class{GaussianPrediction}
 Prediction <- setClass("Prediction",
   representation = representation(
-    f_draws = "FunctionDraws",
-    pred = "data.frame"
+    f_comp = "list",
+    f = "matrix",
+    h = "matrix"
   ),
   validity = validate_Prediction
 )
@@ -485,6 +439,37 @@ class_info_fp <- function(class_name, comp_names, D) {
   desc <- paste0(desc, "\n - ", D[1], " parameter set(s)")
   desc <- paste0(desc, "\n - ", D[2], " evaluation points")
   return(desc)
+}
+
+# Check that all listed dimensions are equal
+validate_dimension_list <- function(dims) {
+  errors <- c()
+  L <- length(dims)
+  d1 <- dims[[1]]
+  K <- length(d1)
+  for (j in seq_len(L)) {
+    dj <- dims[[j]]
+    for (k in seq_len(K)) {
+      if (dj[k] != d1[k]) {
+        msg <- paste0(k, "th dimensions of elements 1 and ", j, " differ!")
+        errors <- c(errors, msg)
+      }
+    }
+  }
+  return(errors)
+}
+
+
+# Check that arguments have equal lengths
+validate_lengths <- function(a, b) {
+  errors <- c()
+  L1 <- length(a)
+  L2 <- length(b)
+  if (L1 != L2) {
+    msg <- "lengths do not agree!"
+    errors <- c(errors, msg)
+  }
+  return(errors)
 }
 
 
@@ -520,9 +505,4 @@ setGeneric(
 setGeneric(
   "get_draws",
   function(object, draws = NULL, reduce = NULL, ...) standardGeneric("get_draws")
-)
-
-setGeneric(
-  "get_df",
-  function(object, ...) standardGeneric("get_df")
 )

@@ -4,22 +4,15 @@ setMethod("show", "GaussianPrediction", function(object) {
   cat(desc)
 })
 
-#' @describeIn GaussianPrediction  Visualization.
+#' @describeIn GaussianPrediction Visualization.
 #' Optional arguments (\code{...}) are passed to
-#' \code{\link{plot_GaussianPrediction}}.
+#' \code{\link{plot_pred}}.
 #' @param x a \linkS4class{GaussianPrediction} object to visualize
 #' @param y unused argument
 setMethod(
   "plot",
   signature = c("GaussianPrediction", "missing"),
   function(x, y, ...) {
-    plot_GaussianPrediction(x, ...)
+    plot_pred(pred = x, ...)
   }
 )
-
-#' Not implemented
-#'
-#' @param object object to plot
-plot_GaussianPrediction <- function(object) {
-  stop("not implemented")
-}

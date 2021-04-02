@@ -6,26 +6,19 @@
 \alias{Prediction}
 \alias{show,Prediction-method}
 \alias{plot,Prediction,missing-method}
-\title{An S4 class to represent draws from a general
-predictive distribution}
+\title{An S4 class to represent general additive model predictions}
 \usage{
 \S4method{show}{Prediction}(object)
 
 \S4method{plot}{Prediction,missing}(x, y, ...)
 }
 \arguments{
-\item{object}{\linkS4class{Prediction} object for which to apply a
-class method.}
-
 \item{x}{a \linkS4class{Prediction} object to visualize}
 
 \item{y}{unused argument}
-
-\item{...}{optional arguments passed to a subroutine}
 }
 \description{
-An S4 class to represent draws from a general
-predictive distribution
+An S4 class to represent general additive model predictions
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -33,15 +26,18 @@ predictive distribution
 
 \item \code{plot}: Visualization.
 Optional arguments (\code{...}) are passed to
-\code{\link{plot_Prediction}}.
+\code{\link{plot_pred}}.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{f_draws}}{An object of class \linkS4class{FunctionDraws}.}
+\item{\code{f_comp}}{component predictions}
 
-\item{\code{pred}}{A data frame.}
+\item{\code{f}}{signal prediction}
+
+\item{\code{h}}{prediction (signal predictions transformed through inverse link
+function)}
 }}
 
 \seealso{
