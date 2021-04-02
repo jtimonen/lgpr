@@ -1,42 +1,18 @@
-#' @describeIn FunctionPosteriors Print a summary about the object.
-setMethod("show", "FunctionPosteriors", function(object) {
+#' @describeIn FunctionPosterior Print a summary about the object.
+setMethod("show", "FunctionPosterior", function(object) {
   comp_names <- component_names(object@model)
   n_eval_points <- nrow(object@x)
   DIMS <- c(object@num_paramsets, n_eval_points)
-  desc <- class_info_fp("FunctionPosteriors", comp_names, DIMS)
+  desc <- class_info_fp("FunctionPosterior", comp_names, DIMS)
   cat(desc)
 })
 
-
-#' @describeIn FunctionDraws Print a summary about the object.
-setMethod("show", "FunctionDraws", function(object) {
-  df <- object@components
-  comps <- levels(dollar(df, "component"))
-  paramsets <- levels(dollar(df, "paramset"))
-  eval_points <- levels(dollar(df, "eval_point"))
-  num_comps <- length(comps)
-  DIMS <- c(length(paramsets), length(eval_points))
-  desc <- class_info_fp("FunctionDraws", num_comps, DIMS)
-  cat(desc)
-})
-
-# Class info for show methods of function posterior objects
-class_info_fp <- function(class_name, comp_names, D) {
-  num_comps <- length(comp_names)
-  comp_str <- paste(comp_names, collapse = ", ")
-  desc <- class_info(class_name)
-  desc <- paste0(desc, "\n - ", num_comps, " components: ", comp_str)
-  desc <- paste0(desc, "\n - ", D[1], " parameter set(s)")
-  desc <- paste0(desc, "\n - ", D[2], " evaluation points")
-  return(desc)
-}
-
-#' @describeIn FunctionPosteriors Access the main data frames.
+#' @describeIn FunctionPosterior Access the main data frames.
 #' @param paramset index of parameter set to pick (NULL = all)
 #' @param component name of component to pick (NULL = all)
 #' @param covariates covariates to include (NULL = none)
 setMethod(
-  "get_df", "FunctionPosteriors",
+  "get_df", "FunctionPosterior",
   function(object, paramset = NULL, component = NULL,
            covariates = NULL) {
     df <- object@f
@@ -64,22 +40,22 @@ setMethod(
   }
 )
 
-#' @describeIn FunctionPosteriors Visualization of function posteriors.
+#' @describeIn FunctionPosterior Visualization of function posteriors.
 #' Optional arguments (\code{...}) are passed to
-#' \code{\link{plot_FunctionPosteriors}}.
-#' @param x a \linkS4class{FunctionPosteriors} object to visualize
+#' \code{\link{plot_FunctionPosterior}}.
+#' @param x a \linkS4class{FunctionPosterior} object to visualize
 #' @param y unused argument
 setMethod(
   "plot",
-  signature = c("FunctionPosteriors", "missing"),
+  signature = c("FunctionPosterior", "missing"),
   function(x, y, ...) {
-    plot_FunctionPosteriors(x, ...)
+    plot_FunctionPosterior(x, ...)
   }
 )
 
 #' Visualize function posterior distributions
 #'
-#' @param fp An object of class \linkS4class{FunctionPosteriors}.
+#' @param fp An object of class \linkS4class{FunctionPosterior}.
 #' @param paramset index of parameter set to pick (NULL = all, but only
 #' posterior means will be plotted)
 #' @param component name of component to pick (NULL = all)
@@ -95,18 +71,18 @@ setMethod(
 #' @param no_line hide line even when it would normally be plotted?
 #' @return a \code{\link[ggplot2]{ggplot}} object
 #' @param verbose Can this print any messages?
-plot_FunctionPosteriors <- function(fp,
-                                    paramset = NULL,
-                                    component = NULL,
-                                    group_by = "id",
-                                    color_by = NULL,
-                                    t_name = "age",
-                                    MULT_STD = 2.0,
-                                    alpha_err = 0.2,
-                                    alpha = 1.0,
-                                    no_err = FALSE,
-                                    no_line = FALSE,
-                                    verbose = TRUE) {
+plot_FunctionPosterior <- function(fp,
+                                   paramset = NULL,
+                                   component = NULL,
+                                   group_by = "id",
+                                   color_by = NULL,
+                                   t_name = "age",
+                                   MULT_STD = 2.0,
+                                   alpha_err = 0.2,
+                                   alpha = 1.0,
+                                   no_err = FALSE,
+                                   no_line = FALSE,
+                                   verbose = TRUE) {
 
   # Get data frame for ggplot
   covariates <- c(t_name, group_by, color_by)

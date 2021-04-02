@@ -190,7 +190,7 @@ validate_lgpfit <- function(object) {
 }
 
 #' @rdname validate
-validate_FunctionPosteriors <- function(object) {
+validate_FunctionPosterior <- function(object) {
   errors <- c()
   if (object@num_paramsets != length(object@sigma2)) {
     errors <- c(errors, "invalid length of sigma2!")
@@ -198,7 +198,7 @@ validate_FunctionPosteriors <- function(object) {
   cn <- colnames(object@f)
   tgt <- c("paramset", "eval_point_idx", "component", "mean", "sd")
   if (!all.equal(cn, tgt)) {
-    errors <- c(errors, "invalid data frame in the FunctionPosteriors object!")
+    errors <- c(errors, "invalid data frame in the FunctionPosterior object!")
   }
   return_true_or_errors(errors)
 }
@@ -218,6 +218,17 @@ return_true_or_errors <- function(errors) {
   if (length(errors) > 0) errors else TRUE
 }
 
+#' @rdname validate
+validate_GaussianPrediction <- function(object) {
+  errors <- c()
+  return_true_or_errors(errors)
+}
+
+#' @rdname validate
+validate_Prediction <- function(object) {
+  errors <- c()
+  return_true_or_errors(errors)
+}
 
 #' An S4 class to represent an lgp expression
 #'
@@ -368,8 +379,8 @@ lgpsim <- setClass("lgpsim",
   )
 )
 
-#' An S4 class to represent analytic conditional function posterior
-#' distributions of an additive GP
+#' An S4 class to represent analytic function posterior
+#' distributions (multivariate Gaussians), conditional on model parameters
 #'
 #' @slot f A data frame representing the conditional posterior (given different
 #' parameter vectors) distribution of each model component (on normalized scale) and
@@ -384,11 +395,11 @@ lgpsim <- setClass("lgpsim",
 #' been computed.
 #' @slot sigma2 Vector of \eqn{\sigma^2} values (noise variance parameter),
 #' with length equal to \code{num_paramsets}.
-#' @param object \linkS4class{FunctionPosteriors} object for which to apply a
+#' @param object \linkS4class{FunctionPosterior} object for which to apply a
 #' class method.
 #' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{FunctionDraws}
-FunctionPosteriors <- setClass("FunctionPosteriors",
+FunctionPosterior <- setClass("FunctionPosterior",
   representation = representation(
     f = "data.frame",
     x = "data.frame",
@@ -396,11 +407,10 @@ FunctionPosteriors <- setClass("FunctionPosteriors",
     num_paramsets = "integer",
     sigma2 = "numeric"
   ),
-  validity = validate_FunctionPosteriors
+  validity = validate_FunctionPosterior
 )
 
-#' An S4 class to represent posterior or prior function (component)
-#' draws of an additive latent GP model
+#' An S4 class to represent general additive function (component) draws
 #'
 #' @slot components Data frame representing the draws of each model component.
 #' @slot x The evaluation points (values of covariates) where the function
@@ -410,7 +420,7 @@ FunctionPosteriors <- setClass("FunctionPosteriors",
 #' total draws through an inverse link function.
 #' @param object \linkS4class{FunctionDraws} object for which to apply a class
 #' method.
-#' @seealso \linkS4class{FunctionPosteriors}
+#' @seealso \linkS4class{FunctionPosterior}
 FunctionDraws <- setClass("FunctionDraws",
   representation = representation(
     components = "data.frame",
@@ -418,6 +428,42 @@ FunctionDraws <- setClass("FunctionDraws",
     model = "lgpmodel"
   ),
   validity = validate_FunctionDraws
+)
+
+
+#' An S4 class to represent analytic predictive distributions
+#' (multivariate Gaussians), conditional on model parameters
+#'
+#' @slot f_post An object of class \linkS4class{FunctionPosterior}.
+#' @slot pred A data frame.
+#' @param object \linkS4class{GaussianPrediction} object for which to apply a
+#' class method.
+#' @param ... optional arguments passed to a subroutine
+#' @seealso \linkS4class{Prediction}
+GaussianPrediction <- setClass("GaussianPrediction",
+  representation = representation(
+    f_draws = "FunctionPosterior",
+    pred = "data.frame"
+  ),
+  validity = validate_GaussianPrediction
+)
+
+
+#' An S4 class to represent draws from a general
+#' predictive distribution
+#'
+#' @slot f_draws An object of class \linkS4class{FunctionDraws}.
+#' @slot pred A data frame.
+#' @param object \linkS4class{Prediction} object for which to apply a
+#' class method.
+#' @param ... optional arguments passed to a subroutine
+#' @seealso \linkS4class{GaussianPrediction}
+Prediction <- setClass("Prediction",
+  representation = representation(
+    f_draws = "FunctionDraws",
+    pred = "data.frame"
+  ),
+  validity = validate_Prediction
 )
 
 
@@ -429,6 +475,18 @@ class_info <- function(class_name) {
   )
   return(str)
 }
+
+# Class info for show methods of function posterior objects
+class_info_fp <- function(class_name, comp_names, D) {
+  num_comps <- length(comp_names)
+  comp_str <- paste(comp_names, collapse = ", ")
+  desc <- class_info(class_name)
+  desc <- paste0(desc, "\n - ", num_comps, " components: ", comp_str)
+  desc <- paste0(desc, "\n - ", D[1], " parameter set(s)")
+  desc <- paste0(desc, "\n - ", D[2], " evaluation points")
+  return(desc)
+}
+
 
 # S4 GENERICS -------------------------------------------------------------
 

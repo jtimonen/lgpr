@@ -6,8 +6,10 @@
 \alias{validate_lgpformula}
 \alias{validate_lgpscaling}
 \alias{validate_lgpfit}
-\alias{validate_FunctionPosteriors}
+\alias{validate_FunctionPosterior}
 \alias{validate_FunctionDraws}
+\alias{validate_GaussianPrediction}
+\alias{validate_Prediction}
 \title{Validate S4 class objects}
 \usage{
 validate_lgpexpr(object)
@@ -18,9 +20,13 @@ validate_lgpscaling(object)
 
 validate_lgpfit(object)
 
-validate_FunctionPosteriors(object)
+validate_FunctionPosterior(object)
 
 validate_FunctionDraws(object)
+
+validate_GaussianPrediction(object)
+
+validate_Prediction(object)
 }
 \arguments{
 \item{object}{an object to validate}

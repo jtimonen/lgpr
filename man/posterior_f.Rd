@@ -44,7 +44,7 @@ Can be used for debugging \code{\link{kernels_fpost}}.}
 large computations that might crash R or take forever.}
 }
 \value{
-An object of class \linkS4class{FunctionPosteriors} or
+An object of class \linkS4class{FunctionPosterior} or
 \linkS4class{FunctionDraws}.
 }
 \description{

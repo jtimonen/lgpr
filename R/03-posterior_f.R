@@ -14,7 +14,7 @@
 #' Can be used for debugging \code{\link{kernels_fpost}}.
 #' @param force This is by default \code{FALSE} to prevent unnecessarily
 #' large computations that might crash R or take forever.
-#' @return An object of class \linkS4class{FunctionPosteriors} or
+#' @return An object of class \linkS4class{FunctionPosterior} or
 #' \linkS4class{FunctionDraws}.
 posterior_f <- function(fit,
                         x = NULL,
@@ -92,7 +92,7 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   if (verbose) cat("\n")
 
   # Return
-  new("FunctionPosteriors",
+  new("FunctionPosterior",
     f = DF,
     x = x,
     model = fit@model,

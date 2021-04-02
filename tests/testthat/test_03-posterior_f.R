@@ -17,7 +17,7 @@ my_prior <- list(effect_time_info = list(
   zero = 0
 ))
 
-test_that("posterior_f and FunctionPosteriors class work", {
+test_that("posterior_f and FunctionPosterior class work", {
 
 
   # Fit a model
@@ -42,7 +42,7 @@ test_that("posterior_f and FunctionPosteriors class work", {
   # Compute conditional function posteriors with proper x
   x_pred <- new_x(data = DAT, x_values = seq(0, 40, 0.5), x_ns = "dis_age")
   fp <- posterior_f(fit, x_pred, verbose = FALSE, reduce = NULL)
-  expect_s4_class(fp, "FunctionPosteriors")
+  expect_s4_class(fp, "FunctionPosterior")
   expect_output(show(fp))
 
   # Plotting
@@ -53,7 +53,7 @@ test_that("posterior_f and FunctionPosteriors class work", {
 
   # Same thing but with reduce to mean and x_pred = NULL
   fp <- posterior_f(fit, verbose = FALSE)
-  expect_s4_class(fp, "FunctionPosteriors")
+  expect_s4_class(fp, "FunctionPosterior")
   p3 <- plot(fp, color_by = "sex")
   p4 <- plot(fp, group_by = "id", color_by = "dis_age", verbose = FALSE)
   expect_s3_class(p3, "ggplot")
