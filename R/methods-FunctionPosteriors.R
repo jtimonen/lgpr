@@ -129,16 +129,34 @@ plot_fpost <- function(fp,
   # Create ggplot object
   plt <- ggplot2::ggplot(df, aes) +
     ggplot2::facet_grid(. ~ component)
+  do_ribbon <- FALSE
   if (!no_err) {
     S <- length(levels(dollar(df, "paramset")))
     if (S == 1) {
+      do_ribbon <- TRUE
+      if (!is.null(color_by)) {
+        fac3 <- dollar(df, color_by)
+        if (class(fac3) != "factor") {
+          color_by_rib <- NULL
+          msg <- paste0(
+            "Coloring variable (color_by=", color_by, ") is not a factor, ",
+            "so not coloring the ribbon."
+          )
+          if (verbose) cat(msg, "\n")
+        }
+        else {
+          color_by_rib <- color_by
+        }
+      } else {
+        color_by_rib <- color_by
+      }
       aes_rib <- ggplot2::aes_string(
         x = t_name,
         ymin = paste0("mean - ", MULT_STD, " * sd"),
         ymax = paste0("mean + ", MULT_STD, " * sd"),
         group = group_by,
-        color = color_by,
-        fill = color_by
+        color = color_by_rib,
+        fill = color_by_rib
       )
       plt <- plt + ggplot2::geom_ribbon(
         mapping = aes_rib,
@@ -156,5 +174,7 @@ plot_fpost <- function(fp,
   if (!no_line) {
     plt <- plt + ggplot2::geom_line(alpha = alpha)
   }
+  ylab <- if (do_ribbon) paste0("mean +- ", MULT_STD, " x std") else "mean"
+  plt <- plt + ggplot2::ylab(ylab)
   return(plt)
 }
