@@ -12,7 +12,9 @@
 #' @param x Deprecated argument. This is now taken from the \code{pred}
 #' object to ensure compatibility.
 #' @param pred An object of class \linkS4class{GaussianPrediction} or
-#' \linkS4class{Prediction}.
+#' \linkS4class{Prediction}. It is not recommended to set \code{pred=NULL},
+#' as the \code{pred} needs to be then computed inside this function by
+#' calling \code{\link{pred}}.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable (use \code{group_by=NA}
 #' to avoid grouping)
@@ -199,130 +201,6 @@ plot_components <- function(fit,
   invisible(out)
 }
 
-#' Helper function for plot_pred and plot_f
-#'
-#' @inheritParams plot_pred
-#' @return a list with names \code{pred} and \code{df_base}
-plot_pred.create_input <- function(pred, x, draws, reduce,
-                                   group_by, t_name) {
-  x_grp <- create_grouping_factor(x, group_by) # util
-  df_base <- data.frame(x_grp, dollar(x, t_name))
-  group_by <- if (is.na(group_by)) "group__" else group_by
-  colnames(df_base) <- c(group_by, t_name)
-  list(pred = pred, df_base = df_base)
-}
-
-#' Helper functions for plot_pred
-#'
-#' @inheritParams plot_pred
-#' @param df_base a data frame with two columns
-#' @return a data frame
-#' @name plot_pred.create
-NULL
-
-#' @rdname plot_pred.create
-plot_pred.create.df_line <- function(fit, pred, df_base) {
-  line_arr <- if (is_f_sampled(fit)) pred@h else pred@y_mean
-  num_draws <- nrow(line_arr)
-  df_wide <- make_draw_df(line_arr)
-  df_long <- to_long_format(df_wide)
-  colnames(df_long) <- c("_draw_", "y")
-  df_base <- rep_df(df_base, times = num_draws)
-  out <- cbind(df_base, df_long)
-  if (num_draws == 1) out[["_draw_"]] <- NULL
-  return(out)
-}
-
-#' @rdname plot_pred.create
-plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
-  check_positive(MULT_STD)
-  line_arr <- if (is_f_sampled(fit)) pred@h else pred@y_mean
-  num_draws <- nrow(line_arr)
-  if (num_draws > 1 || is_f_sampled(fit)) {
-    return(NULL)
-  }
-  m <- as.vector(line_arr)
-  std <- as.vector(pred@y_std)
-  upper <- m + MULT_STD * std
-  lower <- m - MULT_STD * std
-  df <- data.frame(upper, lower)
-  cbind(df_base, df)
-}
-
-#' Helper function for plot_f
-#'
-#' @inheritParams plot_f
-#' @return a factor
-plot_f.get_color_fac <- function(fit, pred, x, color_by) {
-  n <- if (is.null(pred)) get_num_obs(fit) else nrow(x)
-  if (is.na(color_by)) {
-    color_fac <- as.factor(rep(1, n))
-    return(color_fac)
-  }
-  if (is.null(pred)) {
-    dat <- get_data(fit)
-    color_fac <- dollar(dat, color_by)
-  } else {
-    color_fac <- dollar(x, color_by)
-  }
-  if (!is.factor(color_fac)) {
-    # Color by whether or not the coloring variable is NA or NaN
-    color_fac <- as.numeric(!is.na(color_fac))
-    color_fac <- as.factor(c("N/A", "available")[color_fac + 1])
-  }
-  return(color_fac)
-}
-
-
-#' Helper functions for plot_f
-#'
-#' @inheritParams plot_f
-#' @param df_base a data frame with two columns
-#' @return a data frame
-#' @name plot_f.create
-NULL
-
-#' @rdname plot_f.create
-plot_f.create.df_line <- function(fit, pred, df_base, comp_idx) {
-  line_arr <- plot_f.create.line_arr(fit, pred, comp_idx)
-  num_draws <- nrow(line_arr)
-  df_wide <- make_draw_df(line_arr)
-  df_long <- to_long_format(df_wide)
-  colnames(df_long) <- c("_draw_", "y")
-  df_base <- rep_df(df_base, times = num_draws)
-  out <- cbind(df_base, df_long)
-  if (num_draws == 1) out[["_draw_"]] <- NULL
-  return(out)
-}
-
-#' @rdname plot_f.create
-plot_f.create.df_ribbon <- function(fit, pred, df_base, comp_idx,
-                                    MULT_STD) {
-  check_positive(MULT_STD)
-  line_arr <- plot_f.create.line_arr(fit, pred, comp_idx)
-  num_draws <- nrow(line_arr)
-  if (num_draws > 1 || is_f_sampled(fit)) {
-    return(NULL)
-  }
-  m <- as.vector(line_arr)
-  f_std <- if (is.null(comp_idx)) pred@f_std else pred@f_comp_std[[comp_idx]]
-  std <- as.vector(f_std)
-  upper <- m + MULT_STD * std
-  lower <- m - MULT_STD * std
-  df <- data.frame(upper, lower)
-  cbind(df_base, df)
-}
-
-#' @rdname plot_f.create
-plot_f.create.line_arr <- function(fit, pred, comp_idx) {
-  if (is.null(comp_idx)) {
-    line_arr <- if (is_f_sampled(fit)) pred@f else pred@f_mean
-  } else {
-    f_cmp <- if (is_f_sampled(fit)) pred@f_comp else pred@f_comp_mean
-    line_arr <- f_cmp[[comp_idx]]
-  }
-  return(line_arr)
-}
 
 # Process arguments to plot_pred or plot_f
 plot_pred.process_args <- function(fit, pred, x, draws, reduce, verbose) {
@@ -341,4 +219,109 @@ plot_pred.process_args <- function(fit, pred, x, draws, reduce, verbose) {
     pred <- pred(fit, x = NULL, draws = draws, reduce = reduce, verbose = vrb)
   }
   return(pred)
+}
+
+# Create a list with names \code{pred} and \code{df_base}
+plot_pred.create_input <- function(pred, x, draws, reduce, group_by, t_name) {
+  x_grp <- create_grouping_factor(x, group_by) # util
+  df_base <- data.frame(x_grp, dollar(x, t_name))
+  group_by <- if (is.na(group_by)) "group__" else group_by
+  colnames(df_base) <- c(group_by, t_name)
+  list(pred = pred, df_base = df_base)
+}
+
+# Helper functions for plot_pred
+#
+# @param df_base a data frame with two columns
+# @return a data frame
+plot_pred.create.df_line <- function(fit, pred, df_base) {
+  line_arr <- if (is_f_sampled(fit)) pred@h else pred@y_mean
+  num_draws <- nrow(line_arr)
+  df_wide <- make_draw_df(line_arr)
+  df_long <- to_long_format(df_wide)
+  colnames(df_long) <- c("_draw_", "y")
+  df_base <- rep_df(df_base, times = num_draws)
+  out <- cbind(df_base, df_long)
+  if (num_draws == 1) out[["_draw_"]] <- NULL
+  return(out)
+}
+
+plot_pred.create.df_ribbon <- function(fit, pred, df_base, MULT_STD) {
+  check_positive(MULT_STD)
+  line_arr <- if (is_f_sampled(fit)) pred@h else pred@y_mean
+  num_draws <- nrow(line_arr)
+  if (num_draws > 1 || is_f_sampled(fit)) {
+    return(NULL)
+  }
+  m <- as.vector(line_arr)
+  std <- as.vector(pred@y_std)
+  upper <- m + MULT_STD * std
+  lower <- m - MULT_STD * std
+  df <- data.frame(upper, lower)
+  cbind(df_base, df)
+}
+
+
+# Helper functions for plot_f
+#
+# @param df_base a data frame with two columns
+# @return a data frame
+plot_f.create.df_line <- function(fit, pred, df_base, comp_idx) {
+  line_arr <- plot_f.create.line_arr(fit, pred, comp_idx)
+  num_draws <- nrow(line_arr)
+  df_wide <- make_draw_df(line_arr)
+  df_long <- to_long_format(df_wide)
+  colnames(df_long) <- c("_draw_", "y")
+  df_base <- rep_df(df_base, times = num_draws)
+  out <- cbind(df_base, df_long)
+  if (num_draws == 1) out[["_draw_"]] <- NULL
+  return(out)
+}
+
+plot_f.create.df_ribbon <- function(fit, pred, df_base, comp_idx,
+                                    MULT_STD) {
+  check_positive(MULT_STD)
+  line_arr <- plot_f.create.line_arr(fit, pred, comp_idx)
+  num_draws <- nrow(line_arr)
+  if (num_draws > 1 || is_f_sampled(fit)) {
+    return(NULL)
+  }
+  m <- as.vector(line_arr)
+  f_std <- if (is.null(comp_idx)) pred@f_std else pred@f_comp_std[[comp_idx]]
+  std <- as.vector(f_std)
+  upper <- m + MULT_STD * std
+  lower <- m - MULT_STD * std
+  df <- data.frame(upper, lower)
+  cbind(df_base, df)
+}
+
+plot_f.create.line_arr <- function(fit, pred, comp_idx) {
+  if (is.null(comp_idx)) {
+    line_arr <- if (is_f_sampled(fit)) pred@f else pred@f_mean
+  } else {
+    f_cmp <- if (is_f_sampled(fit)) pred@f_comp else pred@f_comp_mean
+    line_arr <- f_cmp[[comp_idx]]
+  }
+  return(line_arr)
+}
+
+# Create a factor for coloring
+plot_f.get_color_fac <- function(fit, pred, x, color_by) {
+  n <- if (is.null(pred)) get_num_obs(fit) else nrow(x)
+  if (is.na(color_by)) {
+    color_fac <- as.factor(rep(1, n))
+    return(color_fac)
+  }
+  if (is.null(pred)) {
+    dat <- get_data(fit)
+    color_fac <- dollar(dat, color_by)
+  } else {
+    color_fac <- dollar(x, color_by)
+  }
+  if (!is.factor(color_fac)) {
+    # Color by whether or not the coloring variable is NA or NaN
+    color_fac <- as.numeric(!is.na(color_fac))
+    color_fac <- as.factor(c("N/A", "available")[color_fac + 1])
+  }
+  return(color_fac)
 }

@@ -4,10 +4,10 @@ source("helpers/SW.R")
 
 # -------------------------------------------------------------------------
 
-context("Computing posterior predictive distributions")
+context("Creating GaussianPrediction objects")
 
-N_ITER <- 20
-N_CHAINS <- 1
+N_ITER <- 33
+N_CHAINS <- 2
 SW({
   fit <- example_fit(iter = N_ITER, chains = N_CHAINS)
 })
@@ -16,16 +16,12 @@ test_that("pred works with defaults", {
   a <- pred(fit = fit, verbose = FALSE)
   expect_s4_class(a, "GaussianPrediction")
   expect_output(show(a))
-  plt <- plot_pred(fit, pred = a)
-  expect_s3_class(plt, "ggplot")
 })
 
 test_that("pred works with reduce = NULL", {
   a <- pred(fit = fit, reduce = NULL, verbose = FALSE)
   expect_s4_class(a, "GaussianPrediction")
   expect_output(show(a))
-  plt <- plot_pred(fit, a, alpha = 0.3)
-  expect_s3_class(plt, "ggplot")
 })
 
 test_that("pred works with defaults and given x", {
@@ -33,8 +29,6 @@ test_that("pred works with defaults and given x", {
   a <- pred(fit = fit, x = x_pred, verbose = FALSE)
   expect_s4_class(a, "GaussianPrediction")
   expect_output(show(a))
-  plt <- plot_pred(fit, pred = a) # nice and smooth plot
-  expect_s3_class(plt, "ggplot")
 })
 
 test_that("pred works with defaults and given x, and reduce = NULL", {
@@ -45,6 +39,9 @@ test_that("pred works with defaults and given x, and reduce = NULL", {
   )
   expect_s4_class(a, "GaussianPrediction")
   expect_output(show(a))
-  plt <- plot_pred(fit, pred = a) # nice and smooth plot
-  expect_s3_class(plt, "ggplot")
+
+  # Check that default is verbose (should print also progbars)
+  expect_output({
+    pp <- pred(fit = fit, x = x_pred, reduce = NULL)
+  })
 })

@@ -17,7 +17,9 @@ plot_f.create.line_arr(fit, pred, comp_idx)
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{pred}{An object of class \linkS4class{GaussianPrediction} or
-\linkS4class{Prediction}.}
+\linkS4class{Prediction}. It is not recommended to set \code{pred=NULL},
+as the \code{pred} needs to be then computed inside this function by
+calling \code{\link{pred}}.}
 
 \item{df_base}{a data frame with two columns}
 

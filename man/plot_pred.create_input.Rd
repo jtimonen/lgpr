@@ -8,7 +8,9 @@ plot_pred.create_input(pred, x, draws, reduce, group_by, t_name)
 }
 \arguments{
 \item{pred}{An object of class \linkS4class{GaussianPrediction} or
-\linkS4class{Prediction}.}
+\linkS4class{Prediction}. It is not recommended to set \code{pred=NULL},
+as the \code{pred} needs to be then computed inside this function by
+calling \code{\link{pred}}.}
 
 \item{x}{Deprecated argument. This is now taken from the \code{pred}
 object to ensure compatibility.}

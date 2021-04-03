@@ -323,11 +323,6 @@ default_ppc_fun <- function(object) {
   return(fun)
 }
 
-# Get number of nonstationary model components
-get_num_ns <- function(stan_input) {
-  dollar(stan_input, "num_ns")
-}
-
 # Compute row variances for a 2-dimensional array
 row_vars <- function(x) {
   check_not_null(x)
