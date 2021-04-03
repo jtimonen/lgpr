@@ -396,6 +396,9 @@ lgpsim <- setClass("lgpsim",
 #' @slot y_std predictive standard deviation (on original data scale)
 #' @slot x a data frame of points where the posteriors/predictions have
 #' been evaluated
+#' @param object \linkS4class{GaussianPrediction} object for which to apply a
+#' class method.
+#' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{Prediction}
 GaussianPrediction <- setClass("GaussianPrediction",
   representation = representation(
@@ -416,6 +419,9 @@ GaussianPrediction <- setClass("GaussianPrediction",
 #' @slot f signal prediction
 #' @slot h prediction (signal predictions transformed through inverse link
 #' function)
+#' @param object \linkS4class{Prediction} object for which to apply a class
+#' method.
+#' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{GaussianPrediction}
 Prediction <- setClass("Prediction",
   representation = representation(

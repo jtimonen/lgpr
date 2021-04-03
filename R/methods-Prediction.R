@@ -22,7 +22,9 @@ setMethod(
 
 #' @describeIn Prediction Print a summary about the object.
 setMethod("show", "Prediction", function(object) {
-  desc <- class_info_fp("Prediction")
+  comp_names <- names(object@f_comp)
+  D <- dim(object@f_comp[[1]])
+  desc <- class_info_fp("Prediction", comp_names, D)
   cat(desc)
 })
 

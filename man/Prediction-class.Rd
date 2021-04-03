@@ -13,9 +13,14 @@
 \S4method{plot}{Prediction,missing}(x, y, ...)
 }
 \arguments{
+\item{object}{\linkS4class{Prediction} object for which to apply a class
+method.}
+
 \item{x}{a \linkS4class{Prediction} object to visualize}
 
 \item{y}{unused argument}
+
+\item{...}{optional arguments passed to a subroutine}
 }
 \description{
 An S4 class to represent general additive model predictions

@@ -14,9 +14,14 @@
 \S4method{plot}{GaussianPrediction,missing}(x, y, ...)
 }
 \arguments{
+\item{object}{\linkS4class{GaussianPrediction} object for which to apply a
+class method.}
+
 \item{x}{a \linkS4class{GaussianPrediction} object to visualize}
 
 \item{y}{unused argument}
+
+\item{...}{optional arguments passed to a subroutine}
 }
 \description{
 An S4 class to represent analytically computed predictive distributions
