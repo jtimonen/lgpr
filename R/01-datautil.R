@@ -221,6 +221,8 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #'
 #' @family data frame handling functions
 new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
+  if (is(data, "lgpfit")) data <- get_data(data@model)
+  if (is(data, "lgpmodel")) data <- get_data(model)
   check_type(data, "data.frame")
   check_not_null(x)
   check_not_null(x_values)
