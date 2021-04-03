@@ -3,17 +3,16 @@
 #' @description
 #' \itemize{
 #'   \item Function draws at data points can be visualized using
-#'   \code{plot_pred}. Out-of-sample predictions can be visualized by giving
-#'   the \code{pred} and \code{x} arguments.
+#'   \code{plot_pred}. If the \code{pred} argument is \code{NULL}, it
+#'   is computed using the \code{\link{pred}} function with \code{x=NULL}.
 #'   \item The total signal \code{f} or any of its
 #'   additive components can be plotted using \code{plot_f}.
 #' }
 #' @param fit An object of class \linkS4class{lgpfit}.
-#' @param x A data frame of prediction points, containing at least the
-#' variables used as covariates in the model. This must be specified if
-#' \code{pred} is not \code{NULL}.
-#' @param pred An object of class \linkS4class{FunctionPosteriors} or
-#' \linkS4class{FunctionDraws}.
+#' @param x Deprecated argument. This is now taken from the \code{pred}
+#' object to ensure compatibility.
+#' @param pred An object of class \linkS4class{GaussianPrediction} or
+#' \linkS4class{Prediction}.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable (use \code{group_by=NA}
 #' to avoid grouping)
@@ -22,6 +21,7 @@
 #' @param MULT_STD a multiplier for standard deviation
 #' @param ... additional arguments to \code{\link{plot_api_g}} or
 #' \code{\link{plot_api_c}}
+#' @param verbose Can this print any messages?
 #' @return a \code{\link[ggplot2]{ggplot}} object
 #' @family main plot functions
 #' @name plot_pred
@@ -30,18 +30,30 @@ NULL
 #' @export
 #' @rdname plot_pred
 plot_pred <- function(fit,
-                      x = NULL,
                       pred = NULL,
                       group_by = "id",
                       t_name = "age",
-                      draws = NULL,
-                      reduce = mean,
                       MULT_STD = 2.0,
+                      verbose = TRUE,
+                      draws = NULL,
+                      reduce = function(x) base::mean(x),
+                      # deprecated
+                      x = NULL,
                       ...) {
   check_type(fit, "lgpfit")
   df_data <- create_plot_df(fit, t_name, group_by)
-
-  input <- plot_pred.create_input(fit, pred, x, draws, reduce, group_by, t_name)
+  if (!is.null(x)) {
+    warning("The <x> argument is deprecated and has no effect..")
+  }
+  if (is.null(pred)) {
+    if (verbose) cat("pred is NULL, so computing it with pred(x=NULL, ...) ..\n")
+    pred <- pred(fit,
+      x = NULL, draws = draws, reduce = reduce,
+      verbose = verbose
+    )
+  }
+  x <- pred@x
+  input <- plot_pred.create_input(pred, x, draws, reduce, group_by, t_name)
   pred <- dollar(input, "pred")
   df_base <- dollar(input, "df_base")
   y_name <- get_y_name(fit)
@@ -180,17 +192,12 @@ plot_components <- function(fit,
 #'
 #' @inheritParams plot_pred
 #' @return a list with names \code{pred} and \code{df_base}
-plot_pred.create_input <- function(fit, pred, x, draws, reduce,
+plot_pred.create_input <- function(pred, x, draws, reduce,
                                    group_by, t_name) {
-  if (is.null(pred)) {
-    pred <- get_pred(fit, draws, reduce)
-    df_base <- create_plot_df(fit, t_name, group_by)[, 1:2]
-  } else {
-    x_grp <- create_grouping_factor(x, group_by) # util
-    df_base <- data.frame(x_grp, dollar(x, t_name))
-    group_by <- if (is.na(group_by)) "group__" else group_by
-    colnames(df_base) <- c(group_by, t_name)
-  }
+  x_grp <- create_grouping_factor(x, group_by) # util
+  df_base <- data.frame(x_grp, dollar(x, t_name))
+  group_by <- if (is.na(group_by)) "group__" else group_by
+  colnames(df_base) <- c(group_by, t_name)
   list(pred = pred, df_base = df_base)
 }
 

@@ -47,7 +47,7 @@ Can be used for debugging \code{\link{kernels_fpost}}.}
 large computations that might crash R or take forever.}
 }
 \value{
-
+a named list
 }
 \description{
 Evaluates (or extracts) the posterior distribution of the

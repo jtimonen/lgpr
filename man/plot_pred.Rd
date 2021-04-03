@@ -7,13 +7,14 @@
 \usage{
 plot_pred(
   fit,
-  x = NULL,
   pred = NULL,
   group_by = "id",
   t_name = "age",
-  draws = NULL,
-  reduce = mean,
   MULT_STD = 2,
+  verbose = TRUE,
+  draws = NULL,
+  reduce = function(x) base::mean(x),
+  x = NULL,
   ...
 )
 
@@ -34,23 +35,24 @@ plot_f(
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{x}{A data frame of prediction points, containing at least the
-variables used as covariates in the model. This must be specified if
-\code{pred} is not \code{NULL}.}
-
-\item{pred}{An object of class \linkS4class{FunctionPosteriors} or
-\linkS4class{FunctionDraws}.}
+\item{pred}{An object of class \linkS4class{GaussianPrediction} or
+\linkS4class{Prediction}.}
 
 \item{group_by}{name of the grouping variable (use \code{group_by=NA}
 to avoid grouping)}
 
 \item{t_name}{name of the x-axis variable}
 
+\item{MULT_STD}{a multiplier for standard deviation}
+
+\item{verbose}{Can this print any messages?}
+
 \item{draws}{only has effect if \code{pred} is \code{NULL}}
 
 \item{reduce}{only has effect if \code{pred} is \code{NULL}}
 
-\item{MULT_STD}{a multiplier for standard deviation}
+\item{x}{Deprecated argument. This is now taken from the \code{pred}
+object to ensure compatibility.}
 
 \item{...}{additional arguments to \code{\link{plot_api_g}} or
 \code{\link{plot_api_c}}}
@@ -66,8 +68,8 @@ a \code{\link[ggplot2]{ggplot}} object
 \description{
 \itemize{
   \item Function draws at data points can be visualized using
-  \code{plot_pred}. Out-of-sample predictions can be visualized by giving
-  the \code{pred} and \code{x} arguments.
+  \code{plot_pred}. If the \code{pred} argument is \code{NULL}, it
+  is computed using the \code{\link{pred}} function with \code{x=NULL}.
   \item The total signal \code{f} or any of its
   additive components can be plotted using \code{plot_f}.
 }

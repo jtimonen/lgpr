@@ -13,7 +13,7 @@
 #' Can be used for debugging \code{\link{kernels_fpost}}.
 #' @param force This is by default \code{FALSE} to prevent unnecessarily
 #' large computations that might crash R or take forever.
-#' @return
+#' @return a named list
 posterior_f <- function(fit,
                         x = NULL,
                         reduce = function(x) base::mean(x),
@@ -60,10 +60,17 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   K <- dollar(km, "K")
   Ks <- dollar(km, "Ks")
   Kss <- dollar(km, "Kss")
+
+  # Create output arrays
   S <- length(Ks) # number of parameter sets
+  P <- nrow(x) # number of output points
+  J <- get_num_comps(fit) # number of components
+  f_comp_mean <- array(0, c(S, P, J))
+  f_comp_std <- array(0, c(S, P, J))
+  f_mean <- array(0, c(S, P))
+  f_std <- array(0, c(S, P))
 
   # Setup
-  DF <- NULL
   progbar <- verbose && S > 1
   pb <- progbar_setup(L = S)
   hdr <- dollar(pb, "header")
@@ -79,18 +86,32 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
     Ks_i <- Ks[[idx]]
     Kss_i <- Kss[[idx]]
     fp_i <- fp_gaussian.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
+    mean_i <- dollar(fp_i, "mean") # matrix(0, P, J + 1)
+    std_i <- dollar(fp_i, "sd") # matrix(0, P, J + 1)
 
-    # Format as data.frame and update progress
-    fp_i <- fp_gaussian.format(fp_i, dollar(km, "comp_names"), idx)
-    DF <- rbind(DF, fp_i)
+    # Store result and update progress
+    f_comp_mean[idx, , ] <- mean_i[, 1:J]
+    f_comp_std[idx, , ] <- std_i[, 1:J]
+    f_mean[idx, ] <- mean_i[, J + 1]
+    f_std[idx, ] <- std_i[, J + 1]
+
     if (progbar) progbar_print(idx, idx_print)
   }
   if (progbar) cat("\n")
-  colnames(DF) <- c("paramset", "eval_point_idx", "component", "mean", "sd")
   if (verbose) cat("\n")
 
   # Return
-  return(DF)
+  comp_names <- dollar(km, "comp_names")
+  f_comp_mean <- aperm(f_comp_mean, c(3, 1, 2)) # dim (S, P, J) -> (J, S, P)
+  f_comp_std <- aperm(f_comp_std, c(3, 1, 2)) # dim (S, P, J) -> (J, S, P)
+  list(
+    f_comp_mean = arr3_to_list(f_comp_mean, comp_names), # list with len J
+    f_comp_std = arr3_to_list(f_comp_std, comp_names), # list with len J
+    f_mean = f_mean, # dim (S, P)
+    f_std = f_std, # dim (S, P)
+    sigma2 = sigma2,
+    x = x
+  )
 }
 
 # Compute componentwise and total function posteriors
@@ -143,25 +164,6 @@ fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
 
   # Return
   list(mean = F_MU, sd = F_SD)
-}
-
-# Format fp computation result (for one parameter set) as a data frame
-fp_gaussian.format <- function(fp, comp_names, paramset_idx) {
-  m <- dollar(fp, "mean") # shape (P, J+1)
-  s <- dollar(fp, "sd") # shape (P, J+1)
-  P <- dim(m)[1]
-  J <- dim(m)[2] - 1
-  comp_names <- c(comp_names, "f_sum")
-  component <- as.factor(rep(comp_names, each = P))
-  eval_point_idx <- as.factor(rep(1:P, times = J + 1))
-  m <- as.vector(m)
-  s <- as.vector(s)
-  check_lengths(m, s)
-  check_lengths(m, component)
-  check_lengths(m, eval_point_idx)
-  paramset <- as.factor(rep(paramset_idx, length(m)))
-  df <- data.frame(paramset, eval_point_idx, component, m, s)
-  return(df)
 }
 
 # Function posterior draws

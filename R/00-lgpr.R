@@ -276,6 +276,9 @@ validate_GaussianPrediction <- function(object) {
     D <- c(D, list(dim(m), dim(s)))
   }
   errors <- c(errors, validate_dimension_list(D))
+  if (is.null(object@x)) {
+    errors <- c(errors, "x can't be NULL!")
+  }
   out <- if (length(errors) > 0) errors else TRUE
   return(out)
 }
@@ -391,6 +394,8 @@ lgpsim <- setClass("lgpsim",
 #' @slot f_std signal standard deviation (on normalized scale)
 #' @slot y_mean predictive mean (on original data scale)
 #' @slot y_std predictive standard deviation (on original data scale)
+#' @slot x a data frame of points where the posteriors/predictions have
+#' been evaluated
 #' @seealso \linkS4class{Prediction}
 GaussianPrediction <- setClass("GaussianPrediction",
   representation = representation(
@@ -399,7 +404,8 @@ GaussianPrediction <- setClass("GaussianPrediction",
     f_mean = "matrix",
     f_std = "matrix",
     y_mean = "matrix",
-    y_std = "matrix"
+    y_std = "matrix",
+    x = "data.frame"
   ),
   validity = validate_GaussianPrediction
 )

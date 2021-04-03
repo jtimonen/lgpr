@@ -26,12 +26,11 @@ plot_components(
 \arguments{
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
-\item{x}{A data frame of prediction points, containing at least the
-variables used as covariates in the model. This must be specified if
-\code{pred} is not \code{NULL}.}
+\item{x}{Deprecated argument. This is now taken from the \code{pred}
+object to ensure compatibility.}
 
-\item{pred}{An object of class \linkS4class{FunctionPosteriors} or
-\linkS4class{FunctionDraws}.}
+\item{pred}{An object of class \linkS4class{GaussianPrediction} or
+\linkS4class{Prediction}.}
 
 \item{group_by}{name of the grouping variable (use \code{group_by=NA}
 to avoid grouping)}

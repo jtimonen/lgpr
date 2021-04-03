@@ -420,12 +420,13 @@ make_draw_df <- function(x) {
 
 # Format a 3-dimensional array into a list of 2-dimensional arrays
 # List length is specified by first dimension of x
-arr3_to_list <- function(x) {
+arr3_to_list <- function(x, list_names) {
   out <- list()
   d <- dim(x)[1]
   for (j in seq_len(d)) {
     out[[j]] <- arr3_select(x, j)
   }
+  names(out) <- list_names
   return(out)
 }
 

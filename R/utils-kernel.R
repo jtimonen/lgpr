@@ -31,9 +31,14 @@ kernels_fpost <- function(fit,
     Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
   }
 
-  # Return matrices
+  # Return
   comp_names <- component_names(fit@model)
-  list(K = K, Ks = Ks, Kss = Kss, comp_names = comp_names)
+  list(
+    K = K,
+    Ks = Ks,
+    Kss = Kss,
+    comp_names = comp_names
+  )
 }
 
 # Compute all constant kernel matrices of a model
@@ -143,10 +148,7 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
 
 # Create a list of things that will be used as input to the wrapped Stan
 # kernel computation functions (after some formatting)
-kernels_fpost.create_input <- function(fit,
-                                       x = NULL,
-                                       reduce = NULL,
-                                       draws = NULL) {
+kernels_fpost.create_input <- function(fit, x, reduce, draws) {
   si <- get_stan_input(fit) # common
   si_x_OUT <- fp_input_x(fit, x) # output points (covariate values)
   si_draws <- fp_input_draws(fit, reduce, draws) # parameter values

@@ -59,30 +59,50 @@ pred <- function(fit,
   if (f_sampled) {
     out <- pred_kr(fit, fp, verbose, STREAM, c_hat_pred)
   } else {
-    out <- pred_gaussian(fit, fp, verbose, STREAM)
+    out <- pred_gaussian(fit, fp, verbose)
   }
   return(out)
 }
 
-pred_gaussian <- function(fit, fp, verbose, STREAM) {
-  if (verbose) cat("Computing preditive distribution...\n")
-  f_mean <- dollar(post, "f_mean")
-  f_std <- dollar(post, "f_std")
+# pred when sample_f = FALSE
+pred_gaussian <- function(fit, fp, verbose) {
+  if (verbose) {
+    cat("Computing preditive distribution on original data scale...\n")
+  }
+  f_mean <- dollar(fp, "f_mean")
+  f_std <- dollar(fp, "f_std")
+  sigma2 <- dollar(fp, "sigma2")
   y_scl <- dollar(fit@model@var_scalings, "y")
-  stop("TODO: f to y!")
-  # y_pred <- pred_gaussian.f_to_y(f_mean, f_std, sigma, y_scl@fun_inv)
+  y_pred <- pred_gaussian.f_to_y(f_mean, f_std, sigma2, y_scl)
 
   if (verbose) cat("Done.\n")
   new("GaussianPrediction",
-    f_comp_mean = arr3_to_list(dollar(post, "f_comp_mean")),
-    f_comp_std = arr3_to_list(dollar(post, "f_comp_std")),
+    f_comp_mean = dollar(fp, "f_comp_mean"),
+    f_comp_std = dollar(fp, "f_comp_std"),
     f_mean = f_mean,
     f_std = f_std,
     y_mean = dollar(y_pred, "mean"),
-    y_std = dollar(y_pred, "std")
+    y_std = dollar(y_pred, "std"),
+    x = dollar(fp, "x")
   )
 }
 
+# Tranform distribution of f to distribution of y
+pred_gaussian.f_to_y <- function(f_mean, f_std, sigma2, y_scl) {
+
+  # Compute y_mean and y_std on normalized scale
+  y_mean <- f_mean
+  y_var <- add_to_columns(f_std^2, sigma2)
+  y_std <- sqrt(y_var)
+
+  # Scale y_mean and y_std to original scale and return
+  list(
+    mean = apply_scaling(y_scl, y_mean, inverse = TRUE),
+    std = y_scl@scale * y_std
+  )
+}
+
+# pred when sample_f = TRUE
 pred_kr <- function(fit, fp, verbose, STREAM, c_hat_pred) {
   kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
   si <- get_stan_input(fit)
