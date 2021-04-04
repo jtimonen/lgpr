@@ -2,9 +2,12 @@
 % Please edit documentation in R/methods-lgpmodel.R
 \name{model_summary}
 \alias{model_summary}
+\alias{param_summary}
 \title{Print a model summary.}
 \usage{
 model_summary(object)
+
+param_summary(object)
 }
 \arguments{
 \item{object}{a model or fit}

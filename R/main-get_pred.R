@@ -1,6 +1,8 @@
 #' Extract model predictions and function posteriors
 #'
 #' @export
+#' @description \emph{NOTE:} It is not recommended for users to call this. Use
+#' \code{\link{pred}} instead.
 #' @inheritParams pred
 #' @return an object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}

@@ -24,5 +24,6 @@ an object of class \linkS4class{GaussianPrediction} or
 \linkS4class{Prediction}
 }
 \description{
-Extract model predictions and function posteriors
+\emph{NOTE:} It is not recommended for users to call this. Use
+\code{\link{pred}} instead.
 }

@@ -12,8 +12,8 @@
 #' @param x Deprecated argument. This is now taken from the \code{pred}
 #' object to ensure compatibility.
 #' @param pred An object of class \linkS4class{GaussianPrediction} or
-#' \linkS4class{Prediction}. If \code{pred=NULL}, \code{\link{get_pred}}
-#' is called with the given \code{reduce} and \code{draws} arguments.
+#' \linkS4class{Prediction}. If \code{pred=NULL}, the \code{\link{pred}}
+#' function is called with the given \code{reduce} and \code{draws} arguments.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable (use \code{group_by=NA}
 #' to avoid grouping)
@@ -202,16 +202,19 @@ plot_components <- function(fit,
 
 
 # Process arguments to plot_pred or plot_f
-plot_pred.process_args <- function(fit, pred, x, draws, reduce, verbose) {
+plot_pred.process_args <- function(fit, pred_in, x, draws, reduce, verbose) {
   check_type(fit, "lgpfit")
   vrb <- verbose
   if (!is.null(x)) {
     warning("The <x> argument is deprecated and has no effect..")
   }
-  if (is.null(pred)) {
-    pred <- get_pred(fit, draws = draws, reduce = reduce, verbose = vrb)
+  if (is.null(pred_in)) {
+    if (verbose) cat("pred is NULL, need to compute it...\n")
+    pred_out <- pred(fit, draws = draws, reduce = reduce, verbose = vrb)
+  } else {
+    pred_out <- pred_in
   }
-  return(pred)
+  return(pred_out)
 }
 
 # Create a list with names \code{pred} and \code{df_base}

@@ -37,8 +37,8 @@ plot_f(
 \item{fit}{An object of class \linkS4class{lgpfit}.}
 
 \item{pred}{An object of class \linkS4class{GaussianPrediction} or
-\linkS4class{Prediction}. If \code{pred=NULL}, \code{\link{get_pred}}
-is called with the given \code{reduce} and \code{draws} arguments.}
+\linkS4class{Prediction}. If \code{pred=NULL}, the \code{\link{pred}}
+function is called with the given \code{reduce} and \code{draws} arguments.}
 
 \item{group_by}{name of the grouping variable (use \code{group_by=NA}
 to avoid grouping)}

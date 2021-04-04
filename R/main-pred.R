@@ -53,6 +53,14 @@ pred <- function(fit,
                  ...) {
   f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
+
+  # If f is sampled and no x given, call get_pred()
+  if (f_sampled && is.null(x)) {
+    out <- get_pred(fit, draws = draws, reduce = reduce, verbose = verbose)
+    return(out)
+  }
+
+  # Otherwise requires kernel computations
   fp <- posterior_f(
     fit = fit, x = x, reduce = reduce, draws = draws,
     verbose = verbose, STREAM = STREAM, ...

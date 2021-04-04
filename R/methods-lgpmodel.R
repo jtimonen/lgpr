@@ -92,6 +92,12 @@ model_summary <- function(object) {
   invisible(object)
 }
 
+#' @export
+#' @rdname model_summary
+param_summary <- function(object) {
+  model <- object_to_model(object)
+  parameter_info(model)
+}
 
 # Categorial covariate information
 covariate_info.cat <- function(object) {
