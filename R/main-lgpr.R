@@ -177,6 +177,8 @@ validate_lgpscaling <- function(object) {
 #' @rdname validate
 validate_lgpfit <- function(object) {
   errors <- character()
+
+  # Validate num_draws
   N1 <- nrow(get_draws(object, NULL, NULL, pars = c("alpha")))
   N2 <- object@num_draws
   msg <- paste0(
@@ -185,6 +187,14 @@ validate_lgpfit <- function(object) {
   )
   if (N1 != N2) {
     errors <- c(errors, msg)
+  }
+
+  # Validate postproc_results slot
+  if (contains_postproc(object)) {
+    ppn <- names(object@postproc_results)
+    if (ppn != "pred") {
+      errors <- c(errors, "allowed names for postproc_results: {pred}!")
+    }
   }
   return_true_or_errors(errors)
 }

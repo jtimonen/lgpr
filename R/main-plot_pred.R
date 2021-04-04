@@ -12,14 +12,13 @@
 #' @param x Deprecated argument. This is now taken from the \code{pred}
 #' object to ensure compatibility.
 #' @param pred An object of class \linkS4class{GaussianPrediction} or
-#' \linkS4class{Prediction}. It is not recommended to set \code{pred=NULL},
-#' as the \code{pred} needs to be then computed inside this function by
-#' calling \code{\link{pred}}.
+#' \linkS4class{Prediction}. If \code{pred=NULL}, \code{\link{get_pred}}
+#' is called with the given \code{reduce} and \code{draws} arguments.
 #' @param t_name name of the x-axis variable
 #' @param group_by name of the grouping variable (use \code{group_by=NA}
 #' to avoid grouping)
-#' @param draws only has effect if \code{pred} is \code{NULL}
-#' @param reduce only has effect if \code{pred} is \code{NULL}
+#' @param draws Only has effect if \code{pred=NULL}.
+#' @param reduce Only has effect if \code{pred=NULL}.
 #' @param MULT_STD a multiplier for standard deviation
 #' @param ... additional arguments to \code{\link{plot_api_g}} or
 #' \code{\link{plot_api_c}}
@@ -210,13 +209,7 @@ plot_pred.process_args <- function(fit, pred, x, draws, reduce, verbose) {
     warning("The <x> argument is deprecated and has no effect..")
   }
   if (is.null(pred)) {
-    msg <- paste0(
-      "Setting pred=NULL is deprecated. It is recommended to",
-      " first call pred() and then pass the result to plot_pred.",
-      " Now calling pred(x=NULL, ...).\n"
-    )
-    warning(msg)
-    pred <- pred(fit, x = NULL, draws = draws, reduce = reduce, verbose = vrb)
+    pred <- get_pred(fit, draws = draws, reduce = reduce, verbose = vrb)
   }
   return(pred)
 }

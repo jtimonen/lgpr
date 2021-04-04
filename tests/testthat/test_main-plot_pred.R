@@ -20,14 +20,13 @@ test_that("plotting works with defaults", {
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2[[1]], "ggplot")
   expect_equal(length(p2), 5) # num_comps + 1
-  expect_warning(
-    plot_pred(fit, verbose = FALSE),
-    "Setting pred=NULL is deprecated."
-  )
-  expect_warning(
-    plot_components(fit, verbose = FALSE, draw = FALSE),
-    "Setting pred=NULL is deprecated."
-  )
+
+  # With pred = NULL
+  p3 <- plot_pred(fit, verbose = FALSE)
+  p4 <- plot_components(fit, verbose = FALSE, draw = FALSE)
+  expect_s3_class(p3, "ggplot")
+  expect_s3_class(p4[[1]], "ggplot")
+  expect_equal(length(p4), 5) # num_comps + 1
 })
 
 test_that("plotting works with reduce = NULL", {

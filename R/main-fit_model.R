@@ -7,6 +7,8 @@
 #' @inheritParams create_model
 #' @inheritParams sample_model
 #' @inheritParams optimize_model
+#' @param verbose Can messages be printed during model creation? Has no
+#' effect if \code{quiet=TRUE}.
 #'
 #' @section Model formula syntax:
 #' There are two ways to define the model formula:
@@ -139,6 +141,7 @@ NULL
 #' @param skip_postproc Should all postprocessing be skipped? If this is
 #' \code{TRUE}, the returned \linkS4class{lgpfit} object will likely be
 #' much smaller (if \code{sample_f=FALSE}).
+#' @param verbose Can messages be printed during possible postprocessing?
 #' @param ... Optional arguments passed to
 #' \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.
 sample_model <- function(model, verbose = TRUE, quiet = FALSE,

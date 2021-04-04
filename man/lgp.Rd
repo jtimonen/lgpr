@@ -80,7 +80,8 @@ are equivalent to
 
 \item{prior_only}{Should likelihood be ignored?}
 
-\item{verbose}{Should some informative messages be printed?}
+\item{verbose}{Can messages be printed during model creation? Has no
+effect if \code{quiet=TRUE}.}
 
 \item{sample_f}{Determines if the latent function values are sampled
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is

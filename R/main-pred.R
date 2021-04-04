@@ -181,7 +181,7 @@ pred.kr_compute <- function(kernels, pred, delta, verbose,
   num_pred <- dim(Kss)[3]
   out <- array(0, dim = c(D + 1, num_draws, num_pred))
   DELTA <- delta * diag(num_obs)
-  hdr <- progbar_header(num_draws)
+  hdr <- progbar_setup(num_draws)
   idx_print <- dollar(hdr, "idx_print")
   if (verbose) cat(dollar(hdr, "header"), "\n")
   for (i in seq_len(num_draws)) {

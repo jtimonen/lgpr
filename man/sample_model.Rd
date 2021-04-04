@@ -18,6 +18,8 @@ optimize_model(model, ...)
 \arguments{
 \item{model}{An object of class \linkS4class{lgpmodel}.}
 
+\item{verbose}{Can messages be printed during possible postprocessing?}
+
 \item{quiet}{Should all output messages be suppressed? You need to set
 also \code{refresh=0} if you want to suppress also the progress update
 messages from \code{\link[rstan]{sampling}}.}
