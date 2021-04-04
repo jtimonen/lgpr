@@ -1,11 +1,13 @@
 # Set paths
 STAN_HOME <- file.path("inst", "stan")
 FILES <- c(
-  "_common/functions-kernels.stan"
+  "_common/functions-utils.stan",
+  "_common/functions-kernels.stan",
+  "_common/functions-prior.stan"
 )
 
 if (length(FILES) > 0) {
-  # Create stan model containing only a functions block with all the functions
+  # Create Stan model containing only a functions block with all the functions
   two_spaces <- "  " 
   f_list <- lapply(file.path(STAN_HOME, FILES), FUN = readLines)
   functions <- paste(unlist(f_list), collapse = paste0("\n", two_spaces))

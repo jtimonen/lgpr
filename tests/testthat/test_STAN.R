@@ -2,7 +2,7 @@ library(lgpr)
 
 # 1. STAN UTILS -----------------------------------------------------------
 
-context("Stan utils")
+context("STAN functions: utils")
 
 STREAM <- get_stream()
 test_that("rstan::get_stream is in namespace", {
@@ -48,7 +48,7 @@ test_that("STAN_vectorsum works properly", {
 # 2. STAN PRIORS ----------------------------------------------------------
 
 require(stats)
-context("Stan priors")
+context("STAN functions: priors")
 
 test_that("normal prior is correct", {
   x <- 0.333

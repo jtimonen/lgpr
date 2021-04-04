@@ -7,6 +7,31 @@
 
 using namespace Rcpp;
 
+// STAN_vectorsum
+Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_vectorsum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& vecs, const int& L, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_vectorsum(SEXP vecsSEXP, SEXP LSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >& >::type vecs(vecsSEXP);
+    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_vectorsum(vecs, L, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
+// STAN_matrix_array_sum
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> STAN_matrix_array_sum(const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& K, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_matrix_array_sum(SEXP KSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& >::type K(KSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_matrix_array_sum(K, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
 // STAN_warp_input
 Eigen::Matrix<double, Eigen::Dynamic, 1> STAN_warp_input(const Eigen::Matrix<double, Eigen::Dynamic, 1>& x, const double& a, std::ostream* pstream__);
 RcppExport SEXP _lgpr_STAN_warp_input(SEXP xSEXP, SEXP aSEXP, SEXP pstream__SEXP) {
@@ -207,11 +232,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// STAN_log_prior
+double STAN_log_prior(const double& x, const std::vector<int>& types, const std::vector<double>& p, std::ostream* pstream__);
+RcppExport SEXP _lgpr_STAN_log_prior(SEXP xSEXP, SEXP typesSEXP, SEXP pSEXP, SEXP pstream__SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type types(typesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type p(pSEXP);
+    Rcpp::traits::input_parameter< std::ostream* >::type pstream__(pstream__SEXP);
+    rcpp_result_gen = Rcpp::wrap(STAN_log_prior(x, types, p, pstream__));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_mod();
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
+    {"_lgpr_STAN_matrix_array_sum", (DL_FUNC) &_lgpr_STAN_matrix_array_sum, 2},
     {"_lgpr_STAN_warp_input", (DL_FUNC) &_lgpr_STAN_warp_input, 3},
     {"_lgpr_STAN_var_mask", (DL_FUNC) &_lgpr_STAN_var_mask, 3},
     {"_lgpr_STAN_expand", (DL_FUNC) &_lgpr_STAN_expand, 3},
@@ -225,6 +266,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_kernel_varmask", (DL_FUNC) &_lgpr_STAN_kernel_varmask, 5},
     {"_lgpr_STAN_kernel_beta", (DL_FUNC) &_lgpr_STAN_kernel_beta, 4},
     {"_lgpr_STAN_kernel_all", (DL_FUNC) &_lgpr_STAN_kernel_all, 18},
+    {"_lgpr_STAN_log_prior", (DL_FUNC) &_lgpr_STAN_log_prior, 4},
     {"_rcpp_module_boot_stan_fit4lgp_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},
     {NULL, NULL, 0}
