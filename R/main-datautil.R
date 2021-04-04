@@ -221,9 +221,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #'
 #' @family data frame handling functions
 new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
-  if (is(data, "lgpfit")) data <- get_data(data@model)
-  if (is(data, "lgpmodel")) data <- get_data(model)
-  check_type(data, "data.frame")
+  data <- allow_data_model_or_fit(data)
   check_not_null(x)
   check_not_null(x_values)
   check_in_data(x, data, "data")
@@ -315,7 +313,7 @@ plot_data <- function(data,
                       highlight = NULL,
                       main = NULL,
                       sub = NULL) {
-  check_type(data, "data.frame")
+  data <- allow_data_model_or_fit(data)
 
   # Create initial plot and add data
   df <- data[c(x_name, y_name, group_by, color_by, facet_by)]
@@ -402,4 +400,12 @@ plot_data_add_highlight_factor <- function(df, group_by, highlight) {
     df[[name]] <- as.factor(levels[hl])
   }
   return(df)
+}
+
+# This allows data utilities to work with lgpmodel or lgpfit, too
+allow_data_model_or_fit <- function(data) {
+  if (is(data, "lgpfit")) data <- get_data(get_model(data))
+  if (is(data, "lgpmodel")) data <- get_data(data)
+  check_type(data, "data.frame")
+  return(data)
 }

@@ -51,8 +51,8 @@ Optional arguments (\code{...}) are passed to
 
 \item{\code{y_std}}{predictive standard deviation (on original data scale)}
 
-\item{\code{x}}{a data frame of points where the posteriors/predictions have
-been evaluated}
+\item{\code{x}}{a data frame of points (covariate values) where the
+function posteriors or predictive distributions have been evaluated}
 }}
 
 \seealso{

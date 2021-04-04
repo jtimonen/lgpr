@@ -43,6 +43,9 @@ Optional arguments (\code{...}) are passed to
 
 \item{\code{h}}{prediction (signal predictions transformed through inverse link
 function)}
+
+\item{\code{x}}{a data frame of points (covariate values) where the
+functions/predictions have been evaluated/sampled}
 }}
 
 \seealso{

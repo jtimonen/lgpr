@@ -6,6 +6,11 @@ setMethod("show", "lgpfit", function(object) {
   fit_summary(object)
 })
 
+#' @describeIn lgpfit Get names of model components.
+setMethod("component_names", "lgpfit", function(object) {
+  component_names(get_model(object))
+})
+
 #' @describeIn lgpfit Apply postprocessing. Returns an updated
 #' \linkS4class{lgpfit} object (copies data).
 #' @param verbose Can the method print any messages?

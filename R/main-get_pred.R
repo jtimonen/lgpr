@@ -38,7 +38,8 @@ get_pred.sampled <- function(fit, draws, reduce) {
   new("Prediction",
     f_comp = get_pred.sampled.f_comp(fit, draws, reduce),
     f = get_pred.sampled.f(fit, draws, reduce),
-    h = get_pred.sampled.h(fit, draws, reduce)
+    h = get_pred.sampled.h(fit, draws, reduce),
+    x = get_data(get_model(fit))
   )
 }
 
