@@ -5,17 +5,29 @@
 \alias{lgpfit-class}
 \alias{lgpfit}
 \alias{show,lgpfit-method}
+\alias{postproc,lgpfit-method}
+\alias{contains_postproc,lgpfit-method}
+\alias{clear_postproc,lgpfit-method}
 \alias{get_model,lgpfit-method}
 \alias{get_stanfit,lgpfit-method}
+\alias{is_f_sampled,lgpfit-method}
 \alias{get_draws,lgpfit-method}
 \alias{plot,lgpfit,missing-method}
 \title{An S4 class to represent the output of the \code{lgp} function}
 \usage{
 \S4method{show}{lgpfit}(object)
 
+\S4method{postproc}{lgpfit}(object, verbose = TRUE)
+
+\S4method{contains_postproc}{lgpfit}(object)
+
+\S4method{clear_postproc}{lgpfit}(object)
+
 \S4method{get_model}{lgpfit}(object)
 
 \S4method{get_stanfit}{lgpfit}(object)
+
+\S4method{is_f_sampled}{lgpfit}(object)
 
 \S4method{get_draws}{lgpfit}(object, draws = NULL, reduce = NULL, ...)
 
@@ -23,6 +35,8 @@
 }
 \arguments{
 \item{object}{\linkS4class{lgpfit} object for which to apply a class method.}
+
+\item{verbose}{Can the method print any messages?}
 
 \item{draws}{Indices of the parameter draws. \code{NULL} corresponds to
 all post-warmup draws.}
@@ -46,6 +60,14 @@ An S4 class to represent the output of the \code{lgp} function
 \itemize{
 \item \code{show}: Print information and summary about the fit object.
 
+\item \code{postproc}: Apply postprocessing. Returns an updated
+\linkS4class{lgpfit} object (copies data).
+
+\item \code{contains_postproc}: Check if object contains postprocessing information.
+
+\item \code{clear_postproc}: Returns an updated (copies data)
+\linkS4class{lgpfit} object without any postprocessing information.
+
 \item \code{get_model}: Get the stored \linkS4class{lgpmodel} object.
 Various properties of the returned object can be accessed as explained
 in the documentation of \linkS4class{lgpmodel}.
@@ -55,6 +77,9 @@ Various properties of the returned object can be accessed or plotted
 as explained
 \href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}
 or in the documentation of \code{\link[rstan]{stanfit}}.
+
+\item \code{is_f_sampled}: Determine if inference was done by sampling
+the latent signal \code{f} (and its components).
 
 \item \code{get_draws}: Extract parameter draws. Uses \code{\link[rstan]{extract}}
 with \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the
@@ -74,6 +99,9 @@ return value is always a 2-dimensional array of shape
 \item{\code{model}}{An object of class \code{lgpmodel}.}
 
 \item{\code{num_draws}}{Total number of parameter draws.}
+
+\item{\code{postproc_results}}{A named list containing possible postprocessing
+results.}
 }}
 
 \seealso{

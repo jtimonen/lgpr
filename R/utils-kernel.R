@@ -227,7 +227,7 @@ fp_input_draws.latent <- function(fit, reduce, draws) {
     d_f_latent = get_draws(fit, pars = "f_latent"), # S x (num_comps*num_obs)
     d_sigma = get_draw_arr(fit, draws, reduce, "sigma", S, num_sigma),
     d_phi = get_draw_arr(fit, draws, reduce, "phi", S, num_phi),
-    d_gamma = get_draw_arr(fit, draws, reduce, "phi", S, num_gamma)
+    d_gamma = get_draw_arr(fit, draws, reduce, "gamma", S, num_gamma)
   )
 }
 

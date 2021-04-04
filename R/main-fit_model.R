@@ -92,7 +92,10 @@ lgp <- function(formula,
                 prior_only = FALSE,
                 verbose = FALSE,
                 sample_f = !(likelihood == "gaussian"),
+                quiet = FALSE,
+                skip_postproc = sample_f,
                 ...) {
+  if (quiet) verbose <- FALSE
 
   # Create model
   model <- create_model(
@@ -102,7 +105,13 @@ lgp <- function(formula,
 
   # Fit model
   if (verbose) cat("\nSampling model...\n")
-  fit <- sample_model(model = model, ...)
+  fit <- sample_model(
+    model = model,
+    verbose = verbose,
+    quiet = quiet,
+    skip_postproc = skip_postproc,
+    ...
+  )
   if (verbose) cat("Done.\n")
   return(fit)
 }
@@ -124,27 +133,61 @@ NULL
 #' @rdname sample_model
 #' @export
 #' @param model An object of class \linkS4class{lgpmodel}.
+#' @param quiet Should all output messages be suppressed? You need to set
+#' also \code{refresh=0} if you want to suppress also the progress update
+#' messages from \code{\link[rstan]{sampling}}.
+#' @param skip_postproc Should all postprocessing be skipped? If this is
+#' \code{TRUE}, the returned \linkS4class{lgpfit} object will likely be
+#' much smaller (if \code{sample_f=FALSE}).
 #' @param ... Optional arguments passed to
 #' \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.
-sample_model <- function(model, ...) {
+sample_model <- function(model, verbose = TRUE, quiet = FALSE,
+                         skip_postproc = is_f_sampled(model), ...) {
+  if (quiet) verbose <- FALSE
   num_obs <- get_num_obs(model)
   large_data_msg(num_obs, 300)
   object <- get_stan_model(model)
   data <- model@stan_input
+
+  # Run sampling
   stan_fit <- rstan::sampling(
     object = object,
     data = data,
     check_data = TRUE,
     pars = "eta",
     include = FALSE,
+    verbose = verbose,
     ...
   )
   if (stan_fit@mode == 2) {
-    print(stan_fit)
+    if (!quiet) print(stan_fit)
     stop("Failed to create stanfit.")
   }
-  num_draws <- nrow(as.matrix(stan_fit))
-  new("lgpfit", model = model, stan_fit = stan_fit, num_draws = num_draws)
+
+  # Create the lgpfit object
+  fit <- new("lgpfit",
+    model = model,
+    stan_fit = stan_fit,
+    num_draws = nrow(as.matrix(stan_fit)),
+    postproc_results = list()
+  )
+
+  # Postprocess
+  if (skip_postproc) {
+    return(fit)
+  } else {
+    verbose_postproc <- if (quiet) FALSE else TRUE
+    tryCatch(
+      {
+        fit <- postproc(fit, verbose = verbose_postproc)
+      },
+      error = function(e) {
+        warning("\nPostprocessing failed. Reason:")
+        warning(e)
+      }
+    )
+  }
+  return(fit)
 }
 
 #' @rdname sample_model

@@ -6,6 +6,46 @@ setMethod("show", "lgpfit", function(object) {
   fit_summary(object)
 })
 
+#' @describeIn lgpfit Apply postprocessing. Returns an updated
+#' \linkS4class{lgpfit} object (copies data).
+#' @param verbose Can the method print any messages?
+setMethod("postproc", "lgpfit", function(object, verbose = TRUE) {
+
+  # Compute pred that can be used to compute relevances
+  if (contains_postproc(object)) {
+    msg <- paste0(
+      "Object already contains postprocessing information!",
+      " You can remove it by calling clear_postproc()."
+    )
+    stop(msg)
+  }
+  pred <- pred(fit = object, reduce = NULL, verbose = verbose)
+
+  # Return
+  new("lgpfit",
+    model = object@model,
+    stan_fit = object@stan_fit,
+    num_draws = object@num_draws,
+    postproc_results = list(pred = pred)
+  )
+})
+
+#' @describeIn lgpfit Check if object contains postprocessing information.
+setMethod("contains_postproc", "lgpfit", function(object) {
+  length(object@postproc_results) > 0
+})
+
+#' @describeIn lgpfit Returns an updated (copies data)
+#' \linkS4class{lgpfit} object without any postprocessing information.
+setMethod("clear_postproc", "lgpfit", function(object) {
+  new("lgpfit",
+    model = object@model,
+    stan_fit = object@stan_fit,
+    num_draws = object@num_draws,
+    postproc_results = list()
+  )
+})
+
 #' @describeIn lgpfit Get the stored \linkS4class{lgpmodel} object.
 #' Various properties of the returned object can be accessed as explained
 #' in the documentation of \linkS4class{lgpmodel}.
@@ -20,6 +60,12 @@ setMethod("get_model", "lgpfit", function(object) {
 #' or in the documentation of \code{\link[rstan]{stanfit}}.
 setMethod("get_stanfit", "lgpfit", function(object) {
   object@stan_fit
+})
+
+#' @describeIn lgpfit Determine if inference was done by sampling
+#' the latent signal \code{f} (and its components).
+setMethod("is_f_sampled", "lgpfit", function(object) {
+  is_f_sampled(object@model)
 })
 
 #' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}}

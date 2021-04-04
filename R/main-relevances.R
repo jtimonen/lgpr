@@ -1,28 +1,17 @@
 #' Assess component relevances
 #'
-#' @description
-#' \itemize{
-#'   \item \code{relevances} returns a named vector with length equal to
-#'   \code{num_comps + 1}
-#'   \item \code{relevances.default} is the default method
-#'   \item \code{relevances.default_all} returns a \code{data.frame} of size
-#'   \code{num_draws} x \code{num_comps + 1}
-#' }
-#' @param fit an object of class \code{lgpfit}
-#' @param reduce a function to apply to reduce the relevances in each
-#' draw into one value
-#' @param ... currently has no effect
-#' @name relevances
-NULL
-
 #' @export
-#' @rdname relevances
+#' @param fit an object of class \code{lgpfit}
+#' @param reduce a function to apply to reduce the relevances given each
+#' parameter draw into one value
+#' @return a named vector with length equal to \code{num_comps + 1}
+#' @param ... currently has no effect
 relevances <- function(fit, reduce = function(x) base::mean(x), ...) {
   check_type(fit, "lgpfit")
   relevances.default(fit, reduce, ...)
 }
 
-#' @rdname relevances
+# Default method
 relevances.default <- function(fit, reduce, ...) {
   df <- relevances.default.all(fit)
   if (is.null(reduce)) {
@@ -34,7 +23,7 @@ relevances.default <- function(fit, reduce, ...) {
   return(df)
 }
 
-#' @rdname relevances
+# returns a data frame of size (num_draws) x (num_comps + 1)
 relevances.default.all <- function(fit) {
   pred <- get_pred(fit)
   p_noise <- relevances.default.noise(fit, pred)
@@ -47,27 +36,11 @@ relevances.default.all <- function(fit) {
   return(df)
 }
 
-#' Helper functions for relevances.default
-#'
-#' @description
-#' \itemize{
-#'   \item \code{relevances.default.noise} computes the noise proportion
-#'   in each draws, and returns a vector with length \code{num_draws}
-#'   \item \code{relevances.default.comp} divides the signal proportion for
-#'   each component in each draw, and returns a data frame with
-#'   \code{num_draws} rows and \code{num_comps} colums
-#' }
-#' @param pred an object of class \linkS4class{FunctionDraws} or
-#' \linkS4class{FunctionPosterior}
-#' @inheritParams relevances
-#' @name relevances_default
-#' @return an array or vector
-NULL
-
-#' @rdname relevances_default
+# Computes the noise proportion in each draw, and returns a vector with
+# length num_draws
 relevances.default.noise <- function(fit, pred) {
   typ <- class(pred)
-  h <- if (typ == "FunctionDraws") pred@h else pred@y_mean
+  h <- if (typ == "Prediction") pred@h else pred@y_mean
   num_obs <- ncol(h)
   num_draws <- nrow(h)
   y <- get_y(fit, original = TRUE)
@@ -79,10 +52,11 @@ relevances.default.noise <- function(fit, pred) {
   return(1 - p_signal)
 }
 
-#' @rdname relevances_default
+# Divides the signal proportion for each component in each draw, and returns
+# a data frame with \code{num_draws} rows and \code{num_comps} colums
 relevances.default.comp <- function(fit, pred) {
   typ <- class(pred)
-  f_comp <- if (typ == "FunctionDraws") pred@f_comp else pred@f_comp_mean
+  f_comp <- if (typ == "Prediction") pred@f_comp else pred@f_comp_mean
   v_list <- lapply(f_comp, row_vars)
   nam <- names(v_list)
   df <- data.frame(v_list)
@@ -184,16 +158,7 @@ select_freq.integrate <- function(fit,
   )
 }
 
-
-#' Helper functions for component selection
-#'
-#' @inheritParams select
-#' @param rel an array of relevances
-#' @name select.helper
-NULL
-
-
-#' @rdname select.helper
+# Helper function for component selection
 select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
 
   # Get relevances
@@ -230,7 +195,7 @@ select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
 }
 
 
-#' @rdname select.helper
+# Helper function for component selection
 select_freq.all_thresholds <- function(fit, p, h, verbose, ...) {
 
   # Get relevances
@@ -262,8 +227,8 @@ select_freq.all_thresholds <- function(fit, p, h, verbose, ...) {
 }
 
 
-#' @rdname select.helper
-#' @param arr an array of frequencies or selections
+# Helper function for component selection
+# @param arr an array of frequencies or selections
 select.compute_integral <- function(arr, p) {
   L <- nrow(arr)
   D <- ncol(arr)
@@ -274,7 +239,8 @@ select.compute_integral <- function(arr, p) {
   colSums(E * arr)
 }
 
-#' @rdname select.helper
+# Helper function for component selection
+# @param rel an array of relevances
 select.all_draws <- function(rel, threshold) {
   S <- nrow(rel)
   J <- ncol(rel)
@@ -287,7 +253,7 @@ select.all_draws <- function(rel, threshold) {
   return(sel)
 }
 
-#' @rdname select.helper
+# Helper function for component selection
 select.one_draw <- function(rel, threshold) {
   J <- length(rel)
   p_noise <- rel[J]
@@ -308,10 +274,10 @@ select.one_draw <- function(rel, threshold) {
   return(1:J)
 }
 
-#' @rdname select.helper
-#' @param val values
-#' @param val_name name of variable that \code{val} presents
-#' @param comp_names component names
+# Helper function for component selection
+# @param val values
+# @param val_name name of variable that \code{val} presents
+# @param comp_names component names
 result_df <- function(val, val_name, comp_names) {
   df <- data.frame(val)
   colnames(df) <- c("Component")

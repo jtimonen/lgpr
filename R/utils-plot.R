@@ -136,11 +136,7 @@ plot_api_c <- function(df,
   return(h)
 }
 
-#' Initialize a grouped plot
-#'
-#' @inheritParams plot_api_g
-#' @return a \code{ggplot} object
-#' @family plot_api_g functions
+# Initialize a grouped plot
 plot_api_g_create <- function(df_data, i_test, nrow, ncol) {
 
   # Create dummy variable for type (train/test)
@@ -173,13 +169,11 @@ plot_api_g_create <- function(df_data, i_test, nrow, ncol) {
   return(h)
 }
 
-#' Helper function for plot_grouped
-#'
-#' @param data a data frame with three columns
-#' @param type_name name of a factor that is to be distinguished by
-#' plot marker and/or type
-#' @return a ggplot aes object
-#' @family plot_api_g functions
+# Helper function for plot_grouped (creates a ggplot aes object)
+#
+# @param data a data frame with three columns
+# @param type_name name of a factor that is to be distinguished by
+# plot marker and/or type
 plot_api_g_create_aes <- function(data, type_name) {
   group_by <- colnames(data)[1]
   x_name <- colnames(data)[2]
@@ -198,16 +192,8 @@ plot_api_g_create_aes <- function(data, type_name) {
   return(aes)
 }
 
-#' Add real or observed disease effect times to a grouped plot
-#'
-#' @param h a \code{ggplot} object
-#' @param teff a named vector
-#' @param group_by name of grouping variable
-#' @param linecolor line color
-#' @param linetype line type
-#' @param lwd line width
-#' @return updated \code{ggplot} object
-#' @family plot_api_g functions
+# Add real or observed disease effect times to a grouped plot
+# @param teff a named vector
 plot_api_g_add_effect_times <- function(h, teff, group_by,
                                         linecolor, linetype, lwd) {
   if (!is.null(teff)) {
@@ -227,22 +213,7 @@ plot_api_g_add_effect_times <- function(h, teff, group_by,
   return(h)
 }
 
-
-#' Add layers to a grouped or componentwise plot
-#'
-#' @param h a ggplot object
-#' @param df a data frame containing the things to add
-#' @param x_name name of the x-axis variable
-#' @param group_by name of the grouping factor
-#' @param color_by name of the coloring factor
-#' @param color color
-#' @param alpha opacity
-#' @return a modified ggplot object
-#' @name add_layer
-NULL
-
-
-#' @rdname add_layer
+# Add line layer to a componentwise plot
 add_c_layer_line <- function(h, df, x_name, group_by, color_by, alpha) {
   if (!is.null(df)) {
     check_type(df, "data.frame")
@@ -271,7 +242,7 @@ add_c_layer_line <- function(h, df, x_name, group_by, color_by, alpha) {
   return(h)
 }
 
-#' @rdname add_layer
+# Add ribbon layer to a componentwise plot
 add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
   if (!is.null(df)) {
     check_type(df, "data.frame")
@@ -299,7 +270,7 @@ add_c_layer_ribbon <- function(h, df, x_name, group_by, color_by, alpha) {
   return(h)
 }
 
-#' @rdname add_layer
+# Add ribbon layer to a grouped plot
 add_g_layer_ribbon <- function(h, df, x_name, group_by, color, alpha) {
   if (!is.null(df)) {
     check_type(df, "data.frame")
@@ -321,7 +292,7 @@ add_g_layer_ribbon <- function(h, df, x_name, group_by, color, alpha) {
   return(h)
 }
 
-#' @rdname add_layer
+# Add model fit (line) layer to a grouped plot
 add_g_layer_fit <- function(h, df, x_name, group_by, color, alpha) {
   if (!is.null(df)) {
     check_type(df, "data.frame")
@@ -345,8 +316,7 @@ add_g_layer_fit <- function(h, df, x_name, group_by, color, alpha) {
   return(h)
 }
 
-
-#' @rdname add_layer
+# Add true signal (line) layer to a grouped plot
 add_g_layer_signal <- function(h, df, x_name, group_by, color) {
   if (!is.null(df)) {
     check_type(df, "data.frame")
@@ -365,9 +335,7 @@ add_g_layer_signal <- function(h, df, x_name, group_by, color) {
   return(h)
 }
 
-#' @rdname add_layer
-#' @param facet_by factor to use for faceting
-#' @inheritParams plot_api_g
+# Add faceting to a grouped plot
 add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
   f <- stats::as.formula(paste("~", facet_by))
   labfun <- ggplot2::label_both
@@ -376,13 +344,13 @@ add_g_layer_faceting <- function(h, facet_by, nrow, ncol) {
 }
 
 
-#' Plot colors
-#'
-#' @param main Color name. Must be a valid scheme name for
-#' \code{\link[bayesplot]{color_scheme_get}}.
-#' @param variant Must be one of {"light", "light_highlight", "mid",
-#' "mid_highlight", "dark", "dark_highlight"}.
-#' @return A hex value of the color.
+# Plot colors
+#
+# @param main Color name. Must be a valid scheme name for
+# \code{\link[bayesplot]{color_scheme_get}}.
+# @param variant Must be one of {"light", "light_highlight", "mid",
+# "mid_highlight", "dark", "dark_highlight"}.
+# @return A hex value of the color.
 colorset <- function(main, variant = "mid") {
   scheme <- bayesplot::color_scheme_get(scheme = main)
   col <- scheme[[variant]]

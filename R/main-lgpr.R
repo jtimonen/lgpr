@@ -342,13 +342,16 @@ lgpmodel <- setClass("lgpmodel",
 #' @slot stan_fit An object of class \code{stanfit}.
 #' @slot model An object of class \code{lgpmodel}.
 #' @slot num_draws Total number of parameter draws.
+#' @slot postproc_results A named list containing possible postprocessing
+#' results.
 #' @param object \linkS4class{lgpfit} object for which to apply a class method.
 #' @param ... optional arguments passed to a subroutine
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
     model = "lgpmodel",
-    num_draws = "numeric"
+    num_draws = "numeric",
+    postproc_results = "list"
   ),
   validity = validate_lgpfit
 )
@@ -510,6 +513,11 @@ setGeneric(
 )
 
 setGeneric(
+  "is_f_sampled",
+  function(object) standardGeneric("is_f_sampled")
+)
+
+setGeneric(
   "get_stanfit",
   function(object) standardGeneric("get_stanfit")
 )
@@ -517,4 +525,16 @@ setGeneric(
 setGeneric(
   "get_draws",
   function(object, draws = NULL, reduce = NULL, ...) standardGeneric("get_draws")
+)
+
+setGeneric(
+  "postproc", function(object, ...) standardGeneric("postproc")
+)
+
+setGeneric(
+  "contains_postproc", function(object) standardGeneric("contains_postproc")
+)
+
+setGeneric(
+  "clear_postproc", function(object) standardGeneric("clear_postproc")
 )

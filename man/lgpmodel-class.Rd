@@ -9,6 +9,7 @@
 \alias{component_info,lgpmodel-method}
 \alias{covariate_info,lgpmodel-method}
 \alias{component_names,lgpmodel-method}
+\alias{is_f_sampled,lgpmodel-method}
 \title{An S4 class to represent an additive GP model}
 \usage{
 \S4method{show}{lgpmodel}(object)
@@ -20,6 +21,8 @@
 \S4method{covariate_info}{lgpmodel}(object)
 
 \S4method{component_names}{lgpmodel}(object)
+
+\S4method{is_f_sampled}{lgpmodel}(object)
 }
 \arguments{
 \item{object}{\linkS4class{lgpmodel} object for which to apply a class
@@ -44,6 +47,9 @@ component.
 \item \code{covariate_info}: Get covariate information.
 
 \item \code{component_names}: Get names of model components.
+
+\item \code{is_f_sampled}: Determine if inference of the model requires sampling
+the latent signal \code{f} (and its components).
 }}
 
 \section{Slots}{

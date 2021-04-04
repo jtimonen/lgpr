@@ -5,12 +5,26 @@
 \alias{optimize_model}
 \title{Fitting a model}
 \usage{
-sample_model(model, ...)
+sample_model(
+  model,
+  verbose = TRUE,
+  quiet = FALSE,
+  skip_postproc = is_f_sampled(model),
+  ...
+)
 
 optimize_model(model, ...)
 }
 \arguments{
 \item{model}{An object of class \linkS4class{lgpmodel}.}
+
+\item{quiet}{Should all output messages be suppressed? You need to set
+also \code{refresh=0} if you want to suppress also the progress update
+messages from \code{\link[rstan]{sampling}}.}
+
+\item{skip_postproc}{Should all postprocessing be skipped? If this is
+\code{TRUE}, the returned \linkS4class{lgpfit} object will likely be
+much smaller (if \code{sample_f=FALSE}).}
 
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}

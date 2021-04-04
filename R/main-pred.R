@@ -3,7 +3,8 @@
 #' @description
 #' \itemize{
 #'   \item If \code{fit} is for a model that marginalizes the latent
-#'   signal \code{f}, this computes the analytical conditional posterior
+#'   signal \code{f} (i.e. \code{is_f_sampled(fit)=FALSE}), this computes the
+#'   analytical conditional posterior
 #'   distributions of each model component, their sum, and the conditional
 #'   predictive distribution. All these are computed for
 #'   each (hyper)parameter draw (defined by \code{draws}), or other parameter
@@ -11,9 +12,9 @@
 #'   in a \linkS4class{GaussianPrediction} object which is then returned.
 #'
 #'   \item If \code{fit} is for a model that samples the latent
-#'   signal components (and their sum \code{f}), this will in addition to
-#'   these function samples, compute versions of the sum \code{f} samples
-#'   which are transformed through the inverse link function.
+#'   signal \code{f} (i.e. \code{is_f_sampled(fit)=TRUE}), this will in
+#'   addition to these function samples, compute versions of the sum
+#'   \code{f} samples which are transformed through the inverse link function.
 #'   These are stored in a \linkS4class{Prediction}
 #'   object which is then returned.
 #' }

@@ -15,6 +15,8 @@ lgp(
   prior_only = FALSE,
   verbose = FALSE,
   sample_f = !(likelihood == "gaussian"),
+  quiet = FALSE,
+  skip_postproc = sample_f,
   ...
 )
 }
@@ -84,6 +86,14 @@ are equivalent to
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
 \code{TRUE}, the response variable will be normalized to have zero mean
 and unit variance.}
+
+\item{quiet}{Should all output messages be suppressed? You need to set
+also \code{refresh=0} if you want to suppress also the progress update
+messages from \code{\link[rstan]{sampling}}.}
+
+\item{skip_postproc}{Should all postprocessing be skipped? If this is
+\code{TRUE}, the returned \linkS4class{lgpfit} object will likely be
+much smaller (if \code{sample_f=FALSE}).}
 
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}

@@ -42,6 +42,12 @@ setMethod("component_names", "lgpmodel", function(object) {
   rownames(get_component_encoding(object))
 })
 
+#' @describeIn lgpmodel Determine if inference of the model requires sampling
+#' the latent signal \code{f} (and its components).
+setMethod("is_f_sampled", "lgpmodel", function(object) {
+  object@sample_f
+})
+
 #' Print a model summary.
 #'
 #' @export
@@ -193,12 +199,6 @@ get_num_obs <- function(object) {
 # Get number of components
 get_num_comps <- function(object) {
   dollar(get_stan_input(object), "num_comps")
-}
-
-# Determine if f is sampled
-is_f_sampled <- function(object) {
-  object <- object_to_model(object)
-  object@sample_f
 }
 
 # Get observation model (human readable string)
