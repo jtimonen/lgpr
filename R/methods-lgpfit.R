@@ -17,6 +17,7 @@ setMethod("component_names", "lgpfit", function(object) {
 setMethod("postproc", "lgpfit", function(object, verbose = TRUE) {
 
   # Compute pred that can be used to compute relevances
+  if (verbose) cat("Postprocessing...\n")
   if (contains_postproc(object)) {
     msg <- paste0(
       "Object already contains postprocessing information!",

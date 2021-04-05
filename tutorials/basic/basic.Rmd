@@ -364,8 +364,8 @@ the data.
 ```{r vis3, fig.width=7, fig.height=4}
 t <- seq(1, 120, by = 1)
 x_pred <- new_x(testdata_002, t, x_ns = "diseaseAge")
-p <- pred(fit, x_pred, reduce = mean)
-plot_pred(fit, x = x_pred, pred = p)
+p <- pred(fit, x_pred, reduce = mean) # use posterior mean kernel parameters
+plot_pred(fit, pred = p)
 ```
 
 # Visualizing the inferred covariate effects
@@ -374,7 +374,6 @@ Also the posterior distribution of each component can be visualized
 
 ```{r vis4, fig.width=7, fig.height=7}
 plot_components(fit,
-                x = x_pred, 
                 pred = p,
                 color_by = c(NA, NA, "sex", "group", "group", "group"),
                 ylim = c(-3,2),
