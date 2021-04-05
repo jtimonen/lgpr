@@ -83,8 +83,6 @@ pred_gaussian <- function(fit, fp, verbose) {
   sigma2 <- dollar(fp, "sigma2")
   y_scl <- dollar(fit@model@var_scalings, "y")
   y_pred <- pred_gaussian.f_to_y(f_mean, f_std, sigma2, y_scl)
-
-  if (verbose) cat("Done.\n")
   new("GaussianPrediction",
     f_comp_mean = dollar(fp, "f_comp_mean"),
     f_comp_std = dollar(fp, "f_comp_std"),
