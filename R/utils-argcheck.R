@@ -1,13 +1,9 @@
-#' Argument validation
-#'
-#' @name checks
-#' @param arg An argument to check.
-#' @return \code{TRUE} if the check passes, throw error otherwise.
-#' @family argument checks
-NULL
+# Argument validation
+#
+# @param arg An argument to check.
+# @return \code{TRUE} if the check passes, throw error otherwise.
 
-#' @describeIn checks checks that argument has expected type
-#' @param allowed Allowed class names.
+# checks that argument has one of the allowed types
 check_type <- function(arg, allowed) {
   arg_name <- deparse(substitute(arg))
 
@@ -34,8 +30,7 @@ check_type <- function(arg, allowed) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is a function
-#' @param arg_name argument name
+# checks that argument is a function
 check_function <- function(arg, arg_name) {
   ok <- is.function(arg)
   if (!ok) {
@@ -48,7 +43,7 @@ check_function <- function(arg, arg_name) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is numeric
+# checks that argument is numeric
 check_numeric <- function(arg) {
   if (!is.numeric(arg)) {
     arg_name <- deparse(substitute(arg))
@@ -58,7 +53,7 @@ check_numeric <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is positive
+# checks that argument is positive
 check_positive <- function(arg) {
   check_numeric(arg)
   if (arg <= 0) {
@@ -69,7 +64,7 @@ check_positive <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is non-negative
+# checks that argument is non-negative
 check_non_negative <- function(arg) {
   check_numeric(arg)
   if (arg < 0) {
@@ -80,7 +75,7 @@ check_non_negative <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has only positive values
+# checks that argument has only positive values
 check_positive_all <- function(arg) {
   check_numeric(arg)
   if (any(arg <= 0)) {
@@ -91,7 +86,7 @@ check_positive_all <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has only non-negative values
+# checks that argument has only non-negative values
 check_non_negative_all <- function(arg) {
   check_numeric(arg)
   if (any(arg < 0)) {
@@ -102,7 +97,7 @@ check_non_negative_all <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has only integer values
+# checks that argument has only integer values
 check_integer_all <- function(arg) {
   check_numeric(arg)
   if (sum(round(arg) != arg) > 0) {
@@ -113,9 +108,7 @@ check_integer_all <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that value is in some interval (strictly)
-#' @param lower interval minimum
-#' @param upper interval maximum
+# checks checks that value is in some interval (strictly)
 check_interval <- function(arg, lower, upper) {
   check_numeric(arg)
   if (arg < lower || arg > upper) {
@@ -129,7 +122,7 @@ check_interval <- function(arg, lower, upper) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is not NULL
+# checks that argument is not NULL
 check_not_null <- function(arg) {
   arg_name <- deparse(substitute(arg))
   if (is.null(arg)) {
@@ -138,8 +131,8 @@ check_not_null <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is NULL
-#' @param reason explanation why the argument should be NULL
+# checks checks that argument is NULL
+# @param reason explanation why the argument should be NULL
 check_null <- function(arg, reason = NULL) {
   arg_name <- deparse(substitute(arg))
   if (!is.null(arg)) {
@@ -152,8 +145,7 @@ check_null <- function(arg, reason = NULL) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has expected length
-#' @param expected Expected length.
+# checks that argument has expected length
 check_length <- function(arg, expected) {
   L <- length(arg)
   ok <- (L == expected)
@@ -168,8 +160,7 @@ check_length <- function(arg, expected) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has length 1 or required other value
-#' @param expected Expected length.
+# checks that argument has length 1 or required other value
 check_length_1_or <- function(arg, expected) {
   L <- length(arg)
   ok <- (L == expected) || (L == 1)
@@ -184,8 +175,7 @@ check_length_1_or <- function(arg, expected) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has at least some length
-#' @param min_length Minimum allowed length.
+# checks that argument has at least min_length length
 check_length_geq <- function(arg, min_length) {
   L <- length(arg)
   bad <- (L < min_length)
@@ -200,9 +190,7 @@ check_length_geq <- function(arg, min_length) {
   TRUE
 }
 
-#' @describeIn checks checks that arguments have same length
-#' @param a An argument to check.
-#' @param b An argument to check.
+# checks that arguments a and b have same length
 check_lengths <- function(a, b) {
   L1 <- length(a)
   L2 <- length(b)
@@ -218,7 +206,7 @@ check_lengths <- function(a, b) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is FALSE
+# checks that argument is FALSE
 check_false <- function(arg) {
   arg_name <- deparse(substitute(arg))
   check_not_null(arg)
@@ -231,10 +219,10 @@ check_false <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that data frame contains a variable
-#' @param var_name the variable to be searched for
-#' @param data a data frame
-#' @param arg_name name of the data frame
+# checks that data frame contains a variable
+# @param var_name the variable to be searched for
+# @param data a data frame
+# @param arg_name name of the data frame
 check_in_data <- function(var_name, data, arg_name) {
   d_names <- colnames(data)
   ok <- (var_name %in% d_names)
@@ -249,9 +237,8 @@ check_in_data <- function(var_name, data, arg_name) {
   TRUE
 }
 
-#' @describeIn checks checks that argument is a \code{data.frame} and contains
-#' required variables
-#' @param var_names required variable names in a data frame
+# checks that argument is a \code{data.frame} and contains
+# required variables (var_names)
 check_df_with <- function(arg, var_names) {
   arg_name <- deparse(substitute(arg))
   c_data <- class(arg)
@@ -264,9 +251,8 @@ check_df_with <- function(arg, var_names) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has values less than equal to
-#' given maximums, elementwise
-#' @param maximums maximum allowed values for \code{arg}
+# checks that argument has values less than equal to
+# given maximums, elementwise
 check_all_leq <- function(arg, maximums) {
   check_lengths(arg, maximums)
   L <- length(arg)
@@ -286,7 +272,7 @@ check_all_leq <- function(arg, maximums) {
   TRUE
 }
 
-#' @describeIn checks checks that object has no names
+# checks that object has no names
 check_not_named <- function(arg) {
   arg_name <- deparse(substitute(arg))
   nams <- names(arg)
@@ -298,7 +284,7 @@ check_not_named <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that object has names
+# checks that object has names
 check_named <- function(arg) {
   arg_name <- deparse(substitute(arg))
   nams <- names(arg)
@@ -309,8 +295,7 @@ check_named <- function(arg) {
   TRUE
 }
 
-#' @describeIn checks checks that argument has expected number of dimensions
-#' @param D expected number of dimensions
+# checks that argument has expected number of dimensions
 check_dim <- function(arg, D) {
   arg_name <- deparse(substitute(arg))
   L <- length(dim(arg))
@@ -324,7 +309,7 @@ check_dim <- function(arg, D) {
   TRUE
 }
 
-#' @describeIn checks checks that vector has only unique values
+# checks that vector has only unique values
 check_unique <- function(arg) {
   arg_name <- deparse(substitute(arg))
   L1 <- length(arg)
@@ -333,17 +318,17 @@ check_unique <- function(arg) {
   TRUE
 }
 
-#' Check if argument is one of the allowed options
-#'
-#' @description Replacement for the \code{base} R function \code{match.arg}.
-#' Gives more informative errors and requires exact match. Should only be used
-#' as a subroutine of other functions and never directly.
-#'
-#' @param arg The given argument. Cannot be a list.
-#' @param allowed Allowed arguments. Must be have length at least 2.
-#' @return Return the index of \code{arg} in \code{allowed} or
-#' throws an error if argument is not valid.
-#' @family argument checks
+# Check if argument is one of the allowed options
+#
+# @description Replacement for the \code{base} R function \code{match.arg}.
+# Gives more informative errors and requires exact match. Should only be used
+# as a subroutine of other functions and never directly.
+#
+# @param arg The given argument. Cannot be a list.
+# @param allowed Allowed arguments. Must be have length at least 2.
+# @return Return the index of \code{arg} in \code{allowed} or
+# throws an error if argument is not valid.
+# @family argument checks
 check_allowed <- function(arg, allowed) {
 
   # Get names of given arguments and caller function

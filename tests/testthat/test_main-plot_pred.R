@@ -19,14 +19,14 @@ test_that("plotting works with defaults", {
   p2 <- plot_components(fit, pred = a, draw = FALSE)
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2[[1]], "ggplot")
-  expect_equal(length(p2), 5) # num_comps + 1
+  expect_equal(length(p2), 5) # should have length num_comps + 1
 
   # With pred = NULL
   p3 <- plot_pred(fit, verbose = FALSE)
   p4 <- plot_components(fit, verbose = FALSE, draw = FALSE)
   expect_s3_class(p3, "ggplot")
   expect_s3_class(p4[[1]], "ggplot")
-  expect_equal(length(p4), 5) # num_comps + 1
+  expect_equal(length(p4), 5) # should have length num_comps + 1
 })
 
 test_that("plotting works with reduce = NULL", {

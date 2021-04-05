@@ -67,19 +67,23 @@ kernel_const_all <- function(input, is_out1, is_out2, STREAM) {
 }
 
 
+
 # Compute all kernel matrices of a model
 kernel_all <- function(input, K_const, is_out1, is_out2,
                        verbose, debug_dims, STREAM) {
 
   # Field names
-  A1 <- if (is_out1) "x_cont_OUT" else "x_cont"
-  A2 <- if (is_out2) "x_cont_OUT" else "x_cont"
-  B1 <- if (is_out1) "x_cont_unnorm_OUT" else "x_cont_unnorm"
-  B2 <- if (is_out2) "x_cont_unnorm_OUT" else "x_cont_unnorm"
+  field_name <- function(is_out, base_name) {
+    if (is_out) paste0(base_name, "_OUT") else base_name
+  }
+  A1 <- field_name(is_out1, "x_cont")
+  A2 <- field_name(is_out2, "x_cont")
+  B1 <- field_name(is_out1, "x_cont_unnorm")
+  B2 <- field_name(is_out2, "x_cont_unnorm")
   C1 <- if (is_out1) "num_OUT" else "num_obs"
   C2 <- if (is_out2) "num_OUT" else "num_obs"
-  D1 <- if (is_out1) "idx_expand_OUT" else "idx_expand"
-  D2 <- if (is_out2) "idx_expand_OUT" else "idx_expand"
+  D1 <- field_name(is_out1, "idx_expand")
+  D2 <- field_name(is_out2, "idx_expand")
 
   # Get fields (possibly in list format)
   x1 <- matrix_to_list(dollar(input, A1))
@@ -98,12 +102,11 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   alpha <- dollar(input, "d_alpha")
   ell <- dollar(input, "d_ell")
   wrp <- dollar(input, "d_wrp")
-  beta <- dollar(input, "d_beta") # shape (S, num_heter > 1, num_bt)
-  teff <- dollar(input, "d_teff") # shape (S, num_uncrt > 1, num_bt)
+  beta <- dollar(input, "d_beta") # has shape (S, num_heter > 1, num_bt)
+  teff <- dollar(input, "d_teff") # has shape (S, num_uncrt > 1, num_bt)
 
   # Setup
   S <- dollar(input, "num_paramsets")
-  J <- length(K_const) # number of components
   K_out <- list()
 
   # Print dimensions

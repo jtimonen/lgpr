@@ -86,8 +86,8 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
     Ks_i <- Ks[[idx]]
     Kss_i <- Kss[[idx]]
     fp_i <- fp_gaussian.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
-    mean_i <- dollar(fp_i, "mean") # matrix(0, P, J + 1)
-    std_i <- dollar(fp_i, "sd") # matrix(0, P, J + 1)
+    mean_i <- dollar(fp_i, "mean") # matrix with shape (P, J + 1)
+    std_i <- dollar(fp_i, "sd") # matrix with shape (P, J + 1)
 
     # Store result and update progress
     f_comp_mean[idx, , ] <- mean_i[, 1:J]
