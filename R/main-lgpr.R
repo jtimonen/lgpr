@@ -30,7 +30,7 @@
 #' @section Data:
 #' The data that you wish to analyze with \code{lgpr} should be in an R
 #' \code{data.frame} where columns correspond to measured variables and rows
-#' corresponds to obervations. Some functions that can help working with such
+#' correspond to observations. Some functions that can help working with such
 #' data frames are:
 #' \itemize{
 #'  \item \code{\link{plot_data}}: Visualizing data.
