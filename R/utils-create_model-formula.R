@@ -15,12 +15,12 @@
 #' @return an object of class \linkS4class{lgpformula}
 #' @family internal model creation functions
 create_model.formula <- function(formula, data, verbose = FALSE) {
-  if (verbose) cat("Parsing formula...\n")
+  log_progress("Parsing formula...", verbose)
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data)
   fp <- as.character(formula)
   formula_str <- paste(fp[2], fp[1], fp[3])
-  if (verbose) cat("Formula interpreted as:", formula_str, "\n")
+  log_info(paste0("Formula interpreted as: ", formula_str), verbose)
   parse_formula_advanced(formula)
 }
 

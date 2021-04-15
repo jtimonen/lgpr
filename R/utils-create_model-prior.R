@@ -8,7 +8,7 @@
 #' @return a named list of parsed options
 #' @family internal model creation functions
 create_model.prior <- function(prior, stan_input, verbose) {
-  if (verbose) cat("Parsing prior...\n")
+  log_progress("Parsing prior...", verbose)
   num_uncrt <- dollar(stan_input, "num_uncrt")
   num_ns <- dollar(stan_input, "num_ns")
   filled <- fill_prior(prior, num_uncrt)
@@ -28,7 +28,7 @@ create_model.prior <- function(prior, stan_input, verbose) {
     " model, default priors are used for them: {", str2, "}"
   )
   info <- paste0(msg1, "\n", msg2, "\n")
-  if (verbose) cat(info)
+  log_info(info, verbose)
 
   raw <- dollar(filled, "prior")
   to_stan <- parse_prior_full(raw, stan_input)

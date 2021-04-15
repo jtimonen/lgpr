@@ -1,4 +1,4 @@
-set.seed(9393)
+set.seed(93391)
 library(lgpr)
 # source("tests/testthat/helpers/SW.R")
 source("helpers/SW.R")
@@ -44,7 +44,7 @@ test_that("matrices have correct shape when model has multiple components", {
   expect_equal(length(mats$Kss[[1]]), J)
 
   # Expect output in debug mode
-  expect_output(
+  expect_message(
     posterior_f(fit, debug_km = TRUE, debug_dims = TRUE, verbose = FALSE)
   )
 

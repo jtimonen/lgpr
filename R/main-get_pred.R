@@ -24,14 +24,12 @@ get_pred.gaussian <- function(fit, draws, reduce, verbose) {
   if (contains_postproc(fit)) {
     pred <- dollar(fit@postproc_results, "pred")
   } else {
-    if (verbose) {
-      cat(
-        "No existing postprocessing information stored.",
-        "Re-computation needed.\n"
-      )
-    }
-    pred <- pred(fit, reduce = reduce, draws = draws, verbose = verbose)
+    log_info(
+      "No existing postprocessing information stored. Recomputing...",
+      verbose
+    )
   }
+  pred <- pred(fit, reduce = reduce, draws = draws, verbose = verbose)
   return(pred)
 }
 

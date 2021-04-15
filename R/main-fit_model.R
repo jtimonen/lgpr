@@ -100,14 +100,14 @@ lgp <- function(formula,
   if (quiet) verbose <- FALSE
 
   # Create model
-  if (verbose) cat("Creating model...\n")
+  log_progress("Creating model...", verbose)
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
     prior_only, verbose, sample_f
   )
 
   # Fit model
-  if (verbose) cat("\nSampling model...\n")
+  log_progress("\nSampling model...", verbose)
   fit <- sample_model(
     model = model,
     verbose = verbose,
@@ -162,7 +162,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
     verbose = verbose,
     ...
   )
-  if (verbose) cat("Sampling done.\n")
+  log_progress("Sampling done.", verbose)
   if (stan_fit@mode == 2) {
     if (!quiet) print(stan_fit)
     stop("Failed to create stanfit.")
@@ -177,7 +177,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
   )
 
   # Postprocess
-  if (verbose) cat("\nPostprocessing...\n")
+  log_progress("\nPostprocessing...", verbose)
   if (skip_postproc) {
     return(fit)
   } else {
@@ -192,7 +192,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
       }
     )
   }
-  if (verbose) cat("Postprocessing done.\n")
+  log_progress("Postprocessing done.", verbose)
   return(fit)
 }
 

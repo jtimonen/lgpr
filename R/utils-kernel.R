@@ -10,24 +10,24 @@ kernels_fpost <- function(fit,
                           STREAM = get_stream()) {
   vrb <- verbose
   dd <- debug_dims
-  if (vrb) cat("Creating inputs...\n")
+  log_progress("Creating inputs...", vrb)
   input <- kernels_fpost.create_input(fit, x, reduce, draws)
 
-  if (vrb) cat("Creating constant kernel matrices...\n")
+  log_progress("Creating constant kernel matrices...", vrb)
   K_const <- kernel_const_all(input, FALSE, FALSE, STREAM)
   Ks_const <- kernel_const_all(input, TRUE, FALSE, STREAM)
   Kss_const <- kernel_const_all(input, TRUE, TRUE, STREAM)
 
   # Final parameter-dependent kernel matrices
-  if (verbose) cat("Creating final kernel matrices (data vs. data)...\n")
+  log_progress("Creating final kernel matrices (data vs. data)...", vrb)
   K <- kernel_all(input, K_const, FALSE, FALSE, vrb, dd, STREAM)
   if (is.null(x)) {
     Ks <- K
     Kss <- K
   } else {
-    if (verbose) cat("Creating final kernel matrices (out vs. data)...\n")
+    log_progress("Creating final kernel matrices (out vs. data)...", vrb)
     Ks <- kernel_all(input, Ks_const, TRUE, FALSE, vrb, dd, STREAM)
-    if (verbose) cat("Creating final kernel matrices (out vs. out)...\n")
+    log_progress("Creating final kernel matrices (out vs. out)...", vrb)
     Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
   }
 
@@ -123,7 +123,7 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
   progbar <- verbose && S > 1
   pb <- progbar_setup(S)
   idx_print <- dollar(pb, "idx_print")
-  if (progbar) cat(dollar(pb, "header"))
+  log_progress(dollar(pb, "header"), progbar)
 
   for (idx in seq_len(S)) {
 
@@ -145,7 +145,7 @@ kernel_all <- function(input, K_const, is_out1, is_out2,
     # Store result and update progress
     if (progbar) progbar_print(idx, idx_print)
   }
-  if (progbar) cat("\n")
+  log_progress(" ", progbar)
   return(K_out)
 }
 

@@ -75,9 +75,10 @@ pred <- function(fit,
 
 # pred when sample_f = FALSE
 pred_gaussian <- function(fit, fp, verbose) {
-  if (verbose) {
-    cat("Computing preditive distribution on original data scale...\n")
-  }
+  log_progress(
+    "Computing preditive distribution on original data scale...",
+    verbose
+  )
   f_mean <- dollar(fp, "f_mean")
   f_std <- dollar(fp, "f_std")
   sigma2 <- dollar(fp, "sigma2")
@@ -114,12 +115,12 @@ pred_kr <- function(fit, fp, verbose, STREAM, c_hat_pred) {
   kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
   si <- get_stan_input(fit)
   delta <- dollar(si, "delta")
-  if (verbose) cat("Extracting sampled function components...\n")
+  log_progress("Extracting sampled function components...", verbose)
   pred <- get_pred(fit, draws = draws, reduce = reduce)
-  if (verbose) cat("Computing kernel regression...\n")
+  log_progress("Computing kernel regression...", verbose)
   kr <- pred.kr_compute(kernels, pred, delta, verbose, STREAM)
   f <- dollar(kr, "f")
-  if (verbose) cat("Done.\n")
+  log_progress("Done.", verbose)
 
   h <- pred.kr_h(fit, f, c_hat_pred, verbose)
 
@@ -153,7 +154,7 @@ pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
         "c_hat_pred not given,",
         " using constant c_hat_pred = ", c_hat_data[1], "\n"
       )
-      if (verbose) cat(msg)
+      log_info(msg, verbose)
       c_hat_pred <- rep(c_hat_data[1], num_pred)
     } else {
       msg <- paste0(
@@ -189,7 +190,7 @@ pred.kr_compute <- function(kernels, pred, delta, verbose,
   DELTA <- delta * diag(num_obs)
   hdr <- progbar_setup(num_draws)
   idx_print <- dollar(hdr, "idx_print")
-  if (verbose) cat(dollar(hdr, "header"), "\n")
+  log_progress(dollar(hdr, "header"), verbose)
   for (i in seq_len(num_draws)) {
     f_sum <- 0
     for (j in seq_len(D)) {
@@ -204,7 +205,7 @@ pred.kr_compute <- function(kernels, pred, delta, verbose,
     out[D + 1, i, ] <- f_sum
     if (verbose) progbar_print(i, idx_print)
   }
-  if (verbose) cat("\n")
+  log_progress(" ", verbose)
 
   # Return
   list(

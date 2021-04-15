@@ -71,7 +71,7 @@ create_model <- function(formula,
     sample_f = sample_f,
     full_prior = full_prior
   )
-  if (verbose) cat("Done.\n")
+  log_progress("Done.", verbose)
   return(out)
 }
 
@@ -92,7 +92,7 @@ create_model <- function(formula,
 create_model.options <- function(options, verbose) {
 
   # Default options
-  if (verbose) cat("Parsing options...\n")
+  log_progress("Parsing options...", verbose)
   input <- options
   opts <- list(delta = 1e-8, vm_params = c(0.025, 1))
 

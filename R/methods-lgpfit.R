@@ -1,7 +1,7 @@
 #' @describeIn lgpfit Print information and summary about the fit object.
 setMethod("show", "lgpfit", function(object) {
-  msg <- class_info("lgpfit")
-  cat(msg)
+  desc <- class_info("lgpfit")
+  cat(desc)
   cat("\n")
   fit_summary(object)
 })

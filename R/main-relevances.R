@@ -182,7 +182,7 @@ select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
   pb <- progbar_setup(L)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
-  if (verbose) cat(hdr, "\n")
+  log_progress(hdr, verbose)
 
   # Loop
   for (i in 1:L) {
@@ -190,7 +190,7 @@ select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
     SEL[i, ] <- sel
     if (verbose) progbar_print(i, idx_print)
   }
-  if (verbose) cat("\n")
+  log_progress(" ", verbose)
   return(SEL)
 }
 
@@ -214,7 +214,7 @@ select_freq.all_thresholds <- function(fit, p, h, verbose, ...) {
   pb <- progbar_setup(L)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
-  if (verbose) cat(hdr, "\n")
+  log_progress(hdr, verbose)
 
   # Loop
   for (i in 1:L) {
@@ -222,7 +222,7 @@ select_freq.all_thresholds <- function(fit, p, h, verbose, ...) {
     FREQ[i, ] <- colMeans(freq)
     if (verbose) progbar_print(i, idx_print)
   }
-  if (verbose) cat("\n")
+  log_progress(" ", verbose)
   return(FREQ)
 }
 

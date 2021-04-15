@@ -1,8 +1,8 @@
 #' @describeIn lgpmodel Print information and summary about the object.
 #' Returns \code{object} invisibly.
 setMethod("show", "lgpmodel", function(object) {
-  msg <- class_info("lgpmodel")
-  cat(msg)
+  desc <- class_info("lgpmodel")
+  cat(desc)
   cat("\n")
   model_summary(object)
 })

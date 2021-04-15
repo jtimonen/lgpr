@@ -75,8 +75,8 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   pb <- progbar_setup(L = S)
   hdr <- dollar(pb, "header")
   idx_print <- dollar(pb, "idx_print")
-  if (verbose) cat("Computing analytic function posteriors...\n")
-  if (progbar) cat(hdr)
+  log_progress("Computing analytic function posteriors...", verbose)
+  log_progress(hdr, progbar)
 
   # Loop through parameter sets
   for (idx in seq_len(S)) {
@@ -97,8 +97,8 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
 
     if (progbar) progbar_print(idx, idx_print)
   }
-  if (progbar) cat("\n")
-  if (verbose) cat("\n")
+  log_progress(" ", progbar)
+  log_progress(" ", verbose)
 
   # Return
   comp_names <- dollar(km, "comp_names")
@@ -182,10 +182,10 @@ prevent_too_large_mats <- function(fit, x, reduce, draws, verbose, force) {
   msg <- paste0(
     "Computations will require creating and handling ",
     P, " x ", N, " matrices ", S, " x ", J + 1,
-    " times. \n"
+    " times."
   )
   P_LIMIT <- 6000
-  if (verbose) cat(msg)
+  log_info(msg, verbose)
   if (P > P_LIMIT) {
     if (!force) {
       msg <- paste0(

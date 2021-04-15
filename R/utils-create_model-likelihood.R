@@ -37,7 +37,7 @@
 #' @family internal model creation functions
 create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
                                     y_name, sample_f, verbose) {
-  if (verbose) cat("Parsing response and likelihood...\n")
+  log_progress("Parsing response and likelihood...", verbose)
   LH <- likelihood_as_int(likelihood)
 
   # Check that data contains the response variable,

@@ -1,3 +1,13 @@
+# Print informational message
+log_info <- function(msg, verbose = TRUE) {
+  if (verbose) message(msg)
+}
+
+# Print progress message
+log_progress <- function(msg, verbose = TRUE) {
+  if (verbose) cat(msg, "\n")
+}
+
 # A safer alternative for the dollar operator
 #
 # @description Requires exact match and throws an informative error if
@@ -278,7 +288,8 @@ large_data_msg <- function(num_obs, threshold) {
     " 'gradient computation took X seconds' information show by",
     " Stan to estimate total runtime."
   )
-  msg <- if (num_obs >= threshold) cat(msg)
+  show_msg <- (num_obs >= threshold)
+  log_info(msg, show_msg)
 }
 
 # Create a progress bar header
@@ -290,7 +301,7 @@ progbar_setup <- function(L) {
   top <- paste0(top, "|")
   barlen <- nchar(top) - 1
   list(
-    header = paste0(top, "\n"),
+    header = top,
     idx_print = ceiling(seq(1, L, length.out = barlen))
   )
 }
@@ -508,5 +519,6 @@ example_fit <- function(
 print_arr_dim <- function(x) {
   name <- deparse(substitute(x))
   dim_str <- paste(dim(x), collapse = ", ")
-  cat(" * dim(", name, ") = c(", dim_str, ")\n", sep = "")
+  desc <- paste0(" * dim(", name, ") = c(", dim_str, ")", sep = "")
+  log_info(desc, TRUE)
 }

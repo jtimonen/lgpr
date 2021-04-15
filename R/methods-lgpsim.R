@@ -1,8 +1,8 @@
 #' @describeIn lgpsim Show summary of object.
 #' @param object an \linkS4class{lgpsim} object
 setMethod("show", "lgpsim", function(object) {
-  msg <- class_info("lgpsim")
-  cat(msg)
+  desc <- class_info("lgpsim")
+  cat(desc)
   invisible(object)
 })
 
@@ -78,7 +78,7 @@ plot_sim.data <- function(simdata,
   if (!is.null(teff_true)) {
     info <- paste(info, plot_sim.data.title_teff(), sep = "\n")
   }
-  if (verbose) cat(info, "\n")
+  log_info(info, verbose)
   h <- h + ggplot2::ggtitle("Simulated data")
   return(h)
 }
@@ -100,7 +100,7 @@ plot_sim.component <- function(simdata,
   title <- dollar(out, "name")
   h <- plot_api_c(df = dollar(out, "df"), ...)
   h <- h + ggplot2::ylab("f") + ggplot2::ggtitle(title)
-  if (verbose) cat("Plotting component", comp_idx, "\n")
+  log_info(paste0("component_idx = ", comp_idx), verbose)
   return(h)
 }
 

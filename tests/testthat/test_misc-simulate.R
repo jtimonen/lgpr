@@ -46,7 +46,7 @@ test_that("negative binomial data can be simulated", {
   y <- dat@data$y
   diff <- round(y) - y
   expect_lt(max(diff), 1e-6)
-  expect_output(plot_sim(dat, verbose = TRUE))
+  expect_message(plot_sim(dat, verbose = TRUE), "Line is the true signal mapped")
 })
 
 test_that("binomial data can be simulated", {
@@ -275,8 +275,14 @@ test_that("simulated data with disease effect can be plotted", {
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")
   expect_s3_class(p3, "ggplot")
-  expect_output(plot_sim(dat, verbose = TRUE))
-  expect_output(plot_sim(dat, comp_idx = 1, verbose = TRUE))
+  expect_message(
+    plot_sim(dat, verbose = TRUE),
+    "Dashed vert. line is the 'observed' disease initiation time"
+  )
+  expect_message(
+    plot_sim(dat, comp_idx = 2, verbose = TRUE),
+    "component_idx = 2"
+  )
 })
 
 test_that("show method for simulated data prints output", {

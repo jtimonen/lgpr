@@ -16,7 +16,7 @@ create_model.covs_and_comps <- function(data, model_formula,
 
   # Check that data is a data.frame and that all covariates exist in it
   x_names <- unique(rhs_variables(model_formula@terms))
-  if (verbose) cat("Parsing covariates and components...\n")
+  log_progress("Parsing covariates and components...", verbose)
   check_df_with(data, x_names)
 
   # Create the inputs to Stan
