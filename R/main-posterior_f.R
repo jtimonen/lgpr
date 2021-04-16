@@ -98,7 +98,6 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
     if (progbar) progbar_print(idx, idx_print)
   }
   log_progress(" ", progbar)
-  log_progress(" ", verbose)
 
   # Return
   comp_names <- dollar(km, "comp_names")

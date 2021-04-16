@@ -108,27 +108,26 @@ We see that the posterior mean of the `gamma` parameter is close to the value us
 plot_draws(fit, type = "trace", regex_pars = "gamma")
 ```
 
-# Visualising predictions and components
+```{r relevances, cache = TRUE}
+relevances(fit)
+```
 
-We subsample 50 draws from the posterior
+# Visualising inferred signal and its components
+
+We subsample 50 draws from the posterior of each component $f^{(j)}$, $j=1,2,3$
 ```{r random}
 draws <- sample.int(1000, 50)
 ```
 
-and use them to visualize the model predictions
-```{r pred}
-t <- seq(2, 100, by = 2)
-x_pred <- new_x(dat, t)
-p <- pred(fit, x_pred, draws = draws)
-```
-
-```{r plt1, fig.width = 7, fig.height=4.5}
-plot_pred(fit, x = x_pred, pred = p, alpha = 0.2)
-```
-
-and model components
+and visualize them
 ```{r plt2, fig.width = 7, fig.height=4.5}
-plot_components(fit, x = x_pred, pred = p, alpha = 0.1, color_by = c(NA, NA, "z", "z"))
+p <- pred(fit, draws = draws)
+plot_components(fit, pred = p, alpha = 0.1, color_by = c(NA, NA, "z", "z"))
+```
+
+as well as the sum $f = f^{(1)} + f^{(2)} + f^{(3)}$
+```{r plt1, fig.width = 7, fig.height=4.5}
+plot_pred(fit, pred = p, alpha = 0.3)
 ```
 
 # Additional notes
@@ -136,9 +135,12 @@ plot_components(fit, x = x_pred, pred = p, alpha = 0.1, color_by = c(NA, NA, "z"
 **Note:** as always, the `plot_pred()` and `plot_components()` functions can be used without the `x` and `pred` arguments, too, in which case computing
 out-of-sample predictions is not be needed. The predictions and inferred components are then shown only at the data points.
 
-```{r vis_datapred, fig.width=7, fig.height=4}
-plot_pred(fit)
-plot_components(fit, color_by = c(NA, NA, "z", "z"))
+```{r vis_outsamplepred, fig.width=7, fig.height=4}
+#t <- seq(2, 100, by = 2)
+#x_pred <- new_x(dat, t)
+#p <- pred(fit, x_pred, draws = draws)
+#plot_pred(fit, p, alpha = 0.3)
+#plot_components(fit, x = x_pred, pred = p, alpha = 0.1, color_by = c(NA, NA, #"z", "z"))
 ```
 
 # Computing environment

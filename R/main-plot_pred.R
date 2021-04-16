@@ -209,7 +209,10 @@ plot_pred.process_args <- function(fit, pred_in, x, draws, reduce, verbose) {
     warning("The <x> argument is deprecated and has no effect..")
   }
   if (is.null(pred_in)) {
-    log_info("pred is NULL, need to compute it...", verbose)
+    log_info(
+      "Missing 'pred' argument, computing or extracting it...",
+      verbose
+    )
     pred_out <- pred(fit, draws = draws, reduce = reduce, verbose = vrb)
   } else {
     pred_out <- pred_in
