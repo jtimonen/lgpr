@@ -82,10 +82,9 @@ test_that("pred works with defaults and given x, and reduce = NULL", {
   )
   expect_s4_class(a, "Prediction")
   expect_output(show(a))
-  
+
   # Check that default is verbose (should print also progbars)
   expect_output({
     pp <- pred(fit = fit, x = x_pred, reduce = NULL)
   })
 })
-

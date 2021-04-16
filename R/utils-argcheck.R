@@ -3,42 +3,17 @@
 # @param arg An argument to check.
 # @return \code{TRUE} if the check passes, throw error otherwise.
 
-# checks that argument has one of the allowed types
-check_type <- function(arg, allowed) {
+# checks that argument has expected type
+check_type <- function(arg, type) {
   arg_name <- deparse(substitute(arg))
-
-  # If allowed is 'function'
-  if (length(allowed) == 1) {
-    if (allowed == "function") {
-      check_function(arg, arg_name)
-      return(TRUE)
-    }
-  }
-
-  # Check type otherwise
-  type <- class(arg)
-  ok <- any(type %in% allowed)
-  if (!ok) {
-    str1 <- paste(allowed, collapse = ", ")
-    str2 <- paste(type, collapse = ", ")
-    msg <- paste0(
-      "Wrong argument type: class(", arg_name, ") must contain one of {",
-      str1, "}. Found = {", str2, "}."
+  is_type <- is(arg, type)
+  if (!is_type) {
+    found <- as.character(class(arg))
+    stop(
+      "'", arg_name, "' must be an object of type <", type, ">!",
+      " Found = <", found, ">",
+      sep = ""
     )
-    stop(msg)
-  }
-  TRUE
-}
-
-# checks that argument is a function
-check_function <- function(arg, arg_name) {
-  ok <- is.function(arg)
-  if (!ok) {
-    msg <- paste0(
-      "'", arg_name, "' must be a function, but ",
-      "is.function(", arg_name, ") returned FALSE."
-    )
-    stop(msg)
   }
   TRUE
 }

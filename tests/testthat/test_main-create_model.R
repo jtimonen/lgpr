@@ -316,7 +316,7 @@ test_that("lgpexpr and lgpterm can be summed", {
 })
 
 test_that("error is thrown when formula is not a formula", {
-  reason <- "Wrong argument type"
+  reason <- "must be an object of type <formula>! Found = <character>"
   expect_error(create_model("a + b ", testdata_001), reason)
 })
 

@@ -108,8 +108,9 @@ array_to_arraylist <- function(x, L) {
 
 # Ensure that input is model or fit and return a model
 object_to_model <- function(object) {
-  allowed <- c("lgpmodel", "lgpfit")
-  check_type(object, allowed)
+  if (!is(object, "lgpmodel") && !is(object, "lgpfit")) {
+    stop("object must be an lgpmodel or lgpfit object!")
+  }
   if (class(object) == "lgpfit") {
     out <- object@model
   } else {
