@@ -9,8 +9,7 @@ See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usa
 
 ## Requirements
 
-* Linux is the preferred operating system. However, the package works also on
-  Mac and Windows. We dont have pre-compiled binaries distributed yet, so 
+* The package should work on all major operating systems. We dont have pre-compiled binaries distributed yet, so 
   currently *lgpr* needs to be installed from source. 
 * To compile the Stan code included in the package on Windows or Mac, you need
   to have your toolchain setup properly. 
