@@ -33,10 +33,6 @@ method.}
 \item{y}{unused argument}
 
 \item{...}{optional arguments passed to a subroutine}
-
-\item{extrapolated}{Boolean value telling if the function draws are
-original MCMC draws or if they have been created by extrapolating
-such draws.}
 }
 \description{
 An S4 class to represent draws from an additive function posterior.
@@ -72,6 +68,10 @@ transformed through inverse link function)}
 
 \item{\code{x}}{a data frame of points (covariate values) where the
 functions/predictions have been evaluated/sampled}
+
+\item{\code{extrapolated}}{Boolean value telling if the function draws are
+original MCMC draws or if they have been created by extrapolating
+such draws.}
 }}
 
 \seealso{

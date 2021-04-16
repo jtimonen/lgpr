@@ -434,11 +434,11 @@ GaussianPrediction <- setClass("GaussianPrediction",
 #' transformed through inverse link function)
 #' @slot x a data frame of points (covariate values) where the
 #' functions/predictions have been evaluated/sampled
-#' @param object \linkS4class{Prediction} object for which to apply a class
-#' method.
-#' @param extrapolated Boolean value telling if the function draws are
+#' @slot extrapolated Boolean value telling if the function draws are
 #' original MCMC draws or if they have been created by extrapolating
 #' such draws.
+#' @param object \linkS4class{Prediction} object for which to apply a class
+#' method.
 #' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{GaussianPrediction}
 Prediction <- setClass("Prediction",
