@@ -2,7 +2,7 @@
 [![coverage](https://codecov.io/gh/jtimonen/lgpr/branch/master/graph/badge.svg)](https://codecov.io/gh/jtimonen/lgpr)
 [![travis](https://travis-ci.org/jtimonen/lgpr.svg?branch=master)](https://travis-ci.org/github/jtimonen/lgpr)
 
-R package for **L**ongitudinal **G**aussian **P**rocess **R**egression. 
+R-package for interpretable nonparametric modeling of longitudinal data using additive Gaussian processes. Contains functionality for inferring covariate effects and assessing covariate relevances. Various models can be specified using a convenient formula syntax.
 
 ## Getting started
 See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usage/index.html. 
