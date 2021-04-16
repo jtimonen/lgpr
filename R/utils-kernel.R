@@ -13,21 +13,21 @@ kernels_fpost <- function(fit,
   log_progress("Creating inputs...", vrb)
   input <- kernels_fpost.create_input(fit, x, reduce, draws)
 
-  log_progress("Creating constant kernel matrices...", vrb)
+  log_progress("Creating kernel matrices...", vrb)
   K_const <- kernel_const_all(input, FALSE, FALSE, STREAM)
   Ks_const <- kernel_const_all(input, TRUE, FALSE, STREAM)
   Kss_const <- kernel_const_all(input, TRUE, TRUE, STREAM)
 
   # Final parameter-dependent kernel matrices
-  log_progress("Creating final kernel matrices (data vs. data)...", vrb)
+  log_progress("Creating kernel matrices (data vs. data)...", vrb)
   K <- kernel_all(input, K_const, FALSE, FALSE, vrb, dd, STREAM)
   if (is.null(x)) {
     Ks <- K
     Kss <- K
   } else {
-    log_progress("Creating final kernel matrices (out vs. data)...", vrb)
+    log_progress("Creating kernel matrices (out vs. data)...", vrb)
     Ks <- kernel_all(input, Ks_const, TRUE, FALSE, vrb, dd, STREAM)
-    log_progress("Creating final kernel matrices (out vs. out)...", vrb)
+    log_progress("Creating kernel matrices (out vs. out)...", vrb)
     Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
   }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/main-posterior_f.R
 \name{posterior_f}
 \alias{posterior_f}
-\title{Evaluate or extract function posterior distributions}
+\title{Function posterior distributions}
 \usage{
 posterior_f(
   fit,
@@ -43,16 +43,23 @@ Can be used for debugging or testing \code{\link{kernels_fpost}}.}
 \item{debug_dims}{Should this print dimensions of some variables.
 Can be used for debugging \code{\link{kernels_fpost}}.}
 
-\item{force}{This is by default \code{FALSE} to prevent unnecessarily
+\item{force}{This is by default \code{FALSE} to prevent unintended
 large computations that might crash R or take forever.}
 }
 \value{
-a named list
+A named list.
 }
 \description{
-Evaluates (or extracts) the posterior distribution of the
-total signal \code{f} and its additive components (or draws from these
-distributions). All these are computed for
-each parameter draw (defined by \code{draws}), or other parameter set
-(obtained by a reduction defined by \code{reduce}).
+\itemize{
+  \item If \code{fit} is for a model that marginalizes the latent
+  signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{FALSE}), this
+  computes the analytic conditional posterior
+  distributions of each model component, and their sum.
+
+  \item If \code{fit} is for a model that samples the latent
+  signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
+  extract these function samples and compute their sum. If \code{x} is not
+  \code{NULL}, the function draws are extrapolated to the points \code{x}
+  using kernel regression.
+}
 }

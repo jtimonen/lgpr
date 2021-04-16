@@ -64,7 +64,9 @@ An object of class \linkS4class{GaussianPrediction} or
   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
   extract these function samples, compute their sum, and a version of the
   sum \code{f} that is transformed through the inverse link function.
-  These are stored in a \linkS4class{Prediction}
+  If \code{x} is not \code{NULL}, the function draws are extrapolated
+  to the points specified by \code{x} using kernel regression.
+  Results are stored in a \linkS4class{Prediction}
   object which is then returned.
 }
 }

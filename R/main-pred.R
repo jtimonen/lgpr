@@ -15,7 +15,9 @@
 #'   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
 #'   extract these function samples, compute their sum, and a version of the
 #'   sum \code{f} that is transformed through the inverse link function.
-#'   These are stored in a \linkS4class{Prediction}
+#'   If \code{x} is not \code{NULL}, the function draws are extrapolated
+#'   to the points specified by \code{x} using kernel regression.
+#'   Results are stored in a \linkS4class{Prediction}
 #'   object which is then returned.
 #' }
 #'
@@ -66,7 +68,7 @@ pred <- function(fit,
     verbose = verbose, STREAM = STREAM, ...
   )
   if (f_sampled) {
-    out <- pred_kr(fit, fp, verbose, STREAM, c_hat_pred)
+    out <- pred_extrapolated_draws(fit, fp, c_hat_pred, verbose)
   } else {
     out <- pred_gaussian(fit, fp, verbose)
   }
@@ -83,7 +85,7 @@ pred_gaussian <- function(fit, fp, verbose) {
   f_std <- dollar(fp, "f_std")
   sigma2 <- dollar(fp, "sigma2")
   y_scl <- dollar(fit@model@var_scalings, "y")
-  y_pred <- pred_gaussian.f_to_y(f_mean, f_std, sigma2, y_scl)
+  y_pred <- map_f_to_y(f_mean, f_std, sigma2, y_scl)
   new("GaussianPrediction",
     f_comp_mean = dollar(fp, "f_comp_mean"),
     f_comp_std = dollar(fp, "f_comp_std"),
@@ -95,49 +97,24 @@ pred_gaussian <- function(fit, fp, verbose) {
   )
 }
 
-# Tranform distribution of f to distribution of y
-pred_gaussian.f_to_y <- function(f_mean, f_std, sigma2, y_scl) {
-
-  # Compute y_mean and y_std on normalized scale
-  y_mean <- f_mean
-  y_var <- add_to_columns(f_std^2, sigma2)
-  y_std <- sqrt(y_var)
-
-  # Scale y_mean and y_std to original scale and return
-  list(
-    mean = apply_scaling(y_scl, y_mean, inverse = TRUE),
-    std = y_scl@scale * y_std
-  )
-}
-
 # pred when sample_f = TRUE
-pred_kr <- function(fit, fp, verbose, STREAM, c_hat_pred) {
-  kernels <- pred_kernels(fit, x, reduce, draws, verbose, STREAM)
-  si <- get_stan_input(fit)
-  delta <- dollar(si, "delta")
-  log_progress("Extracting sampled function components...", verbose)
-  pred <- get_pred(fit, draws = draws, reduce = reduce)
-  log_progress("Computing kernel regression...", verbose)
-  kr <- pred.kr_compute(kernels, pred, delta, verbose, STREAM)
-  f <- dollar(kr, "f")
-  log_progress("Done.", verbose)
-
-  h <- pred.kr_h(fit, f, c_hat_pred, verbose)
+pred_extrapolated_draws <- function(fit, fp, c_hat_pred, verbose) {
+  f_ext <- dollar(fp, "f_ext")
+  c_hat_pred <- set_c_hat_pred(fit, f_ext, c_hat_pred, verbose)
+  h_ext <- map_f_to_h(fit, f_ext, c_hat_pred, reduce = NULL)
 
   # Return
   new("Prediction",
-    f_comp = arr3_to_list(dollar(kr, "f_comp")),
-    f = f,
-    h = h
+    f_comp = dollar(fp, "f_ext_comp"),
+    f = f_ext,
+    h = h_ext,
+    x = dollar(fp, "x"),
+    extrapolated = TRUE
   )
 }
 
-# Map the sum f from pred.kr_compute to h
-#
-# @inheritParams pred
-# @param f an array of shape (num_draws, num_pred_points)
-# @return an array with same shape as \code{f}
-pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
+# Set c_hat_pred
+set_c_hat_pred <- function(fit, f, c_hat_pred, verbose) {
 
   # helper function
   is_constant <- function(x) {
@@ -164,52 +141,5 @@ pred.kr_h <- function(fit, f, c_hat_pred, verbose) {
       stop(msg)
     }
   }
-
-  f <- f + repvec(c_hat_pred, num_draws)
-  h <- link_inv(f, get_obs_model(fit))
-  return(h)
-}
-
-# Compute out-of-sample predictions using kernel regression on
-# sampled function values
-#
-# @param pred An object of class \linkS4class{Prediction}.
-# @inheritParams pred.gaussian_compute
-# @return An object of class \linkS4class{Prediction}.
-pred.kr_compute <- function(kernels, pred, delta, verbose,
-                            STREAM = get_stream()) {
-  K <- dollar(kernels, "data_vs_data")
-  Ks <- dollar(kernels, "pred_vs_data")
-  Kss <- dollar(kernels, "pred_vs_pred")
-  f_comp <- pred@f_comp # list, each elem has shape num_draws x num_obs
-  num_draws <- dim(Kss)[1]
-  D <- dim(Kss)[2]
-  num_obs <- dim(K)[3]
-  num_pred <- dim(Kss)[3]
-  out <- array(0, dim = c(D + 1, num_draws, num_pred))
-  DELTA <- delta * diag(num_obs)
-  hdr <- progbar_setup(num_draws)
-  idx_print <- dollar(hdr, "idx_print")
-  log_progress(dollar(hdr, "header"), verbose)
-  for (i in seq_len(num_draws)) {
-    f_sum <- 0
-    for (j in seq_len(D)) {
-      fj <- f_comp[[j]]
-      k <- K[i, j, , ] + DELTA
-      ks <- Ks[i, j, , ]
-      f <- fj[i, ]
-      f_pred <- ks %*% solve(k, f)
-      out[j, i, ] <- f_pred
-      f_sum <- f_sum + f_pred
-    }
-    out[D + 1, i, ] <- f_sum
-    if (verbose) progbar_print(i, idx_print)
-  }
-  log_progress(" ", verbose)
-
-  # Return
-  list(
-    f_comp = out[1:D, , , drop = FALSE],
-    f = arr3_select(out, D + 1)
-  )
+  return(c_hat_pred)
 }

@@ -6,12 +6,24 @@
 \alias{GaussianPrediction}
 \alias{show,GaussianPrediction-method}
 \alias{plot,GaussianPrediction,missing-method}
+\alias{component_names,GaussianPrediction-method}
+\alias{num_components,GaussianPrediction-method}
+\alias{num_paramsets,GaussianPrediction-method}
+\alias{num_evalpoints,GaussianPrediction-method}
 \title{An S4 class to represent analytically computed predictive distributions
 (conditional on hyperparameters) of an additive GP model}
 \usage{
 \S4method{show}{GaussianPrediction}(object)
 
 \S4method{plot}{GaussianPrediction,missing}(x, y, ...)
+
+\S4method{component_names}{GaussianPrediction}(object)
+
+\S4method{num_components}{GaussianPrediction}(object)
+
+\S4method{num_paramsets}{GaussianPrediction}(object)
+
+\S4method{num_evalpoints}{GaussianPrediction}(object)
 }
 \arguments{
 \item{object}{\linkS4class{GaussianPrediction} object for which to apply a
@@ -34,6 +46,16 @@ An S4 class to represent analytically computed predictive distributions
 \item \code{plot}: Visualization.
 Optional arguments (\code{...}) are passed to
 \code{\link{plot_pred}}.
+
+\item \code{component_names}: Get names of components.
+
+\item \code{num_components}: Get number of components.
+
+\item \code{num_paramsets}: Get number of parameter combinations
+(different parameter vectors) using which predictions were computed.
+
+\item \code{num_evalpoints}: Get number of points where
+predictions were computed.
 }}
 
 \section{Slots}{

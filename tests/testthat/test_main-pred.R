@@ -67,7 +67,7 @@ test_that("pred works with reduce = NULL", {
   expect_output(show(a))
 })
 
-test_that("pred works with defaults and given x", {
+test_that("pred works with defaults and given x (extrapolation)", {
   x_pred <- new_x(fit, x_values = seq(0, 100, by = 2.5))
   a <- pred(fit = fit, x = x_pred, verbose = FALSE)
   expect_s4_class(a, "Prediction")
@@ -84,7 +84,8 @@ test_that("pred works with defaults and given x, and reduce = NULL", {
   expect_output(show(a))
 
   # Check that default is verbose (should print also progbars)
+  # should also print "c_hat_pred not given, using constant c_hat_pred ="
   expect_output({
-    pp <- pred(fit = fit, x = x_pred, reduce = NULL)
+    pred(fit = fit, x = x_pred, reduce = NULL)
   })
 })

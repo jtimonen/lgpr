@@ -39,7 +39,8 @@ get_pred.sampled <- function(fit, draws, reduce) {
     f_comp = get_pred.sampled.f_comp(fit, draws, reduce),
     f = get_pred.sampled.f(fit, draws, reduce),
     h = get_pred.sampled.h(fit, draws, reduce),
-    x = get_data(get_model(fit))
+    x = get_data(get_model(fit)),
+    extrapolated = FALSE
   )
 }
 
@@ -70,13 +71,7 @@ get_pred.sampled.h <- function(fit, draws, reduce) {
 
   # Get f and add c_hat
   f <- get_pred.sampled.f(fit, draws, reduce = NULL)
-  num_draws <- dim(f)[1]
   c_hat <- get_chat(fit)
-  f <- f + repvec(c_hat, num_draws)
-
-  # Apply inverse link function and reduction
-  likelihood <- get_obs_model(fit)
-  h <- link_inv(f, likelihood)
-  h <- apply_reduce(h, reduce)
+  h <- map_f_to_h(fit, f, c_hat, reduce)
   return(h)
 }

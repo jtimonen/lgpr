@@ -179,74 +179,6 @@ to_long_format <- function(df) {
   return(out)
 }
 
-# List available likelihood names
-likelihood_list <- function() {
-  c("gaussian", "poisson", "nb", "binomial", "bb")
-}
-
-# Convert Stan likelihood encoding to a string
-likelihood_as_str <- function(index) {
-  names <- likelihood_list()
-  L <- length(names)
-  check_interval(index, 1, L)
-  name <- names[index]
-  return(name)
-}
-
-# Convert likelihood name to Stan encoding
-likelihood_as_int <- function(likelihood) {
-  likelihood <- tolower(likelihood)
-  allowed <- likelihood_list()
-  index <- check_allowed(likelihood, allowed)
-  return(index)
-}
-
-# Check if likelihood is binomial or beta-binomial
-is_bin_or_bb <- function(likelihood) {
-  likelihood %in% c("binomial", "bb")
-}
-
-# Check if likelihood is Poisson or negative binomial
-is_pois_or_nb <- function(likelihood) {
-  likelihood %in% c("poisson", "nb")
-}
-
-# Map x through link function
-link <- function(x, likelihood) {
-  allowed <- likelihood_list()
-  check_allowed(likelihood, allowed)
-  if (is_pois_or_nb(likelihood)) {
-    x <- log(x)
-  } else if (is_bin_or_bb(likelihood)) {
-    x <- log(x) - log(1 - x)
-  }
-  return(x)
-}
-
-# Map x through inverse link function
-link_inv <- function(x, likelihood) {
-  allowed <- likelihood_list()
-  check_allowed(likelihood, allowed)
-  if (is_pois_or_nb(likelihood)) {
-    x <- exp(x)
-  } else if (is_bin_or_bb(likelihood)) {
-    x <- 1 / (1 + exp(-x))
-  }
-  return(x)
-}
-
-# Divide vector a elementwise by the vector of numbers of trials
-divide_by_num_trials <- function(a, fit) {
-  check_type(fit, "lgpfit")
-  likelihood <- get_obs_model(fit)
-  if (!is_bin_or_bb(likelihood)) {
-    return(a)
-  }
-  y_num_trials <- get_num_trials(fit)
-  check_lengths(a, y_num_trials)
-  a / y_num_trials
-}
-
 # Ensure vector has expected length (len) or replicate value to such vector
 ensure_len <- function(v, len) {
   v_name <- deparse(substitute(v))
@@ -364,13 +296,12 @@ add_to_columns <- function(x, v) {
   return(x)
 }
 
-#' Apply possible reduction to rows of an array
-#'
-#' @param x an array of shape \code{n} x \code{m}
-#' @param reduce a function or \code{NULL}
-#' @return an array of shape \code{1} x \code{m} if \code{reduce} is not
-#' \code{NULL}, otherwise the original array \code{x}
-#' @family array utilities
+# Apply possible reduction to rows of an array
+#
+# @param x an array of shape \code{n} x \code{m}
+# @param reduce a function or \code{NULL}
+# @return an array of shape \code{1} x \code{m} if \code{reduce} is not
+# \code{NULL}, otherwise the original array \code{x}
 apply_reduce <- function(x, reduce) {
   if (!is.null(reduce)) {
     check_type(reduce, "function")

@@ -426,16 +426,19 @@ GaussianPrediction <- setClass("GaussianPrediction",
   validity = validate_GaussianPrediction
 )
 
-#' An S4 class to represent general additive model predictions
+#' An S4 class to represent draws from an additive function posterior.
 #'
-#' @slot f_comp component predictions
-#' @slot f signal prediction
-#' @slot h prediction (signal predictions transformed through inverse link
-#' function)
+#' @slot f_comp component draws
+#' @slot f signal draws
+#' @slot h predictions (signal draws + scaling factor \code{c_hat},
+#' transformed through inverse link function)
 #' @slot x a data frame of points (covariate values) where the
 #' functions/predictions have been evaluated/sampled
 #' @param object \linkS4class{Prediction} object for which to apply a class
 #' method.
+#' @param extrapolated Boolean value telling if the function draws are
+#' original MCMC draws or if they have been created by extrapolating
+#' such draws.
 #' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{GaussianPrediction}
 Prediction <- setClass("Prediction",
@@ -443,7 +446,8 @@ Prediction <- setClass("Prediction",
     f_comp = "list",
     f = "matrix",
     h = "matrix",
-    x = "data.frame"
+    x = "data.frame",
+    extrapolated = "logical"
   ),
   validity = validate_Prediction
 )
@@ -460,12 +464,11 @@ class_info <- function(class_name) {
 
 # Class info for show methods of function posterior objects
 class_info_fp <- function(class_name, comp_names, D) {
-  num_comps <- length(comp_names)
   comp_str <- paste(comp_names, collapse = ", ")
   desc <- class_info(class_name)
-  desc <- paste0(desc, "\n - ", num_comps, " components: ", comp_str)
-  desc <- paste0(desc, "\n - ", D[1], " parameter set(s)")
-  desc <- paste0(desc, "\n - ", D[2], " evaluation points")
+  desc <- paste0(desc, "\n - ", D[1], " components: ", comp_str)
+  desc <- paste0(desc, "\n - ", D[2], " parameter set(s)")
+  desc <- paste0(desc, "\n - ", D[3], " evaluation points")
   return(desc)
 }
 
@@ -550,4 +553,16 @@ setGeneric(
 
 setGeneric(
   "clear_postproc", function(object) standardGeneric("clear_postproc")
+)
+
+setGeneric(
+  "num_paramsets", function(object) standardGeneric("num_paramsets")
+)
+
+setGeneric(
+  "num_evalpoints", function(object) standardGeneric("num_evalpoints")
+)
+
+setGeneric(
+  "num_components", function(object) standardGeneric("num_components")
 )

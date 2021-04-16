@@ -6,11 +6,23 @@
 \alias{Prediction}
 \alias{show,Prediction-method}
 \alias{plot,Prediction,missing-method}
-\title{An S4 class to represent general additive model predictions}
+\alias{component_names,Prediction-method}
+\alias{num_components,Prediction-method}
+\alias{num_paramsets,Prediction-method}
+\alias{num_evalpoints,Prediction-method}
+\title{An S4 class to represent draws from an additive function posterior.}
 \usage{
 \S4method{show}{Prediction}(object)
 
 \S4method{plot}{Prediction,missing}(x, y, ...)
+
+\S4method{component_names}{Prediction}(object)
+
+\S4method{num_components}{Prediction}(object)
+
+\S4method{num_paramsets}{Prediction}(object)
+
+\S4method{num_evalpoints}{Prediction}(object)
 }
 \arguments{
 \item{object}{\linkS4class{Prediction} object for which to apply a class
@@ -21,9 +33,13 @@ method.}
 \item{y}{unused argument}
 
 \item{...}{optional arguments passed to a subroutine}
+
+\item{extrapolated}{Boolean value telling if the function draws are
+original MCMC draws or if they have been created by extrapolating
+such draws.}
 }
 \description{
-An S4 class to represent general additive model predictions
+An S4 class to represent draws from an additive function posterior.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -32,17 +48,27 @@ An S4 class to represent general additive model predictions
 \item \code{plot}: Visualization.
 Optional arguments (\code{...}) are passed to
 \code{\link{plot_pred}}.
+
+\item \code{component_names}: Get names of components.
+
+\item \code{num_components}: Get number of components.
+
+\item \code{num_paramsets}: Get number of parameter combinations
+(different parameter vectors) using which predictions were computed.
+
+\item \code{num_evalpoints}: Get number of points where
+predictions were computed.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{f_comp}}{component predictions}
+\item{\code{f_comp}}{component draws}
 
-\item{\code{f}}{signal prediction}
+\item{\code{f}}{signal draws}
 
-\item{\code{h}}{prediction (signal predictions transformed through inverse link
-function)}
+\item{\code{h}}{predictions (signal draws + scaling factor \code{c_hat},
+transformed through inverse link function)}
 
 \item{\code{x}}{a data frame of points (covariate values) where the
 functions/predictions have been evaluated/sampled}
