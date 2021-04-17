@@ -16,10 +16,12 @@ test_that("optimize_model can optimize MAP parameters", {
 
 # -------------------------------------------------------------------------
 
+N_ITER <- 23
+N_CHAINS <- 1
+SEED <- 992
+
 context("Posterior sampling (f marginalized)")
 
-N_ITER <- 20
-N_CHAINS <- 1
 DAT <- testdata_001
 
 my_prior <- list(
@@ -146,7 +148,7 @@ test_that("f can be sampled with binomial likelihood", {
 })
 
 test_that("f can be sampled with beta-binomial likelihood", {
-  suppressWarnings({
+  SW({
     fit <- lgp(
       formula = y ~ gp(age) + categ(id) * gp(age) + categ(id),
       likelihood = "bb",
@@ -164,4 +166,63 @@ test_that("f can be sampled with beta-binomial likelihood", {
   expect_output(show(fit@model))
   expect_equal(get_obs_model(fit), "bb")
   expect_true(is_f_sampled(fit))
+})
+
+# -------------------------------------------------------------------------
+
+context("Prior sampling")
+
+test_that("Model with uncertain effect time (f marginalized)", {
+  formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
+  data <- testdata_001
+  et <- list(backwards = FALSE, lower = 15, upper = 30, zero = 0)
+  prior <- list(effect_time_info = et, wrp = igam(14, 5))
+
+  # NOTE: Not suppressing warnings here!
+  fit <- lgp(
+    formula = formula,
+    data = data,
+    prior = prior,
+    prior_only = TRUE,
+    iter = 2000,
+    chains = 1,
+    refresh = 0,
+    seed = SEED,
+    quiet = TRUE
+  )
+  expect_s4_class(fit, "lgpfit")
+  si <- get_stan_input(fit)
+  expect_equal(si$is_likelihood_skipped, 1)
+  p1 <- plot_warp(fit)
+  p2 <- plot_effect_times(fit)
+  p3 <- plot_pred(fit, alpha = 1.0, draws = c(3, 4, 6), verbose = FALSE)
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "ggplot")
+  expect_s3_class(p3, "ggplot")
+})
+
+test_that("Model with heterogeneous disease effect (f sampled)", {
+  formula <- y ~ gp(age) + het(id) * gp_ns(dis_age)
+  data <- testdata_001
+  data$y <- round(exp(data$y))
+  SW({
+    fit <- lgp(
+      formula = formula,
+      data = data,
+      prior_only = TRUE,
+      prior = list(wrp = igam(14, 5)),
+      likelihood = "nb",
+      iter = N_ITER,
+      chains = N_CHAINS,
+      refresh = 0,
+      seed = SEED,
+      quiet = TRUE
+    )
+  })
+
+  expect_s4_class(fit, "lgpfit")
+  si <- get_stan_input(fit)
+  expect_equal(si$is_likelihood_skipped, 1)
+  p1 <- plot_beta(fit)
+  expect_s3_class(p1, "ggplot")
 })
