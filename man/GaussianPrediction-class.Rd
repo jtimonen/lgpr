@@ -5,7 +5,6 @@
 \alias{GaussianPrediction-class}
 \alias{GaussianPrediction}
 \alias{show,GaussianPrediction-method}
-\alias{plot,GaussianPrediction,missing-method}
 \alias{component_names,GaussianPrediction-method}
 \alias{num_components,GaussianPrediction-method}
 \alias{num_paramsets,GaussianPrediction-method}
@@ -14,8 +13,6 @@
 (conditional on hyperparameters) of an additive GP model}
 \usage{
 \S4method{show}{GaussianPrediction}(object)
-
-\S4method{plot}{GaussianPrediction,missing}(x, y, ...)
 
 \S4method{component_names}{GaussianPrediction}(object)
 
@@ -29,10 +26,6 @@
 \item{object}{\linkS4class{GaussianPrediction} object for which to apply a
 class method.}
 
-\item{x}{a \linkS4class{GaussianPrediction} object to visualize}
-
-\item{y}{unused argument}
-
 \item{...}{optional arguments passed to a subroutine}
 }
 \description{
@@ -42,10 +35,6 @@ An S4 class to represent analytically computed predictive distributions
 \section{Methods (by generic)}{
 \itemize{
 \item \code{show}: Print a summary about the object.
-
-\item \code{plot}: Visualization.
-Optional arguments (\code{...}) are passed to
-\code{\link{plot_pred}}.
 
 \item \code{component_names}: Get names of components.
 

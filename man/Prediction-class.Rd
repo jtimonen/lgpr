@@ -5,7 +5,6 @@
 \alias{Prediction-class}
 \alias{Prediction}
 \alias{show,Prediction-method}
-\alias{plot,Prediction,missing-method}
 \alias{component_names,Prediction-method}
 \alias{num_components,Prediction-method}
 \alias{num_paramsets,Prediction-method}
@@ -13,8 +12,6 @@
 \title{An S4 class to represent draws from an additive function posterior.}
 \usage{
 \S4method{show}{Prediction}(object)
-
-\S4method{plot}{Prediction,missing}(x, y, ...)
 
 \S4method{component_names}{Prediction}(object)
 
@@ -28,10 +25,6 @@
 \item{object}{\linkS4class{Prediction} object for which to apply a class
 method.}
 
-\item{x}{a \linkS4class{Prediction} object to visualize}
-
-\item{y}{unused argument}
-
 \item{...}{optional arguments passed to a subroutine}
 }
 \description{
@@ -40,10 +33,6 @@ An S4 class to represent draws from an additive function posterior.
 \section{Methods (by generic)}{
 \itemize{
 \item \code{show}: Print a summary about the object.
-
-\item \code{plot}: Visualization.
-Optional arguments (\code{...}) are passed to
-\code{\link{plot_pred}}.
 
 \item \code{component_names}: Get names of components.
 

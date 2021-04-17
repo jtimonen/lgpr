@@ -141,3 +141,13 @@ test_that("check_integer_all works correctly", {
   reason <- "<a> must have only integer values"
   expect_error(check_integer_all(a), reason)
 })
+
+test_that("check_unique works correctly", {
+  a <- c(2)
+  b <- c("moi", "hei")
+  expect_true(check_unique(a))
+  expect_true(check_unique(b))
+  a <- c("moi", "moi")
+  reason <- "<a> must have only unique elements"
+  expect_error(check_unique(a), reason)
+})

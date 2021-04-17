@@ -369,17 +369,6 @@ plot_data_titles <- function(main, sub, data, group_by) {
   list(main = main, sub = sub, N = N, n = n)
 }
 
-# Get number of distinct colors needed by plot_data
-plot_data_num_colors <- function(data, color_by) {
-  if (is.null(color_by)) {
-    N <- 1
-  } else {
-    g <- data[[color_by]]
-    N <- length(unique(g))
-  }
-  return(N)
-}
-
 # Add factor to data frame for highlighting in plot
 plot_data_add_highlight_factor <- function(df, group_by, highlight) {
   if (!is.null(highlight)) {

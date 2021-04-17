@@ -427,6 +427,15 @@ test_that("can't have only partly missing vals for group when using het()", {
   expect_error(create_model(formula = formula, data = dat), reason)
 })
 
+test_that("options can be specified", {
+  form <- y ~ age + id
+  dat <- testdata_001
+  DVAL <- stats::runif(1, 0, 0.01)
+  model <- create_model(form, dat, options = list(delta = DVAL))
+  expect_equal(model@stan_input$delta, DVAL)
+  model <- create_model(form, dat, options = list(vm_params = c(0.1, 0.3)))
+  expect_equal(model@stan_input$vm_params, c(0.1, 0.3))
+})
 
 # -------------------------------------------------------------------------
 

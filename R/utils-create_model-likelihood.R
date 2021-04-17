@@ -122,10 +122,9 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
       check_all_leq(response, num_trials)
       p <- mean(response / num_trials)
       c_hat <- log(p / (1 - p)) # Binomial or BB
-    } else if (gaussian) {
-      c_hat <- mean(response) # Gaussian
     } else {
-      stop("unknown likelihood LH =", LH)
+      stopifnot(gaussian)
+      c_hat <- mean(response) # Gaussian
     }
   }
   n <- length(response)

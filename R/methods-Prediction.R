@@ -28,32 +28,6 @@ setMethod("show", "Prediction", function(object) {
   cat(desc)
 })
 
-#' @describeIn GaussianPrediction Visualization.
-#' Optional arguments (\code{...}) are passed to
-#' \code{\link{plot_pred}}.
-#' @param x a \linkS4class{GaussianPrediction} object to visualize
-#' @param y unused argument
-setMethod(
-  "plot",
-  signature = c("GaussianPrediction", "missing"),
-  function(x, y, ...) {
-    plot_pred(pred = x, ...)
-  }
-)
-
-#' @describeIn Prediction  Visualization.
-#' Optional arguments (\code{...}) are passed to
-#' \code{\link{plot_pred}}.
-#' @param x a \linkS4class{Prediction} object to visualize
-#' @param y unused argument
-setMethod(
-  "plot",
-  signature = c("Prediction", "missing"),
-  function(x, y, ...) {
-    plot_pred(pred = x, ...)
-  }
-)
-
 #' @describeIn GaussianPrediction Get names of components.
 setMethod("component_names", "GaussianPrediction", function(object) {
   names(object@f_comp_mean)

@@ -46,6 +46,13 @@ test_that("pred works with defaults and given x, and reduce = NULL", {
   })
 })
 
+test_that("cant accidentally start very large computations", {
+  x_pred <- new_x(fit, x_values = seq(0, 100, by = 0.05))
+  expect_error(
+    pred(fit = fit, x = x_pred, verbose = FALSE, reduce = NULL),
+    "set force = TRUE if you are sure you want to do this"
+  )
+})
 
 # -------------------------------------------------------------------------
 
