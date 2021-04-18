@@ -4,13 +4,15 @@
 \alias{relevances}
 \title{Assess component relevances}
 \usage{
-relevances(fit, reduce = function(x) base::mean(x), ...)
+relevances(fit, reduce = function(x) base::mean(x), verbose = TRUE, ...)
 }
 \arguments{
 \item{fit}{an object of class \code{lgpfit}}
 
 \item{reduce}{a function to apply to reduce the relevances given each
 parameter draw into one value}
+
+\item{verbose}{Can this print any messages?}
 
 \item{...}{currently has no effect}
 }

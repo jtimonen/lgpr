@@ -8,6 +8,10 @@
 #' \linkS4class{Prediction}
 get_pred <- function(fit, draws = NULL, reduce = NULL, verbose = TRUE) {
   check_type(fit, "lgpfit")
+  if (contains_postproc(fit)) {
+    pr <- fit@postproc_results
+    return(dollar(pr, "pred"))
+  }
   in1 <- is.null(draws)
   in2 <- is.null(reduce)
   if (!in1 && !in2) stop("either draws or reduce (or both) must be NULL")
