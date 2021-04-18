@@ -5,12 +5,14 @@
 \alias{param_summary}
 \title{Print a model summary.}
 \usage{
-model_summary(object)
+model_summary(object, digits = 3)
 
-param_summary(object)
+param_summary(object, digits = 3)
 }
 \arguments{
 \item{object}{a model or fit}
+
+\item{digits}{number of digits to round floats to}
 }
 \value{
 \code{object} invisibly.

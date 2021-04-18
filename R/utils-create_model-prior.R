@@ -82,6 +82,7 @@ prior_type_names <- function(idx = NULL) {
 prior_to_df <- function(stan_input, digits = 3) {
 
   # Positive parameters
+  check_positive(digits)
   pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
   df <- NULL
   for (p in pnames) {
@@ -137,6 +138,7 @@ prior_to_df_pos <- function(stan_input, parname, digits) {
 # Helper function for converting prior representation to human readable df
 prior_to_df_unit <- function(stan_input, parname, num, digits) {
   hyper <- dollar(stan_input, paste0("hyper_", parname))
+  check_positive(digits)
   a <- round(hyper[1], digits = digits)
   b <- round(hyper[2], digits = digits)
   dist <- paste0("beta(", a, ", ", b, ")")

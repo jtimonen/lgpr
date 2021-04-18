@@ -382,28 +382,6 @@ fill_palette <- function(n) {
   palette[1:n]
 }
 
-# Visualize color palette
-plot_color_palette <- function(n) {
-  colors <- color_palette(n)
-  x <- rep(c(0, 1), n)
-  y <- rep(c(1:n), each = 2)
-  col <- as.factor(rep(colors, each = 2))
-  df <- data.frame(x, y, col)
-  aes <- ggplot2::aes_string(x = x, y = y, color = col, group = col)
-  h <- ggplot2::ggplot(df) +
-    ggplot2::geom_line(aes, lwd = 1)
-  h <- h + ggplot2::scale_color_manual(values = colors)
-  blank <- ggplot2::element_blank()
-  h <- h + ggplot2::theme(
-    axis.text = blank,
-    axis.title = blank,
-    axis.ticks = blank
-  )
-  h <- h + ggplot2::theme(legend.position = "none")
-  h <- h + ggplot2::ggtitle("Colors")
-  return(h)
-}
-
 # A color scale for lines etc
 scale_color <- function(n) {
   if (n > 5) {

@@ -52,8 +52,9 @@ setMethod("is_f_sampled", "lgpmodel", function(object) {
 #'
 #' @export
 #' @param object a model or fit
+#' @param digits number of digits to round floats to
 #' @return \code{object} invisibly.
-model_summary <- function(object) {
+model_summary <- function(object, digits = 3) {
   model <- object_to_model(object)
 
   # Helper function
@@ -88,15 +89,15 @@ model_summary <- function(object) {
     print(info_cat)
     cat("\n")
   }
-  print(parameter_info(model))
+  print(parameter_info(model, digits))
   invisible(object)
 }
 
 #' @export
 #' @rdname model_summary
-param_summary <- function(object) {
+param_summary <- function(object, digits = 3) {
   model <- object_to_model(object)
-  parameter_info(model)
+  parameter_info(model, digits)
 }
 
 # Categorial covariate information
