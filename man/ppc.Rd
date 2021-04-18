@@ -7,6 +7,8 @@
 ppc(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE, ...)
 }
 \arguments{
+\item{fit}{an ojbect of class \linkS4class{lgpfit}}
+
 \item{data}{the original data frame}
 
 \item{fun}{\code{bayesplot} function name}

@@ -412,7 +412,6 @@ lgpsim <- setClass("lgpsim",
 #' function posteriors or predictive distributions have been evaluated
 #' @param object \linkS4class{GaussianPrediction} object for which to apply a
 #' class method.
-#' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{Prediction}
 GaussianPrediction <- setClass("GaussianPrediction",
   representation = representation(
@@ -440,7 +439,6 @@ GaussianPrediction <- setClass("GaussianPrediction",
 #' such draws.
 #' @param object \linkS4class{Prediction} object for which to apply a class
 #' method.
-#' @param ... optional arguments passed to a subroutine
 #' @seealso \linkS4class{GaussianPrediction}
 Prediction <- setClass("Prediction",
   representation = representation(

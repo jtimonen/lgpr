@@ -25,8 +25,6 @@
 \arguments{
 \item{object}{\linkS4class{GaussianPrediction} object for which to apply a
 class method.}
-
-\item{...}{optional arguments passed to a subroutine}
 }
 \description{
 An S4 class to represent analytically computed predictive distributions

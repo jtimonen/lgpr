@@ -24,8 +24,6 @@
 \arguments{
 \item{object}{\linkS4class{Prediction} object for which to apply a class
 method.}
-
-\item{...}{optional arguments passed to a subroutine}
 }
 \description{
 An S4 class to represent draws from an additive function posterior.
