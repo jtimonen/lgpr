@@ -122,7 +122,7 @@ test_that("f can be sampled with nb likelihood", {
     )
   })
   expect_s4_class(fit, "lgpfit")
-  p1 <- plot(fit, type = "areas")
+  p1 <- plot(fit)
   p2 <- plot_draws(fit, regex_pars = "f_latent")
   expect_s3_class(p1, "ggplot")
   expect_s3_class(p2, "ggplot")

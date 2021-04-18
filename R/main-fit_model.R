@@ -2,8 +2,8 @@
 #'
 #' @export
 #' @description
-#' Creates a model by calling \code{\link{create_model}} and fits by calling
-#' \code{\link{sample_model}}.
+#' Creates an additive Gaussian process model using
+#' \code{\link{create_model}} and fits it using \code{\link{sample_model}}.
 #' @inheritParams create_model
 #' @inheritParams sample_model
 #' @inheritParams optimize_model

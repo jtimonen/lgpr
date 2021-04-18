@@ -34,7 +34,7 @@
 
 \S4method{get_draws}{lgpfit}(object, draws = NULL, reduce = NULL, ...)
 
-\S4method{plot}{lgpfit,missing}(x, y, plotfun = plot_draws, ...)
+\S4method{plot}{lgpfit,missing}(x, y)
 }
 \arguments{
 \item{object}{\linkS4class{lgpfit} object for which to apply a class method.}
@@ -53,8 +53,6 @@ one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 \item{x}{an \linkS4class{lgpfit} object to visualize}
 
 \item{y}{unused argument}
-
-\item{plotfun}{plotting function to use}
 }
 \description{
 An S4 class to represent the output of the \code{lgp} function
@@ -92,8 +90,7 @@ return value is always a 2-dimensional array of shape
 \code{num_param_sets} x \code{num_params}. Optional arguments
 (\code{...}) are passed to \code{\link[rstan]{extract}}.
 
-\item \code{plot}: Visualize parameter draws. Optional arguments
-(\code{...}) are passed to  \code{plotfun}.
+\item \code{plot}: Visualize parameter draws using \code{\link{plot_draws}}.
 }}
 
 \section{Slots}{
@@ -110,7 +107,7 @@ results.}
 }}
 
 \seealso{
-For different plotting functions, see \code{\link{plot_draws}},
+For more detailed plotting functions, see \code{\link{plot_draws}},
 \code{\link{plot_beta}}, \code{\link{plot_warp}},
 \code{\link{plot_effect_times}}
 }

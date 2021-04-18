@@ -103,8 +103,8 @@ much smaller (if \code{sample_f=FALSE}).}
 Returns an object of the S4 class \linkS4class{lgpfit}.
 }
 \description{
-Creates a model by calling \code{\link{create_model}} and fits by calling
-\code{\link{sample_model}}.
+Creates an additive Gaussian process model using
+\code{\link{create_model}} and fits it using \code{\link{sample_model}}.
 }
 \section{Model formula syntax}{
 

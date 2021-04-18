@@ -19,10 +19,11 @@ using Stan (\code{\link[rstan]{rstan}}).
 Core functionality of the package consists of creating and fitting an
 additive GP model. Main functions are:
 \itemize{
- \item \code{\link{lgp}}: Specify and fit a model with one command.
+ \item \code{\link{lgp}}: Specify and fit an additive GP model with one
+ command.
  \item \code{\link{create_model}}: Define an \linkS4class{lgpmodel} object.
  \item \code{\link{sample_model}}: Sample model parameters and create an
- an \linkS4class{lgpfit} object.
+ \linkS4class{lgpfit} object.
  \item \code{\link{optimize_model}} (experimental): Optimize model
  parameters.
 }

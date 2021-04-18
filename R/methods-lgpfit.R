@@ -100,20 +100,17 @@ setMethod(
   }
 )
 
-#' @describeIn lgpfit Visualize parameter draws. Optional arguments
-#' (\code{...}) are passed to  \code{plotfun}.
+#' @describeIn lgpfit Visualize parameter draws using \code{\link{plot_draws}}.
 #' @param x an \linkS4class{lgpfit} object to visualize
 #' @param y unused argument
-#' @param plotfun plotting function to use
-#' @seealso For different plotting functions, see \code{\link{plot_draws}},
+#' @seealso For more detailed plotting functions, see \code{\link{plot_draws}},
 #' \code{\link{plot_beta}}, \code{\link{plot_warp}},
 #' \code{\link{plot_effect_times}}
 setMethod(
   "plot",
   signature = c("lgpfit", "missing"),
-  function(x, y, plotfun = plot_draws, ...) {
-    check_type(plotfun, "function")
-    plotfun(x, ...)
+  function(x, y) {
+    plot_draws(fit = x)
   }
 )
 
