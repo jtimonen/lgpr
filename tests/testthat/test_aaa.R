@@ -1,8 +1,9 @@
 library(lgpr)
+source("helpers/SW.R")
 
 # -------------------------------------------------------------------------
 
-context("Validation of expr, formula and scaling objects")
+context("Validation of S4 class objects")
 
 test_that("lgpexpr validation works correctly", {
   a <- lgpexpr(fun = "gp", covariate = "x")
@@ -48,4 +49,22 @@ test_that("lgpscaling and its validation work correctly", {
   x_rec <- apply_scaling(a, y, inverse = TRUE)
   max_err <- max(abs(x - x_rec), na.rm = TRUE)
   expect_lt(max_err, 1e-6)
+})
+
+test_that("lgpfit and GaussianPrediction validation works correctly", {
+  SW({
+    fit <- example_fit(refresh = 0, quiet = TRUE)
+  })
+  expect_true(validate_lgpfit(fit))
+  a <- pred(fit, verbose = FALSE)
+  expect_true(validate_GaussianPrediction(a))
+})
+
+test_that("lgpfit Prediction validation works correctly", {
+  SW({
+    fit <- example_fit(refresh = 0, quiet = TRUE, likelihood = "nb")
+  })
+  expect_true(validate_lgpfit(fit))
+  a <- pred(fit, verbose = FALSE, reduce = NULL)
+  expect_true(validate_Prediction(a))
 })

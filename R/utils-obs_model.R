@@ -32,14 +32,12 @@ is_pois_or_nb <- function(likelihood) {
 
 # Map x through link function
 link <- function(x, likelihood) {
-  allowed <- likelihood_list()
-  check_allowed(likelihood, allowed)
+  check_allowed(likelihood, likelihood_list())
   if (is_pois_or_nb(likelihood)) {
-    x <- log(x)
+    log(x)
   } else if (is_bin_or_bb(likelihood)) {
-    x <- log(x) - log(1 - x)
+    log(x) - log(1 - x)
   }
-  return(x)
 }
 
 # Map x through inverse link function

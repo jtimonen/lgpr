@@ -3,7 +3,7 @@ library(lgpr)
 # -------------------------------------------------------------------------
 dat <- testdata_001
 
-context("methods for lgpmodel objects")
+context("Methods for lgpmodel objects")
 
 test_that("param_summary works for models with uncertain effect time", {
   et_info <- list(backwards = TRUE, lower = 3, upper = 23, zero = 10)

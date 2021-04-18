@@ -229,7 +229,6 @@ plot_effect_times <- function(fit, type = "areas", ...) {
   return(h)
 }
 
-
 determine_num_paramsets <- function(fit, draws, reduce) {
   # Decide number of output param sets based on total number of
   # posterior draws, possible reduction and subset of draw indices
@@ -237,27 +236,4 @@ determine_num_paramsets <- function(fit, draws, reduce) {
   if (!is.null(reduce)) S <- 1
   if (!is.null(draws)) S <- length(draws)
   return(S)
-}
-
-#' Graphical posterior or prior predictive checks
-#'
-#' @export
-#' @param data the original data frame
-#' @param fun \code{bayesplot} function name
-#' @param ... additional arguments passed to the default
-#' \code{\link[bayesplot]{pp_check}} method in
-#' \code{bayesplot}
-#' @return a \code{ggplot} object
-#' @seealso Introduction to graphical posterior predictive checks:
-#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
-#'
-ppc <- function(fit, data, fun = default_ppc_fun(fit), ...) {
-  check_type(fit, "lgpfit")
-  check_type(data, "data.frame")
-  check_type(fun, "function")
-  y_name <- get_y_name(fit)
-  y <- dollar(data, y_name)
-  stop("not implemented")
-  # y_rep <- get_y_rng(fit, original_scale = TRUE)
-  # bayesplot::pp_check(y, y_rep, fun, ...)
 }
