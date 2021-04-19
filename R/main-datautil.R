@@ -33,7 +33,7 @@ adjusted_c_hat <- function(y, norm_factors) {
 #' have same name as the variable passed as input \code{x}.
 #' @family data frame handling functions
 add_factor <- function(data, x, id_var = "id") {
-  check_type(data, "data.frame")
+  data <- convert_to_data_frame(data)
   name <- deparse(substitute(x))
   bad <- name %in% colnames(data)
   if (bad) stop("<data> already contains a variable called '", name, "'!")
@@ -53,13 +53,14 @@ add_factor <- function(data, x, id_var = "id") {
 
 #' Add a crossing of two factors to a data frame
 #'
-#' @param df a data frame
+#' @param data a data frame
 #' @param fac1 name of first factor, must be found in \code{df}
 #' @param fac2 name of second factor, must be found in \code{df}
 #' @param new_name name of the new factor
 #' @return a data frame
 #' @family data frame handling functions
-add_factor_crossing <- function(df, fac1, fac2, new_name) {
+add_factor_crossing <- function(data, fac1, fac2, new_name) {
+  df <- convert_to_data_frame(data)
   a <- dollar(df, fac1)
   b <- dollar(df, fac2)
   check_not_null(new_name)
@@ -84,7 +85,7 @@ add_factor_crossing <- function(df, fac1, fac2, new_name) {
 #' be called \code{dis_age}. For controls, its value will be \code{NaN}.
 #' @family data frame handling functions
 add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
-  check_type(data, "data.frame")
+  data <- convert_to_data_frame(data)
   bad <- "dis_age" %in% colnames(data)
   if (bad) stop("<data> already contains a variable called 'dis_age'!")
   check_named(t_init)
@@ -135,7 +136,7 @@ split_by_factor <- function(data, test, var_name = "id") {
 #' @rdname split
 #' @param idx_test indices point indices with the factor
 split_within_factor <- function(data, idx_test, var_name = "id") {
-  check_type(data, "data.frame")
+  data <- convert_to_data_frame(data)
   id <- dollar(data, var_name)
   check_type(id, "factor")
   uid <- unique(id)
@@ -151,7 +152,7 @@ split_within_factor <- function(data, idx_test, var_name = "id") {
 #' @param k_test desired number of test data points per each level of the
 #' factor
 split_within_factor_random <- function(data, k_test = 1, var_name = "id") {
-  check_type(data, "data.frame")
+  data <- convert_to_data_frame(data)
   id <- dollar(data, var_name)
   check_type(id, "factor")
   uid <- unique(id)
@@ -170,7 +171,7 @@ split_within_factor_random <- function(data, k_test = 1, var_name = "id") {
 #' @param n_test desired number of test data points (if NULL, \code{p_test}
 #' is used to compute this)
 split_random <- function(data, p_test = 0.2, n_test = NULL) {
-  check_type(data, "data.frame")
+  data <- convert_to_data_frame(data)
   n_total <- dim(data)[1]
   if (is.null(n_test)) {
     n_test <- round(p_test * n_total)
@@ -183,7 +184,7 @@ split_random <- function(data, p_test = 0.2, n_test = NULL) {
 #' @param i_test test data row indices
 #' @param sort_ids should the test indices be sorted into increasing order
 split_data <- function(data, i_test, sort_ids = TRUE) {
-  check_type(data, "data.frame")
+  data <- convert_to_data_frame(data)
   i_test <- if (sort_ids) sort(i_test, decreasing = FALSE) else sort_ids
   n_total <- dim(data)[1]
   i_train <- setdiff(seq_len(n_total), i_test)
@@ -222,6 +223,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #' @family data frame handling functions
 new_x <- function(data, x_values, group_by = "id", x = "age", x_ns = NULL) {
   data <- allow_data_model_or_fit(data)
+  data <- convert_to_data_frame(data)
   check_not_null(x)
   check_not_null(x_values)
   check_in_data(x, data, "data")
@@ -314,6 +316,12 @@ plot_data <- function(data,
                       main = NULL,
                       sub = NULL) {
   data <- allow_data_model_or_fit(data)
+  data <- convert_to_data_frame(data)
+
+  # Check that needed variables exist
+  check_in_data(x_name, data, "data")
+  check_in_data(y_name, data, "data")
+  check_in_data(group_by, data, "data")
 
   # Create initial plot and add data
   df <- data[c(x_name, y_name, group_by, color_by, facet_by)]
@@ -397,4 +405,15 @@ allow_data_model_or_fit <- function(data) {
   if (is(data, "lgpmodel")) data <- get_data(data)
   check_type(data, "data.frame")
   return(data)
+}
+
+# Convert data to data.frame
+convert_to_data_frame <- function(data) {
+  check_type(data, "data.frame") # check if inherits from data.frame
+  cname <- class(data)
+  if (length(cname) > 1) {
+    warning("data is not a plain data.frame, converting using as.data.frame()")
+    data <- as.data.frame(data)
+  }
+  data
 }

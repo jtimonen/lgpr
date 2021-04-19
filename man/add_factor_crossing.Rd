@@ -4,10 +4,10 @@
 \alias{add_factor_crossing}
 \title{Add a crossing of two factors to a data frame}
 \usage{
-add_factor_crossing(df, fac1, fac2, new_name)
+add_factor_crossing(data, fac1, fac2, new_name)
 }
 \arguments{
-\item{df}{a data frame}
+\item{data}{a data frame}
 
 \item{fac1}{name of first factor, must be found in \code{df}}
 

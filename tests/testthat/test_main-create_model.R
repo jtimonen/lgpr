@@ -169,7 +169,7 @@ test_that("creating an lgpmodel errors with invalid data", {
   )
   expect_error(
     create_model(y ~ gp(age) + categ(id), "notdata"),
-    "<data> must be a data.frame"
+    "must be an object of type <data.frame>"
   )
 })
 

@@ -20,6 +20,7 @@ create_model <- function(formula,
                          sample_f = !(likelihood == "gaussian")) {
 
   # Parse common parts (formula, covariates, components, options)
+  data <- convert_to_data_frame(data)
   lgp_formula <- create_model.formula(formula, data, verbose)
   cc_info <- create_model.covs_and_comps(data, lgp_formula, NA, verbose)
   stan_x <- dollar(cc_info, "to_stan")

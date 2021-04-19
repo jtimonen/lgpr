@@ -1,8 +1,7 @@
-
 #' Graphical posterior or prior predictive checks
 #'
 #' @export
-#' @param fit an ojbect of class \linkS4class{lgpfit}
+#' @param fit an object of class \linkS4class{lgpfit}
 #' @param data the original data frame
 #' @param fun \code{bayesplot} function name
 #' @param ... additional arguments passed to the default
