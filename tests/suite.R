@@ -1,7 +1,7 @@
 # A larger test suite
 #  - tests correctness of inference
 #  - measures runtime
-library(bench)
+library(profvis)
 library(lgpr)
 library(rstan)
 
@@ -10,9 +10,10 @@ NUM_CHAINS <- 4
 NUM_CORES <- 4
 REFRESH <- 0
 STAN_SEED <- 123
+DRAW_INDS <- round(seq(1, NUM_ITER*NUM_CHAINS/2, length.out = 100))
 
 # Get experiment information from lgpfit object
-get_info <- function(fit, name, n_pred, pred_time, pred_mem) {
+get_info <- function(fit, name, n_pred, pred_time1, pred_time2, total_time) {
   n_obs <- lgpr:::get_num_obs(fit)
   n_comps <- lgpr:::get_num_comps(fit)
   f_sampled <- is_f_sampled(fit)
@@ -22,7 +23,7 @@ get_info <- function(fit, name, n_pred, pred_time, pred_mem) {
   fit_time_sd <- stats::sd(chain_times)
   df <- data.frame(
     name, f_sampled, n_div, n_obs, n_comps, fit_time_mean, fit_time_sd,
-    n_pred, pred_time, pred_mem
+    n_pred, pred_time1, pred_time2, total_time
   )
   return(df)
 }
@@ -38,6 +39,7 @@ for (f in files) {
   fp <- file.path(suite_path, f)
   cat("FILE:", fp, "\n")
   source(fp)
+  start_time <- Sys.time()
 
   # Run model fitting
   fit <- run_test(
@@ -46,7 +48,13 @@ for (f in files) {
   )
 
   # Run post-fitting tasks
-  res <- run_post_tasks(fit)
-  info <- get_info(fit, f, res$n_pred, res$pred_time, res$pred_mem)
-  INFO <- cbind()
+  res <- run_post_tasks(fit, DRAW_INDS)
+
+  # Store info
+  total_time <- as.numeric(Sys.time() - start_time)
+  info <- get_info(
+    fit, f, res$n_pred, res$time1, res$time2,
+    total_time
+  )
+  INFO <- rbind(INFO, info)
 }
