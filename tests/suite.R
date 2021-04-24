@@ -13,8 +13,8 @@ STAN_SEED <- 123
 
 # Get experiment information from lgpfit object
 get_info <- function(fit, name, n_pred, pred_time, pred_mem) {
-  obs <- lgpr:::get_num_obs(fit)
-  comps <- lgpr:::get_num_comps(fit)
+  n_obs <- lgpr:::get_num_obs(fit)
+  n_comps <- lgpr:::get_num_comps(fit)
   f_sampled <- is_f_sampled(fit)
   n_div <- rstan::get_num_divergent(fit@stan_fit)
   chain_times <- apply(rstan::get_elapsed_time(fit@stan_fit), 1, mean)
