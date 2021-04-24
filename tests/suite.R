@@ -8,9 +8,10 @@ library(rstan)
 NUM_ITER <- 2000
 NUM_CHAINS <- 4
 NUM_CORES <- 4
+REFRESH <- 0
 
 # Get experiment information from lgpfit object
-get_info <- function(fit, iter, chains, cores, name) {
+get_info <- function(fit, iter, chains, cores, name, total_time, mem_alloc) {
   obs <- lgpr:::get_num_obs(fit)
   comps <- lgpr:::get_num_comps(fit)
   f_sampled <- is_f_sampled(fit)
@@ -20,7 +21,7 @@ get_info <- function(fit, iter, chains, cores, name) {
   t_sd <- stats::sd(times)
   df <- data.frame(
     name, iter, chains, cores, div, f_sampled,
-    obs, comps, t_mean, t_sd
+    obs, comps, t_mean, t_sd, total_time, mem_alloc
   )
   return(df)
 }
@@ -34,9 +35,12 @@ for (f in files) {
   source(fp)
   bm <- bench::mark(
     {
-      fit <- run_test(iter = NUM_ITER, chains = NUM_CHAINS, cores = NUM_CORES)
+      fit <- run_test(iter = NUM_ITER, chains = NUM_CHAINS, cores = NUM_CORES,
+                      refresh = REFRESH)
     },
     iterations = 1
   )
-  info <- get_info(fit, NUM_ITER, NUM_CHAINS, NUM_CORES, f)
+  mem <-  bm$mem_alloc
+  tt <- bm$total_time
+  info <- get_info(fit, NUM_ITER, NUM_CHAINS, NUM_CORES, f, tt, mem)
 }
