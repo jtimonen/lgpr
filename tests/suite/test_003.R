@@ -2,10 +2,10 @@
 library(lgpr)
 
 # Create data using two age components
-setup_data <- function(N=10, H=10, sigma=0.2) {
-  ttt <- seq(12, 72, by = H) 
+setup_data <- function(N = 10, H = 10, sigma = 0.2) {
+  ttt <- seq(12, 72, by = H)
   K <- length(ttt)
-  age <- rep(ttt, N) + rep(H/N*1:N, each=K)
+  age <- rep(ttt, N) + rep(H / N * 1:N, each = K)
   id <- as.factor(rep(1:N, each = K))
   dat <- data.frame(id, age)
   f1 <- exp(-sin(0.2 * age))
@@ -37,14 +37,13 @@ run_test <- function(...) {
 create_plots <- function(fit) {
   p <- get_pred(fit, reduce = mean)
   expect_s4_class(p, "Prediction")
-  
+
   plt1 <- plot_components(fit, group_by = NA, reduce = NULL)
   plt2 <- plot_pred(fit, group_by = NA, reduce = NULL)
-  
+
   x_pred <- new_x(dat, x_values = seq(0, 200, by = 2), group_by = NA)
   x_pred$age2 <- x_pred$age
   pp <- pred(fit, x_pred, reduce = NULL, draws = c(1, 2, 5), verbose = FALSE)
   plt3 <- plot_components(fit, pp, group_by = NA)
   plt4 <- plot_pred(fit, pp, group_by = NA)
 }
-
