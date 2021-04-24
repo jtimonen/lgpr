@@ -1,5 +1,6 @@
 # A model with two age components
 library(lgpr)
+library(bench)
 
 # Create data using two age components
 setup_data <- function(N = 10, H = 10, sigma = 0.2) {
@@ -34,16 +35,33 @@ run_test <- function(...) {
   return(fit)
 }
 
-create_plots <- function(fit) {
-  p <- get_pred(fit, reduce = mean)
-  expect_s4_class(p, "Prediction")
+# Run post-fitting tasks
+run_post_tasks <- function(fit) {
 
-  plt1 <- plot_components(fit, group_by = NA, reduce = NULL)
-  plt2 <- plot_pred(fit, group_by = NA, reduce = NULL)
+  # Compute and plot predictions at data points
+  p <- pred(fit, reduce = NULL)
+  plt1 <- plot_components(fit, p, group_by = NA)
+  plt2 <- plot_pred(fit, p, group_by = NA)
 
-  x_pred <- new_x(dat, x_values = seq(0, 200, by = 2), group_by = NA)
+  # Compute and plot out-of-sample predictions
+  x_pred <- new_x(fit, x_values = seq(0, 200, by = 1), group_by = NA)
   x_pred$age2 <- x_pred$age
-  pp <- pred(fit, x_pred, reduce = NULL, draws = c(1, 2, 5), verbose = FALSE)
+  bm <- bench::mark(
+    {
+      pp <- pred(fit, x_pred, reduce = NULL)
+    },
+    iterations = 1
+  )
   plt3 <- plot_components(fit, pp, group_by = NA)
   plt4 <- plot_pred(fit, pp, group_by = NA)
+
+  # Return results
+  results <- list(
+    n_pred = nrow(x_pred),
+    pred_time = as.character(bm$total_time),
+    pred_mem = as.character(bm$mem_alloc),
+    pred_bm = bm,
+    plots = list(plt1, plt2, plt3, plt4)
+  )
+  return(results)
 }

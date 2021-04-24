@@ -9,19 +9,20 @@ NUM_ITER <- 2000
 NUM_CHAINS <- 4
 NUM_CORES <- 4
 REFRESH <- 0
+STAN_SEED <- 123
 
 # Get experiment information from lgpfit object
-get_info <- function(fit, iter, chains, cores, name, total_time, mem_alloc) {
+get_info <- function(fit, name, n_pred, pred_time, pred_mem) {
   obs <- lgpr:::get_num_obs(fit)
   comps <- lgpr:::get_num_comps(fit)
   f_sampled <- is_f_sampled(fit)
-  div <- rstan::get_num_divergent(fit@stan_fit)
-  times <- apply(rstan::get_elapsed_time(fit@stan_fit), 1, mean)
-  t_mean <- mean(times)
-  t_sd <- stats::sd(times)
+  n_div <- rstan::get_num_divergent(fit@stan_fit)
+  chain_times <- apply(rstan::get_elapsed_time(fit@stan_fit), 1, mean)
+  fit_time_mean <- mean(chain_times)
+  fit_time_sd <- stats::sd(chain_times)
   df <- data.frame(
-    name, iter, chains, cores, div, f_sampled,
-    obs, comps, t_mean, t_sd, total_time, mem_alloc
+    name, f_sampled, n_div, n_obs, n_comps, fit_time_mean, fit_time_sd,
+    n_pred, pred_time, pred_mem
   )
   return(df)
 }
@@ -29,21 +30,23 @@ get_info <- function(fit, iter, chains, cores, name, total_time, mem_alloc) {
 # Run test suite
 suite_path <- file.path("tests/suite")
 files <- dir(suite_path)
+INFO <- c()
+
 for (f in files) {
+
+  # Setup
   fp <- file.path(suite_path, f)
   cat("FILE:", fp, "\n")
   source(fp)
+
+  # Run model fitting
   fit <- run_test(
     iter = NUM_ITER, chains = NUM_CHAINS, cores = NUM_CORES,
-    refresh = REFRESH
+    refresh = REFRESH, seed = STAN_SEED
   )
-  bm <- bench::mark(
-    {
-      r <- relevances(fit)
-    },
-    iterations = 1
-  )
-  mem <- bm$mem_alloc
-  tt <- bm$total_time
-  info <- get_info(fit, NUM_ITER, NUM_CHAINS, NUM_CORES, f, tt, mem)
+
+  # Run post-fitting tasks
+  res <- run_post_tasks(fit)
+  info <- get_info(fit, f, res$n_pred, res$pred_time, res$pred_mem)
+  INFO <- cbind()
 }
