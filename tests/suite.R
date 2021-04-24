@@ -33,14 +33,17 @@ for (f in files) {
   fp <- file.path(suite_path, f)
   cat("FILE:", fp, "\n")
   source(fp)
+  fit <- run_test(
+    iter = NUM_ITER, chains = NUM_CHAINS, cores = NUM_CORES,
+    refresh = REFRESH
+  )
   bm <- bench::mark(
     {
-      fit <- run_test(iter = NUM_ITER, chains = NUM_CHAINS, cores = NUM_CORES,
-                      refresh = REFRESH)
+      r <- relevances(fit)
     },
     iterations = 1
   )
-  mem <-  bm$mem_alloc
+  mem <- bm$mem_alloc
   tt <- bm$total_time
   info <- get_info(fit, NUM_ITER, NUM_CHAINS, NUM_CORES, f, tt, mem)
 }

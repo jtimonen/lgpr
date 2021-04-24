@@ -72,15 +72,12 @@ pred <- function(fit,
   } else {
     out <- pred_gaussian(fit, fp, verbose)
   }
+  log_progress("Done.", verbose)
   return(out)
 }
 
 # pred when sample_f = FALSE
 pred_gaussian <- function(fit, fp, verbose) {
-  log_progress(
-    "Computing preditive distribution on original data scale...",
-    verbose
-  )
   f_mean <- dollar(fp, "f_mean")
   f_std <- dollar(fp, "f_std")
   sigma2 <- dollar(fp, "sigma2")

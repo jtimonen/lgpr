@@ -18,11 +18,11 @@ setup_data <- function(N = 10, H = 10, sigma = 0.2) {
 }
 
 # Create model where there are different priors for the two lengthscales
-setup_model <- function(dat, ...) {
+setup_model <- function(dat) {
   d1 <- log_normal(1.0, 0.3)
   d2 <- normal(0, 0.3)
   prior <- list(ell = list(d1, d2))
-  model <- create_model(y ~ age + age2, dat, prior = prior, ...)
+  model <- create_model(y ~ age + age2, dat, prior = prior)
   return(model)
 }
 
