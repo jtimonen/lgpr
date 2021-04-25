@@ -159,7 +159,6 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
     check_data = TRUE,
     pars = "eta",
     include = FALSE,
-    verbose = verbose,
     ...
   )
   log_progress("Sampling done.", verbose)
