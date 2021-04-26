@@ -1,0 +1,65 @@
+---
+title: "Two age components"
+output:
+  html_document:
+    toc: true
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model
+
+```{r model}
+print(fit@model)
+```
+
+## Fit
+
+```{r fit}
+print(fit)
+plot(fit)
+```
+
+## Plots
+
+You can also embed plots, for example:
+
+```{r plots_1}
+# Compute and plot predictions at data points (reduce = NULL)
+alpha <- 0.3
+p1 <- pred(fit, reduce = NULL, draws = DRAW_INDS, verbose = verbose)
+plot_components(fit, p1, group_by = NA, alpha = alpha)
+plot_pred(fit, p1, group_by = NA, alpha = alpha)
+```
+
+```{r plots_2}
+# Compute and plot out-of-sample predictions (reduce = NULL)
+x_pred <- new_x(fit, x_values = seq(0, 200, by = 1), group_by = NA)
+x_pred$age_fast <- x_pred$age
+p2 <- pred(fit, x_pred, reduce = NULL, draws = DRAW_INDS, verbose = verbose)
+plot_components(fit, p2, group_by = NA, alpha = alpha)
+plot_pred(fit, p2, group_by = NA, alpha = alpha)
+```
+
+```{r plots_3}
+# Compute and plot out-of-sample predictions (reduce = mean)
+p3 <- pred(fit, x_pred, reduce = mean, verbose = verbose)
+plot_components(fit, p3, group_by = NA)
+plot_pred(fit, p3, group_by = NA)
+```
+
+## Relevances and selection
+```{r relevances}
+r <- relevances(fit)
+s <- select(fit)
+print(r)
+print(s)
+```
+
+## sessionInfo()
+```{r ses}
+sessionInfo()
+```
