@@ -1,6 +1,5 @@
 # A model with two age components
 library(lgpr)
-library(ggplot2)
 
 # Create data using two age components
 setup_data <- function(N = 10, H = 10, sigma = 0.5) {

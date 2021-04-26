@@ -1,19 +1,20 @@
 # Object size
-r_size_mb <- function(object) {
-  format(object.size(object), units = "Mb")
+r_size_kb <- function(object) {
+  format(object.size(object), units = "kb")
 }
 
 # File size
-file_size_mb <- function(file) {
+file_size_kb <- function(file) {
   fi <- file.info(file)
-  fs_mb <- fi$size / (1000 * 1000)
-  paste0(round(fs_mb, 1), " Mb")
+  fs_mb <- fi$size / (100)
+  paste0(round(fs_mb, 1), " kb")
 }
 
 # Get experiment information from lgpfit object
 get_info <- function(fit, name, t_fit, t_pred, t_post, t_total, size_disk) {
   n_obs <- lgpr:::get_num_obs(fit)
   n_comps <- lgpr:::get_num_comps(fit)
+  obs_model <- lgpr:::get_obs_model(fit)
   f_sampled <- is_f_sampled(fit)
   n_div <- rstan::get_num_divergent(fit@stan_fit)
   mf <- rstan::monitor(fit@stan_fit, print = FALSE)
@@ -23,12 +24,12 @@ get_info <- function(fit, name, t_fit, t_pred, t_post, t_total, size_disk) {
   chain_times <- apply(rstan::get_elapsed_time(fit@stan_fit), 1, mean)
   t_ch_mean <- mean(chain_times)
   t_ch_sd <- stats::sd(chain_times)
-  size_fit <- r_size_mb(fit)
-  size_small <- r_size_mb(clear_postproc(fit))
+  size_fit <- r_size_kb(fit)
+  size_small <- r_size_kb(clear_postproc(fit))
 
   # Return data frame
   data.frame(
-    name, f_sampled, n_obs, n_comps,
+    name, obs_model, f_sampled, n_obs, n_comps,
     t_ch_mean, t_ch_sd, t_fit, t_pred, t_post, t_total,
     size_fit, size_small, size_disk,
     n_div, max_Rhat, min_TESS, min_BESS
@@ -40,7 +41,7 @@ run_example <- function(verbose, ...) {
   mod <- setup_model()
   start_time <- Sys.time()
   fit <- sample_model(mod, quiet = !verbose, ...)
-  elapsed_time <- as.numeric(Sys.time() - start_time)
+  elapsed_time <- as.double(Sys.time() - start_time, units = "secs")
   list(fit = fit, time = elapsed_time)
 }
 
@@ -49,7 +50,7 @@ run_pred <- function(fit, verbose) {
   x_pred <- get_data(fit)
   start_time <- Sys.time()
   p <- pred(fit, x = x_pred, reduce = NULL, verbose = verbose)
-  elapsed_time <- as.numeric(Sys.time() - start_time)
+  elapsed_time <- as.double(Sys.time() - start_time, units = "secs")
   return(elapsed_time)
 }
 

@@ -204,8 +204,9 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
 #' possibly another continuous variable \code{x_ns} derived from it, with new
 #' values, for each level of a grouping factor (usually id)
 #' @export
-#' @param data a data frame
-#' @param group_by name of the grouping varible, must be a factor
+#' @param data A data frame. Can also be an \linkS4class{lgpfit} or
+#' \linkS4class{lgpmodel} object, in which case data is extracted from it.
+#' @param group_by name of the grouping variable, must be a factor
 #' in \code{data} (or use \code{group_by=NA} to create a dummy grouping
 #' factor which has only one value)
 #' @param x of the variable along which to extend,

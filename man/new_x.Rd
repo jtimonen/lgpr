@@ -7,11 +7,12 @@
 new_x(data, x_values, group_by = "id", x = "age", x_ns = NULL)
 }
 \arguments{
-\item{data}{a data frame}
+\item{data}{A data frame. Can also be an \linkS4class{lgpfit} or
+\linkS4class{lgpmodel} object, in which case data is extracted from it.}
 
 \item{x_values}{the values of \code{x} to set for each individual}
 
-\item{group_by}{name of the grouping varible, must be a factor
+\item{group_by}{name of the grouping variable, must be a factor
 in \code{data} (or use \code{group_by=NA} to create a dummy grouping
 factor which has only one value)}
 

@@ -4,6 +4,7 @@
 library(rmarkdown)
 library(lgpr)
 library(rstan)
+library(lme4) # for sleepstudy data
 
 # Common settings for all tests
 NUM_ITER <- 2000
@@ -52,7 +53,7 @@ for (f in files) {
 
   # Save the fit object
   saveRDS(fit, file = rds_file)
-  size_disk <- file_size_mb(rds_file)
+  size_disk <- file_size_kb(rds_file)
 
   # Time pred
   t_pred <- run_pred(fit, verbose)
@@ -64,10 +65,10 @@ for (f in files) {
     output_dir = out_path,
     quiet = !verbose
   )
-  t_post <- as.numeric(Sys.time() - render_start_time)
+  t_post <- as.double(Sys.time() - render_start_time, units = "secs")
 
   # Store info
-  t_total <- as.numeric(Sys.time() - start_time)
+  t_total <- as.double(Sys.time() - start_time, units = "secs")
   info_f <- get_info(fit, base_name, t_fit, t_pred, t_post, t_total, size_disk)
   INFO <- rbind(INFO, info_f)
 }
