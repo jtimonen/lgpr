@@ -1,13 +1,13 @@
 # Object size
 r_size_kb <- function(object) {
-  format(object.size(object), units = "kb")
+  format(object.size(object), units = "Kb")
 }
 
 # File size
 file_size_kb <- function(file) {
   fi <- file.info(file)
   fs_mb <- fi$size / (100)
-  paste0(round(fs_mb, 1), " kb")
+  paste0(round(fs_mb, 1), " Kb")
 }
 
 # Get experiment information from lgpfit object
