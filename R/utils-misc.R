@@ -389,15 +389,22 @@ create_grouping_factor <- function(x, group_by) {
 }
 
 # Get type of each data frame column
-data_types <- function(data) {
+data_types <- function(data, verbose) {
   check_type(data, "data.frame")
-  allowed <- c("factor", "numeric")
   D <- ncol(data)
   nams <- names(data)
   types <- list()
   for (j in seq_len(D)) {
-    check_allowed(class(data[, j])[1], allowed)
-    types[[j]] <- class(data[, j])[1]
+    var <- data[, j]
+    if (inherits(var, what = "factor")) {
+      types[[j]] <- "factor"
+    } else if (inherits(var, what = "numeric")) {
+      types[[j]] <- "numeric"
+    } else {
+      stop("variable ", nams[j], " is neither numeric nor a factor!")
+    }
+    msg <- paste0("Variable type (", nams[j], "): ", types[[j]])
+    log_info(msg, verbose)
   }
   names(types) <- nams
   return(types)

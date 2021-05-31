@@ -17,7 +17,7 @@
 create_model.formula <- function(formula, data, verbose = FALSE) {
   log_progress("Parsing formula...", verbose)
   advanced <- is_advanced_formula(formula)
-  if (!advanced) formula <- formula_to_advanced(formula, data)
+  if (!advanced) formula <- formula_to_advanced(formula, data, verbose)
   fp <- as.character(formula)
   formula_str <- paste(fp[2], fp[1], fp[3])
   log_info(paste0("Formula interpreted as: ", formula_str), verbose)
@@ -42,19 +42,19 @@ split_formula <- function(formula) {
 }
 
 # Translate formula to advanced syntax format
-formula_to_advanced <- function(formula, data) {
+formula_to_advanced <- function(formula, data, verbose) {
   f <- split_formula(formula)
   rhs <- dollar(f, "right")
   y_name <- dollar(f, "left")
-  rhs <- rhs_to_advanced(rhs, data)
+  rhs <- rhs_to_advanced(rhs, data, verbose)
   f_str <- paste(y_name, "~", rhs)
   out <- stats::formula(f_str)
   return(out)
 }
 
 # Translate formula right-hand side
-rhs_to_advanced <- function(rhs, data) {
-  types <- data_types(data)
+rhs_to_advanced <- function(rhs, data, verbose) {
+  types <- data_types(data, verbose)
   terms <- rhs_to_terms(rhs)
   rhs_adv <- ""
   idx <- 0

@@ -7,7 +7,7 @@ library(rstan)
 library(lme4) # for sleepstudy data
 
 # Common settings for all tests
-NUM_ITER <- 2000
+NUM_ITER <- 20
 NUM_CHAINS <- 4
 NUM_CORES <- 4
 REFRESH <- 0

@@ -22,10 +22,10 @@ create_model.prior <- function(prior, stan_input, verbose) {
     msg <- warn_msg_default_prior("input warping steepness", "wrp", model_desc)
     warning(msg)
   }
-  msg1 <- paste0("  * user-specified priors found for: {", str1, "}")
+  msg1 <- paste0("User-specified priors found for: {", str1, "}.")
   msg2 <- paste0(
-    "  * if any of the following parameters are included in the",
-    " model, default priors are used for them: {", str2, "}"
+    "If any of the following parameters are included in the",
+    " model, default priors are used for them: {", str2, "}."
   )
   info <- paste0(msg1, "\n", msg2, "\n")
   log_info(info, verbose)
