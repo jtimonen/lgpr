@@ -418,3 +418,43 @@ convert_to_data_frame <- function(data) {
   }
   data
 }
+
+
+
+#' Function for reading the built-in proteomics data
+#'
+#' @export
+#' @param parentDir Path to local parent directory for the data.
+#' If this is \code{NULL}, data is downloaded from
+#' \url{https://github.com/jtimonen/lgpr-usage/tree/master/data/proteomics}.
+#' @param protein Index or name of protein.
+#' @param verbose Can this print some output?
+#' @return a \code{data.frame}
+#' @family built-in data
+read_proteomics_data <- function(parentDir = NULL, protein = NULL,
+                                 verbose = TRUE) {
+  if (is.null(protein)) stop("specify name or index of protein!")
+  fn_X <- paste(parentDir, "/liu_preproc_X.csv", sep = "")
+  fn_Y <- paste(parentDir, "/liu_preproc_Y.csv", sep = "")
+  X_data <- read.csv(fn_X, header = TRUE, sep = ",")
+  Y_data <- read.csv(fn_Y, header = TRUE, sep = ",")
+  names <- colnames(Y_data)
+  if (!is.character(protein)) {
+    pname <- names[protein]
+  } else {
+    pname <- protein
+  }
+  msg <- paste0("Read data for protein '", pname, "'.")
+  log_info(msg, verbose)
+  y <- Y_data[[pname]]
+  notnan <- which(!is.nan(y))
+  n_nan <- length(which(is.nan(y)))
+  data <- data.frame(cbind(X_data, y))
+  data <- data[notnan, ]
+  msg <- paste0(
+    "Removed ", n_nan, " rows with NaN value as the ",
+    "protein measurement."
+  )
+  log_info(msg, verbose)
+  return(data)
+}

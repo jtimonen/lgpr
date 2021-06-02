@@ -1,10 +1,10 @@
-# A model for Orthodont data
+# A model for the longitudinal proteomics data set (Liu et. al, 2018)
 library(lgpr)
 library(nlme)
 
 # Load data
 setup_data <- function() {
-  as.data.frame(nlme::Orthodont)
+  stop("Data path not set!")
 }
 
 # Create model

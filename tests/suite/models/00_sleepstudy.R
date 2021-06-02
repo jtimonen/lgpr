@@ -1,4 +1,4 @@
-# A model with two age components
+# A model for the sleepstudy data
 library(lgpr)
 library(lme4)
 
