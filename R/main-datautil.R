@@ -434,10 +434,25 @@ convert_to_data_frame <- function(data) {
 read_proteomics_data <- function(parentDir = NULL, protein = NULL,
                                  verbose = TRUE) {
   if (is.null(protein)) stop("specify name or index of protein!")
-  fn_X <- paste(parentDir, "/liu_preproc_X.csv", sep = "")
-  fn_Y <- paste(parentDir, "/liu_preproc_Y.csv", sep = "")
-  X_data <- read.csv(fn_X, header = TRUE, sep = ",")
-  Y_data <- read.csv(fn_Y, header = TRUE, sep = ",")
+  REPO_PATH <- "jtimonen/lgpr-usage/master/data/proteomics/"
+  RAW_PATH <- paste0("https://raw.githubusercontent.com/", REPO_PATH)
+  fn_X <- "liu_preproc_X.csv"
+  fn_Y <- "liu_preproc_Y.csv"
+  if (is.null(parentDir)) {
+    msg <- "Given parentDir was NULL, downloading the data from internet..."
+    log_info(msg, verbose)
+    fn_X <- paste0(RAW_PATH, fn_X)
+    fn_Y <- paste0(RAW_PATH, fn_Y)
+    X_data <- read_csv_url(fn_X, verbose, header = TRUE, sep = ",")
+    Y_data <- read_csv_url(fn_Y, verbose, header = TRUE, sep = ",")
+  } else {
+    fn_X <- paste0(parentDir, "/", fn_X)
+    fn_Y <- paste0(parentDir, "/", fn_Y)
+    X_data <- read.csv(fn_X, header = TRUE, sep = ",")
+    Y_data <- read.csv(fn_Y, header = TRUE, sep = ",")
+  }
+
+  # Get protein
   names <- colnames(Y_data)
   if (!is.character(protein)) {
     pname <- names[protein]
@@ -446,6 +461,8 @@ read_proteomics_data <- function(parentDir = NULL, protein = NULL,
   }
   msg <- paste0("Read data for protein '", pname, "'.")
   log_info(msg, verbose)
+
+  # Remove rows containing NaNs for the protein
   y <- Y_data[[pname]]
   notnan <- which(!is.nan(y))
   n_nan <- length(which(is.nan(y)))
@@ -456,5 +473,21 @@ read_proteomics_data <- function(parentDir = NULL, protein = NULL,
     "protein measurement."
   )
   log_info(msg, verbose)
+
+  # Categorical variables to factors
+  data$id <- as.factor(data$id)
+  data$group <- as.factor(data$group)
+  data$sex <- as.factor(data$sex)
+  levels(data$group)[levels(data$group) == 0] <- "Control"
+  levels(data$group)[levels(data$group) == 1] <- "Case"
   return(data)
+}
+
+# Read a csv from URL
+read_csv_url <- function(fn, verbose, ...) {
+  msg <- paste0("Reading ", fn, " with ?accessType=DOWNLOAD")
+  log_info(msg, verbose)
+  url <- paste0(fn, "?accessType=DOWNLOAD")
+  text <- RCurl::getURL(url)
+  read.csv(text = text, ...)
 }

@@ -1,0 +1,56 @@
+---
+title: "Longitudinal proteomics data"
+output:
+  html_document:
+    toc: true
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model
+
+```{r model}
+print(fit@model)
+```
+
+## Fit
+
+```{r fit}
+print(fit)
+plot(fit)
+```
+
+## Plots
+
+```{r plots_1}
+# Compute and plot predictions at data points (reduce = NULL)
+alpha <- 0.3
+p1 <- pred(fit, reduce = NULL, draws = DRAW_INDS, verbose = verbose)
+plot_components(fit, p1,  t_name = "age", group_by = "id", alpha = alpha)
+plot_pred(fit, p1, t_name = "age", group_by = "id", alpha = alpha)
+```
+
+```{r plots_2}
+# Compute and plot out-of-sample predictions (reduce = mean)
+x_pred <- new_x(fit, x_values = seq(0, 100, by = 2), group_by = "id",
+                x = "age")
+p2 <- pred(fit, x_pred, reduce = mean, verbose = verbose)
+plot_components(fit, p2, t_name = "age", group_by = "id", color_by = "sex")
+plot_pred(fit, p2, t_name = "age", group_by = "id")
+```
+
+## Relevances and selection
+```{r relevances}
+r <- relevances(fit)
+s <- select(fit)
+print(r)
+print(s)
+```
+
+## sessionInfo()
+```{r ses}
+sessionInfo()
+```
