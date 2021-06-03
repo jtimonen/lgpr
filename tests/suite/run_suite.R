@@ -37,8 +37,8 @@ NUM_CHAINS <- 4
 NUM_CORES <- 4
 REFRESH <- 0
 STAN_SEED <- 123
-DRAW_INDS <- round(seq(1, NUM_ITER * NUM_CHAINS / 2, length.out = 100))
-verbose <- FALSE
+DRAW_INDS <- round(seq(1, NUM_ITER * NUM_CHAINS / 2, length.out = 10))
+verbose <- TRUE
 
 # Set paths
 models_path <- file.path(suite_path, "models")
@@ -54,6 +54,7 @@ source(file.path(suite_path, "common.R"))
 
 # Run the test suite
 INFO <- c()
+cat("==========================================================\n")
 for (f in files) {
 
   # Setup
@@ -96,7 +97,8 @@ for (f in files) {
   info_f <- get_info(fit, base_name, t_fit, t_pred, t_post, t_total, size_disk)
   INFO <- rbind(INFO, info_f)
 }
-cat("Finished.\n\n")
+cat("Finished.\n")
+cat("==========================================================\n\n")
 
 INFO <- round_results(INFO, 2L, 3L)
 print(INFO)
