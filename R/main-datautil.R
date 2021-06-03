@@ -465,14 +465,14 @@ read_proteomics_data <- function(parentDir = NULL, protein = NULL,
   # Remove rows containing NaNs for the protein
   y <- Y_data[[pname]]
   notnan <- which(!is.nan(y))
-  n_nan <- length(which(is.nan(y)))
+  num_nan <- length(which(is.nan(y)))
   data <- data.frame(cbind(X_data, y))
   data <- data[notnan, ]
   msg <- paste0(
-    "Removed ", n_nan, " rows with NaN value as the ",
+    "Removed ", num_nan, " rows with NaN value as the ",
     "protein measurement."
   )
-  log_info(msg, verbose)
+  if (num_nan > 0) log_info(msg, verbose)
 
   # Categorical variables to factors
   data$id <- as.factor(data$id)
