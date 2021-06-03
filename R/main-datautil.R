@@ -480,6 +480,8 @@ read_proteomics_data <- function(parentDir = NULL, protein = NULL,
   data$sex <- as.factor(data$sex)
   levels(data$group)[levels(data$group) == 0] <- "Control"
   levels(data$group)[levels(data$group) == 1] <- "Case"
+  levels(data$sex)[levels(data$sex) == 0] <- "Female"
+  levels(data$sex)[levels(data$sex) == 1] <- "Male"
   return(data)
 }
 

@@ -96,6 +96,13 @@ model_summary <- function(object, digits = 3) {
     cat("\n")
   }
   print(parameter_info(model, digits))
+  bi <- beta_teff_idx_info(model)
+  if (!is.null(bi)) {
+    cat("\n")
+    print(bi)
+  }
+  cat("\n")
+  cat(misc_info(model), "\n")
   invisible(object)
 }
 
@@ -104,6 +111,28 @@ model_summary <- function(object, digits = 3) {
 param_summary <- function(object, digits = 3) {
   model <- object_to_model(object)
   parameter_info(model, digits)
+}
+
+beta_teff_idx_info <- function(object) {
+  model <- object_to_model(object)
+  a <- dollar(model@info, "caseid_map")
+  if (is.null(a)) {
+    return(a)
+  }
+  a <- t(a)
+  rownames(a)[2] <- "beta_teff_idx"
+  colnames(a) <- NULL
+  return(a)
+}
+
+misc_info <- function(object) {
+  model <- object_to_model(object)
+  info <- model@info
+  desc <- paste0(
+    "Created on ", dollar(info, "created"), " with lgpr ",
+    dollar(info, "lgpr_version"), "."
+  )
+  return(desc)
 }
 
 # Categorial covariate information

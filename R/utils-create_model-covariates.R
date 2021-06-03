@@ -437,11 +437,11 @@ create_idx_expand <- function(components, x_cat, x_cont_mask) {
     map <- NULL
   } else {
     i_cont <- components[inds, 9]
-    to_red <- x_cont_mask[i_cont, ]
+    to_reduce <- x_cont_mask[i_cont, ]
     if (length(i_cont) == 1) {
-      to_red <- repvec(to_red, 1)
+      to_reduce <- repvec(to_reduce, 1)
     }
-    idx_mask <- reduce_rows(to_red)
+    idx_mask <- reduce_rows(to_reduce)
     map <- map_factor_to_caseid(x_fac, idx_mask, factor_name)
     idx_expand <- map_caseid_to_row(x_fac, map) + 1 # note the plus 1
   }
@@ -493,11 +493,12 @@ map_factor_to_caseid <- function(x_fac, x_cont_mask, factor_name) {
     all0 <- all.equal(vals, rep(0, L)) == TRUE
     all1 <- all.equal(vals, rep(1, L)) == TRUE
     if (all0) {
+      # case individual, set its case_id
       num_cases <- num_cases + 1
       id[num_cases] <- u
       case_id[num_cases] <- num_cases
     } else if (all1) {
-      num_cases <- num_cases + 1
+      # do nothing, not a case
     } else {
       msg <- paste0(
         "inconsistent x_cont_mask values observations where ",
