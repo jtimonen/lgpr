@@ -1,3 +1,4 @@
+#' @export
 #' @describeIn lgpmodel Print information and summary about the object.
 #' Returns \code{object} invisibly.
 setMethod("show", "lgpmodel", function(object) {
@@ -7,6 +8,7 @@ setMethod("show", "lgpmodel", function(object) {
   model_summary(object)
 })
 
+#' @export
 #' @describeIn lgpmodel Get a parameter summary (bounds and
 #' priors). Returns a \code{data.frame}.
 #' @param digits number of digits to show for floating point numbers
@@ -15,6 +17,7 @@ setMethod("parameter_info", "lgpmodel", function(object, digits = 3) {
   prior_to_df(si, digits = digits)
 })
 
+#' @export
 #' @describeIn lgpmodel Get a data frame with information about each model
 #' component.
 setMethod("component_info", "lgpmodel", function(object) {
@@ -30,6 +33,7 @@ setMethod("component_info", "lgpmodel", function(object) {
   data.frame(a)
 })
 
+#' @export
 #' @describeIn lgpmodel Get covariate information.
 setMethod("covariate_info", "lgpmodel", function(object) {
   info1 <- covariate_info.cont(object)
@@ -37,11 +41,13 @@ setMethod("covariate_info", "lgpmodel", function(object) {
   list(continuous = info1, categorical = info2)
 })
 
+#' @export
 #' @describeIn lgpmodel Get names of model components.
 setMethod("component_names", "lgpmodel", function(object) {
   rownames(get_component_encoding(object))
 })
 
+#' @export
 #' @describeIn lgpmodel Determine if inference of the model requires sampling
 #' the latent signal \code{f} (and its components).
 setMethod("is_f_sampled", "lgpmodel", function(object) {

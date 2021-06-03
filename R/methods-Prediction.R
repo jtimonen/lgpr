@@ -1,3 +1,4 @@
+#' @export
 #' @describeIn GaussianPrediction Print a summary about the object.
 setMethod("show", "GaussianPrediction", function(object) {
   D1 <- num_components(object)
@@ -9,6 +10,7 @@ setMethod("show", "GaussianPrediction", function(object) {
   cat(desc)
 })
 
+#' @export
 #' @describeIn Prediction Print a summary about the object.
 setMethod("show", "Prediction", function(object) {
   D1 <- num_components(object)
@@ -28,26 +30,31 @@ setMethod("show", "Prediction", function(object) {
   cat(desc)
 })
 
+#' @export
 #' @describeIn GaussianPrediction Get names of components.
 setMethod("component_names", "GaussianPrediction", function(object) {
   names(object@f_comp_mean)
 })
 
+#' @export
 #' @describeIn Prediction Get names of components.
 setMethod("component_names", "Prediction", function(object) {
   names(object@f_comp)
 })
 
+#' @export
 #' @describeIn GaussianPrediction Get number of components.
 setMethod("num_components", "GaussianPrediction", function(object) {
   length(component_names(object))
 })
 
+#' @export
 #' @describeIn Prediction Get number of components.
 setMethod("num_components", "Prediction", function(object) {
   length(component_names(object))
 })
 
+#' @export
 #' @describeIn GaussianPrediction Get number of parameter combinations
 #' (different parameter vectors) using which predictions were computed.
 setMethod("num_paramsets", "GaussianPrediction", function(object) {
@@ -55,6 +62,7 @@ setMethod("num_paramsets", "GaussianPrediction", function(object) {
   D[1]
 })
 
+#' @export
 #' @describeIn Prediction Get number of parameter combinations
 #' (different parameter vectors) using which predictions were computed.
 setMethod("num_paramsets", "Prediction", function(object) {
@@ -62,6 +70,7 @@ setMethod("num_paramsets", "Prediction", function(object) {
   D[1]
 })
 
+#' @export
 #' @describeIn GaussianPrediction Get number of points where
 #' predictions were computed.
 setMethod("num_evalpoints", "GaussianPrediction", function(object) {
@@ -69,6 +78,7 @@ setMethod("num_evalpoints", "GaussianPrediction", function(object) {
   D[2]
 })
 
+#' @export
 #' @describeIn Prediction Get number of points where
 #' predictions were computed.
 setMethod("num_evalpoints", "Prediction", function(object) {

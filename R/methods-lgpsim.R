@@ -1,3 +1,4 @@
+#' @export
 #' @describeIn lgpsim Show summary of object.
 #' @param object an \linkS4class{lgpsim} object
 setMethod("show", "lgpsim", function(object) {
@@ -6,6 +7,7 @@ setMethod("show", "lgpsim", function(object) {
   invisible(object)
 })
 
+#' @export
 #' @describeIn lgpsim Plot the data and generating process. For more
 #' information see \code{\link{plot_sim}}.
 #' @param x an \linkS4class{lgpsim} object to plot
