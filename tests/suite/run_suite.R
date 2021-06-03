@@ -1,13 +1,38 @@
-# A larger test suite
+#!/usr/bin/env Rscript
+
+# A larger test suite for lgpr
+# -------------------------------------
 #  - tests correctness of inference
 #  - measures runtime
+#
+# Rscript run_suite.R  <num_iter> <suite_path>
+#
+# Example uses:
+# - Rscript run_suite.R
+# - Rscript run_suite.R 500
+# - Rscript run_suite.R 500 tests/suite
 library(rmarkdown)
 library(lgpr)
 library(rstan)
 library(lme4) # for sleepstudy data
+library(nlme) # for Orthodont data
+
+# Parse command line arguments
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) == 0) {
+  NUM_ITER <- 2000
+  msg <- paste0("Defaulting to NUM_ITER=", NUM_ITER, "\n")
+  cat(msg)
+} else {
+  NUM_ITER <- as.numeric(args[1])
+}
+if (length(args) == 2) {
+  suite_path <- args[2]
+} else {
+  suite_path <- file.path(".")
+}
 
 # Common settings for all tests
-NUM_ITER <- 20
 NUM_CHAINS <- 4
 NUM_CORES <- 4
 REFRESH <- 0
@@ -16,7 +41,6 @@ DRAW_INDS <- round(seq(1, NUM_ITER * NUM_CHAINS / 2, length.out = 100))
 verbose <- FALSE
 
 # Set paths
-suite_path <- file.path("tests", "suite")
 models_path <- file.path(suite_path, "models")
 Rmd_path <- file.path(suite_path, "Rmd")
 out_path <- file.path(suite_path, "out")

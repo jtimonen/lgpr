@@ -10,7 +10,7 @@ setup_data <- function(verbose) {
 # Create model
 setup_model <- function(...) {
   dat <- setup_data(verbose = TRUE)
-  f <- y ~ gp(age) * zs(id) + gp(age) + gp_vm(diseaseAge) +
+  f <- y ~ gp(age) * zs(id) + gp(age) + het(id) * gp_vm(diseaseAge) +
     zs(sex) * gp(age) + zs(group)
   model <- create_model(formula = f, dat, ...)
   return(model)

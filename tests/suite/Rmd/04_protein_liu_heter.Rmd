@@ -1,5 +1,5 @@
 ---
-title: "Longitudinal proteomics data"
+title: "Longitudinal proteomics data (heterogeneous model)"
 output:
   html_document:
     toc: true
@@ -42,6 +42,11 @@ p2 <- pred(fit, x_pred, reduce = mean, verbose = verbose)
 plot_components(fit, p2, t_name = "age", group_by = "id", 
                 color_by = c(NA, NA, "group", "sex", "group"))
 plot_pred(fit, p2, t_name = "age", group_by = "id")
+```
+
+```{r plots_3}
+# Plot beta parameters
+plot_beta(fit)
 ```
 
 ## Relevances and selection

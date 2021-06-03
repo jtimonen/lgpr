@@ -1,3 +1,5 @@
+library(lgpr)
+
 # Object size
 r_size_kb <- function(object) {
   format(object.size(object), units = "Kb")
@@ -47,7 +49,7 @@ run_example <- function(verbose, ...) {
 
 # Time pred() at data points with reduce = NULL
 run_pred <- function(fit, verbose) {
-  x_pred <- get_data(fit)
+  x_pred <- lgpr:::get_data(fit)
   start_time <- Sys.time()
   p <- pred(fit, x = x_pred, reduce = NULL, verbose = verbose)
   elapsed_time <- as.double(Sys.time() - start_time, units = "secs")

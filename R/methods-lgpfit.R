@@ -1,3 +1,4 @@
+#' @export
 #' @describeIn lgpfit Print information and summary about the fit object.
 setMethod("show", "lgpfit", function(object) {
   desc <- class_info("lgpfit")
@@ -6,11 +7,13 @@ setMethod("show", "lgpfit", function(object) {
   fit_summary(object)
 })
 
+#' @export
 #' @describeIn lgpfit Get names of model components.
 setMethod("component_names", "lgpfit", function(object) {
   component_names(get_model(object))
 })
 
+#' @export
 #' @describeIn lgpfit Apply postprocessing. Returns an updated
 #' \linkS4class{lgpfit} object (copies data).
 #' @param verbose Can the method print any messages?
@@ -35,11 +38,13 @@ setMethod("postproc", "lgpfit", function(object, verbose = TRUE) {
   )
 })
 
+#' @export
 #' @describeIn lgpfit Check if object contains postprocessing information.
 setMethod("contains_postproc", "lgpfit", function(object) {
   length(object@postproc_results) > 0
 })
 
+#' @export
 #' @describeIn lgpfit Returns an updated (copies data)
 #' \linkS4class{lgpfit} object without any postprocessing information.
 setMethod("clear_postproc", "lgpfit", function(object) {
@@ -51,6 +56,7 @@ setMethod("clear_postproc", "lgpfit", function(object) {
   )
 })
 
+#' @export
 #' @describeIn lgpfit Get the stored \linkS4class{lgpmodel} object.
 #' Various properties of the returned object can be accessed as explained
 #' in the documentation of \linkS4class{lgpmodel}.
@@ -58,6 +64,7 @@ setMethod("get_model", "lgpfit", function(object) {
   object@model
 })
 
+#' @export
 #' @describeIn lgpfit Get the stored \code{\link[rstan]{stanfit}} object.
 #' Various properties of the returned object can be accessed or plotted
 #' as explained
@@ -67,12 +74,14 @@ setMethod("get_stanfit", "lgpfit", function(object) {
   object@stan_fit
 })
 
+#' @export
 #' @describeIn lgpfit Determine if inference was done by sampling
 #' the latent signal \code{f} (and its components).
 setMethod("is_f_sampled", "lgpfit", function(object) {
   is_f_sampled(object@model)
 })
 
+#' @export
 #' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}}
 #' with \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the
 #' return value is always a 2-dimensional array of shape
@@ -100,6 +109,7 @@ setMethod(
   }
 )
 
+#' @export
 #' @describeIn lgpfit Visualize parameter draws using \code{\link{plot_draws}}.
 #' @param x an \linkS4class{lgpfit} object to visualize
 #' @param y unused argument
