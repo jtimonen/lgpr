@@ -5,12 +5,12 @@
 #  - tests correctness of inference
 #  - measures runtime
 #
-# Rscript run_suite.R  <num_iter> <suite_path>
+# Rscript run_suite.R  <num_iter> <suite_path> <idx_test>
 #
 # Example uses:
 # - Rscript run_suite.R
 # - Rscript run_suite.R 500
-# - Rscript run_suite.R 500 tests/suite
+# - Rscript run_suite.R 500 tests/suite 3
 library(rmarkdown)
 library(lgpr)
 library(rstan)
@@ -32,6 +32,13 @@ if (length(args) == 2) {
   suite_path <- file.path(".")
 }
 
+# Which tests to run (0 = all)
+if (length(args) == 3) {
+  IDX <- as.numeric(args[3])
+} else {
+  IDX <- 0
+}
+
 # Common settings for all tests
 NUM_CHAINS <- 4
 NUM_CORES <- 4
@@ -48,6 +55,9 @@ rds_path <- file.path(out_path, "rds")
 dir.create(out_path)
 dir.create(rds_path)
 files <- dir(models_path)
+if (IDX != 0) {
+  files <- files[IDX]
+}
 
 # Source helper files
 source(file.path(suite_path, "common.R"))
