@@ -54,6 +54,8 @@ num_components(object)
 \item{draws}{indices of draws}
 
 \item{reduce}{possible reduction}
+
+\item{...}{additional optional arguments to pass}
 }
 \description{
 S4 generics for lgpfit, lgpmodel, and other objects

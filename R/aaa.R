@@ -509,6 +509,7 @@ validate_lengths <- function(a, b) {
 #'
 #' @param object object for which to apply the generic
 #' @param digits number of digits to show
+#' @param ... additional optional arguments to pass
 #' @name s4_generics
 #' @seealso To find out which methods have been implemented for which classes,
 #' see \linkS4class{lgpfit}, \linkS4class{lgpmodel},
