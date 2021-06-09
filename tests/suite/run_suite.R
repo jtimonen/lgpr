@@ -160,3 +160,5 @@ for (j in seq_len(length(REL))) {
 cat(HR)
 cat("\n\n")
 print(FNS)
+cat("\n\n")
+print(sessionInfo())
