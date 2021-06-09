@@ -15,5 +15,5 @@ setup_model <- function(...) {
 }
 
 expected_relevances <- function() {
-  c(0.3160955, 0.5442927, 0.1396118)
+  c(0.3096018, 0.5637252, 0.1266730)
 }
