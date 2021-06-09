@@ -1,15 +1,15 @@
 library(lgpr)
 
 # Object size
-r_size_kb <- function(object) {
-  format(object.size(object), units = "Kb")
+r_size_Mb <- function(object) {
+  format(object.size(object), units = "Mb")
 }
 
 # File size
-file_size_kb <- function(file) {
+file_size_Mb <- function(file) {
   fi <- file.info(file)
-  fs_mb <- fi$size / (100)
-  paste0(round(fs_mb, 1), " Kb")
+  fs_mb <- fi$size / (1000 * 1000)
+  paste0(round(fs_mb, 1), " Mb")
 }
 
 # Get experiment information from lgpfit object
@@ -26,8 +26,8 @@ get_info <- function(fit, name, t_fit, t_pred, t_post, t_total, size_disk) {
   chain_times <- apply(rstan::get_elapsed_time(fit@stan_fit), 1, mean)
   t_ch_mean <- mean(chain_times)
   t_ch_sd <- stats::sd(chain_times)
-  size_fit <- r_size_kb(fit)
-  size_small <- r_size_kb(clear_postproc(fit))
+  size_fit <- r_size_Mb(fit)
+  size_small <- r_size_Mb(clear_postproc(fit))
 
   # Return data frame
   data.frame(

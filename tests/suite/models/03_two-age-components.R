@@ -13,7 +13,7 @@ setup_data <- function(N = 10, H = 10, sigma = 0.5) {
   f1 <- f1 / sd(f1)
   f2 <- f2 / sd(f2)
   dat$age_fast <- age
-  dat$y <- f1 + f2 + sigma * rnorm(n = length(age))
+  dat$y <- f1 + f2 + sigma * stats::rnorm(n = length(age))
   return(dat)
 }
 
@@ -25,4 +25,8 @@ setup_model <- function(dat, ...) {
   prior <- list(ell = list(d1, d2))
   model <- create_model(y ~ age + age_fast, dat, prior = prior)
   return(model)
+}
+
+expected_relevances <- function() {
+  c(0.67598126, 0.08528433, 0.23873440)
 }

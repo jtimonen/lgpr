@@ -39,8 +39,7 @@ if (length(args) == 3) {
   IDX <- 0
 }
 
-
-# Which tests to run (0 = all)
+# Verbose or quiet mode?
 if (length(args) == 4) {
   verbose <- as.logical(args[4])
 } else {
@@ -57,7 +56,7 @@ DRAW_INDS <- round(seq(1, NUM_ITER * NUM_CHAINS / 2, length.out = 10))
 # Set paths
 models_path <- file.path(suite_path, "models")
 Rmd_path <- file.path(suite_path, "Rmd")
-out_path <- file.path(suite_path, "out")
+out_path <- file.path("test_suite_out")
 rds_path <- file.path(out_path, "rds")
 dir.create(out_path)
 dir.create(rds_path)
@@ -70,11 +69,17 @@ if (IDX != 0) {
 source(file.path(suite_path, "common.R"))
 
 # Run the test suite
+msg <- paste0("Results will be saved to '", out_path, "'.\n")
+cat(msg)
 INFO <- c()
+REL <- c()
+FNS <- c()
 HR <- "-----------------------------------------------------------------------"
 HR <- paste0("\u001b[1m\u001b[36m", HR, "\u001b[0m\n")
 cat(HR)
+idx_file <- 0
 for (f in files) {
+  idx_file <- idx_file + 1
 
   # Setup
   r_file <- file.path(models_path, f)
@@ -82,6 +87,7 @@ for (f in files) {
   rds_file <- file.path(rds_path, paste0(base_name, ".rds"))
   Rmd_file <- file.path(Rmd_path, paste0(base_name, ".Rmd"))
   html_file <- paste0(base_name, ".html")
+  FNS <- rbind(FNS, c(f, rds_file))
   MSG <- paste0("\u001b[1m\u001b[36mRunning: ", base_name, "\u001b[0m\n")
   cat(MSG)
   start_time <- Sys.time()
@@ -95,10 +101,16 @@ for (f in files) {
   )
   fit <- res_fit$fit
   t_fit <- res_fit$time
+  rel <- relevances(fit)
+
+  # Get expected relevances
+  rel <- rbind(rel, expected_relevances())
+  rownames(rel) <- c("Relevance", "Expected")
+  REL[[idx_file]] <- rel
 
   # Save the fit object
   saveRDS(fit, file = rds_file)
-  size_disk <- file_size_kb(rds_file)
+  size_disk <- file_size_Mb(rds_file)
 
   # Time pred
   t_pred <- run_pred(fit, verbose)
@@ -122,5 +134,29 @@ cat(MSG)
 cat(HR)
 cat("\n")
 
+# Save results
+names(REL) <- files
+FNS <- data.frame(FNS)
+colnames(FNS) <- c("file", "rds")
+results <- list(
+  filenames = FNS,
+  table = INFO,
+  relevances = REL
+)
+outfile <- file.path(out_path, "results.rds")
+saveRDS(results, file = outfile)
+
+# Print formatted
+cat("\n")
 INFO <- round_results(INFO, 2L, 3L)
 print(INFO)
+cat("\n\n")
+for (j in seq_len(length(REL))) {
+  cat(HR)
+  msg <- paste0("\u001b[1m\u001b[36m", FNS$file[j], ": \u001b[0m\n")
+  cat(msg)
+  print(REL[[j]])
+}
+cat(HR)
+cat("\n\n")
+print(FNS)

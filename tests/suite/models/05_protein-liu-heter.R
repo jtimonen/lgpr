@@ -15,3 +15,7 @@ setup_model <- function(...) {
   model <- create_model(formula = f, dat, ...)
   return(model)
 }
+
+expected_relevances <- function() {
+  c(0.270712119, 0.171311656, 0.008459786, 0.049614305, 0.013833720, 0.486068414)
+}

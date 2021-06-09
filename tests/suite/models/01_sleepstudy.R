@@ -13,3 +13,7 @@ setup_model <- function(...) {
   model <- create_model(Reaction ~ Days + Days | Subject, dat, ...)
   return(model)
 }
+
+expected_relevances <- function() {
+  c(0.3160955, 0.5442927, 0.1396118)
+}
