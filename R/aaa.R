@@ -505,63 +505,94 @@ validate_lengths <- function(a, b) {
 
 # S4 GENERICS -------------------------------------------------------------
 
+#' S4 generics for lgpfit, lgpmodel, and other objects
+#'
+#' @param object object for which to apply the generic
+#' @param digits number of digits to show
+#' @name s4_generics
+#' @seealso To find out which methods have been implemented for which classes,
+#' see \linkS4class{lgpfit}, \linkS4class{lgpmodel},
+#' \linkS4class{Prediction} and \linkS4class{GaussianPrediction}.
+NULL
+
+
+#' @describeIn s4_generics Get parameter information (priors etc.).
 setGeneric(
   "parameter_info",
   function(object, digits) standardGeneric("parameter_info")
 )
 
+
+#' @describeIn s4_generics Get component information.
 setGeneric(
   "component_info", function(object) standardGeneric("component_info")
 )
 
+#' @describeIn s4_generics Get covariate information.
 setGeneric(
   "covariate_info", function(object) standardGeneric("covariate_info")
 )
 
+#' @describeIn s4_generics Get component names.
 setGeneric(
   "component_names", function(object) standardGeneric("component_names")
 )
 
+#' @describeIn s4_generics Get \linkS4class{lgpmodel} object.
 setGeneric(
   "get_model",
   function(object) standardGeneric("get_model")
 )
 
+#' @describeIn s4_generics Determine if signal f is sampled or marginalized.
 setGeneric(
   "is_f_sampled",
   function(object) standardGeneric("is_f_sampled")
 )
 
+#' @describeIn s4_generics Extract stanfit object.
 setGeneric(
   "get_stanfit",
   function(object) standardGeneric("get_stanfit")
 )
 
+#' @describeIn s4_generics Extract parameter draws.
+#' @param draws indices of draws
+#' @param reduce possible reduction
 setGeneric(
   "get_draws",
   function(object, draws = NULL, reduce = NULL, ...) standardGeneric("get_draws")
 )
 
+#' @describeIn s4_generics Perform postprocessing.
 setGeneric(
   "postproc", function(object, ...) standardGeneric("postproc")
 )
 
+#' @describeIn s4_generics Determine if object contains postprocessing
+#' information.
 setGeneric(
   "contains_postproc", function(object) standardGeneric("contains_postproc")
 )
 
+#' @describeIn s4_generics Clear postprocessing information (to reduce
+#' size of object).
 setGeneric(
   "clear_postproc", function(object) standardGeneric("clear_postproc")
 )
 
+
+#' @describeIn s4_generics Get number of parameter sets.
 setGeneric(
   "num_paramsets", function(object) standardGeneric("num_paramsets")
 )
 
+#' @describeIn s4_generics Get number of points where posterior is evaluated.
 setGeneric(
   "num_evalpoints", function(object) standardGeneric("num_evalpoints")
 )
 
+#' @describeIn s4_generics Get number of model components.
 setGeneric(
   "num_components", function(object) standardGeneric("num_components")
 )

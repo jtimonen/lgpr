@@ -448,8 +448,8 @@ read_proteomics_data <- function(parentDir = NULL, protein = NULL,
   } else {
     fn_X <- paste0(parentDir, "/", fn_X)
     fn_Y <- paste0(parentDir, "/", fn_Y)
-    X_data <- read.csv(fn_X, header = TRUE, sep = ",")
-    Y_data <- read.csv(fn_Y, header = TRUE, sep = ",")
+    X_data <- utils::read.csv(fn_X, header = TRUE, sep = ",")
+    Y_data <- utils::read.csv(fn_Y, header = TRUE, sep = ",")
   }
 
   # Get protein
@@ -491,5 +491,5 @@ read_csv_url <- function(fn, verbose, ...) {
   log_info(msg, verbose)
   url <- paste0(fn, "?accessType=DOWNLOAD")
   text <- RCurl::getURL(url)
-  read.csv(text = text, ...)
+  utils::read.csv(text = text, ...)
 }
