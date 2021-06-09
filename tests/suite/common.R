@@ -49,9 +49,9 @@ run_example <- function(verbose, ...) {
 
 # Time pred() at data points with reduce = NULL
 run_pred <- function(fit, verbose) {
-  x_pred <- lgpr:::get_data(fit)
+  x <- lgpr:::get_data(fit)
   start_time <- Sys.time()
-  p <- pred(fit, x = x_pred, reduce = NULL, verbose = verbose)
+  p <- pred(fit, x = x, reduce = NULL, verbose = verbose)
   elapsed_time <- as.double(Sys.time() - start_time, units = "secs")
   return(elapsed_time)
 }

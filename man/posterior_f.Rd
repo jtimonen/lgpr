@@ -10,9 +10,8 @@ posterior_f(
   reduce = function(x) base::mean(x),
   draws = NULL,
   verbose = TRUE,
-  STREAM = get_stream(),
   debug_km = FALSE,
-  debug_dims = FALSE,
+  STREAM = get_stream(),
   force = FALSE
 )
 }
@@ -34,14 +33,10 @@ draws.}
 \item{verbose}{Should more information and a possible progress bar be
 printed?}
 
+\item{debug_km}{Debug kernel matrix computation initialization.}
+
 \item{STREAM}{External pointer. By default obtained with
 \code{\link[rstan]{get_stream}}.}
-
-\item{debug_km}{Should this only return the required kernel matrices.
-Can be used for debugging or testing \code{\link{kernels_fpost}}.}
-
-\item{debug_dims}{Should this print dimensions of some variables.
-Can be used for debugging \code{\link{kernels_fpost}}.}
 
 \item{force}{This is by default \code{FALSE} to prevent unintended
 large computations that might crash R or take forever.}

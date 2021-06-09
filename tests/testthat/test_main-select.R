@@ -26,7 +26,7 @@ test_that("selection can be done when sample_f = FALSE", {
         "No existing postprocessing information stored"
       )
     },
-    "Creating kernel matrices"
+    "Computing analytic function posteriors"
   )
   sel_after <- select(fit, verbose = FALSE)
   expect_equal(sel_before, sel_after)

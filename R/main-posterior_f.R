@@ -15,10 +15,7 @@
 #' }
 #'
 #' @inheritParams pred
-#' @param debug_km Should this only return the required kernel matrices.
-#' Can be used for debugging or testing \code{\link{kernels_fpost}}.
-#' @param debug_dims Should this print dimensions of some variables.
-#' Can be used for debugging \code{\link{kernels_fpost}}.
+#' @param debug_km Debug kernel matrix computation initialization.
 #' @param force This is by default \code{FALSE} to prevent unintended
 #' large computations that might crash R or take forever.
 #' @return A named list.
@@ -27,9 +24,8 @@ posterior_f <- function(fit,
                         reduce = function(x) base::mean(x),
                         draws = NULL,
                         verbose = TRUE,
-                        STREAM = get_stream(),
                         debug_km = FALSE,
-                        debug_dims = FALSE,
+                        STREAM = get_stream(),
                         force = FALSE) {
 
   # Settings
@@ -39,44 +35,75 @@ posterior_f <- function(fit,
   # Stop if potentially going to crash the computer
   prevent_too_large_mats(fit, x, reduce, draws, verbose, force)
 
-  # Compute all required kernel matrices
-  km <- kernels_fpost(fit, x, reduce, draws, verbose, debug_dims, STREAM)
-  if (debug_km) {
-    return(km)
-  }
-  if (is.null(x)) x <- get_data(fit@model)
+  # Create common constant inputs
+  log_progress("Creating inputs...", verbose)
+  input <- kernels_fpost.create_input(fit, x, reduce, draws)
 
-  # Compute the function posteriors
-  if (f_sampled) {
-    out <- fp_extrapolate(km, fit, x, reduce, draws, verbose, STREAM)
+  # Constant kernel computations and covariate-dependent inputs
+  K_init <- kernels_fpost.init(input, FALSE, FALSE, STREAM)
+  if (is.null(x)) {
+    Ks_init <- NULL
+    Kss_init <- NULL
+    x <- get_data(fit)
+    P <- dollar(K_init, "n1") # number of output points
   } else {
-    out <- fp_gaussian(km, fit, x, reduce, draws, verbose, STREAM)
+    Ks_init <- kernels_fpost.init(input, TRUE, FALSE, STREAM)
+    Kss_init <- kernels_fpost.init(input, TRUE, TRUE, STREAM)
+    P <- dollar(Ks_init, "n1") # number of output points
   }
+  N <- dollar(K_init, "n1")
+  S <- dollar(input, "num_paramsets")
+  J <- get_num_comps(fit)
+  comp_names <- component_names(fit)
+  init <- list(
+    K_init = K_init, Ks_init = Ks_init, Kss_init = Kss_init,
+    P = P, N = N, S = S, J = J, comp_names = comp_names
+  )
+  if (debug_km) {
+    return(init)
+  }
+
+  # Get kernel parameter draws
+  param_draws <- list(
+    alpha = dollar(input, "d_alpha"),
+    ell = dollar(input, "d_ell"),
+    wrp = dollar(input, "d_wrp"),
+    beta = dollar(input, "d_beta"), # has shape (S, num_heter > 1, num_bt)
+    teff = dollar(input, "d_teff") # has shape (S, num_uncrt > 1, num_bt)
+  )
+
+  # Compute the function posteriors for each parameter set
+  if (f_sampled) {
+    fp_at_data <- get_pred(fit, reduce = reduce, draws = draws)
+    out <- fp_extrapolate(input, init, param_draws, fp_at_data, verbose, STREAM)
+  } else {
+    y <- get_y(fit, original = FALSE) # normalized y
+    d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
+    sigma2 <- as.vector(d_sigma^2)
+    out <- fp_gaussian(input, init, param_draws, sigma2, y, verbose, STREAM)
+  }
+  out[["x"]] <- x
   return(out)
 }
 
 # Analytic function posteriors
-fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
+fp_gaussian <- function(input, init, param_draws, sigma2, y, verbose, STREAM) {
 
-  # Fetch sigma2, delta and normalized y
-  y <- get_y(fit, original = FALSE)
-  d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
-  sigma2 <- as.vector(d_sigma^2)
-  delta <- dollar(get_stan_input(fit), "delta")
-
-  # Get kernel matrices
-  K <- dollar(km, "K")
-  Ks <- dollar(km, "Ks")
-  Kss <- dollar(km, "Kss")
+  # Extract info
+  S <- dollar(init, "S") # number of parameter sets
+  P <- dollar(init, "P") # number of output points
+  J <- dollar(init, "J") # number of components
+  comp_names <- dollar(init, "comp_names")
+  delta <- dollar(input, "delta")
+  K_init <- dollar(init, "K_init")
+  Ks_init <- dollar(init, "Ks_init")
+  Kss_init <- dollar(init, "Kss_init")
 
   # Create output arrays
-  S <- length(Ks) # number of parameter sets
-  P <- nrow(x) # number of output points
-  J <- get_num_comps(fit) # number of components
-  f_comp_mean <- array(0, c(S, P, J))
-  f_comp_std <- array(0, c(S, P, J))
-  f_mean <- array(0, c(S, P))
-  f_std <- array(0, c(S, P))
+  f_comp_mean <- array(0.0, c(S, P, J))
+  f_comp_std <- array(0.0, c(S, P, J))
+  f_mean <- array(0.0, c(S, P))
+  f_std <- array(0.0, c(S, P))
 
   # Setup
   progbar <- verbose && S > 1
@@ -89,10 +116,17 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   # Loop through parameter sets
   for (idx in seq_len(S)) {
 
+    # Compute full kernel matrices for one parameter set
+    K_i <- kernel_all(K_init, input, param_draws, idx, STREAM)
+    if (is.null(Ks_init)) {
+      Ks_i <- K_i
+      Kss_i <- K_i
+    } else {
+      Ks_i <- kernel_all(Ks_init, input, param_draws, idx, STREAM)
+      Kss_i <- kernel_all(Kss_init, input, param_draws, idx, STREAM)
+    }
+
     # Perform computations for one parameter set
-    K_i <- K[[idx]]
-    Ks_i <- Ks[[idx]]
-    Kss_i <- Kss[[idx]]
     fp_i <- fp_gaussian.compute(K_i, Ks_i, Kss_i, sigma2[idx], delta, y)
     mean_i <- dollar(fp_i, "mean") # matrix with shape (P, J + 1)
     std_i <- dollar(fp_i, "sd") # matrix with shape (P, J + 1)
@@ -108,7 +142,6 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   log_progress(" ", progbar)
 
   # Return
-  comp_names <- dollar(km, "comp_names")
   f_comp_mean <- aperm(f_comp_mean, c(3, 1, 2)) # dim (S, P, J) -> (J, S, P)
   f_comp_std <- aperm(f_comp_std, c(3, 1, 2)) # dim (S, P, J) -> (J, S, P)
   list(
@@ -116,8 +149,7 @@ fp_gaussian <- function(km, fit, x, reduce, draws, verbose, STREAM) {
     f_comp_std = arr3_to_list(f_comp_std, comp_names), # list with len J
     f_mean = f_mean, # dim (S, P)
     f_std = f_std, # dim (S, P)
-    sigma2 = sigma2,
-    x = x
+    sigma2 = sigma2
   )
 }
 
@@ -174,24 +206,21 @@ fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
 }
 
 # Extrapolate function posterior draws using kernel regression
-fp_extrapolate <- function(km, fit, x, reduce, draws, verbose, STREAM) {
+fp_extrapolate <- function(input, init, param_draws, fp_at_data,
+                           verbose, STREAM) {
 
-  # Fetch delta and draws of f
-  delta <- dollar(get_stan_input(fit), "delta")
-  fp_at_data <- get_pred(fit, reduce = reduce, draws = draws)
+  # Extract info
+  S <- dollar(init, "S") # number of parameter sets
+  P <- dollar(init, "P") # number of output points
+  J <- dollar(init, "J") # number of components
+  comp_names <- dollar(init, "comp_names")
+  delta <- dollar(input, "delta")
+  K_init <- dollar(init, "K_init")
+  Ks_init <- dollar(init, "Ks_init")
   fp_comp_draws <- fp_at_data@f_comp
-
-  # Helper function to use with sapply
   take_row <- function(A, idx) A[idx, ]
 
-  # Get kernel matrices
-  K <- dollar(km, "K")
-  Ks <- dollar(km, "Ks")
-
   # Create output arrays
-  S <- length(Ks) # number of parameter sets
-  P <- nrow(x) # number of output points
-  J <- get_num_comps(fit) # number of components
   f_ext_comp <- array(0, c(S, P, J))
   f_ext <- array(0, c(S, P))
 
@@ -207,8 +236,12 @@ fp_extrapolate <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   for (idx in seq_len(S)) {
 
     # Perform computations for one parameter set
-    K_i <- K[[idx]]
-    Ks_i <- Ks[[idx]]
+    K_i <- kernel_all(K_init, input, param_draws, idx, STREAM)
+    if (is.null(Ks_init)) {
+      Ks_i <- K_i
+    } else {
+      Ks_i <- kernel_all(Ks_init, input, param_draws, idx, STREAM)
+    }
     fp_comp_i <- sapply(fp_comp_draws, take_row, idx = idx) # dim = (N, J)
     fp_i <- fp_extrapolate.compute(K_i, Ks_i, delta, fp_comp_i) # dim = (P, J)
 
@@ -221,12 +254,10 @@ fp_extrapolate <- function(km, fit, x, reduce, draws, verbose, STREAM) {
   log_progress(" ", progbar)
 
   # Return
-  comp_names <- dollar(km, "comp_names")
   f_ext_comp <- aperm(f_ext_comp, c(3, 1, 2)) # dim (S, P, J) -> (J, S, P)
   out <- list(
     f_ext_comp = arr3_to_list(f_ext_comp, comp_names), # list with len J
-    f_ext = f_ext, # dim (S, P)
-    x = x
+    f_ext = f_ext # dim (S, P)
   )
   return(out)
 }

@@ -81,6 +81,7 @@ setMethod("is_f_sampled", "lgpfit", function(object) {
   is_f_sampled(object@model)
 })
 
+
 #' @export
 #' @describeIn lgpfit Extract parameter draws. Uses \code{\link[rstan]{extract}}
 #' with \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the

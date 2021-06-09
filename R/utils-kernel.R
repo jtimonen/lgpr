@@ -1,43 +1,43 @@
-#' Kernel matrices for function posterior computation
-#'
-#' @inheritParams posterior_f
-kernels_fpost <- function(fit,
-                          x,
-                          reduce,
-                          draws,
-                          verbose,
-                          debug_dims,
-                          STREAM = get_stream()) {
-  vrb <- verbose
-  dd <- debug_dims
-  log_progress("Creating inputs...", vrb)
-  input <- kernels_fpost.create_input(fit, x, reduce, draws)
+# Initialize kernel matrix computations for function posterior computation
+kernels_fpost.init <- function(input, is_out1, is_out2, STREAM) {
 
-  log_progress("Creating kernel matrices...", vrb)
-  K_const <- kernel_const_all(input, FALSE, FALSE, STREAM)
-  Ks_const <- kernel_const_all(input, TRUE, FALSE, STREAM)
-  Kss_const <- kernel_const_all(input, TRUE, TRUE, STREAM)
+  # Compute constant kernel matrices
+  K_const <- kernel_const_all(input, is_out1, is_out2, STREAM)
 
-  # Final parameter-dependent kernel matrices
-  log_progress("Creating kernel matrices (data vs. data)...", vrb)
-  K <- kernel_all(input, K_const, FALSE, FALSE, vrb, dd, STREAM)
-  if (is.null(x)) {
-    Ks <- K
-    Kss <- K
-  } else {
-    log_progress("Creating kernel matrices (out vs. data)...", vrb)
-    Ks <- kernel_all(input, Ks_const, TRUE, FALSE, vrb, dd, STREAM)
-    log_progress("Creating kernel matrices (out vs. out)...", vrb)
-    Kss <- kernel_all(input, Kss_const, TRUE, TRUE, vrb, dd, STREAM)
+  # Covariate-input field names
+  field_name <- function(is_out, base_name) {
+    if (is_out) paste0(base_name, "_OUT") else base_name
   }
+  A1 <- field_name(is_out1, "x_cont")
+  A2 <- field_name(is_out2, "x_cont")
+  B1 <- field_name(is_out1, "x_cont_unnorm")
+  B2 <- field_name(is_out2, "x_cont_unnorm")
+  C1 <- if (is_out1) "num_OUT" else "num_obs"
+  C2 <- if (is_out2) "num_OUT" else "num_obs"
+  D1 <- field_name(is_out1, "idx_expand")
+  D2 <- field_name(is_out2, "idx_expand")
+
+  # Get fields (possibly in list format)
+  x1 <- matrix_to_list(dollar(input, A1))
+  x2 <- matrix_to_list(dollar(input, A2))
+  x1_unnorm <- matrix_to_list(dollar(input, B1))
+  x2_unnorm <- matrix_to_list(dollar(input, B2))
+  n1 <- dollar(input, C1)
+  n2 <- dollar(input, C2)
+  idx1_expand <- dollar(input, D1)
+  idx2_expand <- dollar(input, D2)
 
   # Return
-  comp_names <- component_names(fit@model)
   list(
-    K = K,
-    Ks = Ks,
-    Kss = Kss,
-    comp_names = comp_names
+    K_const = K_const,
+    x1 = x1,
+    x2 = x2,
+    x1_unnorm = x1_unnorm,
+    x2_unnorm = x2_unnorm,
+    n1 = n1,
+    n2 = n2,
+    idx1_expand = idx1_expand,
+    idx2_expand = idx2_expand
   )
 }
 
@@ -66,88 +66,40 @@ kernel_const_all <- function(input, is_out1, is_out2, STREAM) {
   )
 }
 
-
-
-# Compute all kernel matrices of a model
-kernel_all <- function(input, K_const, is_out1, is_out2,
-                       verbose, debug_dims, STREAM) {
-
-  # Field names
-  field_name <- function(is_out, base_name) {
-    if (is_out) paste0(base_name, "_OUT") else base_name
-  }
-  A1 <- field_name(is_out1, "x_cont")
-  A2 <- field_name(is_out2, "x_cont")
-  B1 <- field_name(is_out1, "x_cont_unnorm")
-  B2 <- field_name(is_out2, "x_cont_unnorm")
-  C1 <- if (is_out1) "num_OUT" else "num_obs"
-  C2 <- if (is_out2) "num_OUT" else "num_obs"
-  D1 <- field_name(is_out1, "idx_expand")
-  D2 <- field_name(is_out2, "idx_expand")
-
-  # Get fields (possibly in list format)
-  x1 <- matrix_to_list(dollar(input, A1))
-  x2 <- matrix_to_list(dollar(input, A2))
-  x1_unnorm <- matrix_to_list(dollar(input, B1))
-  x2_unnorm <- matrix_to_list(dollar(input, B2))
-  n1 <- dollar(input, C1)
-  n2 <- dollar(input, C2)
-  idx1_expand <- dollar(input, D1)
-  idx2_expand <- dollar(input, D2)
+# Compute all constant kernel matrices of a model given draw idx
+kernel_all <- function(init, input, param_draws, idx, STREAM) {
   components <- matrix_to_list(dollar(input, "components"))
   vm_params <- dollar(input, "vm_params")
   teff_zero <- matrix_to_list(dollar(input, "teff_zero"))
 
-  # Kernel hyper-parameters
-  alpha <- dollar(input, "d_alpha")
-  ell <- dollar(input, "d_ell")
-  wrp <- dollar(input, "d_wrp")
-  beta <- dollar(input, "d_beta") # has shape (S, num_heter > 1, num_bt)
-  teff <- dollar(input, "d_teff") # has shape (S, num_uncrt > 1, num_bt)
+  # Get parameters in correct format
+  alpha_idx <- dollar(param_draws, "alpha")[idx, ]
+  ell_idx <- dollar(param_draws, "ell")[idx, ]
+  wrp_idx <- dollar(param_draws, "wrp")[idx, ]
+  beta_idx <- list(dollar(param_draws, "beta")[idx, , ])
+  teff_idx <- list(dollar(param_draws, "teff")[idx, , ])
 
-  # Setup
-  S <- dollar(input, "num_paramsets")
-  K_out <- list()
+  # Get covariate input in correct format
+  K_const <- dollar(init, "K_const")
+  n1 <- dollar(init, "n1")
+  n2 <- dollar(init, "n2")
+  x1 <- dollar(init, "x1")
+  x2 <- dollar(init, "x2")
+  x1_unnorm <- dollar(init, "x1_unnorm")
+  x2_unnorm <- dollar(init, "x2_unnorm")
+  idx1_expand <- dollar(init, "idx1_expand")
+  idx2_expand <- dollar(init, "idx2_expand")
 
-  # Print dimensions
-  if (debug_dims) {
-    print_arr_dim(alpha)
-    print_arr_dim(ell)
-    print_arr_dim(wrp)
-    print_arr_dim(beta)
-    print_arr_dim(teff)
-    print_arr_dim(K_out)
-  }
-
-  # Loop through parameter sets
-  progbar <- verbose && S > 1
-  pb <- progbar_setup(S)
-  idx_print <- dollar(pb, "idx_print")
-  log_progress(dollar(pb, "header"), progbar)
-
-  for (idx in seq_len(S)) {
-
-    # Get parameters in correct format
-    alpha_idx <- alpha[idx, ]
-    ell_idx <- ell[idx, ]
-    wrp_idx <- wrp[idx, ]
-    beta_idx <- list(beta[idx, , ])
-    teff_idx <- list(teff[idx, , ])
-
-    # Compute kernels for each component
-    K_out[[idx]] <- STAN_kernel_all(
-      n1, n2, K_const, components,
-      x1, x2, x1_unnorm, x2_unnorm,
-      alpha_idx, ell_idx, wrp_idx, beta_idx, teff_idx,
-      vm_params, idx1_expand, idx2_expand, teff_zero, STREAM
-    )
-
-    # Store result and update progress
-    if (progbar) progbar_print(idx, idx_print)
-  }
-  log_progress(" ", progbar)
-  return(K_out)
+  # Compute kernels for each component (a list with length num_comps)
+  K_all <- STAN_kernel_all(
+    n1, n2, K_const, components,
+    x1, x2, x1_unnorm, x2_unnorm,
+    alpha_idx, ell_idx, wrp_idx, beta_idx, teff_idx,
+    vm_params, idx1_expand, idx2_expand, teff_zero, STREAM
+  )
+  return(K_all)
 }
+
 
 # Create a list of things that will be used as input to the wrapped Stan
 # kernel computation functions (after some formatting)
