@@ -5,7 +5,7 @@
 #  - tests correctness of inference
 #  - measures runtime
 #
-# Rscript run_suite.R  <num_iter> <suite_path> <idx_test>
+# Rscript run_suite.R  <num_iter> <suite_path> <idx_test> <verbose>
 #
 # Example uses:
 # - Rscript run_suite.R
@@ -39,13 +39,20 @@ if (length(args) == 3) {
   IDX <- 0
 }
 
+
+# Which tests to run (0 = all)
+if (length(args) == 4) {
+  verbose <- as.logical(args[4])
+} else {
+  verbose <- FALSE
+}
+
 # Common settings for all tests
 NUM_CHAINS <- 4
 NUM_CORES <- 4
 REFRESH <- 0
 STAN_SEED <- 123
 DRAW_INDS <- round(seq(1, NUM_ITER * NUM_CHAINS / 2, length.out = 10))
-verbose <- TRUE
 
 # Set paths
 models_path <- file.path(suite_path, "models")
@@ -64,7 +71,9 @@ source(file.path(suite_path, "common.R"))
 
 # Run the test suite
 INFO <- c()
-cat("==========================================================\n")
+HR <- "-----------------------------------------------------------------------"
+HR <- paste0("\u001b[1m\u001b[36m", HR, "\u001b[0m\n")
+cat(HR)
 for (f in files) {
 
   # Setup
@@ -73,7 +82,8 @@ for (f in files) {
   rds_file <- file.path(rds_path, paste0(base_name, ".rds"))
   Rmd_file <- file.path(Rmd_path, paste0(base_name, ".Rmd"))
   html_file <- paste0(base_name, ".html")
-  cat("Running:", base_name, "\n")
+  MSG <- paste0("\u001b[1m\u001b[36mRunning: ", base_name, "\u001b[0m\n")
+  cat(MSG)
   start_time <- Sys.time()
   source(r_file)
 
@@ -107,8 +117,10 @@ for (f in files) {
   info_f <- get_info(fit, base_name, t_fit, t_pred, t_post, t_total, size_disk)
   INFO <- rbind(INFO, info_f)
 }
-cat("Finished.\n")
-cat("==========================================================\n\n")
+MSG <- paste0("\u001b[1m\u001b[36mFinished. \u001b[0m\n")
+cat(MSG)
+cat(HR)
+cat("\n")
 
 INFO <- round_results(INFO, 2L, 3L)
 print(INFO)
