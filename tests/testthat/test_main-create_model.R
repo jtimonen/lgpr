@@ -423,7 +423,7 @@ test_that("can't have only partly missing vals for group when using het()", {
   formula <- y ~ gp(age) + het(id) * gp(dis_age)
   dat <- testdata_001
   dat$dis_age[20] <- 1.1
-  reason <- "inconsistent x_cont_mask values observations where id = 4"
+  reason <- "inconsistent x_cont_mask values for observations where id = 4"
   expect_error(create_model(formula = formula, data = dat), reason)
 })
 

@@ -501,7 +501,7 @@ map_factor_to_caseid <- function(x_fac, x_cont_mask, factor_name) {
       # do nothing, not a case
     } else {
       msg <- paste0(
-        "inconsistent x_cont_mask values observations where ",
+        "inconsistent x_cont_mask values for observations where ",
         factor_name, " = ", u
       )
       stop(msg)

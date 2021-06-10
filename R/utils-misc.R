@@ -218,7 +218,7 @@ large_data_msg <- function(num_obs, threshold) {
   msg <- paste0(
     "WARNING: Number of observations is >= ", threshold,
     ", so sampling can take a long time. See the",
-    " 'gradient computation took X seconds' information show by",
+    " 'gradient computation took X seconds' information shown by",
     " Stan to estimate total runtime."
   )
   show_msg <- (num_obs >= threshold)
