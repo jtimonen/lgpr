@@ -181,7 +181,7 @@ Finally we plot the inferred disease component
 t <- seq(0, 100, by = 1)
 x_pred <- new_x(dat, t, x_ns = 'diseaseAge')
 p <- pred(fit, x_pred, verbose = FALSE)
-plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')  + xlab('Age (months)')
+plot_f(fit, pred = p, comp_idx = 3, color_by = 'diseaseAge')  + xlab('Age (months)')
 ```
 
 # Computing environment

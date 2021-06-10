@@ -17,6 +17,8 @@ itself. They are supposed to be run while in the package root directory.
 * TotalCPUTime: `04:54:31`
 * MaxRSS: `3240M`
 
+Proteomics data experiment's (4-5) relevance results confirmed to agree with paper.
+
 ```
 
                    name obs_model f_sampled n_obs n_comps t_ch_mean t_ch_sd

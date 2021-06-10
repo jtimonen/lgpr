@@ -103,7 +103,7 @@ hyperparameters, and see that the inferred effects have the same shape for all i
 t <- seq(0, 100, by = 1)
 x_pred <- new_x(dat, t, x_ns = "diseaseAge")
 p <- pred(fit, x_pred, verbose = FALSE, reduce = stats::median)
-plot_f(fit, x = x_pred, pred = p, comp_idx = 3, color_by = 'diseaseAge')
+plot_f(fit, pred = p, comp_idx = 3, color_by = 'diseaseAge')
 ```
 
 # Computing environment

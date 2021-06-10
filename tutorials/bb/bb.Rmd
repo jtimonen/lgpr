@@ -137,7 +137,7 @@ t <- seq(2, 100, by = 2)
 x_pred <- new_x(dat, t)
 p <- pred(fit, x_pred, draws = draws)
 plot_pred(fit, p, alpha = 0.3)
-plot_components(fit, x = x_pred, pred = p, alpha = 0.1, color_by = c(NA, NA, "z", "z"))
+plot_components(fit, pred = p, alpha = 0.1, color_by = c(NA, NA, "z", "z"))
 ```
 
 # Computing environment
