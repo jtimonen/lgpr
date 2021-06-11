@@ -120,7 +120,8 @@ beta_teff_idx_info <- function(object) {
     return(a)
   }
   a <- t(a)
-  rownames(a)[2] <- "beta_teff_idx"
+  rownames(a)[2] <- "beta_or_teff_param_idx"
+  a <- data.frame(a)
   colnames(a) <- NULL
   return(a)
 }

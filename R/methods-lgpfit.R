@@ -151,6 +151,7 @@ fit_summary <- function(fit,
 #' \code{\link[bayesplot]{mcmc_intervals}}, \code{\link[bayesplot]{mcmc_dens}},
 #' \code{\link[bayesplot]{mcmc_areas}} or \code{\link[bayesplot]{mcmc_trace}}
 #' @return a \code{ggplot} object or list of them
+#' @param verbose Can any output be printed?
 #' @name plot_draws
 NULL
 
@@ -184,11 +185,14 @@ plot_draws <- function(fit,
 #' @export
 #' @describeIn plot_draws visualizes the distribution of the
 #'   individual-specific disease effect magnitude parameter draws
-plot_beta <- function(fit, type = "dens", ...) {
+plot_beta <- function(fit, type = "dens", verbose = TRUE, ...) {
   check_type(fit, "lgpfit")
   num_heter <- dollar(get_stan_input(fit), "num_heter")
   if (num_heter == 0) {
     stop("there are no heterogeneous effects in the model")
+  }
+  if (verbose) {
+    print(beta_teff_idx_info(fit)) # print parameter indices
   }
   h <- plot_draws(fit, type, regex_pars = "beta", ...)
   ptitle <- paste0(
@@ -229,10 +233,13 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
 #' @export
 #' @describeIn plot_draws visualizes the input warping function for
 #'   different parameter draws
-plot_effect_times <- function(fit, type = "areas", ...) {
+plot_effect_times <- function(fit, type = "areas", verbose = TRUE, ...) {
   num_uncrt <- dollar(get_stan_input(fit), "num_uncrt")
   if (num_uncrt == 0) {
     stop("there are no uncertain effect times in the model")
+  }
+  if (verbose) {
+    print(beta_teff_idx_info(fit)) # print parameter indices
   }
   h <- plot_draws(fit, type, regex_pars = "teff[[]", ...)
   ptitle <- "Distribution of the inferred effect times"

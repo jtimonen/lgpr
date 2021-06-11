@@ -105,6 +105,10 @@ lgp <- function(formula,
     formula, data, likelihood, prior, c_hat, num_trials, options,
     prior_only, verbose, sample_f
   )
+  if (verbose) {
+    log_progress("\nModel created, printing it here.")
+    print(model)
+  }
 
   # Fit model
   log_progress("\nSampling model...", verbose)

@@ -14,7 +14,7 @@ plot_draws(
   ...
 )
 
-plot_beta(fit, type = "dens", ...)
+plot_beta(fit, type = "dens", verbose = TRUE, ...)
 
 plot_warp(
   fit,
@@ -24,7 +24,7 @@ plot_warp(
   alpha = 0.5
 )
 
-plot_effect_times(fit, type = "areas", ...)
+plot_effect_times(fit, type = "areas", verbose = TRUE, ...)
 }
 \arguments{
 \item{fit}{an object of class \linkS4class{lgpfit}}
@@ -37,6 +37,8 @@ plot_effect_times(fit, type = "areas", ...)
 \item{...}{additional arguments for the \code{bayesplot} function
 \code{\link[bayesplot]{mcmc_intervals}}, \code{\link[bayesplot]{mcmc_dens}},
 \code{\link[bayesplot]{mcmc_areas}} or \code{\link[bayesplot]{mcmc_trace}}}
+
+\item{verbose}{Can any output be printed?}
 
 \item{num_points}{number of plot points}
 

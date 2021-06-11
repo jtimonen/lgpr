@@ -72,7 +72,6 @@ create_model <- function(formula,
     sample_f = sample_f,
     full_prior = full_prior
   )
-  log_progress("Done.", verbose)
   return(out)
 }
 
