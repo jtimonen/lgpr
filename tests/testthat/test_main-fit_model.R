@@ -262,7 +262,7 @@ test_that("Model with heterogeneous disease effect (f sampled)", {
   model <- create_model(
     formula = formula,
     data = data,
-    prior = prior
+    prior = list(wrp = igam(14, 5))
   )
 
   # NOTE: Not suppressing warnings here!
