@@ -179,7 +179,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
   fit <- new("lgpfit",
     model = model,
     stan_fit = stan_fit,
-    num_draws = nrow(as.matrix(stan_fit)),
+    num_draws = get_num_postwarmup_draws(stan_fit),
     postproc_results = list()
   )
 

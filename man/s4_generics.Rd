@@ -9,7 +9,6 @@
 \alias{get_model}
 \alias{is_f_sampled}
 \alias{get_stanfit}
-\alias{get_draws}
 \alias{postproc}
 \alias{contains_postproc}
 \alias{clear_postproc}
@@ -32,8 +31,6 @@ is_f_sampled(object)
 
 get_stanfit(object)
 
-get_draws(object, draws = NULL, reduce = NULL, ...)
-
 postproc(object, ...)
 
 contains_postproc(object)
@@ -50,10 +47,6 @@ num_components(object)
 \item{object}{object for which to apply the generic}
 
 \item{digits}{number of digits to show}
-
-\item{draws}{indices of draws}
-
-\item{reduce}{possible reduction}
 
 \item{...}{additional optional arguments to pass}
 }
@@ -75,8 +68,6 @@ S4 generics for lgpfit, lgpmodel, and other objects
 \item \code{is_f_sampled}: Determine if signal f is sampled or marginalized.
 
 \item \code{get_stanfit}: Extract stanfit object.
-
-\item \code{get_draws}: Extract parameter draws.
 
 \item \code{postproc}: Perform postprocessing.
 

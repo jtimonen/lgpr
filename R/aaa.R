@@ -357,6 +357,7 @@ lgpmodel <- setClass("lgpmodel",
 #' results.
 #' @param object \linkS4class{lgpfit} object for which to apply a class method.
 #' @param ... optional arguments passed to a subroutine
+#' @seealso For extracting parameter draws, see \code{\link{get_draws}}.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
@@ -451,6 +452,20 @@ Prediction <- setClass("Prediction",
   validity = validate_Prediction
 )
 
+#' An S4 class to represent input for kernel matrix computations
+#'
+#' @slot input a list
+#' @slot init a list
+#' @slot param_draws formatted parameter draws
+#' @slot STREAM external pointer (for calling Stan functions)
+KernelComputer <- setClass("KernelComputer",
+  representation = representation(
+    input = "list",
+    init = "list",
+    param_draws = "list",
+    STREAM = "externalptr"
+  )
+)
 
 # Class info for show methods
 class_info <- function(class_name) {
@@ -555,14 +570,6 @@ setGeneric(
 setGeneric(
   "get_stanfit",
   function(object) standardGeneric("get_stanfit")
-)
-
-#' @describeIn s4_generics Extract parameter draws.
-#' @param draws indices of draws
-#' @param reduce possible reduction
-setGeneric(
-  "get_draws",
-  function(object, draws = NULL, reduce = NULL, ...) standardGeneric("get_draws")
 )
 
 #' @describeIn s4_generics Perform postprocessing.

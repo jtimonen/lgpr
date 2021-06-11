@@ -444,3 +444,9 @@ print_arr_dim <- function(x) {
   desc <- paste0(" * dim(", name, ") = c(", dim_str, ")", sep = "")
   log_info(desc, TRUE)
 }
+
+
+# Get total number of post-warmup draws from stanfit
+get_num_postwarmup_draws <- function(stan_fit) {
+  nrow(as.data.frame(stan_fit))
+}

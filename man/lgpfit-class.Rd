@@ -12,7 +12,6 @@
 \alias{get_model,lgpfit-method}
 \alias{get_stanfit,lgpfit-method}
 \alias{is_f_sampled,lgpfit-method}
-\alias{get_draws,lgpfit-method}
 \alias{plot,lgpfit,missing-method}
 \title{An S4 class to represent the output of the \code{lgp} function}
 \usage{
@@ -32,8 +31,6 @@
 
 \S4method{is_f_sampled}{lgpfit}(object)
 
-\S4method{get_draws}{lgpfit}(object, draws = NULL, reduce = NULL, ...)
-
 \S4method{plot}{lgpfit,missing}(x, y)
 }
 \arguments{
@@ -41,18 +38,11 @@
 
 \item{verbose}{Can the method print any messages?}
 
-\item{draws}{Indices of the parameter draws. \code{NULL} corresponds to
-all post-warmup draws.}
-
-\item{reduce}{Function used to reduce all parameter draws into
-one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
-\code{NULL}.}
-
-\item{...}{optional arguments passed to a subroutine}
-
 \item{x}{an \linkS4class{lgpfit} object to visualize}
 
 \item{y}{unused argument}
+
+\item{...}{optional arguments passed to a subroutine}
 }
 \description{
 An S4 class to represent the output of the \code{lgp} function
@@ -84,12 +74,6 @@ or in the documentation of \code{\link[rstan]{stanfit}}.
 \item \code{is_f_sampled}: Determine if inference was done by sampling
 the latent signal \code{f} (and its components).
 
-\item \code{get_draws}: Extract parameter draws. Uses \code{\link[rstan]{extract}}
-with \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the
-return value is always a 2-dimensional array of shape
-\code{num_param_sets} x \code{num_params}. Optional arguments
-(\code{...}) are passed to \code{\link[rstan]{extract}}.
-
 \item \code{plot}: Visualize parameter draws using \code{\link{plot_draws}}.
 }}
 
@@ -107,6 +91,8 @@ results.}
 }}
 
 \seealso{
+For extracting parameter draws, see \code{\link{get_draws}}.
+
 For more detailed plotting functions, see \code{\link{plot_draws}},
 \code{\link{plot_beta}}, \code{\link{plot_warp}},
 \code{\link{plot_effect_times}}

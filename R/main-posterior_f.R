@@ -30,66 +30,42 @@ posterior_f <- function(fit,
 
   # Settings
   if (!is.null(draws)) reduce <- NULL
-  f_sampled <- is_f_sampled(fit)
 
   # Stop if potentially going to crash the computer
   prevent_too_large_mats(fit, x, reduce, draws, verbose, force)
 
-  # Create common constant inputs
-  log_progress("Creating inputs...", verbose)
-  input <- kernels_fpost.create_input(fit, x, reduce, draws)
-
-  # Constant kernel computations and covariate-dependent inputs
-  K_init <- kernels_fpost.init(input, FALSE, FALSE, STREAM)
-  if (is.null(x)) {
-    Ks_init <- NULL
-    Kss_init <- NULL
-    x <- get_data(fit)
-    P <- dollar(K_init, "n1") # number of output points
-  } else {
-    Ks_init <- kernels_fpost.init(input, TRUE, FALSE, STREAM)
-    Kss_init <- kernels_fpost.init(input, TRUE, TRUE, STREAM)
-    P <- dollar(Ks_init, "n1") # number of output points
-  }
-  N <- dollar(K_init, "n1")
-  S <- dollar(input, "num_paramsets")
-  J <- get_num_comps(fit)
-  comp_names <- component_names(fit)
-  init <- list(
-    K_init = K_init, Ks_init = Ks_init, Kss_init = Kss_init,
-    P = P, N = N, S = S, J = J, comp_names = comp_names
-  )
+  # Create kernel computer
+  model <- get_model(fit)
+  stan_fit <- get_stanfit(fit)
+  kc <- create_kernel_computer(model, stan_fit, x, reduce, draws, STREAM)
   if (debug_km) {
-    return(init)
+    return(kc@init)
   }
-
-  # Get kernel parameter draws
-  param_draws <- list(
-    alpha = dollar(input, "d_alpha"),
-    ell = dollar(input, "d_ell"),
-    wrp = dollar(input, "d_wrp"),
-    beta = dollar(input, "d_beta"), # has shape (S, num_heter > 1, num_bt)
-    teff = dollar(input, "d_teff") # has shape (S, num_uncrt > 1, num_bt)
-  )
 
   # Compute the function posteriors for each parameter set
-  if (f_sampled) {
+  if (is_f_sampled(fit)) {
     fp_at_data <- get_pred(fit, reduce = reduce, draws = draws)
-    out <- fp_extrapolate(input, init, param_draws, fp_at_data, verbose, STREAM)
+    out <- fp_extrapolate(kc, fp_at_data, verbose)
   } else {
     y <- get_y(fit, original = FALSE) # normalized y
     d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
     sigma2 <- as.vector(d_sigma^2)
-    out <- fp_gaussian(input, init, param_draws, sigma2, y, verbose, STREAM)
+    out <- fp_gaussian(kc, sigma2, y, verbose)
+  }
+  if (is.null(x)) {
+    x <- get_data(model)
   }
   out[["x"]] <- x
   return(out)
 }
 
 # Analytic function posteriors
-fp_gaussian <- function(input, init, param_draws, sigma2, y, verbose, STREAM) {
+fp_gaussian <- function(kc, sigma2, y, verbose) {
 
   # Extract info
+  init <- kc@init
+  input <- kc@input
+  param_draws <- kc@param_draws
   S <- dollar(init, "S") # number of parameter sets
   P <- dollar(init, "P") # number of output points
   J <- dollar(init, "J") # number of components
@@ -117,13 +93,13 @@ fp_gaussian <- function(input, init, param_draws, sigma2, y, verbose, STREAM) {
   for (idx in seq_len(S)) {
 
     # Compute full kernel matrices for one parameter set
-    K_i <- kernel_all(K_init, input, param_draws, idx, STREAM)
-    if (is.null(Ks_init)) {
+    K_i <- kernel_all(K_init, input, param_draws, idx, kc@STREAM)
+    if (three_matrices_are_same(kc)) {
       Ks_i <- K_i
       Kss_i <- K_i
     } else {
-      Ks_i <- kernel_all(Ks_init, input, param_draws, idx, STREAM)
-      Kss_i <- kernel_all(Kss_init, input, param_draws, idx, STREAM)
+      Ks_i <- kernel_all(Ks_init, input, param_draws, idx, kc@STREAM)
+      Kss_i <- kernel_all(Kss_init, input, param_draws, idx, kc@STREAM)
     }
 
     # Perform computations for one parameter set
@@ -206,10 +182,12 @@ fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
 }
 
 # Extrapolate function posterior draws using kernel regression
-fp_extrapolate <- function(input, init, param_draws, fp_at_data,
-                           verbose, STREAM) {
+fp_extrapolate <- function(kc, fp_at_data, verbose) {
 
   # Extract info
+  init <- kc@init
+  input <- kc@input
+  param_draws <- kc@param_draws
   S <- dollar(init, "S") # number of parameter sets
   P <- dollar(init, "P") # number of output points
   J <- dollar(init, "J") # number of components
@@ -236,11 +214,11 @@ fp_extrapolate <- function(input, init, param_draws, fp_at_data,
   for (idx in seq_len(S)) {
 
     # Perform computations for one parameter set
-    K_i <- kernel_all(K_init, input, param_draws, idx, STREAM)
-    if (is.null(Ks_init)) {
+    K_i <- kernel_all(K_init, input, param_draws, idx, kc@STREAM)
+    if (three_matrices_are_same(kc)) {
       Ks_i <- K_i
     } else {
-      Ks_i <- kernel_all(Ks_init, input, param_draws, idx, STREAM)
+      Ks_i <- kernel_all(Ks_init, input, param_draws, idx, kc@STREAM)
     }
     fp_comp_i <- sapply(fp_comp_draws, take_row, idx = idx) # dim = (N, J)
     fp_i <- fp_extrapolate.compute(K_i, Ks_i, delta, fp_comp_i) # dim = (P, J)
@@ -284,7 +262,7 @@ fp_extrapolate.compute <- function(K, Ks, delta, fp_comp) {
 
 # Safeguard
 prevent_too_large_mats <- function(fit, x, reduce, draws, verbose, force) {
-  S <- determine_num_paramsets(fit, draws, reduce)
+  S <- determine_num_paramsets(fit@stan_fit, draws, reduce)
   J <- length(component_names(fit@model))
   N <- get_num_obs(fit)
   P <- if (is.null(x)) N else nrow(x)
