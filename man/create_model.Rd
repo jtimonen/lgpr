@@ -75,7 +75,10 @@ If \code{options} is \code{NULL}, default options are used. The defaults
 are equivalent to
 \code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
 
-\item{prior_only}{Should likelihood be ignored?}
+\item{prior_only}{Should likelihood be ignored? See also
+\code{\link{sample_param_prior}} which can be used for any
+\linkS4class{lgpmodel}, and whose runtime is independent of the number of
+observations.}
 
 \item{verbose}{Should some informative messages be printed?}
 

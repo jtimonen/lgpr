@@ -6,7 +6,10 @@
 #' @inheritParams create_model.covs_and_comps
 #' @inheritParams create_model.likelihood
 #' @inheritParams create_model.options
-#' @param prior_only Should likelihood be ignored?
+#' @param prior_only Should likelihood be ignored? See also
+#' \code{\link{sample_param_prior}} which can be used for any
+#' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
+#' observations.
 #' @family main functions
 create_model <- function(formula,
                          data,

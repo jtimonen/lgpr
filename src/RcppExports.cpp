@@ -249,6 +249,7 @@ END_RCPP
 
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4parameter_prior_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
@@ -269,6 +270,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_log_prior", (DL_FUNC) &_lgpr_STAN_log_prior, 4},
     {"_rcpp_module_boot_stan_fit4lgp_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},
+    {"_rcpp_module_boot_stan_fit4parameter_prior_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4parameter_prior_mod, 0},
     {NULL, NULL, 0}
 };
 

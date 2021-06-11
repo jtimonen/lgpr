@@ -170,7 +170,7 @@ test_that("f can be sampled with beta-binomial likelihood", {
 
 # -------------------------------------------------------------------------
 
-context("Prior sampling")
+context("Prior sampling with prior_only = TRUE")
 
 test_that("Model with uncertain effect time (f marginalized)", {
   formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
@@ -225,4 +225,53 @@ test_that("Model with heterogeneous disease effect (f sampled)", {
   expect_equal(si$is_likelihood_skipped, 1)
   p1 <- plot_beta(fit, verbose = FALSE)
   expect_s3_class(p1, "ggplot")
+})
+
+
+
+# -------------------------------------------------------------------------
+
+context("Prior sampling with sample_param_prior")
+
+test_that("Model with uncertain effect time (f marginalized)", {
+  formula <- y ~ gp(age) + unc(id) * gp_vm(dis_age)
+  data <- testdata_001
+  et <- list(backwards = FALSE, lower = 15, upper = 30, zero = 0)
+  prior <- list(effect_time_info = et, wrp = igam(14, 5))
+  model <- create_model(
+    formula = formula,
+    data = data,
+    prior = prior
+  )
+
+  # NOTE: Not suppressing warnings here!
+  fit <- sample_param_prior(model,
+    iter = 2000,
+    chains = 1,
+    refresh = 0,
+    seed = SEED,
+    quiet = TRUE
+  )
+  expect_s4_class(fit, "stanfit")
+})
+
+test_that("Model with heterogeneous disease effect (f sampled)", {
+  formula <- y ~ gp(age) + het(id) * gp_ns(dis_age)
+  data <- testdata_001
+  data$y <- round(exp(data$y))
+  model <- create_model(
+    formula = formula,
+    data = data,
+    prior = prior
+  )
+
+  # NOTE: Not suppressing warnings here!
+  fit <- sample_param_prior(model,
+    iter = 2000,
+    chains = 1,
+    refresh = 0,
+    seed = SEED,
+    quiet = TRUE
+  )
+  expect_s4_class(fit, "stanfit")
 })
