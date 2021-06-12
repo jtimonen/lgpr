@@ -103,6 +103,7 @@ NULL
 #'   \item{y}{a continuous variable}
 #' }
 #' @family built-in datasets
+#' @seealso \code{\link{read_proteomics_data}}
 "testdata_002"
 
 
@@ -332,8 +333,7 @@ validate_Prediction <- function(object) {
 #' @slot info Other info in text format.
 #' @slot sample_f Whether the signal \code{f} is sampled or marginalized.
 #' @slot full_prior Complete prior information.
-#' @param object \linkS4class{lgpmodel} object for which to apply a class
-#' method.
+#' @param object The object for which to apply a class method.
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
@@ -355,9 +355,9 @@ lgpmodel <- setClass("lgpmodel",
 #' @slot num_draws Total number of parameter draws.
 #' @slot postproc_results A named list containing possible postprocessing
 #' results.
-#' @param object \linkS4class{lgpfit} object for which to apply a class method.
-#' @param ... optional arguments passed to a subroutine
-#' @seealso For extracting parameter draws, see \code{\link{get_draws}}.
+#' @param object The object for which to apply a class method.
+#' @seealso For extracting parameter draws, see \code{\link{get_draws}},
+#' or the \code{rstan} methods for \code{stanfit} objects.
 lgpfit <- setClass("lgpfit",
   slots = c(
     stan_fit = "stanfit",
@@ -459,6 +459,7 @@ Prediction <- setClass("Prediction",
 #' @slot init a list
 #' @slot param_draws formatted parameter draws
 #' @slot STREAM external pointer (for calling Stan functions)
+#' @param object The object for which to call a class method.
 KernelComputer <- setClass("KernelComputer",
   representation = representation(
     input = "list",

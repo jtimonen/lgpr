@@ -15,11 +15,23 @@ all post-warmup draws.}
 \item{reduce}{Function used to reduce all parameter draws into
 one set of parameters. Ignored if \code{NULL}, or if \code{draws} is not
 \code{NULL}.}
+
+\item{...}{Additional arguments to \code{rstan::extract()}.}
+}
+\value{
+The return value is always a 2-dimensional array of shape
+\code{num_param_sets} x \code{num_params}.
 }
 \description{
 Uses \code{\link[rstan]{extract}}
-with \code{permuted = FALSE} and \code{inc_warmup = FALSE}, so that the
-return value is always a 2-dimensional array of shape
-\code{num_param_sets} x \code{num_params}. Optional arguments
-(\code{...}) are passed to \code{\link[rstan]{extract}}.
+with \code{permuted = FALSE} and \code{inc_warmup = FALSE}.
 }
+\seealso{
+Other main functions: 
+\code{\link{create_model}()},
+\code{\link{lgp}()},
+\code{\link{pred}()},
+\code{\link{prior_pred}()},
+\code{\link{sample_model}()}
+}
+\concept{main functions}

@@ -12,8 +12,7 @@ pred(
   verbose = TRUE,
   STREAM = get_stream(),
   c_hat_pred = NULL,
-  force = FALSE,
-  ...
+  force = FALSE
 )
 }
 \arguments{
@@ -22,11 +21,11 @@ pred(
 \item{x}{A data frame of points where function posterior distributions
 and predictions should be computed or sampled.
 The function \code{\link{new_x}} provides an easy way to create it.
-If this is NULL, the data points are used.}
+If this is \code{NULL}, the data points are used.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
-NULL (no reduction). Has no effect if \code{draws} is specified.}
+\code{NULL} (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
@@ -35,7 +34,7 @@ draws.}
 printed?}
 
 \item{STREAM}{External pointer. By default obtained with
-\code{\link[rstan]{get_stream}}.}
+\code{rstan::get_stream()}.}
 
 \item{c_hat_pred}{This is only used if the latent signal \code{f} was
 sampled. This input contains the values added to the sum \code{f} before
@@ -73,3 +72,12 @@ An object of class \linkS4class{GaussianPrediction} or
   object which is then returned.
 }
 }
+\seealso{
+Other main functions: 
+\code{\link{create_model}()},
+\code{\link{get_draws}()},
+\code{\link{lgp}()},
+\code{\link{prior_pred}()},
+\code{\link{sample_model}()}
+}
+\concept{main functions}

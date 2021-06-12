@@ -14,7 +14,7 @@ draws.}
 
 \item{reduce}{Reduction for parameters draws. Can be a function that
 is applied to reduce all parameter draws into one parameter set, or
-NULL (no reduction). Has no effect if \code{draws} is specified.}
+\code{NULL} (no reduction). Has no effect if \code{draws} is specified.}
 
 \item{verbose}{Should more information and a possible progress bar be
 printed?}

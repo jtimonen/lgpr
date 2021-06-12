@@ -34,15 +34,13 @@
 \S4method{plot}{lgpfit,missing}(x, y)
 }
 \arguments{
-\item{object}{\linkS4class{lgpfit} object for which to apply a class method.}
+\item{object}{The object for which to apply a class method.}
 
 \item{verbose}{Can the method print any messages?}
 
 \item{x}{an \linkS4class{lgpfit} object to visualize}
 
 \item{y}{unused argument}
-
-\item{...}{optional arguments passed to a subroutine}
 }
 \description{
 An S4 class to represent the output of the \code{lgp} function
@@ -91,7 +89,8 @@ results.}
 }}
 
 \seealso{
-For extracting parameter draws, see \code{\link{get_draws}}.
+For extracting parameter draws, see \code{\link{get_draws}},
+or the \code{rstan} methods for \code{stanfit} objects.
 
 For more detailed plotting functions, see \code{\link{plot_draws}},
 \code{\link{plot_beta}}, \code{\link{plot_warp}},

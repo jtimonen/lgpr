@@ -13,6 +13,7 @@
 #' @inheritParams pred
 #' @param model An object of class \linkS4class{lgpmodel}.
 #' @param refresh Argument for \code{\link[rstan]{sampling}}.
+#' @param quiet Should all output be suppressed?
 #' @param ... Additional arguments for \code{\link[rstan]{sampling}}.
 #' @name prior_pred
 #' @family main functions

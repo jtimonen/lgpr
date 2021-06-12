@@ -76,6 +76,7 @@ This calls \code{\link{plot_f}} for all model components.
 }
 \seealso{
 Other main plot functions: 
+\code{\link{plot_draws}()},
 \code{\link{plot_pred}()}
 }
 \concept{main plot functions}

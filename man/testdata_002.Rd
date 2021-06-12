@@ -22,6 +22,8 @@ testdata_002
 Medium-size artificial test data, used mostly for tutorials
 }
 \seealso{
+\code{\link{read_proteomics_data}}
+
 Other built-in datasets: 
 \code{\link{testdata_001}}
 }

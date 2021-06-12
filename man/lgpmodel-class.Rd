@@ -25,8 +25,7 @@
 \S4method{is_f_sampled}{lgpmodel}(object)
 }
 \arguments{
-\item{object}{\linkS4class{lgpmodel} object for which to apply a class
-method.}
+\item{object}{The object for which to apply a class method.}
 
 \item{digits}{number of digits to show for floating point numbers}
 }

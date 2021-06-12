@@ -26,7 +26,7 @@
 #' @param x A data frame of points where function posterior distributions
 #' and predictions should be computed or sampled.
 #' The function \code{\link{new_x}} provides an easy way to create it.
-#' If this is NULL, the data points are used.
+#' If this is \code{NULL}, the data points are used.
 #' @param c_hat_pred This is only used if the latent signal \code{f} was
 #' sampled. This input contains the values added to the sum \code{f} before
 #' passing through inverse link function. Must be a vector with length equal to
@@ -35,11 +35,11 @@
 #' use the same constant.
 #' @param reduce Reduction for parameters draws. Can be a function that
 #' is applied to reduce all parameter draws into one parameter set, or
-#' NULL (no reduction). Has no effect if \code{draws} is specified.
+#' \code{NULL} (no reduction). Has no effect if \code{draws} is specified.
 #' @param draws Indices of parameter draws to use, or \code{NULL} to use all
 #' draws.
 #' @param STREAM External pointer. By default obtained with
-#' \code{\link[rstan]{get_stream}}.
+#' \code{rstan::get_stream()}.
 #' @param verbose Should more information and a possible progress bar be
 #' printed?
 #' @param force This is by default \code{FALSE} to prevent unintended
@@ -47,6 +47,7 @@
 #' try computing no matter what.
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
+#' @family main functions
 pred <- function(fit,
                  x = NULL,
                  reduce = function(x) base::mean(x),
@@ -54,8 +55,7 @@ pred <- function(fit,
                  verbose = TRUE,
                  STREAM = get_stream(),
                  c_hat_pred = NULL,
-                 force = FALSE,
-                 ...) {
+                 force = FALSE) {
   f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
 

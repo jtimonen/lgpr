@@ -70,3 +70,9 @@ different draws of the warping steepness parameter
 different parameter draws
 }}
 
+\seealso{
+Other main plot functions: 
+\code{\link{plot_components}()},
+\code{\link{plot_pred}()}
+}
+\concept{main plot functions}

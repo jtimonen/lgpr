@@ -22,10 +22,12 @@ sample_param_prior(model, verbose = TRUE, quiet = FALSE, ...)
 \item{verbose}{Should more information and a possible progress bar be
 printed?}
 
+\item{quiet}{Should all output be suppressed?}
+
 \item{refresh}{Argument for \code{\link[rstan]{sampling}}.}
 
 \item{STREAM}{External pointer. By default obtained with
-\code{\link[rstan]{get_stream}}.}
+\code{rstan::get_stream()}.}
 
 \item{...}{Additional arguments for \code{\link[rstan]{sampling}}.}
 }
@@ -43,7 +45,9 @@ printed?}
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
+\code{\link{get_draws}()},
 \code{\link{lgp}()},
+\code{\link{pred}()},
 \code{\link{sample_model}()}
 }
 \concept{main functions}

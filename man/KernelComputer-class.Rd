@@ -9,6 +9,9 @@
 \usage{
 \S4method{show}{KernelComputer}(object)
 }
+\arguments{
+\item{object}{The object for which to call a class method.}
+}
 \description{
 An S4 class to represent input for kernel matrix computations
 }
