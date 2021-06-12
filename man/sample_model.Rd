@@ -3,7 +3,6 @@
 \name{sample_model}
 \alias{sample_model}
 \alias{optimize_model}
-\alias{sample_param_prior}
 \title{Fitting a model}
 \usage{
 sample_model(
@@ -15,8 +14,6 @@ sample_model(
 )
 
 optimize_model(model, ...)
-
-sample_param_prior(model, verbose = TRUE, quiet = FALSE, ...)
 }
 \arguments{
 \item{model}{An object of class \linkS4class{lgpmodel}.}
@@ -41,15 +38,12 @@ much smaller (if \code{sample_f=FALSE}).}
   returns an object of class \linkS4class{lgpfit}.
   \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
   object and fits it using \code{\link[rstan]{optimizing}}.
-  \item The \code{sample_param_prior} function takes an
-  \linkS4class{lgpmodel} object, samples only its parameter prior
-  using \code{\link[rstan]{sampling}} and returns
-  an object of class \code{\link[rstan]{stanfit}}.
 }
 }
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
-\code{\link{lgp}()}
+\code{\link{lgp}()},
+\code{\link{prior_pred}()}
 }
 \concept{main functions}

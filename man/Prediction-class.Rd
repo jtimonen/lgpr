@@ -9,7 +9,8 @@
 \alias{num_components,Prediction-method}
 \alias{num_paramsets,Prediction-method}
 \alias{num_evalpoints,Prediction-method}
-\title{An S4 class to represent draws from an additive function posterior.}
+\title{An S4 class to represent prior or posterior
+draws from an additive function distribution.}
 \usage{
 \S4method{show}{Prediction}(object)
 
@@ -26,7 +27,8 @@
 method.}
 }
 \description{
-An S4 class to represent draws from an additive function posterior.
+An S4 class to represent prior or posterior
+draws from an additive function distribution.
 }
 \section{Methods (by generic)}{
 \itemize{

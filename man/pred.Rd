@@ -12,6 +12,7 @@ pred(
   verbose = TRUE,
   STREAM = get_stream(),
   c_hat_pred = NULL,
+  force = FALSE,
   ...
 )
 }
@@ -43,7 +44,9 @@ the number of prediction points. If original \code{c_hat} was constant,
 then \code{c_hat_pred} can be ignored, in which case this will by default
 use the same constant.}
 
-\item{...}{optional arguments passed to \code{\link{posterior_f}}}
+\item{force}{This is by default \code{FALSE} to prevent unintended
+large computations that might crash R or take forever. Set it to \code{TRUE}
+try computing no matter what.}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or

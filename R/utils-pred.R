@@ -1,30 +1,28 @@
-#' Function posterior distributions
-#'
-#' @description
-#' \itemize{
-#'   \item If \code{fit} is for a model that marginalizes the latent
-#'   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{FALSE}), this
-#'   computes the analytic conditional posterior
-#'   distributions of each model component, and their sum.
-#'
-#'   \item If \code{fit} is for a model that samples the latent
-#'   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
-#'   extract these function samples and compute their sum. If \code{x} is not
-#'   \code{NULL}, the function draws are extrapolated to the points \code{x}
-#'   using kernel regression.
-#' }
-#'
-#' @inheritParams pred
-#' @param debug_km Debug kernel matrix computation initialization.
-#' @param force This is by default \code{FALSE} to prevent unintended
-#' large computations that might crash R or take forever.
-#' @return A named list.
+# Function posterior distributions
+#
+# @description
+# \itemize{
+#   \item If \code{fit} is for a model that marginalizes the latent
+#   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{FALSE}), this
+#   computes the analytic conditional posterior
+#   distributions of each model component, and their sum.
+#
+#   \item If \code{fit} is for a model that samples the latent
+#   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
+#   extract these function samples and compute their sum. If \code{x} is not
+#   \code{NULL}, the function draws are extrapolated to the points \code{x}
+#   using kernel regression.
+# }
+#
+# @inheritParams pred
+# @param force This is by default \code{FALSE} to prevent unintended
+# large computations that might crash R or take forever.
+# @return A named list.
 posterior_f <- function(fit,
                         x = NULL,
                         reduce = function(x) base::mean(x),
                         draws = NULL,
                         verbose = TRUE,
-                        debug_km = FALSE,
                         STREAM = get_stream(),
                         force = FALSE) {
 
@@ -38,9 +36,6 @@ posterior_f <- function(fit,
   model <- get_model(fit)
   stan_fit <- get_stanfit(fit)
   kc <- create_kernel_computer(model, stan_fit, x, reduce, draws, STREAM)
-  if (debug_km) {
-    return(kc@init)
-  }
 
   # Compute the function posteriors for each parameter set
   if (is_f_sampled(fit)) {

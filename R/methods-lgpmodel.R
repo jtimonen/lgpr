@@ -175,10 +175,17 @@ covariate_info.cont <- function(object) {
   return(df)
 }
 
-# Get the c_chat Stan input
+# Get the c_chat Stan input or a vector of zeros
 get_chat <- function(object) {
   si <- get_stan_input(object)
-  dollar(si, "c_hat")
+  model <- object_to_model(object)
+  if (is_f_sampled(model)) {
+    c_hat <- dollar(si, "c_hat")
+  } else {
+    N <- get_num_obs(model)
+    c_hat <- rep(0.0, N)
+  }
+  return(c_hat)
 }
 
 # Get response variable measurements on original or normalized scale

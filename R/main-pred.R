@@ -42,7 +42,9 @@
 #' \code{\link[rstan]{get_stream}}.
 #' @param verbose Should more information and a possible progress bar be
 #' printed?
-#' @param ... optional arguments passed to \code{\link{posterior_f}}
+#' @param force This is by default \code{FALSE} to prevent unintended
+#' large computations that might crash R or take forever. Set it to \code{TRUE}
+#' try computing no matter what.
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
 pred <- function(fit,
@@ -52,6 +54,7 @@ pred <- function(fit,
                  verbose = TRUE,
                  STREAM = get_stream(),
                  c_hat_pred = NULL,
+                 force = FALSE,
                  ...) {
   f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
@@ -65,7 +68,7 @@ pred <- function(fit,
   # Otherwise requires kernel computations
   fp <- posterior_f(
     fit = fit, x = x, reduce = reduce, draws = draws,
-    verbose = verbose, STREAM = STREAM, ...
+    verbose = verbose, STREAM = STREAM, force = force
   )
   if (f_sampled) {
     out <- pred_extrapolated_draws(fit, fp, c_hat_pred, verbose)
@@ -97,8 +100,9 @@ pred_gaussian <- function(fit, fp, verbose) {
 # pred when sample_f = TRUE
 pred_extrapolated_draws <- function(fit, fp, c_hat_pred, verbose) {
   f_ext <- dollar(fp, "f_ext")
-  c_hat_pred <- set_c_hat_pred(fit, f_ext, c_hat_pred, verbose)
-  h_ext <- map_f_to_h(fit, f_ext, c_hat_pred, reduce = NULL)
+  model <- fit@model
+  c_hat_pred <- set_c_hat_pred(model, f_ext, c_hat_pred, verbose)
+  h_ext <- map_f_to_h(model, f_ext, c_hat_pred, reduce = NULL)
 
   # Return
   new("Prediction",
@@ -111,7 +115,7 @@ pred_extrapolated_draws <- function(fit, fp, c_hat_pred, verbose) {
 }
 
 # Set c_hat_pred
-set_c_hat_pred <- function(fit, f, c_hat_pred, verbose) {
+set_c_hat_pred <- function(model, f, c_hat_pred, verbose) {
 
   # helper function
   is_constant <- function(x) {
@@ -122,7 +126,7 @@ set_c_hat_pred <- function(fit, f, c_hat_pred, verbose) {
   num_draws <- dim(f)[1]
   num_pred <- dim(f)[2]
   if (is.null(c_hat_pred)) {
-    c_hat_data <- get_chat(fit)
+    c_hat_data <- get_chat(model)
     if (is_constant(c_hat_data)) {
       msg <- paste0(
         "c_hat_pred not given,",

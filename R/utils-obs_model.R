@@ -71,14 +71,14 @@ map_f_to_y <- function(f_mean, f_std, sigma2, y_scl) {
 }
 
 # Map draws of f to prediction scale
-map_f_to_h <- function(fit, f, c_hat, reduce) {
+map_f_to_h <- function(model, f, c_hat, reduce) {
 
   # Add c_hat
   num_draws <- dim(f)[1]
   f <- f + repvec(c_hat, num_draws)
 
   # Apply inverse link function and reduction
-  likelihood <- get_obs_model(fit)
+  likelihood <- get_obs_model(model)
   h <- link_inv(f, likelihood)
   h <- apply_reduce(h, reduce)
   return(h)

@@ -427,7 +427,8 @@ GaussianPrediction <- setClass("GaussianPrediction",
   validity = validate_GaussianPrediction
 )
 
-#' An S4 class to represent draws from an additive function posterior.
+#' An S4 class to represent prior or posterior
+#' draws from an additive function distribution.
 #'
 #' @slot f_comp component draws
 #' @slot f signal draws

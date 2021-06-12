@@ -93,6 +93,7 @@ Create a model
 \seealso{
 Other main functions: 
 \code{\link{lgp}()},
+\code{\link{prior_pred}()},
 \code{\link{sample_model}()}
 }
 \concept{main functions}

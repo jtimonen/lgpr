@@ -131,10 +131,6 @@ lgp <- function(formula,
 #'   returns an object of class \linkS4class{lgpfit}.
 #'   \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
 #'   object and fits it using \code{\link[rstan]{optimizing}}.
-#'   \item The \code{sample_param_prior} function takes an
-#'   \linkS4class{lgpmodel} object, samples only its parameter prior
-#'   using \code{\link[rstan]{sampling}} and returns
-#'   an object of class \code{\link[rstan]{stanfit}}.
 #' }
 #' @name sample_model
 #' @family main functions
@@ -203,6 +199,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
   return(fit)
 }
 
+
 #' @rdname sample_model
 #' @export
 optimize_model <- function(model, ...) {
@@ -211,22 +208,4 @@ optimize_model <- function(model, ...) {
   object <- get_stan_model(model)
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
-}
-
-
-
-#' @rdname sample_model
-#' @export
-sample_param_prior <- function(model, verbose = TRUE, quiet = FALSE, ...) {
-  if (quiet) verbose <- FALSE
-  object <- dollar(stanmodels, "parameter_prior")
-  data <- model@stan_input
-
-  # Run parameter prior sampling
-  rstan::sampling(
-    object = object,
-    data = data,
-    check_data = TRUE,
-    ...
-  )
 }
