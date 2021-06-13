@@ -4,7 +4,15 @@
 #' \itemize{
 #'   \item The \code{prior_pred} function takes an
 #'   \linkS4class{lgpmodel} object, samples from the prior predictive
-#'   distribution and returns an object of class \linkS4class{Prediction}.
+#'   distribution and returns a list with fields
+#'   \itemize{
+#'      \item \code{y_draws}: matrix containing the prior predictive draws
+#'      as rows
+#'      \item \code{pred_draws}: an object of class \linkS4class{Prediction},
+#'      containing prior draws of each model component and their sum
+#'      \item \code{param_draws}: a \code{stanfit} object of prior parameter
+#'      draws (obtained by calling \code{sample_param_prior} internally)
+#'    }
 #'   \item The \code{sample_param_prior} function takes an
 #'   \linkS4class{lgpmodel} object, samples only its parameter prior
 #'   using \code{\link[rstan]{sampling}} and returns
@@ -63,17 +71,27 @@ sample_param_prior <- function(model, verbose = TRUE, quiet = FALSE, ...) {
 # Draw from prior predictive distribution given prior draws of parameters
 # and functions
 draw_prior_pred <- function(model, stan_fit, f_draws, verbose) {
+
+  # Create h, with shape num_draws x num_points
   f_sum_draws <- dollar(f_draws, "f_draws")
   c_hat <- get_chat(model)
   h <- map_f_to_h(model, f_sum_draws, c_hat, reduce = NULL)
 
-  # Return
-  new("Prediction",
+  # Create Prediction
+  pred_draws <- new("Prediction",
     f_comp = dollar(f_draws, "f_draws_comp"),
     f = f_sum_draws,
     h = h,
     x = dollar(f_draws, "x"),
     extrapolated = FALSE
+  )
+
+  # Draw from predictive distribution and return
+  y_draws <- draw_pred.subroutine(model, stan_fit, pred_draws)
+  list(
+    y_draws = y_draws,
+    pred_draws = pred_draws,
+    param_draws = stan_fit
   )
 }
 

@@ -70,15 +70,14 @@ measurement times.}
 
 \item{f_var}{variance of f}
 
-\item{noise_type}{Either "gaussian", "poisson", "nb" (negative binomial) or
-"binomial".}
+\item{noise_type}{Either "gaussian", "poisson", "nb" (negative binomial),
+"binomial", or "bb" (beta-binomial).}
 
 \item{snr}{The desired signal-to-noise ratio. This argument is valid
-only with \cr
-\code{noise_type = "gaussian"}.}
+only when \code{noise_type} is \code{"gaussian"}.}
 
 \item{phi}{The inverse overdispersion parameter for negative binomial data.
-The variance is g + g^2/phi.}
+The variance is \code{g + g^2/phi}.}
 
 \item{gamma}{The dispersion parameter for beta-binomial data.}
 

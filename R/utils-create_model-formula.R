@@ -46,15 +46,15 @@ formula_to_advanced <- function(formula, data, verbose) {
   f <- split_formula(formula)
   rhs <- dollar(f, "right")
   y_name <- dollar(f, "left")
-  rhs <- rhs_to_advanced(rhs, data, verbose)
+  rhs <- rhs_to_advanced(rhs, data, verbose, y_name)
   f_str <- paste(y_name, "~", rhs)
   out <- stats::formula(f_str)
   return(out)
 }
 
 # Translate formula right-hand side
-rhs_to_advanced <- function(rhs, data, verbose) {
-  types <- data_types(data, verbose)
+rhs_to_advanced <- function(rhs, data, verbose, y_name) {
+  types <- data_types(data, y_name, verbose)
   terms <- rhs_to_terms(rhs)
   rhs_adv <- ""
   idx <- 0
@@ -64,7 +64,13 @@ rhs_to_advanced <- function(rhs, data, verbose) {
     if (length(covs) == 1) {
       check_in_data(covs[1], data, "data")
       t1 <- dollar(types, covs[1])
-      f1 <- if ("factor" %in% t1) "zs" else "gp"
+      if (t1 == "numeric") {
+        f1 <- "gp"
+      } else if (t1 == "factor") {
+        f1 <- "zs"
+      } else {
+        stop("Invalid data type at this point. Please report a bug.")
+      }
       term <- enclose_fun(covs[1], f1)
     } else {
       check_length(covs, 2)

@@ -147,15 +147,14 @@ simulate_data <- function(N,
 }
 
 
-#' Generate noisy observations
-
-#' @param noise_type Either "gaussian", "poisson", "nb" (negative binomial) or
-#' "binomial".
+#' Simulate noisy observations
+#'
+#' @param noise_type Either "gaussian", "poisson", "nb" (negative binomial),
+#' "binomial", or "bb" (beta-binomial).
 #' @param snr The desired signal-to-noise ratio. This argument is valid
-#' only with \cr
-#' \code{noise_type = "gaussian"}.
+#' only when \code{noise_type} is \code{"gaussian"}.
 #' @param phi The inverse overdispersion parameter for negative binomial data.
-#' The variance is g + g^2/phi.
+#' The variance is \code{g + g^2/phi}.
 #' @param gamma The dispersion parameter for beta-binomial data.
 #' @param N_trials The number of trials parameter for binomial data.
 #' @param f The underlying signal.
@@ -176,29 +175,22 @@ sim.create_y <- function(noise_type, f, snr, phi, gamma, N_trials) {
     y_n <- sigma_n * (y_n - mean(y_n)) / stats::sd(y_n)
     y <- h + y_n
   } else if (noise_type == "poisson") {
-    for (i in 1:L) {
-      y[i] <- stats::rpois(n = 1, lambda = h[i])
-    }
+    y <- stats::rpois(n = L, lambda = h)
   } else if (noise_type == "nb") {
-    for (i in 1:L) {
-      y[i] <- stats::rnbinom(n = 1, mu = h[i], size = phi)
-    }
+    y <- stats::rnbinom(n = L, mu = h, size = phi)
   } else if (noise_type == "binomial") {
-    for (i in 1:L) {
-      y[i] <- stats::rbinom(n = 1, size = N_trials, prob = h[i])
-    }
+    y <- stats::rbinom(n = L, size = N_trials, prob = h)
+    h <- N_trials * h
+  } else if (noise_type == "bb") {
+    check_interval(gamma, 0, 1)
+    gam_t <- (1 - gamma) / gamma
+    alpha <- gam_t * h
+    beta <- gam_t * (1.0 - h)
+    prob <- stats::rbeta(n = L, alpha, beta)
+    y <- stats::rbinom(n = L, size = N_trials, prob = prob)
     h <- N_trials * h
   } else {
-    # "bb"
-    check_interval(gamma, 0, 1)
-    for (i in 1:L) {
-      gam_t <- (1 - gamma) / gamma
-      alpha <- gam_t * h[i]
-      beta <- gam_t * (1 - h[i])
-      prob <- stats::rbeta(n = 1, alpha, beta)
-      y[i] <- stats::rbinom(n = 1, size = N_trials, prob = prob)
-    }
-    h <- N_trials * h
+    stop("Unknown noise_type! Please report a bug.")
   }
   NOISY <- list(h = h, y = y)
   return(NOISY)

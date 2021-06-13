@@ -43,6 +43,7 @@ much smaller (if \code{sample_f=FALSE}).}
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
+\code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},
 \code{\link{pred}()},

@@ -35,7 +35,15 @@ printed?}
 \itemize{
   \item The \code{prior_pred} function takes an
   \linkS4class{lgpmodel} object, samples from the prior predictive
-  distribution and returns an object of class \linkS4class{Prediction}.
+  distribution and returns a list with fields
+  \itemize{
+     \item \code{y_draws}: matrix containing the prior predictive draws
+     as rows
+     \item \code{pred_draws}: an object of class \linkS4class{Prediction},
+     containing prior draws of each model component and their sum
+     \item \code{param_draws}: a \code{stanfit} object of prior parameter
+     draws (obtained by calling \code{sample_param_prior} internally)
+   }
   \item The \code{sample_param_prior} function takes an
   \linkS4class{lgpmodel} object, samples only its parameter prior
   using \code{\link[rstan]{sampling}} and returns
@@ -45,6 +53,7 @@ printed?}
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
+\code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},
 \code{\link{pred}()},

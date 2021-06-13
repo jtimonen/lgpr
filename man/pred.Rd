@@ -75,6 +75,7 @@ An object of class \linkS4class{GaussianPrediction} or
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
+\code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},
 \code{\link{prior_pred}()},

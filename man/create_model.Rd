@@ -92,6 +92,7 @@ Create a model
 }
 \seealso{
 Other main functions: 
+\code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},
 \code{\link{pred}()},

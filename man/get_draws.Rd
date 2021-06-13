@@ -29,6 +29,7 @@ with \code{permuted = FALSE} and \code{inc_warmup = FALSE}.
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
+\code{\link{draw_pred}()},
 \code{\link{lgp}()},
 \code{\link{pred}()},
 \code{\link{prior_pred}()},

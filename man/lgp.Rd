@@ -185,6 +185,7 @@ Bayesian analysis. In \code{lgpr} this is especially important when
 \seealso{
 Other main functions: 
 \code{\link{create_model}()},
+\code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{pred}()},
 \code{\link{prior_pred}()},
