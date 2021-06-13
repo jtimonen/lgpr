@@ -24,3 +24,4 @@ test_that("param_summary works for models with heterogeneous effects", {
   )
   expect_output(print(param_summary(mod)), " ~ beta")
 })
+

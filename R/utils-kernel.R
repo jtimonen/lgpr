@@ -194,50 +194,8 @@ kernelcomp.input_x <- function(model, x) {
   return(out)
 }
 
-# parameter draws input
-kernelcomp.input_draws <- function(model, stan_fit, reduce, draws) {
-
-  # Get param sets
-  d_common <- kernelcomp.draws_common(model, stan_fit, reduce, draws)
-  if (is_f_sampled(model)) {
-    d_add <- kernelcomp.draws_latent(model, stan_fit, reduce, draws)
-  } else {
-    d_add <- kernelcomp.draws_marginal(stan_fit, reduce, draws)
-  }
-  c(d_common, d_add)
-}
-
-# parameter draws input (marginal gp)
-kernelcomp.draws_marginal <- function(stan_fit, reduce, draws) {
-  S <- determine_num_paramsets(stan_fit, draws, reduce)
-  list(
-    d_sigma = get_draw_arr(stan_fit, draws, reduce, "sigma", S, 1)
-  )
-}
-
-# parameter draws input (latent gp)
-kernelcomp.draws_latent <- function(model, stan_fit, reduce, draws) {
-  S <- determine_num_paramsets(stan_fit, draws, reduce)
-  si <- get_stan_input(model)
-  LH <- dollar(si, "obs_model")
-  num_sigma <- as.numeric(LH == 1)
-  num_phi <- as.numeric(LH == 3)
-  num_gamma <- as.numeric(LH == 5)
-
-  # Get draws
-  list(
-    num_sigma = num_sigma,
-    num_phi = num_phi,
-    num_gamma = num_gamma,
-    d_f_latent = get_draws(stan_fit, pars = "f_latent"), # S x (n_comps x n_obs)
-    d_sigma = get_draw_arr(stan_fit, draws, reduce, "sigma", S, num_sigma),
-    d_phi = get_draw_arr(stan_fit, draws, reduce, "phi", S, num_phi),
-    d_gamma = get_draw_arr(stan_fit, draws, reduce, "gamma", S, num_gamma)
-  )
-}
-
 # parameter draws input (common fields)
-kernelcomp.draws_common <- function(model, stan_fit, reduce, draws) {
+kernelcomp.input_draws <- function(model, stan_fit, reduce, draws) {
 
   # Get dimensions
   S <- determine_num_paramsets(stan_fit, draws, reduce)

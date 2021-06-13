@@ -38,7 +38,8 @@ test_that("Model with heterogeneous disease effect (f sampled)", {
   model <- create_model(
     formula = formula,
     data = data,
-    prior = list(wrp = igam(14, 5))
+    prior = list(wrp = igam(14, 5)),
+    likelihood = "Poisson"
   )
 
   # NOTE: Not suppressing warnings here!
@@ -68,7 +69,10 @@ test_that("Model with uncertain effect time (f marginalized)", {
     prior = prior
   )
   SW({
-    pp <- prior_pred(model, iter = ITER, chains = CHAINS, quiet = TRUE)
+    pp <- prior_pred(model,
+      iter = ITER, chains = CHAINS,
+      seed = SEED, quiet = TRUE
+    )
   })
 
   expect_equal(names(pp), c("y_draws", "pred_draws", "param_draws"))
@@ -82,7 +86,8 @@ test_that("Model with heterogeneous disease effect (f sampled)", {
   model <- create_model(
     formula = formula,
     data = data,
-    prior = list(wrp = igam(14, 5))
+    prior = list(wrp = igam(14, 5)),
+    likelihood = "NB"
   )
   SW({
     pp <- prior_pred(model, iter = ITER, chains = CHAINS, quiet = TRUE)
