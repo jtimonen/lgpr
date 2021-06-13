@@ -1,8 +1,10 @@
-#' Graphical posterior or prior predictive checks
+#' Graphical posterior predictive checks
 #'
 #' @export
-#' @param fit an object of class \linkS4class{lgpfit}
-#' @param data the original data frame
+#' @param fit An object of class \linkS4class{lgpfit} that can been created
+#' with \code{sample_f=TRUE}.
+#' @param data the original data frame (deprecated argument with no
+#' effect, now obtained from fit object)
 #' @param fun \code{bayesplot} function name
 #' @param ... additional arguments passed to the default
 #' \code{\link[bayesplot]{pp_check}} method in
@@ -10,11 +12,15 @@
 #' @param verbose Can this print any messages?
 #' @return a \code{ggplot} object
 #' @seealso Introduction to graphical posterior predictive checks:
-#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
-#'
+#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}.
+#' Prior predictive check can be done by calling
+#' \code{\link{prior_pred}} and then \code{bayesplot::pp_check()}.
 ppc <- function(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE,
                 ...) {
   check_type(fit, "lgpfit")
+  if (!is_f_sampled(fit)) {
+    stop("fit has been created with sample_f = FALSE")
+  }
 
   # Data is taken from the fit object
   if (!is.null(data)) {
@@ -24,9 +30,8 @@ ppc <- function(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE,
   check_type(fun, "function")
   y_name <- get_y_name(fit)
   y <- dollar(data, y_name)
-  stop("not implemented")
-  # y_rep <- get_y_rng(fit, original_scale = TRUE)
-  # bayesplot::pp_check(y, y_rep, fun, ...)
+  y_rep <- draw_pred(fit)
+  bayesplot::pp_check(y, y_rep, fun, ...)
 }
 
 # Default bayesplot ppc function
@@ -34,7 +39,7 @@ default_ppc_fun <- function(object) {
   likelihood <- get_obs_model(object)
   f1 <- bayesplot::ppc_dens_overlay
   f2 <- bayesplot::ppc_hist
-  fun <- if (likelihood == "gaussian") f1 else f2
+  fun <- f1
   check_type(fun, "function")
   return(fun)
 }

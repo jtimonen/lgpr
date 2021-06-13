@@ -6,8 +6,9 @@
 #'   \linkS4class{lgpmodel} object, samples from the prior predictive
 #'   distribution and returns a list with fields
 #'   \itemize{
-#'      \item \code{y_draws}: matrix containing the prior predictive draws
-#'      as rows
+#'      \item \code{y_draws}: A matrix containing the prior predictive draws
+#'      as rows. Can be passed to \code{bayesplot::pp_check()} for
+#'      graphical prior predictive checking.
 #'      \item \code{pred_draws}: an object of class \linkS4class{Prediction},
 #'      containing prior draws of each model component and their sum
 #'      \item \code{param_draws}: a \code{stanfit} object of prior parameter
@@ -35,6 +36,7 @@ prior_pred <- function(model,
                        refresh = 0,
                        STREAM = get_stream(),
                        ...) {
+  check_type(model, "lgpmodel")
   if (quiet) verbose <- FALSE
   log_progress("Sampling from parameter prior...", verbose)
   stan_fit <- sample_param_prior(
@@ -54,6 +56,7 @@ prior_pred <- function(model,
 #' @rdname prior_pred
 #' @export
 sample_param_prior <- function(model, verbose = TRUE, quiet = FALSE, ...) {
+  check_type(model, "lgpmodel")
   if (quiet) verbose <- FALSE
   object <- dollar(stanmodels, "parameter_prior")
   data <- model@stan_input

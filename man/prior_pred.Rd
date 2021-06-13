@@ -37,8 +37,9 @@ printed?}
   \linkS4class{lgpmodel} object, samples from the prior predictive
   distribution and returns a list with fields
   \itemize{
-     \item \code{y_draws}: matrix containing the prior predictive draws
-     as rows
+     \item \code{y_draws}: A matrix containing the prior predictive draws
+     as rows. Can be passed to \code{bayesplot::pp_check()} for
+     graphical prior predictive checking.
      \item \code{pred_draws}: an object of class \linkS4class{Prediction},
      containing prior draws of each model component and their sum
      \item \code{param_draws}: a \code{stanfit} object of prior parameter

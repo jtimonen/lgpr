@@ -2,14 +2,16 @@
 % Please edit documentation in R/main-ppc.R
 \name{ppc}
 \alias{ppc}
-\title{Graphical posterior or prior predictive checks}
+\title{Graphical posterior predictive checks}
 \usage{
 ppc(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE, ...)
 }
 \arguments{
-\item{fit}{an object of class \linkS4class{lgpfit}}
+\item{fit}{An object of class \linkS4class{lgpfit} that can been created
+with \code{sample_f=TRUE}.}
 
-\item{data}{the original data frame}
+\item{data}{the original data frame (deprecated argument with no
+effect, now obtained from fit object)}
 
 \item{fun}{\code{bayesplot} function name}
 
@@ -23,9 +25,11 @@ ppc(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE, ...)
 a \code{ggplot} object
 }
 \description{
-Graphical posterior or prior predictive checks
+Graphical posterior predictive checks
 }
 \seealso{
 Introduction to graphical posterior predictive checks:
-\href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}
+\href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}.
+Prior predictive check can be done by calling
+\code{\link{prior_pred}} and then \code{bayesplot::pp_check()}.
 }

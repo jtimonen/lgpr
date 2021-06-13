@@ -9,6 +9,7 @@
 #' @param pred An object of \linkS4class{Prediction}.
 #' @family main functions
 draw_pred <- function(fit, pred = NULL) {
+  check_type(fit, "lgpfit")
   if (!is_f_sampled(fit)) {
     stop("fit has been created with sample_f = FALSE")
   }
@@ -68,9 +69,9 @@ draw_pred.Prediction <- function(model, stan_fit, pred) {
     } else if (obs_model == "nb") {
       y_s <- stats::rnbinom(n = length(h_s), mu = h_s, size = theta_s)
     } else if (obs_model == "binomial") {
-      y_s <- stats::rnbinom(n = length(h_s), prob = h_s, size = num_trials)
+      y_s <- stats::rbinom(n = length(h_s), prob = h_s, size = num_trials)
     } else if (obs_model == "bb") {
-      gammma <- theta_s # number
+      gamma <- theta_s # number
       gam_t <- (1 - gamma) / gamma # number
       alpha <- gam_t * h_s # vector
       beta <- gam_t * (1.0 - h_s) # vector
