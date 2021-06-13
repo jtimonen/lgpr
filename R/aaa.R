@@ -28,7 +28,7 @@
 #'  covariate effects after fitting a model.
 #'  \item \code{\link{relevances}}: Assessing covariate relevances after
 #'  fitting a model.
-#'  \item \code{\link{prior_pred:}} Prior predictive sampling to check
+#'  \item \code{\link{prior_pred}}: Prior predictive sampling to check
 #'  if your prior makes sense.
 #' }
 #'

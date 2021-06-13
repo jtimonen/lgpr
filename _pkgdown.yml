@@ -11,8 +11,11 @@ reference:
   - adjusted_c_hat 
   - bet 
   - create_model 
+  - draw_pred 
   - fit_summary 
   - gam 
+  - get_draws 
+  - get_pred 
   - igam 
   - lgp 
   - log_normal 
@@ -20,6 +23,7 @@ reference:
   - new_x 
   - normal 
   - optimize_model 
+  - param_summary 
   - plot_beta 
   - plot_components 
   - plot_data 
@@ -30,8 +34,12 @@ reference:
   - plot_sim 
   - plot_warp 
   - ppc 
+  - pred 
+  - prior_pred 
+  - read_proteomics_data 
   - relevances 
   - sample_model 
+  - sample_param_prior 
   - select 
   - select.integrate 
   - select_freq 
