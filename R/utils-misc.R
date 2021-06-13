@@ -416,7 +416,15 @@ data_types <- function(data, y_name, verbose) {
   return(types)
 }
 
-# Quick way to create an example lgpfit
+#' Quick way to create an example lgpfit, useful for debugging
+#'
+#' @param formula model formula
+#' @param likelihood observation model
+#' @param chains number of chains to run
+#' @param iter number of iterations to run
+#' @param num_indiv number of individuals (data simulation)
+#' @param num_timepoints number of time points (data simulation)
+#' @param ... additional arguments to \code{\link{lgp}}
 example_fit <- function(
                         formula = y ~ id + age + age | SEX + age | LOC,
                         likelihood = "gaussian",

@@ -4,15 +4,18 @@
 \alias{draw_pred}
 \title{Draw pseudo-observations from a predictive distribution}
 \usage{
-draw_pred(fit, pred)
+draw_pred(fit, pred = NULL)
 }
 \arguments{
-\item{fit}{An object of class \linkS4class{lgpfit}.}
+\item{fit}{An object of class \linkS4class{lgpfit} that can been created
+with \code{sample_f=TRUE}.}
 
 \item{pred}{An object of \linkS4class{Prediction}.}
 }
 \description{
-Draw pseudo-observations from a predictive distribution
+This doesn't work for \linkS4class{GaussianPrediction} objects
+because for memory reasons they don't store the
+covariance matrices of the predictive distributions.
 }
 \seealso{
 Other main functions: 

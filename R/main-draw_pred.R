@@ -1,10 +1,20 @@
 #' Draw pseudo-observations from a predictive distribution
 #'
+#' @description This doesn't work for \linkS4class{GaussianPrediction} objects
+#' because for memory reasons they don't store the
+#' covariance matrices of the predictive distributions.
 #' @export
-#' @param fit An object of class \linkS4class{lgpfit}.
+#' @param fit An object of class \linkS4class{lgpfit} that can been created
+#' with \code{sample_f=TRUE}.
 #' @param pred An object of \linkS4class{Prediction}.
 #' @family main functions
-draw_pred <- function(fit, pred) {
+draw_pred <- function(fit, pred = NULL) {
+  if (!is_f_sampled(fit)) {
+    stop("fit has been created with sample_f = FALSE")
+  }
+  if (is.null(pred)) {
+    pred <- get_pred(fit)
+  }
   model <- get_model(fit)
   stan_fit <- get_stanfit(fit)
   draw_pred.subroutine(model, stan_fit, pred)
@@ -12,12 +22,8 @@ draw_pred <- function(fit, pred) {
 
 # Draw pseudo-observations from a predictive distribution
 draw_pred.subroutine <- function(model, stan_fit, pred) {
-  if (is(pred, "GaussianPrediction")) {
-    msg <- paste0(
-      "draw_pred() doesn't work for GaussianPrediction objects ",
-      "because currently they don't hold information about the ",
-      "covariance of the predicitive distribution."
-    )
+  if (!is(pred, "Prediction")) {
+    stop("pred must be an object of class Prediction")
   }
   draw_pred.Prediction(model, stan_fit, pred)
 }
@@ -28,8 +34,8 @@ draw_pred.Prediction <- function(model, stan_fit, pred) {
   obs_model <- get_obs_model(model)
   h <- pred@h
   S <- dim(h)[1] # number of draws
-  N <- dim(h)[2] # number of points
-  y_draws <- matrix(0.0, S, N)
+  L <- num_evalpoints(pred) # number of evaluation points
+  y_draws <- matrix(0.0, S, L)
 
   # Get possible observation model parameter draws
   if (obs_model == "gaussian") {
@@ -39,12 +45,15 @@ draw_pred.Prediction <- function(model, stan_fit, pred) {
   } else if (obs_model == "bb") {
     theta_obs <- as.vector(get_draws(stan_fit, pars = "gamma"))
   } else {
-    theta_obs <- rep(NA, N)
+    theta_obs <- rep(NA, S)
   }
 
   # Get possible number of trials
   if (is_bin_or_bb(obs_model)) {
     num_trials <- as.vector(get_num_trials(model))
+    if (length(num_trials) != L) {
+      stop("length(num_trials) not equal to num_evalpoints(pred)!")
+    }
   } else {
     num_trials <- NULL
   }
@@ -61,9 +70,10 @@ draw_pred.Prediction <- function(model, stan_fit, pred) {
     } else if (obs_model == "binomial") {
       y_s <- stats::rnbinom(n = length(h_s), prob = h_s, size = num_trials)
     } else if (obs_model == "bb") {
-      gam_t <- (1 - gamma) / gamma
-      alpha <- gam_t * h_s
-      beta <- gam_t * (1.0 - h_s)
+      gammma <- theta_s # number
+      gam_t <- (1 - gamma) / gamma # number
+      alpha <- gam_t * h_s # vector
+      beta <- gam_t * (1.0 - h_s) # vector
       prob <- stats::rbeta(n = length(alpha), alpha, beta)
       y_s <- stats::rbinom(n = length(alpha), prob = prob, size = num_trials)
     } else {
