@@ -123,7 +123,6 @@ set_c_hat_pred <- function(model, f, c_hat_pred, verbose) {
     s == length(x)
   }
 
-  num_draws <- dim(f)[1]
   num_pred <- dim(f)[2]
   if (is.null(c_hat_pred)) {
     c_hat_data <- get_chat(model)

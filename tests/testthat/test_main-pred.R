@@ -1,12 +1,11 @@
 library(lgpr)
 source("helpers/SW.R")
-# source("tests/testthat/helpers/SW.R")
 
 # -------------------------------------------------------------------------
 
 context("Creating GaussianPrediction objects")
 
-N_ITER <- 33
+N_ITER <- 35
 N_CHAINS <- 2
 SW({
   fit <- example_fit(iter = N_ITER, chains = N_CHAINS)

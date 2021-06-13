@@ -1,9 +1,8 @@
 library(lgpr)
 source("helpers/SW.R")
-# source("tests/testthat/helpers/SW.R")
 
 # -------------------------------------------------------------------------
-N_ITER <- 18 # should be even
+N_ITER <- 22 # should be even
 N_CHAINS <- 1
 
 context("Covariate selection")
@@ -34,7 +33,11 @@ test_that("selection can be done when sample_f = FALSE", {
 
 test_that("selection can be done when sample_f = TRUE", {
   SW({
-    fit <- example_fit(iter = N_ITER, chains = N_CHAINS, likelihood = "binomial")
+    fit <- example_fit(
+      iter = N_ITER,
+      chains = N_CHAINS,
+      likelihood = "binomial"
+    )
   })
   sel_before <- select(fit, threshold = 0.3)
   expect_equal(length(sel_before$Component), 5)

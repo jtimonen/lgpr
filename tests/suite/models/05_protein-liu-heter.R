@@ -4,7 +4,7 @@ library(lgpr)
 # Load data
 setup_data <- function(verbose) {
   protein <- "Q8WZA1"
-  a <- read_proteomics_data(protein = protein, verbose = verbose)
+  read_proteomics_data(protein = protein, verbose = verbose)
 }
 
 # Create model

@@ -1,9 +1,8 @@
 library(lgpr)
 source("helpers/SW.R")
-# source("tests/testthat/helpers/SW.R")
 
 # -------------------------------------------------------------------------
-N_ITER <- 26 # should be even
+N_ITER <- 28 # should be even
 N_CHAINS <- 1
 
 context("Computing relevances")

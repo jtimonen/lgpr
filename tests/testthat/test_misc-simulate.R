@@ -46,7 +46,8 @@ test_that("negative binomial data can be simulated", {
   y <- dat@data$y
   diff <- round(y) - y
   expect_lt(max(diff), 1e-6)
-  expect_message(plot_sim(dat, verbose = TRUE), "Line is the true signal mapped")
+  exp_msg_contains <- "Line is the true signal mapped"
+  expect_message(plot_sim(dat, verbose = TRUE), exp_msg_contains)
 })
 
 test_that("binomial data can be simulated", {

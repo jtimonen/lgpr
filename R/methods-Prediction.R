@@ -85,4 +85,3 @@ setMethod("num_evalpoints", "Prediction", function(object) {
   D <- dim(object@f_comp[[1]])
   D[2]
 })
-

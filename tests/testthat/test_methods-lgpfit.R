@@ -1,6 +1,5 @@
 library(lgpr)
 source("helpers/SW.R")
-# source("tests/testthat/helpers/SW.R")
 
 # -------------------------------------------------------------------------
 SW({

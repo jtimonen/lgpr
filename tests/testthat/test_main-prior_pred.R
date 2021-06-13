@@ -1,10 +1,9 @@
 library(lgpr)
 source("helpers/SW.R")
-# source("tests/testthat/helpers/SW.R")
 
-ITER <- 122
+ITER <- 121
 CHAINS <- 3
-SEED <- 329
+SEED <- 232
 
 # -------------------------------------------------------------------------
 

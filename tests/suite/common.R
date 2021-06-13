@@ -59,7 +59,7 @@ run_pred <- function(fit, verbose) {
 # Format result data frame
 round_results <- function(info, t_digits, rhat_digits) {
   t_cols <- c("t_ch_mean", "t_ch_sd", "t_fit", "t_pred", "t_post", "t_total")
-  info[t_cols] <- round(INFO[t_cols], t_digits)
+  info[t_cols] <- round(info[t_cols], t_digits)
   info["max_Rhat"] <- round(info["max_Rhat"], rhat_digits)
   return(info)
 }

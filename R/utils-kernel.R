@@ -8,7 +8,6 @@ create_kernel_computer <- function(model,
 
   # Settings
   if (!is.null(draws)) reduce <- NULL
-  f_sampled <- is_f_sampled(model)
   input <- kernelcomp.create_input(model, stan_fit, x, reduce, draws)
 
   # Constant kernel computations and covariate-dependent inputs
@@ -246,8 +245,8 @@ kernelcomp.draws_common <- function(model, stan_fit, reduce, draws) {
   num_comps <- dollar(si, "num_comps")
   num_ell <- dollar(si, "num_ell")
   num_ns <- dollar(si, "num_ns")
-  UNCRT <- dollar(si, "num_uncrt") > 0
-  HETER <- dollar(si, "num_heter") > 0
+  UNC <- dollar(si, "num_uncrt") > 0
+  HET <- dollar(si, "num_heter") > 0
   num_bt <- dollar(si, "num_bt")
 
   # Get draws
@@ -256,8 +255,8 @@ kernelcomp.draws_common <- function(model, stan_fit, reduce, draws) {
     d_alpha = get_draw_arr(stan_fit, draws, reduce, "alpha", S, num_comps),
     d_ell = get_draw_arr(stan_fit, draws, reduce, "ell", S, num_ell),
     d_wrp = get_draw_arr(stan_fit, draws, reduce, "wrp", S, num_ns),
-    d_beta = get_draw_arr_vec(stan_fit, draws, reduce, "beta", S, HETER, num_bt),
-    d_teff = get_draw_arr_vec(stan_fit, draws, reduce, "teff", S, UNCRT, num_bt)
+    d_beta = get_draw_arr_vec(stan_fit, draws, reduce, "beta", S, HET, num_bt),
+    d_teff = get_draw_arr_vec(stan_fit, draws, reduce, "teff", S, UNC, num_bt)
   )
 }
 

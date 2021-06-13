@@ -1,8 +1,7 @@
 library(lgpr)
 source("helpers/SW.R")
-# source("tests/testthat/helpers/SW.R")
-set.seed(4939)
-N_ITER <- 42
+set.seed(1239)
+N_ITER <- 39
 N_CHAINS <- 1
 
 # -------------------------------------------------------------------------
