@@ -1,8 +1,18 @@
 # lgpr 1.1
 
 ## 1.1.0
-  * TODO: WRITE BEFORE RELEASE
-
+  * Adds `prior_pred()` for prior predictive sampling and `sample_param_prior()` for sampling from the parameter prior.
+  * Adds `read_proteomics_data()` function.
+  * Relax data type checking, to require that they only inherit from factor
+  or numeric. Allow also `tibble`s and `data.table`s to be passed as data.
+  * Adds more methods for `lgpfit` and `lgpmodel` objects, see their
+  documentation.
+  * Lot of improvements internally. Kernel computations
+  in functions like `pred()` should take a lot less memory now. Two separete
+  main Stan models now. One for latent GP (signal where f is sampled) and other for GP with marginalized f.
+  * Improved documentation.
+  * Improve verbose messages to user.
+  
 # lgpr 1.0
 
 ## 1.0.13
