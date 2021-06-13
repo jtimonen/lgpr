@@ -1,5 +1,6 @@
 #' Draw pseudo-observations from a predictive distribution
 #'
+#' @export
 #' @param fit An object of class \linkS4class{lgpfit}.
 #' @param pred An object of \linkS4class{Prediction}.
 #' @family main functions
@@ -63,8 +64,8 @@ draw_pred.Prediction <- function(model, stan_fit, pred) {
       gam_t <- (1 - gamma) / gamma
       alpha <- gam_t * h_s
       beta <- gam_t * (1.0 - h_s)
-      prob <- stats::rbeta(n = L, alpha, beta)
-      y_s <- stats::rbinom(n = L, prob = prob, size = num_trials)
+      prob <- stats::rbeta(n = length(alpha), alpha, beta)
+      y_s <- stats::rbinom(n = length(alpha), prob = prob, size = num_trials)
     } else {
       stop("Unknown obs_model! Please report a bug.")
     }

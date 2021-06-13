@@ -15,26 +15,36 @@
 #' interpretable models
 #'
 #'
-#' @section Specifying and fitting models:
-#' Core functionality of the package consists of creating and fitting an
-#' additive GP model. Main functions are:
+#' @section Core functions:
+#' Main functionality of the package consists of creating and fitting an
+#' additive GP model:
 #' \itemize{
 #'  \item \code{\link{lgp}}: Specify and fit an additive GP model with one
 #'  command.
 #'  \item \code{\link{create_model}}: Define an \linkS4class{lgpmodel} object.
-#'  \item \code{\link{sample_model}}: Sample model parameters and create an
-#'  \linkS4class{lgpfit} object.
-#'  \item \code{\link{optimize_model}} (experimental): Optimize model
-#'  parameters.
+#'  \item \code{\link{sample_model}}: Fit a model by sampling the posterior
+#'  distribution of its parameters and create an \linkS4class{lgpfit} object.
+#'  \item \code{\link{pred}}: Computing model predictions and inferred
+#'  covariate effects after fitting a model.
+#'  \item \code{\link{relevances}}: Assessing covariate relevances after
+#'  fitting a model.
+#'  \item \code{\link{prior_pred:}} Prior predictive sampling to check
+#'  if your prior makes sense.
 #' }
 #'
+#' @section Visualization:
+#' \itemize{
+#'  \item \code{\link{plot_pred}}: Plot model predictions.
+#'  \item \code{\link{plot_components}}: Visualize inferred model components.
+#'  \item \code{\link{plot_draws}}: Visualizing parameter draws.
+#'  \item \code{\link{plot_data}}: Visualizing data.
+#' }
 #' @section Data:
 #' The data that you wish to analyze with \code{lgpr} should be in an R
 #' \code{data.frame} where columns correspond to measured variables and rows
 #' correspond to observations. Some functions that can help working with such
 #' data frames are:
 #' \itemize{
-#'  \item \code{\link{plot_data}}: Visualizing data.
 #'  \item \code{\link{new_x}}: Creating new test points where the posterior
 #'  distribution of any function component or sum of all components, or the
 #'  posterior predictive distribution can be computed after model fitting.

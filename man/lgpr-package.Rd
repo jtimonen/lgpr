@@ -14,18 +14,32 @@ shared, group-specific, non-stationary, heterogeneous and temporally
 uncertain effects. Bayesian inference for model parameters is performed
 using Stan (\code{\link[rstan]{rstan}}).
 }
-\section{Specifying and fitting models}{
+\section{Core functions}{
 
-Core functionality of the package consists of creating and fitting an
-additive GP model. Main functions are:
+Main functionality of the package consists of creating and fitting an
+additive GP model:
 \itemize{
  \item \code{\link{lgp}}: Specify and fit an additive GP model with one
  command.
  \item \code{\link{create_model}}: Define an \linkS4class{lgpmodel} object.
- \item \code{\link{sample_model}}: Sample model parameters and create an
- \linkS4class{lgpfit} object.
- \item \code{\link{optimize_model}} (experimental): Optimize model
- parameters.
+ \item \code{\link{sample_model}}: Fit a model by sampling the posterior
+ distribution of its parameters and create an \linkS4class{lgpfit} object.
+ \item \code{\link{pred}}: Computing model predictions and inferred
+ covariate effects after fitting a model.
+ \item \code{\link{relevances}}: Assessing covariate relevances after
+ fitting a model.
+ \item \code{\link{prior_pred:}} Prior predictive sampling to check
+ if your prior makes sense.
+}
+}
+
+\section{Visualization}{
+
+\itemize{
+ \item \code{\link{plot_pred}}: Plot model predictions.
+ \item \code{\link{plot_components}}: Visualize inferred model components.
+ \item \code{\link{plot_draws}}: Visualizing parameter draws.
+ \item \code{\link{plot_data}}: Visualizing data.
 }
 }
 
@@ -36,7 +50,6 @@ The data that you wish to analyze with \code{lgpr} should be in an R
 correspond to observations. Some functions that can help working with such
 data frames are:
 \itemize{
- \item \code{\link{plot_data}}: Visualizing data.
  \item \code{\link{new_x}}: Creating new test points where the posterior
  distribution of any function component or sum of all components, or the
  posterior predictive distribution can be computed after model fitting.
