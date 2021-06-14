@@ -66,7 +66,7 @@ in the documentation of \linkS4class{lgpmodel}.
 \item \code{get_stanfit}: Get the stored \code{\link[rstan]{stanfit}} object.
 Various properties of the returned object can be accessed or plotted
 as explained
-\href{https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html}{here}
+\href{https://CRAN.R-project.org/package=rstan/vignettes/stanfit-objects.html}{here}
 or in the documentation of \code{\link[rstan]{stanfit}}.
 
 \item \code{is_f_sampled}: Determine if inference was done by sampling

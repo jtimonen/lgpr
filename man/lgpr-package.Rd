@@ -38,8 +38,8 @@ additive GP model:
 \itemize{
  \item \code{\link{plot_pred}}: Plot model predictions.
  \item \code{\link{plot_components}}: Visualize inferred model components.
- \item \code{\link{plot_draws}}: Visualizing parameter draws.
- \item \code{\link{plot_data}}: Visualizing data.
+ \item \code{\link{plot_draws}}: Visualize parameter draws.
+ \item \code{\link{plot_data}}: Visualize longitudinal data.
 }
 }
 
@@ -80,7 +80,7 @@ welcome and appreciated. Create an issue in Github or email the author.
   \item Timonen, J. et al. (2021).
   \emph{lgpr: an interpretable non-parametric method for inferring covariate
   effects from longitudinal data}. Bioinformatics,
-  \href{https://doi.org/10.1093/bioinformatics/btab021}{url}.
+  \href{https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btab021/6104850}{url}.
   \item Carpenter, B. et al. (2017).
   \emph{Stan: A probabilistic programming language}. Journal of Statistical
    Software 76(1).
@@ -89,12 +89,12 @@ welcome and appreciated. Create an issue in Github or email the author.
 \author{
 Juho Timonen (first.last at iki.fi)
 }
-\keyword{Gaussian}
-\keyword{Stan,}
+\keyword{Bayesian}
+\keyword{GP}
+\keyword{Stan}
+\keyword{additive}
 \keyword{covariate}
-\keyword{data,}
 \keyword{interpretable}
 \keyword{longitudinal}
-\keyword{models}
-\keyword{processes,}
-\keyword{relevances,}
+\keyword{model}
+\keyword{relevance}

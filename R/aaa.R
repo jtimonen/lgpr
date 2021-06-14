@@ -11,9 +11,8 @@
 #' using Stan (\code{\link[rstan]{rstan}}).
 #'
 #' @author Juho Timonen (first.last at iki.fi)
-#' @keywords Gaussian processes, longitudinal data, Stan, covariate relevances,
-#' interpretable models
-#'
+#' @keywords longitudinal additive model GP Stan interpretable Bayesian
+#' covariate relevance
 #'
 #' @section Core functions:
 #' Main functionality of the package consists of creating and fitting an
@@ -36,8 +35,8 @@
 #' \itemize{
 #'  \item \code{\link{plot_pred}}: Plot model predictions.
 #'  \item \code{\link{plot_components}}: Visualize inferred model components.
-#'  \item \code{\link{plot_draws}}: Visualizing parameter draws.
-#'  \item \code{\link{plot_data}}: Visualizing data.
+#'  \item \code{\link{plot_draws}}: Visualize parameter draws.
+#'  \item \code{\link{plot_data}}: Visualize longitudinal data.
 #' }
 #' @section Data:
 #' The data that you wish to analyze with \code{lgpr} should be in an R
@@ -76,7 +75,7 @@
 #'   \item Timonen, J. et al. (2021).
 #'   \emph{lgpr: an interpretable non-parametric method for inferring covariate
 #'   effects from longitudinal data}. Bioinformatics,
-#'   \href{https://doi.org/10.1093/bioinformatics/btab021}{url}.
+#'   \href{https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btab021/6104850}{url}.
 #'   \item Carpenter, B. et al. (2017).
 #'   \emph{Stan: A probabilistic programming language}. Journal of Statistical
 #'    Software 76(1).
@@ -543,13 +542,11 @@ validate_lengths <- function(a, b) {
 #' \linkS4class{Prediction} and \linkS4class{GaussianPrediction}.
 NULL
 
-
 #' @describeIn s4_generics Get parameter information (priors etc.).
 setGeneric(
   "parameter_info",
   function(object, digits) standardGeneric("parameter_info")
 )
-
 
 #' @describeIn s4_generics Get component information.
 setGeneric(
@@ -600,7 +597,6 @@ setGeneric(
 setGeneric(
   "clear_postproc", function(object) standardGeneric("clear_postproc")
 )
-
 
 #' @describeIn s4_generics Get number of parameter sets.
 setGeneric(
