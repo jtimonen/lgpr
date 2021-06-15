@@ -1,5 +1,8 @@
 # lgpr 1.1
 
+## 1.1.1
+  * Only small patches in documentation etc. in order to conform to CRAN policies
+  
 ## 1.1.0
   * Adds `prior_pred()` for prior predictive sampling and `sample_param_prior()` for sampling from the parameter prior.
   * Adds `read_proteomics_data()` function.

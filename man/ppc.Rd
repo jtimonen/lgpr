@@ -29,7 +29,7 @@ Graphical posterior predictive checks
 }
 \seealso{
 Introduction to graphical posterior predictive checks:
-\href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}.
+\href{https://CRAN.R-project.org/package=bayesplot/vignettes/graphical-ppcs.html}{here}.
 Prior predictive check can be done by calling
 \code{\link{prior_pred}} and then \code{bayesplot::pp_check()}.
 }

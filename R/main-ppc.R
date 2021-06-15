@@ -12,7 +12,7 @@
 #' @param verbose Can this print any messages?
 #' @return a \code{ggplot} object
 #' @seealso Introduction to graphical posterior predictive checks:
-#' \href{here}{https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html}.
+#' \href{https://CRAN.R-project.org/package=bayesplot/vignettes/graphical-ppcs.html}{here}.
 #' Prior predictive check can be done by calling
 #' \code{\link{prior_pred}} and then \code{bayesplot::pp_check()}.
 ppc <- function(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE,
@@ -36,10 +36,5 @@ ppc <- function(fit, data = NULL, fun = default_ppc_fun(fit), verbose = TRUE,
 
 # Default bayesplot ppc function
 default_ppc_fun <- function(object) {
-  likelihood <- get_obs_model(object)
-  f1 <- bayesplot::ppc_dens_overlay
-  f2 <- bayesplot::ppc_hist
-  fun <- f1
-  check_type(fun, "function")
-  return(fun)
+  bayesplot::ppc_dens_overlay
 }
