@@ -87,6 +87,11 @@ observations.}
 \code{TRUE}, the response variable will be normalized to have zero mean
 and unit variance.}
 }
+\value{
+An object of class \linkS4class{lgpmodel}, containing the
+Stan input created based on parsing the specified \code{formula},
+\code{prior}, and other options.
+}
 \description{
 Create a model
 }

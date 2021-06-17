@@ -1,4 +1,4 @@
-#' Draw pseudo-observations from a predictive distribution
+#' Draw pseudo-observations from the predictive distribution
 #'
 #' @description This doesn't work for \linkS4class{GaussianPrediction} objects
 #' because for memory reasons they don't store the
@@ -6,8 +6,16 @@
 #' @export
 #' @param fit An object of class \linkS4class{lgpfit} that can been created
 #' with \code{sample_f=TRUE}.
-#' @param pred An object of \linkS4class{Prediction}.
+#' @param pred An object of class \linkS4class{Prediction} containing the draws
+#' of \code{f}. If \code{NULL}, this is obtained using \code{get_pred(fit)}.
 #' @family main functions
+#' @return An array with shape \eqn{S x P}, where \eqn{S} is the number of
+#' parameter draws that \code{fit} contains, and \eqn{P} is the number of
+#' points where the predictive distribution draws are obtained. Each row
+#' \eqn{s = 1, \ldots, S} of the output is one vector drawn from the predictive
+#' distribution, given parameter draw \eqn{s}. If \code{fit} was created using
+#' \code{prior_only=TRUE}, then these are draws from the prior predictive
+#' distribution, otherwise from the posterior predictive distribution.
 draw_pred <- function(fit, pred = NULL) {
   check_type(fit, "lgpfit")
   if (!is_f_sampled(fit)) {

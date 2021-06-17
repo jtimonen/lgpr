@@ -11,6 +11,9 @@
 #' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
 #' observations.
 #' @family main functions
+#' @return An object of class \linkS4class{lgpmodel}, containing the
+#' Stan input created based on parsing the specified \code{formula},
+#' \code{prior}, and other options.
 create_model <- function(formula,
                          data,
                          likelihood = "gaussian",

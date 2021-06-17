@@ -425,6 +425,8 @@ data_types <- function(data, y_name, verbose) {
 #' @param num_indiv number of individuals (data simulation)
 #' @param num_timepoints number of time points (data simulation)
 #' @param ... additional arguments to \code{\link{lgp}}
+#' @return An \linkS4class{lgpfit} object created by fitting
+#' the example model.
 example_fit <- function(formula = y ~ id + age + age | SEX + age | LOC,
                         likelihood = "gaussian",
                         chains = 1,

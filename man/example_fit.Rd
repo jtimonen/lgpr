@@ -29,6 +29,10 @@ example_fit(
 
 \item{...}{additional arguments to \code{\link{lgp}}}
 }
+\value{
+An \linkS4class{lgpfit} object created by fitting
+the example model.
+}
 \description{
 Quick way to create an example lgpfit, useful for debugging
 }

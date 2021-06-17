@@ -31,12 +31,21 @@ much smaller (if \code{sample_f=FALSE}).}
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}
 }
+\value{
+\itemize{
+  \item \code{sample_model} returns an object of class \linkS4class{lgpfit}
+  containing the parameter draws, the original \code{model} object,
+  and possible postprocessing results. See documentation of
+  \linkS4class{lgpfit} for more information.
+  \item \code{optimize_model} directly returns the list returned by
+\code{\link[rstan]{optimizing}}. See its documentation for more information.
+}
+}
 \description{
 \itemize{
-  \item The \code{sample_model} function takes an \linkS4class{lgpmodel}
-  object, fits it using \code{\link[rstan]{sampling}}, and
-  returns an object of class \linkS4class{lgpfit}.
-  \item The \code{optimize_model} function takes an \linkS4class{lgpmodel}
+  \item \code{sample_model} takes an \linkS4class{lgpmodel}
+  object and fits it using \code{\link[rstan]{sampling}}.
+  \item \code{optimize_model} takes an \linkS4class{lgpmodel}
   object and fits it using \code{\link[rstan]{optimizing}}.
 }
 }

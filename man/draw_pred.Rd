@@ -2,7 +2,7 @@
 % Please edit documentation in R/main-draw_pred.R
 \name{draw_pred}
 \alias{draw_pred}
-\title{Draw pseudo-observations from a predictive distribution}
+\title{Draw pseudo-observations from the predictive distribution}
 \usage{
 draw_pred(fit, pred = NULL)
 }
@@ -10,7 +10,17 @@ draw_pred(fit, pred = NULL)
 \item{fit}{An object of class \linkS4class{lgpfit} that can been created
 with \code{sample_f=TRUE}.}
 
-\item{pred}{An object of \linkS4class{Prediction}.}
+\item{pred}{An object of class \linkS4class{Prediction} containing the draws
+of \code{f}. If \code{NULL}, this is obtained using \code{get_pred(fit)}.}
+}
+\value{
+An array with shape \eqn{S x P}, where \eqn{S} is the number of
+parameter draws that \code{fit} contains, and \eqn{P} is the number of
+points where the predictive distribution draws are obtained. Each row
+\eqn{s = 1, \ldots, S} of the output is one vector drawn from the predictive
+distribution, given parameter draw \eqn{s}. If \code{fit} was created using
+\code{prior_only=TRUE}, then these are draws from the prior predictive
+distribution, otherwise from the posterior predictive distribution.
 }
 \description{
 This doesn't work for \linkS4class{GaussianPrediction} objects
