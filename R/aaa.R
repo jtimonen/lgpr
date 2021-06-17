@@ -8,7 +8,9 @@
 #' Models are specified using a convenient formula syntax, and can include
 #' shared, group-specific, non-stationary, heterogeneous and temporally
 #' uncertain effects. Bayesian inference for model parameters is performed
-#' using Stan (\code{\link[rstan]{rstan}}).
+#' using Stan (\code{\link[rstan]{rstan}}). The modeling approach and methods
+#' are described in detail in
+#' \href{https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btab021/6104850}{Timonen et al. (2021)}.
 #'
 #' @author Juho Timonen (first.last at iki.fi)
 #' @keywords longitudinal additive model GP Stan interpretable Bayesian

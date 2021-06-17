@@ -22,7 +22,9 @@ sample_param_prior(model, verbose = TRUE, quiet = FALSE, ...)
 \item{verbose}{Should more information and a possible progress bar be
 printed?}
 
-\item{quiet}{Should all output be suppressed?}
+\item{quiet}{This forces \code{verbose} to be \code{FALSE}. If you want
+to suppress also the output from Stan, give the additional argument
+\code{refresh=0}.}
 
 \item{refresh}{Argument for \code{\link[rstan]{sampling}}.}
 

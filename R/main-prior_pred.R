@@ -22,7 +22,9 @@
 #' @inheritParams pred
 #' @param model An object of class \linkS4class{lgpmodel}.
 #' @param refresh Argument for \code{\link[rstan]{sampling}}.
-#' @param quiet Should all output be suppressed?
+#' @param quiet This forces \code{verbose} to be \code{FALSE}. If you want
+#' to suppress also the output from Stan, give the additional argument
+#' \code{refresh=0}.
 #' @param ... Additional arguments for \code{\link[rstan]{sampling}}.
 #' @name prior_pred
 #' @family main functions
