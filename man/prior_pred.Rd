@@ -33,11 +33,9 @@ to suppress also the output from Stan, give the additional argument
 
 \item{...}{Additional arguments for \code{\link[rstan]{sampling}}.}
 }
-\description{
+\value{
 \itemize{
-  \item The \code{prior_pred} function takes an
-  \linkS4class{lgpmodel} object, samples from the prior predictive
-  distribution and returns a list with fields
+  \item \code{prior_pred} returns a list with components
   \itemize{
      \item \code{y_draws}: A matrix containing the prior predictive draws
      as rows. Can be passed to \code{bayesplot::pp_check()} for
@@ -47,10 +45,17 @@ to suppress also the output from Stan, give the additional argument
      \item \code{param_draws}: a \code{stanfit} object of prior parameter
      draws (obtained by calling \code{sample_param_prior} internally)
    }
-  \item The \code{sample_param_prior} function takes an
-  \linkS4class{lgpmodel} object, samples only its parameter prior
-  using \code{\link[rstan]{sampling}} and returns
-  an object of class \code{\link[rstan]{stanfit}}.
+  \item \code{sample_param_prior} returns
+  an object of class \code{\link[rstan]{stanfit}}
+}
+}
+\description{
+These functions take an \linkS4class{lgpmodel} object, and
+\itemize{
+  \item \code{prior_pred} samples from the prior predictive distribution of
+  the model
+  \item \code{sample_param_prior} samples only its parameter prior using
+  \code{\link[rstan]{sampling}}
 }
 }
 \seealso{

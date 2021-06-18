@@ -21,13 +21,20 @@
 
 \item{e2}{The second sum, term or expression}
 }
-\description{
+\value{
+The behaviour and return type depend on the types of \code{e1} and \code{e2}.
+You can
 \itemize{
-  \item Sum two \linkS4class{lgprhs}'s to yield an \linkS4class{lgprhs}
-  \item Sum two \linkS4class{lgpterm}'s to yield an \linkS4class{lgprhs}
-  \item Sum an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
+  \item sum (\code{+}) two \linkS4class{lgprhs}'s to yield an
+  \linkS4class{lgprhs}
+  \item sum (\code{+}) two \linkS4class{lgpterm}'s to yield an
+  \linkS4class{lgprhs}
+  \item sum (\code{+}) an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
   to yield an \linkS4class{lgprhs}
-  \item Multiply two \linkS4class{lgpterm}'s to yield
+  \item multiply (\code{*}) two \linkS4class{lgpterm}'s to yield
   an \linkS4class{lgpterm}
 }
+}
+\description{
+Operations on formula terms and expressions
 }

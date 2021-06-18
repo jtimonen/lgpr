@@ -50,6 +50,33 @@ num_components(object)
 
 \item{...}{additional optional arguments to pass}
 }
+\value{
+\itemize{
+   \item \code{parameter_info} returns a data frame with
+   one row for each parameter and columns
+   for parameter name, parameter bounds, and the assigned prior
+   \item \code{component_info} returns a data frame with one row for
+   each model component, and columns encoding information about
+   model components
+   \item \code{covariate_info} returns a list with names
+   \code{continuous} and \code{categorical}, with information about
+   both continuous and categorical covariates
+   \item \code{component_names} returns a character vector with
+   component names
+   \item \code{get_model} for \linkS4class{lgpfit} objects
+   returns an \linkS4class{lgpmodel}
+   \item \code{is_f_sampled} returns a logical value
+   \item \code{get_stanfit} returns a \code{stanfit} (rstan)
+   \item \code{postproc} applies postprocessing and returns an
+   updated \linkS4class{lgpfit}
+   \item \code{clear_postproc} removes postprocessing information and
+   returns an updated \linkS4class{lgpfit}
+   \item \code{num_paramsets}, \code{num_evalpoints} and
+   \code{num_components} return an integer
+
+
+}
+}
 \description{
 S4 generics for lgpfit, lgpmodel, and other objects
 }

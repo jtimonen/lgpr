@@ -1,23 +1,12 @@
 #' Prior (predictive) sampling
 #'
 #' @description
+#' These functions take an \linkS4class{lgpmodel} object, and
 #' \itemize{
-#'   \item The \code{prior_pred} function takes an
-#'   \linkS4class{lgpmodel} object, samples from the prior predictive
-#'   distribution and returns a list with fields
-#'   \itemize{
-#'      \item \code{y_draws}: A matrix containing the prior predictive draws
-#'      as rows. Can be passed to \code{bayesplot::pp_check()} for
-#'      graphical prior predictive checking.
-#'      \item \code{pred_draws}: an object of class \linkS4class{Prediction},
-#'      containing prior draws of each model component and their sum
-#'      \item \code{param_draws}: a \code{stanfit} object of prior parameter
-#'      draws (obtained by calling \code{sample_param_prior} internally)
-#'    }
-#'   \item The \code{sample_param_prior} function takes an
-#'   \linkS4class{lgpmodel} object, samples only its parameter prior
-#'   using \code{\link[rstan]{sampling}} and returns
-#'   an object of class \code{\link[rstan]{stanfit}}.
+#'   \item \code{prior_pred} samples from the prior predictive distribution of
+#'   the model
+#'   \item \code{sample_param_prior} samples only its parameter prior using
+#'   \code{\link[rstan]{sampling}}
 #' }
 #' @inheritParams pred
 #' @param model An object of class \linkS4class{lgpmodel}.
@@ -28,6 +17,21 @@
 #' @param ... Additional arguments for \code{\link[rstan]{sampling}}.
 #' @name prior_pred
 #' @family main functions
+#' @return
+#' \itemize{
+#'   \item \code{prior_pred} returns a list with components
+#'   \itemize{
+#'      \item \code{y_draws}: A matrix containing the prior predictive draws
+#'      as rows. Can be passed to \code{bayesplot::pp_check()} for
+#'      graphical prior predictive checking.
+#'      \item \code{pred_draws}: an object of class \linkS4class{Prediction},
+#'      containing prior draws of each model component and their sum
+#'      \item \code{param_draws}: a \code{stanfit} object of prior parameter
+#'      draws (obtained by calling \code{sample_param_prior} internally)
+#'    }
+#'   \item \code{sample_param_prior} returns
+#'   an object of class \code{\link[rstan]{stanfit}}
+#' }
 NULL
 
 #' @rdname prior_pred

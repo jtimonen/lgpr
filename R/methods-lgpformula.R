@@ -25,18 +25,22 @@ setMethod("as.character", "lgpformula", function(x) {
 
 #' Operations on formula terms and expressions
 #'
-#' @description
-#' \itemize{
-#'   \item Sum two \linkS4class{lgprhs}'s to yield an \linkS4class{lgprhs}
-#'   \item Sum two \linkS4class{lgpterm}'s to yield an \linkS4class{lgprhs}
-#'   \item Sum an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
-#'   to yield an \linkS4class{lgprhs}
-#'   \item Multiply two \linkS4class{lgpterm}'s to yield
-#'   an \linkS4class{lgpterm}
-#' }
 #' @param e1 The first sum, term or expression
 #' @param e2 The second sum, term or expression
 #' @name operations
+#' @return
+#' The behaviour and return type depend on the types of \code{e1} and \code{e2}.
+#' You can
+#' \itemize{
+#'   \item sum (\code{+}) two \linkS4class{lgprhs}'s to yield an
+#'   \linkS4class{lgprhs}
+#'   \item sum (\code{+}) two \linkS4class{lgpterm}'s to yield an
+#'   \linkS4class{lgprhs}
+#'   \item sum (\code{+}) an \linkS4class{lgprhs} and an \linkS4class{lgpterm}
+#'   to yield an \linkS4class{lgprhs}
+#'   \item multiply (\code{*}) two \linkS4class{lgpterm}'s to yield
+#'   an \linkS4class{lgpterm}
+#' }
 NULL
 
 #' @rdname operations
