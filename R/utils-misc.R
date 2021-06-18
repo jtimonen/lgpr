@@ -452,14 +452,6 @@ example_fit <- function(formula = y ~ id + age + age | SEX + age | LOC,
   )
 }
 
-# Neat way to print dimension of an array
-print_arr_dim <- function(x) {
-  name <- deparse(substitute(x))
-  dim_str <- paste(dim(x), collapse = ", ")
-  desc <- paste0(" * dim(", name, ") = c(", dim_str, ")", sep = "")
-  log_info(desc, TRUE)
-}
-
 
 # Get total number of post-warmup draws from stanfit
 get_num_postwarmup_draws <- function(stan_fit) {
