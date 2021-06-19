@@ -1,5 +1,8 @@
 # lgpr 1.1
 
+## 1.1.3
+  * First CRAN release.
+  
 ## 1.1.1-1.1.2
   * Only small patches in documentation etc. in order to conform to CRAN policies
   

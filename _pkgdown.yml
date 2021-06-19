@@ -5,7 +5,7 @@ template:
 reference:
 - title: "Public API"
   desc: "Functions that are exported from the package namespace."
-- contents: 
+- contents:
   - add_dis_age 
   - add_factor 
   - adjusted_c_hat 
