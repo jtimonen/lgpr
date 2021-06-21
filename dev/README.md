@@ -9,7 +9,17 @@ itself. They are supposed to be run while in the package root directory.
 * `lint.R` finds styling errors in the package code
 * (`cpp.R` builds the Stan functions into C++ code)
 
-## Test suite output
+## Dev notes
+
+### CRAN comments to v1.1.3 submission
+
+P.S. For future submissions/updates: Please always write package names,
+software names and API (application programming interface) names in
+single quotes in title and description. e.g: Stan --> 'Stan'
+
+
+
+### Test suite output
 
 * Version: `1.1.0`
 * Date: `13th June 2021`
