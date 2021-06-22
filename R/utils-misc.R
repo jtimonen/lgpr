@@ -17,6 +17,7 @@ log_progress <- function(msg, verbose = TRUE) {
 # @return Returns \code{object[[var_name, exact = TRUE]]} if variable
 # exists.
 dollar <- function(object, var_name) {
+  check_not_null(object)
   check_not_null(var_name)
   obj_name <- deparse(substitute(object))
   nams <- names(object)

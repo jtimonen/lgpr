@@ -466,16 +466,25 @@ Prediction <- setClass("Prediction",
 
 #' An S4 class to represent input for kernel matrix computations
 #'
-#' @slot input a list
-#' @slot init a list
-#' @slot param_draws formatted parameter draws
-#' @slot STREAM external pointer (for calling Stan functions)
+#' @slot input Common input (for example parameter values).
+#' @slot K_input Input for computing kernel matrices between data points
+#' (\code{N} x \code{N}). A list.
+#' @slot Ks_input Input for computing kernel matrices between data and output
+#' points (\code{P} x \code{N}). A list.
+#' @slot Kss_input Input for computing kernel matrices between output
+#' points (\code{P} x \code{P}). A list, empty if \code{full_covariance=FALSE}.
+#' @slot comp_names Component names (character vector).
+#' @slot full_covariance Boolean value.
+#' @slot STREAM external pointer (for calling 'Stan' functions)
 #' @param object The object for which to call a class method.
 KernelComputer <- setClass("KernelComputer",
   representation = representation(
     input = "list",
-    init = "list",
-    param_draws = "list",
+    K_input = "list",
+    Ks_input = "list",
+    Kss_input = "list",
+    comp_names = "character",
+    full_covariance = "logical",
     STREAM = "externalptr"
   )
 )

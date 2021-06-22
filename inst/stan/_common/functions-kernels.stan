@@ -1,34 +1,3 @@
-  // Input warping function
-  vector STAN_warp_input(vector x, real a){
-    return( -1 + 2*inv(1+exp(-a*x)) );
-  }
-  
-  // Variance masking function
-  vector STAN_var_mask(vector x, real a){
-    return( inv(1+exp(-a*x)) );
-  }
-  
-  // Expand a vector
-  vector STAN_expand(vector v, data int[] idx_expand){
-    int L = num_elements(v);
-    vector[L+1] v_add0 = rep_vector(0.0, L+1);
-    v_add0[2:(L+1)] = v;
-    return(v_add0[idx_expand]);
-  }
-  
-  // Edit a continuous covariate according to sampled uncertainty
-  vector STAN_edit_x_cont(
-    vector x_cont,
-    data int[] idx_expand,
-    data vector teff_obs,
-    vector teff)
-  {
-    int n = num_elements(x_cont);
-    vector[n] x_teff_obs = STAN_expand(teff_obs, idx_expand);
-    vector[n] x_teff = STAN_expand(teff, idx_expand);
-    return(x_cont + x_teff_obs - x_teff);
-  }
-  
   // Categorical zero-sum kernel
   matrix STAN_kernel_zerosum(data int[] x1, data int[] x2, data int num_cat) {
     int n1 = size(x1); 
@@ -59,7 +28,7 @@
     return(K);
   }
   
-  // BINARY MASK KERNEL
+  // Binary mask kernel
   matrix STAN_kernel_bin(data int[] x1, data int[] x2) {
     int n1 = size(x1);
     int n2 = size(x2);

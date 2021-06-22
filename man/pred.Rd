@@ -12,7 +12,8 @@ pred(
   verbose = TRUE,
   STREAM = get_stream(),
   c_hat_pred = NULL,
-  force = FALSE
+  force = FALSE,
+  full_covariance = FALSE
 )
 }
 \arguments{
@@ -46,6 +47,12 @@ use the same constant.}
 \item{force}{This is by default \code{FALSE} to prevent unintended
 large computations that might crash R or take forever. Set it to \code{TRUE}
 try computing no matter what.}
+
+\item{full_covariance}{Should full covariance matrices for the predictive
+distribution and function posterior distributions be computed? If this is
+\code{TRUE}, \code{P x P} matrices, where \code{P=nrow(x)},
+need to be computed and stored a lot of memory is required if \code{P}
+is large.}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or

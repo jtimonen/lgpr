@@ -3,6 +3,7 @@ STAN_HOME <- file.path("inst", "stan")
 FILES <- c(
   "_common/functions-utils.stan",
   "_common/functions-kernels.stan",
+  "_common/functions-kernels_diag.stan",
   "_common/functions-prior.stan"
 )
 

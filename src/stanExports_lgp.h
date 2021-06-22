@@ -25,15 +25,15 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(15, 1, "restart", "model_lgp");
     reader.add_event(17, 3, "include", "_common/functions-utils.stan");
     reader.add_event(17, 0, "start", "_common/functions-utils.stan");
-    reader.add_event(37, 20, "end", "_common/functions-utils.stan");
-    reader.add_event(37, 4, "restart", "model_lgp");
-    reader.add_event(37, 4, "include", "_common/functions-prior.stan");
-    reader.add_event(37, 0, "start", "_common/functions-prior.stan");
-    reader.add_event(63, 26, "end", "_common/functions-prior.stan");
-    reader.add_event(63, 5, "restart", "model_lgp");
-    reader.add_event(63, 5, "include", "_common/functions-kernels.stan");
-    reader.add_event(63, 0, "start", "_common/functions-kernels.stan");
-    reader.add_event(314, 251, "end", "_common/functions-kernels.stan");
+    reader.add_event(68, 51, "end", "_common/functions-utils.stan");
+    reader.add_event(68, 4, "restart", "model_lgp");
+    reader.add_event(68, 4, "include", "_common/functions-prior.stan");
+    reader.add_event(68, 0, "start", "_common/functions-prior.stan");
+    reader.add_event(94, 26, "end", "_common/functions-prior.stan");
+    reader.add_event(94, 5, "restart", "model_lgp");
+    reader.add_event(94, 5, "include", "_common/functions-kernels.stan");
+    reader.add_event(94, 0, "start", "_common/functions-kernels.stan");
+    reader.add_event(314, 220, "end", "_common/functions-kernels.stan");
     reader.add_event(314, 6, "restart", "model_lgp");
     reader.add_event(317, 9, "include", "_common/data-general.stan");
     reader.add_event(317, 0, "start", "_common/data-general.stan");
@@ -162,74 +162,6 @@ struct STAN_matrix_array_sum_functor__ {
         return STAN_matrix_array_sum(K, pstream__);
     }
 };
-template <typename T0__, typename T2__>
-typename boost::math::tools::promote_args<T0__, T2__>::type
-STAN_log_prior(const T0__& x,
-                   const std::vector<int>& types,
-                   const std::vector<T2__>& p, std::ostream* pstream__) {
-    typedef typename boost::math::tools::promote_args<T0__, T2__>::type local_scalar_t__;
-    typedef local_scalar_t__ fun_return_scalar_t__;
-    const static bool propto__ = true;
-    (void) propto__;
-        local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
-        (void) DUMMY_VAR__;  // suppress unused var warning
-    int current_statement_begin__ = -1;
-    try {
-        {
-        current_statement_begin__ = 40;
-        local_scalar_t__ log_prior(DUMMY_VAR__);
-        (void) log_prior;  // dummy to suppress unused var warning
-        stan::math::initialize(log_prior, DUMMY_VAR__);
-        stan::math::fill(log_prior, DUMMY_VAR__);
-        stan::math::assign(log_prior,0);
-        current_statement_begin__ = 41;
-        local_scalar_t__ t(DUMMY_VAR__);
-        (void) t;  // dummy to suppress unused var warning
-        stan::math::initialize(t, DUMMY_VAR__);
-        stan::math::fill(t, DUMMY_VAR__);
-        stan::math::assign(t,x);
-        current_statement_begin__ = 44;
-        if (as_bool(logical_eq(get_base1(types, 2, "types", 1), 1))) {
-            current_statement_begin__ = 45;
-            stan::math::assign(log_prior, (log_prior + stan::math::log(stan::math::fabs((2 * x)))));
-            current_statement_begin__ = 46;
-            stan::math::assign(t, square(x));
-        }
-        current_statement_begin__ = 50;
-        if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 2))) {
-            current_statement_begin__ = 51;
-            stan::math::assign(log_prior, (log_prior + normal_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
-        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 3))) {
-            current_statement_begin__ = 53;
-            stan::math::assign(log_prior, (log_prior + student_t_log(t, get_base1(p, 1, "p", 1), 0.0, 1.0)));
-        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 4))) {
-            current_statement_begin__ = 55;
-            stan::math::assign(log_prior, (log_prior + gamma_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
-        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 5))) {
-            current_statement_begin__ = 57;
-            stan::math::assign(log_prior, (log_prior + inv_gamma_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
-        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 6))) {
-            current_statement_begin__ = 59;
-            stan::math::assign(log_prior, (log_prior + lognormal_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
-        }
-        current_statement_begin__ = 62;
-        return stan::math::promote_scalar<fun_return_scalar_t__>(log_prior);
-        }
-    } catch (const std::exception& e) {
-        stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
-        // Next line prevents compiler griping about no return
-        throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
-    }
-}
-struct STAN_log_prior_functor__ {
-    template <typename T0__, typename T2__>
-        typename boost::math::tools::promote_args<T0__, T2__>::type
-    operator()(const T0__& x,
-                   const std::vector<int>& types,
-                   const std::vector<T2__>& p, std::ostream* pstream__) const {
-        return STAN_log_prior(x, types, p, pstream__);
-    }
-};
 template <typename T0__, typename T1__>
 Eigen::Matrix<typename boost::math::tools::promote_args<T0__, T1__>::type, Eigen::Dynamic, 1>
 STAN_warp_input(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x,
@@ -242,7 +174,7 @@ STAN_warp_input(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x,
         (void) DUMMY_VAR__;  // suppress unused var warning
     int current_statement_begin__ = -1;
     try {
-        current_statement_begin__ = 66;
+        current_statement_begin__ = 41;
         return stan::math::promote_scalar<fun_return_scalar_t__>(add(-(1), multiply(2, inv(add(1, stan::math::exp(multiply(-(a), x)))))));
     } catch (const std::exception& e) {
         stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -270,7 +202,7 @@ STAN_var_mask(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x,
         (void) DUMMY_VAR__;  // suppress unused var warning
     int current_statement_begin__ = -1;
     try {
-        current_statement_begin__ = 71;
+        current_statement_begin__ = 46;
         return stan::math::promote_scalar<fun_return_scalar_t__>(inv(add(1, stan::math::exp(multiply(-(a), x)))));
     } catch (const std::exception& e) {
         stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -299,23 +231,23 @@ STAN_expand(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& v,
     int current_statement_begin__ = -1;
     try {
         {
-        current_statement_begin__ = 76;
+        current_statement_begin__ = 51;
         int L(0);
         (void) L;  // dummy to suppress unused var warning
         stan::math::fill(L, std::numeric_limits<int>::min());
         stan::math::assign(L,num_elements(v));
-        current_statement_begin__ = 77;
+        current_statement_begin__ = 52;
         validate_non_negative_index("v_add0", "(L + 1)", (L + 1));
         Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> v_add0((L + 1));
         stan::math::initialize(v_add0, DUMMY_VAR__);
         stan::math::fill(v_add0, DUMMY_VAR__);
         stan::math::assign(v_add0,rep_vector(0.0, (L + 1)));
-        current_statement_begin__ = 78;
+        current_statement_begin__ = 53;
         stan::model::assign(v_add0, 
                     stan::model::cons_list(stan::model::index_min_max(2, (L + 1)), stan::model::nil_index_list()), 
                     v, 
                     "assigning variable v_add0");
-        current_statement_begin__ = 79;
+        current_statement_begin__ = 54;
         return stan::math::promote_scalar<fun_return_scalar_t__>(stan::model::rvalue(v_add0, stan::model::cons_list(stan::model::index_multi(idx_expand), stan::model::nil_index_list()), "v_add0"));
         }
     } catch (const std::exception& e) {
@@ -347,24 +279,24 @@ STAN_edit_x_cont(const Eigen::Matrix<T0__, Eigen::Dynamic, 1>& x_cont,
     int current_statement_begin__ = -1;
     try {
         {
-        current_statement_begin__ = 89;
+        current_statement_begin__ = 64;
         int n(0);
         (void) n;  // dummy to suppress unused var warning
         stan::math::fill(n, std::numeric_limits<int>::min());
         stan::math::assign(n,num_elements(x_cont));
-        current_statement_begin__ = 90;
+        current_statement_begin__ = 65;
         validate_non_negative_index("x_teff_obs", "n", n);
         Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> x_teff_obs(n);
         stan::math::initialize(x_teff_obs, DUMMY_VAR__);
         stan::math::fill(x_teff_obs, DUMMY_VAR__);
         stan::math::assign(x_teff_obs,STAN_expand(teff_obs, idx_expand, pstream__));
-        current_statement_begin__ = 91;
+        current_statement_begin__ = 66;
         validate_non_negative_index("x_teff", "n", n);
         Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> x_teff(n);
         stan::math::initialize(x_teff, DUMMY_VAR__);
         stan::math::fill(x_teff, DUMMY_VAR__);
         stan::math::assign(x_teff,STAN_expand(teff, idx_expand, pstream__));
-        current_statement_begin__ = 92;
+        current_statement_begin__ = 67;
         return stan::math::promote_scalar<fun_return_scalar_t__>(subtract(add(x_cont, x_teff_obs), x_teff));
         }
     } catch (const std::exception& e) {
@@ -381,6 +313,74 @@ struct STAN_edit_x_cont_functor__ {
                      const Eigen::Matrix<T2__, Eigen::Dynamic, 1>& teff_obs,
                      const Eigen::Matrix<T3__, Eigen::Dynamic, 1>& teff, std::ostream* pstream__) const {
         return STAN_edit_x_cont(x_cont, idx_expand, teff_obs, teff, pstream__);
+    }
+};
+template <typename T0__, typename T2__>
+typename boost::math::tools::promote_args<T0__, T2__>::type
+STAN_log_prior(const T0__& x,
+                   const std::vector<int>& types,
+                   const std::vector<T2__>& p, std::ostream* pstream__) {
+    typedef typename boost::math::tools::promote_args<T0__, T2__>::type local_scalar_t__;
+    typedef local_scalar_t__ fun_return_scalar_t__;
+    const static bool propto__ = true;
+    (void) propto__;
+        local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+        (void) DUMMY_VAR__;  // suppress unused var warning
+    int current_statement_begin__ = -1;
+    try {
+        {
+        current_statement_begin__ = 71;
+        local_scalar_t__ log_prior(DUMMY_VAR__);
+        (void) log_prior;  // dummy to suppress unused var warning
+        stan::math::initialize(log_prior, DUMMY_VAR__);
+        stan::math::fill(log_prior, DUMMY_VAR__);
+        stan::math::assign(log_prior,0);
+        current_statement_begin__ = 72;
+        local_scalar_t__ t(DUMMY_VAR__);
+        (void) t;  // dummy to suppress unused var warning
+        stan::math::initialize(t, DUMMY_VAR__);
+        stan::math::fill(t, DUMMY_VAR__);
+        stan::math::assign(t,x);
+        current_statement_begin__ = 75;
+        if (as_bool(logical_eq(get_base1(types, 2, "types", 1), 1))) {
+            current_statement_begin__ = 76;
+            stan::math::assign(log_prior, (log_prior + stan::math::log(stan::math::fabs((2 * x)))));
+            current_statement_begin__ = 77;
+            stan::math::assign(t, square(x));
+        }
+        current_statement_begin__ = 81;
+        if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 2))) {
+            current_statement_begin__ = 82;
+            stan::math::assign(log_prior, (log_prior + normal_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
+        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 3))) {
+            current_statement_begin__ = 84;
+            stan::math::assign(log_prior, (log_prior + student_t_log(t, get_base1(p, 1, "p", 1), 0.0, 1.0)));
+        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 4))) {
+            current_statement_begin__ = 86;
+            stan::math::assign(log_prior, (log_prior + gamma_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
+        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 5))) {
+            current_statement_begin__ = 88;
+            stan::math::assign(log_prior, (log_prior + inv_gamma_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
+        } else if (as_bool(logical_eq(get_base1(types, 1, "types", 1), 6))) {
+            current_statement_begin__ = 90;
+            stan::math::assign(log_prior, (log_prior + lognormal_log(t, get_base1(p, 1, "p", 1), get_base1(p, 2, "p", 1))));
+        }
+        current_statement_begin__ = 93;
+        return stan::math::promote_scalar<fun_return_scalar_t__>(log_prior);
+        }
+    } catch (const std::exception& e) {
+        stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
+        // Next line prevents compiler griping about no return
+        throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
+    }
+}
+struct STAN_log_prior_functor__ {
+    template <typename T0__, typename T2__>
+        typename boost::math::tools::promote_args<T0__, T2__>::type
+    operator()(const T0__& x,
+                   const std::vector<int>& types,
+                   const std::vector<T2__>& p, std::ostream* pstream__) const {
+        return STAN_log_prior(x, types, p, pstream__);
     }
 };
 Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>

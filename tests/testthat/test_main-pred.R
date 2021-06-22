@@ -53,6 +53,20 @@ test_that("cant accidentally start very large computations", {
   )
 })
 
+
+test_that("fastpred works", {
+  x_pred <- new_x(fit, x_values = seq(0, 200, by = 2))
+  a <- pred(
+    fit = fit, x = x_pred, verbose = FALSE
+  )
+  plt1 <- plot_pred(fit, a)
+  b <- pred(
+    fit = fit, x = x_pred, verbose = FALSE,
+    full_covariance = TRUE
+  )
+})
+
+
 # -------------------------------------------------------------------------
 
 context("Creating Prediction objects")

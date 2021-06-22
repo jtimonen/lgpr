@@ -5,9 +5,21 @@
 \alias{KernelComputer-class}
 \alias{KernelComputer}
 \alias{show,KernelComputer-method}
+\alias{num_components,KernelComputer-method}
+\alias{num_evalpoints,KernelComputer-method}
+\alias{num_paramsets,KernelComputer-method}
+\alias{component_names,KernelComputer-method}
 \title{An S4 class to represent input for kernel matrix computations}
 \usage{
 \S4method{show}{KernelComputer}(object)
+
+\S4method{num_components}{KernelComputer}(object)
+
+\S4method{num_evalpoints}{KernelComputer}(object)
+
+\S4method{num_paramsets}{KernelComputer}(object)
+
+\S4method{component_names}{KernelComputer}(object)
 }
 \arguments{
 \item{object}{The object for which to call a class method.}
@@ -18,17 +30,34 @@ An S4 class to represent input for kernel matrix computations
 \section{Methods (by generic)}{
 \itemize{
 \item \code{show}: Print a summary about the object.
+
+\item \code{num_components}: Get number of components.
+
+\item \code{num_evalpoints}: Get number of evaluation points.
+
+\item \code{num_paramsets}: Get number of parameter sets.
+
+\item \code{component_names}: Get component names.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{input}}{a list}
+\item{\code{input}}{Common input (for example parameter values).}
 
-\item{\code{init}}{a list}
+\item{\code{K_input}}{Input for computing kernel matrices between data points
+(\code{N} x \code{N}). A list.}
 
-\item{\code{param_draws}}{formatted parameter draws}
+\item{\code{Ks_input}}{Input for computing kernel matrices between data and output
+points (\code{P} x \code{N}). A list.}
 
-\item{\code{STREAM}}{external pointer (for calling Stan functions)}
+\item{\code{Kss_input}}{Input for computing kernel matrices between output
+points (\code{P} x \code{P}). A list, empty if \code{full_covariance=FALSE}.}
+
+\item{\code{comp_names}}{Component names (character vector).}
+
+\item{\code{full_covariance}}{Boolean value.}
+
+\item{\code{STREAM}}{external pointer (for calling 'Stan' functions)}
 }}
 
