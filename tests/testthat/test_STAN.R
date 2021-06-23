@@ -103,3 +103,12 @@ test_that("square transform is taken into account", {
     stats::dlnorm((!!x)^2, !!mu, !!sigma, log = TRUE) # -38.5
   )
 })
+
+n1 <- 323
+test_that("input warping function works similarly in R and Stan code", {
+  x <- sort(rnorm(n = n1))
+  a <- 0.3 + runif(1)
+  w1 <- warp_input(x, a)
+  w2 <- STAN_warp_input(x, a, get_stream())
+  expect_equal(w1, w2)
+})

@@ -82,8 +82,8 @@ test_that("kernel_cat works similarly in R and Stan code", {
 })
 
 test_that("kernel_bin works similarly in R and Stan code", {
-  x1 <- sample.int(n = num_categ, size = n1, replace = TRUE)
-  x2 <- sample.int(n = num_categ, size = n2, replace = TRUE)
+  x1 <- sample.int(n = num_categ, size = n1, replace = TRUE) - 1
+  x2 <- sample.int(n = num_categ, size = n2, replace = TRUE) - 1
   K1 <- kernel_bin(x1, x2)
   K2 <- STAN_kernel_bin(x1, x2, get_stream())
   expect_equal(K1, K2)
@@ -122,10 +122,74 @@ test_that("kernel_varmask works similarly in R and Stan code", {
   expect_equal(dim(K1), c(n1, n2))
 })
 
-test_that("input warping function works similarly in R and Stan code", {
+# -------------------------------------------------------------------------
+
+context("Compare diagonal and full versions of Stan kernel functions")
+n1 <- 27
+alpha <- exp(rnorm(1))
+ell <- exp(rnorm(1))
+num_categ <- 3
+
+test_that("STAN_kernel_eq_diag works correctly", {
   x <- sort(rnorm(n = n1))
-  a <- 0.3 + runif(1)
-  w1 <- warp_input(x, a)
-  w2 <- STAN_warp_input(x, a, get_stream())
-  expect_equal(w1, w2)
+  K1 <- STAN_kernel_eq(x, x, alpha, ell, get_stream())
+  D1 <- diag(K1)
+  D2 <- STAN_kernel_eq_diag(length(x), alpha, get_stream())
+  expect_equal(D1, D2)
+  expect_equal(length(D1), n1)
+})
+
+test_that("STAN_kernel_const_diag works correctly (zerosum kernel)", {
+  ktype <- 0 # 0 = zs, 1 = cat, 2 = bin
+  x <- sample.int(n = num_categ, size = n1, replace = TRUE)
+  K1 <- STAN_kernel_const(x, x, ktype, 0, get_stream())
+  D1 <- diag(K1)
+  D2 <- STAN_kernel_const_diag(x, ktype, get_stream())
+  expect_equal(D1, D2)
+  expect_equal(length(D1), n1)
+  expect_equal(prod(D1), 1.0) # should be all ones
+})
+
+test_that("STAN_kernel_const_diag works correctly (categorical kernel)", {
+  ktype <- 1 # 0 = zs, 1 = cat, 2 = bin
+  x <- sample.int(n = num_categ, size = n1, replace = TRUE)
+  K1 <- STAN_kernel_const(x, x, ktype, num_categ, get_stream())
+  D1 <- diag(K1)
+  D2 <- STAN_kernel_const_diag(x, ktype, get_stream())
+  expect_equal(D1, D2)
+  expect_equal(length(D1), n1)
+  expect_equal(prod(D1), 1.0) # should be all ones
+})
+
+test_that("STAN_kernel_const_diag works correctly (binary mask kernel)", {
+  ktype <- 2 # 0 = zs, 1 = cat, 2 = bin
+  x <- sample.int(n = num_categ, size = n1, replace = TRUE) - 1
+  K1 <- STAN_kernel_const(x, x, ktype, 0, get_stream())
+  D1 <- diag(K1)
+  D2 <- STAN_kernel_const_diag(x, ktype, get_stream())
+  expect_equal(D1, D2) # should have ones and zeros
+  expect_equal(length(D1), n1)
+})
+
+test_that("STAN_kernel_beta_diag works correctly", {
+  beta <- c(0.29, 0.1, 0.59, 1.0, 0.43)
+  n_cases <- length(beta)
+  idx_expand <- sample.int(n = n_cases + 1, size = n1, replace = TRUE)
+  # idx = 1 means control, 2-6 are cases with one beta param each
+  K1 <- kernel_beta(beta, idx_expand, idx_expand)
+  D1 <- diag(K1)
+  D2 <- STAN_kernel_beta_diag(beta, idx_expand, get_stream())
+  expect_equal(D1, D2)
+  expect_equal(length(D1), n1)
+})
+
+test_that("kernel_varmask works similarly in R and Stan code", {
+  x <- sort(rnorm(n = n1))
+  a <- 0.23 + runif(1)
+  vm_params <- runif(n = 2)
+  K1 <- kernel_varmask(x, x, a, vm_params)
+  D1 <- diag(K1)
+  D2 <- STAN_kernel_varmask_diag(x, a, vm_params, get_stream())
+  expect_equal(D1, D2)
+  expect_equal(length(D1), n1)
 })

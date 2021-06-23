@@ -7,7 +7,11 @@
     int n = num_elements(x);
     vector[n] K_diag = rep_vector(1.0, n);
     if (kernel_type == 2) {
-      K_diag = 1.0 - to_vector(x); // binary mask: ones if not masked, else 0
+      vector[n] is_zero;
+      for(j in 1:n) {
+        is_zero[j] = (x[j]==0);
+      }
+      K_diag = is_zero; // binary mask: one if both inputs are 0
     }
     return(K_diag);
   }
