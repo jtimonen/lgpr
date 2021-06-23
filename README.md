@@ -15,17 +15,23 @@ See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usa
 * R 3.4 or later is required, R 4.0.2 or later is recommended
 
 ## Installing from CRAN
-The latest CRAN release can be installed simply via
+* The latest released version that is available from CRAN can be installed simply via
 ```r
 install.packages("lgpr")
 ```
-
-## Installing from source (GitHub)
-* Install the latest development version of *lgpr* by running
+* Installing from CRAN is probably the easiest option since they might have binaries for your system (so no need to build the package from source yourself)
+* The latest released version (which might not be in CRAN yet) can be installed via
 ```r
 install.packages('devtools') # if you don't have devtools already
 devtools::install_github('jtimonen/lgpr', dependencies = TRUE)
 ```
+* The latest development version can be installed via
+```r
+devtools::install_github('jtimonen/lgpr', dependencies = TRUE, ref = "develop")
+```
+
+## Installing from source
+* Github installations are source installations.
 * If you have trouble installing the dependency [rstan](https://mc-stan.org/rstan/), see [these instructions](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started)
 * Installing from source requires that you have your toolchain setup properly.
 See the instructions for:
