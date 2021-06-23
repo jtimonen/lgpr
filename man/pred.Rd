@@ -13,7 +13,7 @@ pred(
   STREAM = get_stream(),
   c_hat_pred = NULL,
   force = FALSE,
-  full_covariance = FALSE
+  debug_kc = FALSE
 )
 }
 \arguments{
@@ -48,11 +48,9 @@ use the same constant.}
 large computations that might crash R or take forever. Set it to \code{TRUE}
 try computing no matter what.}
 
-\item{full_covariance}{Should full covariance matrices for the predictive
-distribution and function posterior distributions be computed? If this is
-\code{TRUE}, \code{P x P} matrices, where \code{P=nrow(x)},
-need to be computed and stored a lot of memory is required if \code{P}
-is large.}
+\item{debug_kc}{If this is \code{TRUE}, this only returns a
+\linkS4class{KernelComputer} object that is created internally. Meant for
+debugging.}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or

@@ -12,19 +12,15 @@ create_kernel_computer <- function(model,
   input <- kernelcomp.create_input(model, stan_fit, x, reduce, draws)
 
   # Constant kernel computations and covariate-dependent inputs
-  K_input <- kernelcomp.init(input, FALSE, FALSE, STREAM)
-  if (is.null(x)) {
-    Ks_input <- list()
-    Kss_input <- list()
+  K_input <- kernelcomp.init(input, FALSE, FALSE, STREAM, FALSE)
+  no_separate_output_points <- is.null(x)
+  if (no_separate_output_points) {
     x <- get_data(model)
+    Ks_input <- K_input
   } else {
-    Ks_input <- kernelcomp.init(input, TRUE, FALSE, STREAM)
-    if (full_covariance) {
-      Kss_input <- kernelcomp.init(input, TRUE, TRUE, STREAM)
-    } else {
-      Kss_input <- list() # avoid computing the P x P matrix
-    }
+    Ks_input <- kernelcomp.init(input, TRUE, FALSE, STREAM, FALSE)
   }
+  Kss_input <- kernelcomp.init(input, TRUE, TRUE, STREAM, !full_covariance)
 
   # Return
   new("KernelComputer",
@@ -34,7 +30,8 @@ create_kernel_computer <- function(model,
     Kss_input = Kss_input,
     comp_names = component_names(model),
     full_covariance = full_covariance,
-    STREAM = STREAM
+    STREAM = STREAM,
+    no_separate_output_points = no_separate_output_points
   )
 }
 
@@ -64,7 +61,7 @@ kernel_const_all <- function(input, is_out1, is_out2, STREAM) {
 }
 
 # Compute diagonals of all constant kernel matrices of a model,
-# between outputpoints
+# between output points
 # Input is a list returned by fp_input
 kernel_const_all_diag <- function(input, STREAM) {
 
@@ -73,16 +70,14 @@ kernel_const_all_diag <- function(input, STREAM) {
   x_cont_mask <- matrix_to_list(dollar(input, "x_cont_mask_OUT"))
   n <- dollar(input, "num_OUT")
   components <- matrix_to_list(dollar(input, "components"))
-  x_cat_num_levels <- dollar(input, "x_cat_num_levels")
 
-
-  STAN_kernel_const_all(
-    n, n, x_cat, x_cat, x_cont_mask, x_cont_mask,
-    x_cat_num_levels, components, STREAM
+  # Call Stan function
+  STAN_kernel_const_all_diag(
+    n, x_cat, x_cont_mask, components, STREAM
   )
 }
 
-# Compute all constant kernel matrices given draw idx
+# Compute all kernel matrices given draw idx
 kernel_all <- function(init, input, idx, STREAM) {
   components <- matrix_to_list(dollar(input, "components"))
   vm_params <- dollar(input, "vm_params")
@@ -116,11 +111,45 @@ kernel_all <- function(init, input, idx, STREAM) {
   return(K_all)
 }
 
+
+# Compute all kernel matrices' diagonals given draw idx
+kernel_all_diag <- function(init, input, idx, STREAM) {
+  components <- matrix_to_list(dollar(input, "components"))
+  vm_params <- dollar(input, "vm_params")
+  teff_zero <- matrix_to_list(dollar(input, "teff_zero"))
+
+  # Get parameters in correct format
+  alpha_idx <- dollar(input, "d_alpha")[idx, ]
+  wrp_idx <- dollar(input, "d_wrp")[idx, ]
+  beta_idx <- list(dollar(input, "d_beta")[idx, , ])
+  teff_idx <- list(dollar(input, "d_teff")[idx, , ])
+
+  # Get covariate input in correct format
+  K_const_diag <- dollar(init, "K_const")
+  n <- dollar(init, "n1")
+  x <- dollar(init, "x1")
+  x_unnorm <- dollar(init, "x1_unnorm")
+  idx_expand <- dollar(init, "idx1_expand")
+
+  # Compute kernel diagonals for each component (a list with length num_comps)
+  K_all_diag <- STAN_kernel_all_diag(
+    n, K_const_diag, components,
+    x, x_unnorm, alpha_idx, wrp_idx, beta_idx, teff_idx,
+    vm_params, idx_expand, teff_zero, STREAM
+  )
+  return(K_all_diag)
+}
+
+
 # Initialize kernel matrix computations
-kernelcomp.init <- function(input, is_out1, is_out2, STREAM) {
+kernelcomp.init <- function(input, is_out1, is_out2, STREAM, diag) {
 
   # Compute constant kernel matrices
-  K_const <- kernel_const_all(input, is_out1, is_out2, STREAM)
+  if (diag) {
+    K_const <- kernel_const_all_diag(input, STREAM)
+  } else {
+    K_const <- kernel_const_all(input, is_out1, is_out2, STREAM)
+  }
 
   # Covariate-input field names
   field_name <- function(is_out, base_name) {
@@ -155,7 +184,8 @@ kernelcomp.init <- function(input, is_out1, is_out2, STREAM) {
     n1 = n1,
     n2 = n2,
     idx1_expand = idx1_expand,
-    idx2_expand = idx2_expand
+    idx2_expand = idx2_expand,
+    is_diag = diag
   )
 }
 

@@ -15,7 +15,7 @@ test_that("a KernelComputer can be created and printed", {
   )
   kc <- create_kernel_computer(
     f@model, f@stan_fit,
-    NULL, NULL, NULL, get_stream()
+    NULL, NULL, NULL, FALSE, get_stream()
   )
-  expect_output(print(kc), "Three same matrices: TRUE")
+  expect_output(print(kc), "full_covariance = FALSE")
 })

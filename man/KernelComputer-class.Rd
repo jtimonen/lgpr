@@ -56,7 +56,12 @@ points (\code{P} x \code{P}). A list, empty if \code{full_covariance=FALSE}.}
 
 \item{\code{comp_names}}{Component names (character vector).}
 
-\item{\code{full_covariance}}{Boolean value.}
+\item{\code{full_covariance}}{Boolean value determining if this can compute
+full predictive covariance matrices (or just marginal variance at each point).}
+
+\item{\code{no_separate_output_points}}{Boolean value determining if
+\code{Ks_input} and \code{Kss_input} are the same thing. Using this
+knowledge can reduce unnecessary computations of kernel matrices.}
 
 \item{\code{STREAM}}{external pointer (for calling 'Stan' functions)}
 }}

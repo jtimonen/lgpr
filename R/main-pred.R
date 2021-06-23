@@ -45,11 +45,9 @@
 #' @param force This is by default \code{FALSE} to prevent unintended
 #' large computations that might crash R or take forever. Set it to \code{TRUE}
 #' try computing no matter what.
-#' @param full_covariance Should full covariance matrices for the predictive
-#' distribution and function posterior distributions be computed? If this is
-#' \code{TRUE}, \code{P x P} matrices, where \code{P=nrow(x)},
-#' need to be computed and stored a lot of memory is required if \code{P}
-#' is large.
+#' @param debug_kc If this is \code{TRUE}, this only returns a
+#' \linkS4class{KernelComputer} object that is created internally. Meant for
+#' debugging.
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
 #' @family main functions
@@ -61,7 +59,7 @@ pred <- function(fit,
                  STREAM = get_stream(),
                  c_hat_pred = NULL,
                  force = FALSE,
-                 full_covariance = FALSE) {
+                 debug_kc = FALSE) {
   f_sampled <- is_f_sampled(fit)
   if (!is.null(draws)) reduce <- NULL
 
@@ -71,31 +69,32 @@ pred <- function(fit,
     return(out)
   }
 
-  # Otherwise requires kernel computations
+  # Function posterior computations (requires kernel computations)
   fp <- posterior_f(
-    fit = fit, x = x, reduce = reduce, draws = draws,
-    verbose = verbose, STREAM = STREAM, force = force,
-    full_covariance
+    fit, x, reduce, draws, verbose, STREAM,
+    force, debug_kc
   )
+  if (debug_kc) {
+    return(fp)
+  }
+
+  # Predictive computations (requires kernel computations)
   if (f_sampled) {
     out <- pred_extrapolated_draws(fit, fp, c_hat_pred, verbose)
   } else {
-    out <- pred_gaussian(fit, fp, verbose, full_covariance)
+    out <- pred_gaussian(fit, fp, verbose)
   }
   log_progress("Done.", verbose)
   return(out)
 }
 
 # pred when sample_f = FALSE
-pred_gaussian <- function(fit, fp, verbose, full_covariance) {
+pred_gaussian <- function(fit, fp, verbose) {
   f_mean <- dollar(fp, "f_mean")
   f_std <- dollar(fp, "f_std")
   sigma2 <- dollar(fp, "sigma2")
   y_scl <- dollar(fit@model@var_scalings, "y")
   y_pred <- map_f_to_y(f_mean, f_std, sigma2, y_scl)
-  if (full_covariance) {
-    cat("Full covariance NOT IMPLEMENTeD!")
-  }
   new("GaussianPrediction",
     f_comp_mean = dollar(fp, "f_comp_mean"),
     f_comp_std = dollar(fp, "f_comp_std"),

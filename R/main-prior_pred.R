@@ -113,16 +113,14 @@ draw_prior_pred <- function(model, stan_fit, f_draws, verbose) {
 # @inheritParams pred
 # @return A named list.
 draw_f_prior <- function(model, stan_fit, verbose, STREAM) {
-  kc <- create_kernel_computer(model, stan_fit, NULL, NULL, NULL, STREAM)
-  init <- kc@init
+  kc <- create_kernel_computer(model, stan_fit, NULL, NULL, NULL, FALSE, STREAM)
   input <- kc@input
-  param_draws <- kc@param_draws
-  S <- dollar(init, "S") # number of parameter sets
-  P <- dollar(init, "P") # number of output points
-  J <- dollar(init, "J") # number of components
-  comp_names <- dollar(init, "comp_names")
+  K_input <- kc@K_input
+  S <- num_paramsets(kc) # number of parameter sets
+  P <- num_evalpoints(kc) # number of output points
+  J <- num_components(kc) # number of components
+  comp_names <- component_names(kc)
   delta <- dollar(input, "delta")
-  K_init <- dollar(init, "K_init")
 
   # Create output arrays
   f_draws_comp <- array(0.0, c(S, P, J))
@@ -139,7 +137,7 @@ draw_f_prior <- function(model, stan_fit, verbose, STREAM) {
   for (idx in seq_len(S)) {
 
     # Compute full kernel matrices for one parameter set
-    K_prior <- kernel_all(K_init, input, param_draws, idx, kc@STREAM)
+    K_prior <- kernel_all(K_input, input, idx, kc@STREAM)
 
     # Draw each component
     f_i <- draw_gp_components(K_prior, delta) # dim = (P, J)

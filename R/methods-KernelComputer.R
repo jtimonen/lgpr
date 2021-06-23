@@ -1,9 +1,17 @@
 #' @describeIn KernelComputer Print a summary about the object.
 setMethod("show", "KernelComputer", function(object) {
+  S <- num_paramsets(object)
+  J <- num_components(object)
+  P <- num_evalpoints(object)
   desc <- class_info("KernelComputer")
   add_str <- paste0(
-    " Three same matrices: ",
-    three_matrices_are_same(object), "."
+    "\n - ", S, " parameter sets",
+    "\n - ", J, " components",
+    "\n - ", P, " evaluation points "
+  )
+  add_str <- paste0(add_str)
+  add_str <- paste0(
+    add_str, "\n - full_covariance = ", object@full_covariance, "\n"
   )
   desc <- paste0(desc, add_str)
   cat(desc)
@@ -23,7 +31,7 @@ setMethod("num_evalpoints", "KernelComputer", function(object) {
 
 # Get number of observations from KernelComputer object
 get_num_obs_kc <- function(object) {
-  dollar(object@Ks_input, "n2")
+  dollar(object@K_input, "n1")
 }
 
 #' @describeIn KernelComputer Get number of parameter sets.
@@ -35,9 +43,3 @@ setMethod("num_paramsets", "KernelComputer", function(object) {
 setMethod("component_names", "KernelComputer", function(object) {
   object@comp_names
 })
-
-# Determine if K = Ks = Kss for a KernelComputer
-no_separate_output_points <- function(kc) {
-  L <- length(kc@Ks_input)
-  return(L == 0)
-}

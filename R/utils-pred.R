@@ -25,7 +25,8 @@ posterior_f <- function(fit,
                         verbose = TRUE,
                         STREAM = get_stream(),
                         force = FALSE,
-                        full_covariance = FALSE) {
+                        full_covariance = FALSE,
+                        debug_kc = FALSE) {
 
   # Settings
   if (!is.null(draws)) reduce <- NULL
@@ -36,10 +37,13 @@ posterior_f <- function(fit,
   # Create kernel computer
   model <- get_model(fit)
   stan_fit <- get_stanfit(fit)
+  full_covariance <- FALSE
   kc <- create_kernel_computer(
-    model, stan_fit, x, reduce, draws,
-    full_covariance, STREAM
+    model, stan_fit, x, reduce, draws, full_covariance, STREAM
   )
+  if (debug_kc) {
+    return(kc)
+  }
 
   # Compute the function posteriors for each parameter set
   if (is_f_sampled(fit)) {
@@ -88,13 +92,12 @@ fp_gaussian <- function(kc, sigma2, y, verbose) {
 
     # Compute full kernel matrices for one parameter set
     K_i <- kernel_all(kc@K_input, kc@input, idx, kc@STREAM)
-    if (no_separate_output_points(kc)) {
+    if (kc@no_separate_output_points) {
       Ks_i <- K_i
-      Kss_i <- K_i
     } else {
       Ks_i <- kernel_all(kc@Ks_input, kc@input, idx, kc@STREAM)
-      Kss_i_diag <- kernel_all(kc@Kss_input, kc@input, idx, kc@STREAM)
     }
+    Kss_i_diag <- kernel_all_diag(kc@Kss_input, kc@input, idx, kc@STREAM)
 
     # Perform computations for one parameter set
     fp_i <- fp_gaussian.compute(K_i, Ks_i, Kss_i_diag, sigma2[idx], delta, y)
@@ -124,12 +127,13 @@ fp_gaussian <- function(kc, sigma2, y, verbose) {
 }
 
 # Compute componentwise and total function posteriors
-fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
+fp_gaussian.compute <- function(K, Ks, Kss_diag, sigma2, delta, y) {
 
   # Helper function for linear algebra
+  # See e.g. http://www.gaussianprocess.org/gpml/chapters/RW.pdf Algorithm 2.1
   gp_posterior_helper <- function(Ly, Ks, Kss_diag, v) {
     P <- length(Kss_diag)
-    A <- t(forwardsolve(Ly, t(Ks)))
+    A <- t(forwardsolve(Ly, t(Ks))) # A is (P x N)
     f_post <- matrix(0, P, 2)
     f_post[, 1] <- A %*% v # mean
     f_post[, 2] <- sqrt(Kss_diag - rowSums(A * A)) # sd
@@ -145,7 +149,6 @@ fp_gaussian.compute <- function(K, Ks, Kss, sigma2, delta, y) {
     }
     return(out)
   }
-  Kss_diag <- lapply(Kss, diag) # has the diagonals as elements now
 
   # Setup output arrays
   J <- length(Ks) # number of components
@@ -205,7 +208,7 @@ fp_extrapolate <- function(kc, fp_at_data, verbose) {
 
     # Perform computations for one parameter set
     K_i <- kernel_all(kc@K_input, kc@input, idx, kc@STREAM)
-    if (no_separate_output_points(kc)) {
+    if (kc@no_separate_output_points) {
       Ks_i <- K_i
     } else {
       Ks_i <- kernel_all(kc@Ks_input, kc@input, idx, kc@STREAM)
