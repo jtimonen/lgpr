@@ -14,7 +14,7 @@ See overview, tutorials and documentation at https://jtimonen.github.io/lgpr-usa
 * The package should work on all major operating systems. 
 * R 3.4 or later is required, R 4.0.2 or later is recommended
 
-## Installating from CRAN
+## Installing from CRAN
 * The latest released version that is available from CRAN can be installed simply via
 ```r
 install.packages("lgpr")
