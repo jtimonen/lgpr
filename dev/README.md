@@ -9,6 +9,12 @@ itself. They are supposed to be run while in the package root directory.
 * `lint.R` finds styling errors in the package code
 * (`cpp.R` builds the Stan functions into C++ code)
 
+## CRAN download statistics
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/lgpr)](https://cran.r-project.org/package=lgpr)
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/lgpr)](https://cran.r-project.org/package=lgpr)
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/last-week/lgpr)](https://cran.r-project.org/package=lgpr)
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/last-day/lgpr)](https://cran.r-project.org/package=lgpr)
+
 ## Dev notes
 
 ### CRAN comments to v1.1.3 submission
