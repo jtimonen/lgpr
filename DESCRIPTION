@@ -50,3 +50,4 @@ Suggests:
     covr
 URL: https://github.com/jtimonen/lgpr
 BugReports: https://github.com/jtimonen/lgpr/issues
+VignetteBuilder: knitr

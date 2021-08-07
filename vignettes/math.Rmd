@@ -1,0 +1,80 @@
+---
+title: "Mathematical description of the statistical models in lgpr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mathematical description of the statistical models in lgpr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lgpr)
+```
+
+This vignette describes mathematically the statistical models of `lgpr`, and 
+shows which arguments of the `lgp()` modeling function customize which 
+parts of the probabilistic model.
+
+## Bayesian GP regression
+The models in `lgpr` are models for the conditional distribution 
+$$
+p(y \mid f(\textbf{x}), \theta),
+$$
+of response variable $y$ given covariates $\textbf{x}$, where $\theta_{\text{obs}}$ is a possible parameter of the observation model
+(like the magnitude of observation noise). The function $f$ has a GP prior 
+$$
+f \sim \mathcal{GP}(0, k\left(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})\right),
+$$
+
+with covariance function $k(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})$
+that has hyperparameters $\theta_{\text{GP}}$. In addition to the GP prior for $f$, there is a parameter prior distribution $p(\theta)$ for $\theta = \left\{ \theta_{\text{GP}}, \theta_{\text{obs}} \right\}$. Given $N$ observations $\mathcal{D} = \{y_n, \textbf{x}_n\}_{n=1}^N$
+the probabilistic models in `lgpr` have the form
+\begin{align}
+p\left(\theta, \textbf{f}\right) &= p\left(\textbf{f} \mid \theta\right) \cdot p(\theta) & \text{(prior)} \\
+p(\textbf{y} \mid \textbf{f}, \theta) &= \prod_{n=1}^N p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}}) & \text{(likelihood)},
+\end{align}
+where $\textbf{f} = \left[ f(\textbf{x}_1), \ldots, f(\textbf{x}_N) \right]^{\top}$, $\textbf{y} = \left[y_1, \ldots, y_N\right]^{\top}$. The 
+parameter prior density $p(\theta)$ is the product of the prior densities of each parameter, and the GP prior means that the prior for $\textbf{f}$ is the multivariate normal
+\begin{equation}
+p\left(\textbf{f} \mid \theta\right) = \mathcal{N}\left(\textbf{f} \mid \textbf{0}, \textbf{K} \right),
+ \end{equation}
+ where the $N \times N$ matrix $\textbf{K}$ has entries $\{ \textbf{K} \}_{in} = k(\textbf{x}_i, \textbf{x}_n \mid \theta_{\text{GP}})$.
+
+## Model inference
+After the model is defined, `lgpr` uses the MCMC methods of Stan to obtain draws
+from the posterior
+\begin{equation}
+\label{eq: joint_posterior}
+p\left(\theta, \textbf{f} \mid \mathcal{D}\right) \propto p\left(\theta, \textbf{f}\right) \cdot p(\textbf{y} \mid \textbf{f}, \theta) \\
+\end{equation}
+
+This requires evaluating the right-hand side of \ename~\ref{eq: joint_posterior} and its gradient thousands of times. 
+ 
+If the observation model is Gaussian, $\textbf{f}$ can be analytically marginalized and only the marginal posterior $p\left(\theta \mid \mathcal{D}\right)$ needs to be sampled. This reduces the MCMC dimension by $N$ and likely improves sampling efficiency, but one however needs to evaluate $p(\textbf{y} \mid \theta)$ which is again an $N$-dimensional multivariate Gaussian.
+
+## Additive GP regression
+
+In additive GP regression, function $f = f^{(1)} + \ldots + f^{(J)}$ is modeled so that each component $j = 1, \ldots, J$ is a GP 
+\begin{equation}
+\label{eq: gp}
+f^{(j)} \sim \mathcal{GP}\left(0, k_j(\textbf{x}, \textbf{x}') \right),
+\end{equation}
+independently from other components. This means that 
+\begin{equation}
+\label{eq: additive_gp}
+f \sim \mathcal{GP}\left(0, k(\textbf{x}, \textbf{x}')  \right)  \hspace{0.7cm} \text{with} \hspace{0.7cm} k(\textbf{x}, \textbf{x}')  = \sum_{j=1}^J k_j(\textbf{x}, \textbf{x}’).
+\end{equation}
+and
+\begin{equation}
+\textbf{f}j{j} = \left[f^{(j)}(\textbf{x}_1), \ldots, f^{(j)}(\textbf{x}_N) \right]^\top  \sim \mathcal{N}\left(\textbf{0}, \textbf{K}j{j} \right)
+\end{equation}
+for each vector $\textbf{f}j{j}$, $j = 1, \ldots, J$. The matrix $\textbf{K}j{j}$ is defined so that its elements are $\{ \textbf{K}j{j} \}_{ik} = k_j(\textbf{x}_i,\textbf{x}_k)$. This means that the prior for $\textbf{f} = \textbf{f}j{1} + \ldots + \textbf{f}j{J}$ is $\textbf{f} \sim \mathcal{N}\left(\textbf{0},\textbf{K} \right)$, where $\textbf{K} = \sum_{j=1}^J \textbf{K}j{j}$.
+
+
