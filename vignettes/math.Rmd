@@ -1,6 +1,9 @@
 ---
 title: "Mathematical description of the statistical models in lgpr"
-output: rmarkdown::html_vignette
+author: Juho Timonen
+output:
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Mathematical description of the statistical models in lgpr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include = FALSE}
 library(lgpr)
 ```
 
@@ -47,34 +50,77 @@ p\left(\textbf{f} \mid \theta\right) = \mathcal{N}\left(\textbf{f} \mid \textbf{
  \end{equation}
  where the $N \times N$ matrix $\textbf{K}$ has entries $\{ \textbf{K} \}_{in} = k(\textbf{x}_i, \textbf{x}_n \mid \theta_{\text{GP}})$.
 
-## Model inference
-After the model is defined, `lgpr` uses the MCMC methods of Stan to obtain draws
-from the posterior
-\begin{equation}
-\label{eq: joint_posterior}
-p\left(\theta, \textbf{f} \mid \mathcal{D}\right) \propto p\left(\theta, \textbf{f}\right) \cdot p(\textbf{y} \mid \textbf{f}, \theta) \\
-\end{equation}
+## Connection between lgp() arguments and different model parts
 
-This requires evaluating the right-hand side of \ename~\ref{eq: joint_posterior} and its gradient thousands of times. 
- 
-If the observation model is Gaussian, $\textbf{f}$ can be analytically marginalized and only the marginal posterior $p\left(\theta \mid \mathcal{D}\right)$ needs to be sampled. This reduces the MCMC dimension by $N$ and likely improves sampling efficiency, but one however needs to evaluate $p(\textbf{y} \mid \theta)$ which is again an $N$-dimensional multivariate Gaussian.
+The below table shows which parts of the above mathematical description
+are affected by which arguments to `lgp()` or `create_model()`. You can
+read more about them in the documentation of said functions.
+
+| Argument      | Affected model part                                |
+| ------------- |----------------------------------------------------|
+| `formula`     | $k(\textbf{x}, \textbf{x}')$                       |
+| `data`        | $\mathcal{D}$                                      |
+| `likelihood`  | $p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}})$ |
+| `prior`       | $p(\theta)$                                        |
+| `c_hat`       | $p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}})$ |
+| `num_trials`  | $\mathcal{D}$                                      |
+| `options`     | $k(\textbf{x}, \textbf{x}')$                       |
+
+
+## Observation models
+There are currently five observation models available.
+
+* In the Gaussian observation model (`likelihood="gaussian"`),
+\begin{equation}
+p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}}) = \mathcal{N}(y_n \mid f(\textbf{x}_n), \sigma^2)
+\end{equation}
+$\theta_{\text{obs}}=\sigma$ is a noise magnitude parameter.
+
+* Poisson (`likelihood="poisson"`).
+* Negative binomial (`likelihood="nb"`).
+* Binomial (`likelihood="binomial"`).
+* Beta-binomial (`likelihood="bb"`).
 
 ## Additive GP regression
 
-In additive GP regression, function $f = f^{(1)} + \ldots + f^{(J)}$ is modeled so that each component $j = 1, \ldots, J$ is a GP 
+The GP models of `lgpr` are additive, so that
 \begin{equation}
-\label{eq: gp}
-f^{(j)} \sim \mathcal{GP}\left(0, k_j(\textbf{x}, \textbf{x}') \right),
+ k(\textbf{x}, \textbf{x}')  = \sum_{j=1}^J k_j(\textbf{x}, \textbf{x} \mid \theta_{\text{GP}}’).
 \end{equation}
-independently from other components. This means that 
+This is equivalent to saying that we have $f = f^{(1)} + \ldots + f^{(J)}$
+modeled so that each component $j = 1, \ldots, J$ has a GP prior
 \begin{equation}
-\label{eq: additive_gp}
-f \sim \mathcal{GP}\left(0, k(\textbf{x}, \textbf{x}')  \right)  \hspace{0.7cm} \text{with} \hspace{0.7cm} k(\textbf{x}, \textbf{x}')  = \sum_{j=1}^J k_j(\textbf{x}, \textbf{x}’).
+f^{(j)} \sim \mathcal{GP}\left(0, k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}}) \right),
 \end{equation}
-and
+independently from other components. The number of components $J$ is equal
+to the number of terms that you specify in your `formula`. Each formula
+term defines what the corresponding kernel $k_j$ will be like, and what
+covariates and parameters it depends on.
+
+## Model inference
+
+After the model is defined, `lgpr` uses the MCMC methods of Stan to obtain
+draws from the joint posterior $p\left(\theta, \textbf{f} \mid \mathcal{D}\right)$ or the marginal posterior of parameters, i.e. 
+$p\left(\theta \mid \mathcal{D}\right)$. Which one of these is done is determined by the `sample_f` argument of `lgp()` or `create_model()`.
+
+### With sample_f = TRUE
+This option is always possible but not recommended if `likelihood == "gaussian"`. The joint posterior that is sampled from is
 \begin{equation}
-\textbf{f}j{j} = \left[f^{(j)}(\textbf{x}_1), \ldots, f^{(j)}(\textbf{x}_N) \right]^\top  \sim \mathcal{N}\left(\textbf{0}, \textbf{K}j{j} \right)
+p\left(\theta, \textbf{f} \mid \mathcal{D}\right) \propto p\left(\theta, \textbf{f}\right) \cdot p(\textbf{y} \mid \textbf{f}, \theta) \\
 \end{equation}
-for each vector $\textbf{f}j{j}$, $j = 1, \ldots, J$. The matrix $\textbf{K}j{j}$ is defined so that its elements are $\{ \textbf{K}j{j} \}_{ik} = k_j(\textbf{x}_i,\textbf{x}_k)$. This means that the prior for $\textbf{f} = \textbf{f}j{1} + \ldots + \textbf{f}j{J}$ is $\textbf{f} \sim \mathcal{N}\left(\textbf{0},\textbf{K} \right)$, where $\textbf{K} = \sum_{j=1}^J \textbf{K}j{j}$.
+and sampling requires evaluating the right-hand side and its gradient thousands of times. 
+
+### With sample_f = FALSE
+This option is only possible, and is automatically selected by default,
+if `likelihood == "gaussian"`. This is because $p\left(\theta \mid \mathcal{D}\right)$ is analytically available only in this case. The
+distribution that is sampled from is
+\begin{equation}
+p\left(\theta \mid \mathcal{D}\right) \propto p\left(\theta\right) \cdot p(\textbf{y} \mid \theta) \\
+\end{equation}
+and now sampling requires repeatedly evaluating the right-hand side of this equation and its gradient. This analytical marginalization reduces the MCMC dimension by $N$ and likely improves sampling efficiency. The likelihood is
+\begin{equation}
+p\left(\textbf{y} \mid \theta\right) = \mathcal{N}\left(\textbf{y} \mid \textbf{0}, \textbf{K} + \sigma^2 \textbf{I} \right).
+\end{equation}
+
 
 
