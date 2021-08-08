@@ -61,10 +61,15 @@ reference:
     
 navbar:
   structure:
-    left:  [home, overview, articles, reference, news]
+    left:  [home, overview, tutorials, vignettes, reference, news]
     
   components:
-    articles:
+    vignettes:
+      text: Vignettes
+      menu:
+      - text: Mathematical description of lgpr models
+        href: articles/math.html
+    tutorials:
       text: Tutorials
       menu:
       - text: Basic usage
