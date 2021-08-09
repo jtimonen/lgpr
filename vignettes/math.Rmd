@@ -1,6 +1,7 @@
 ---
 title: "Mathematical description of lgpr models"
 author: Juho Timonen
+date: 9th August 2021
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -8,6 +9,7 @@ vignette: >
   %\VignetteIndexEntry{Mathematical description of lgpr models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: references.json
 ---
 
 ```{r, include = FALSE}
@@ -21,9 +23,9 @@ knitr::opts_chunk$set(
 library(lgpr)
 ```
 
-This vignette describes mathematically the statistical models of `lgpr`, and 
-shows which arguments of the `lgp()` modeling function customize which 
-parts of the probabilistic model.
+This vignette describes mathematically the statistical models of `lgpr`. We
+study the different arguments of the `lgp()` or `create_model()` modeling
+functions and what parts of the probabilistic model they customize.
 
 ## Bayesian GP regression
 The models in `lgpr` are models for the conditional distribution 
@@ -50,7 +52,7 @@ p\left(\textbf{f} \mid \theta\right) = \mathcal{N}\left(\textbf{f} \mid \textbf{
  \end{equation}
  where the $N \times N$ matrix $\textbf{K}$ has entries $\{ \textbf{K} \}_{in} = k(\textbf{x}_i, \textbf{x}_n \mid \theta_{\text{GP}})$.
 
-## Connection between lgp() arguments and different model parts
+## Connection between lgpr arguments and different model parts
 
 The below table shows which parts of the above mathematical description
 are affected by which arguments to `lgp()` or `create_model()`. You can
@@ -68,24 +70,61 @@ read more about them in the documentation of said functions.
 
 
 ## Observation models
-There are currently five observation models available.
+The terms **observation  model** and **likelihood** are used to refer to the same formula, i.e. $p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}})$, though the former means it as a function of $\textbf{y}$ and the latter as a function of $\theta$. There
+are currently five observation models available and they all involve
+an inverse link function transformation
+$$
+h_n = g^{-1}\left(  f(\textbf{x}_n)+ \hat{c}_n \right)
+$$
+where $g$ is determined by the `likelihood` argument and $\hat{c}_n$ by the
+`c_hat` argument. The below table shows what the link function is in different
+cases, and what parameter the corresponding observation model has.
+
+| `likelihood`  | Link function $g$ | Parameter $\theta_{\text{obs}}$|
+| ------------- |-------------------|--------------------------------|
+| `gaussian`    | identity          | $\sigma$                       |
+| `poisson`     | logarithm         | -                              |
+| `nb`          | logarithm         | $\phi$                         |
+| `binomial`    | logit             | -                              |
+| `bb`          | logit             | $\gamma$                       |
+
 
 * In the Gaussian observation model (`likelihood="gaussian"`),
 \begin{equation}
-p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}}) = \mathcal{N}(y_n \mid f(\textbf{x}_n), \sigma^2)
+p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}}) = \mathcal{N}(y_n \mid h_n, \sigma^2)
 \end{equation}
 $\theta_{\text{obs}}=\sigma$ is a noise magnitude parameter.
 
-* Poisson (`likelihood="poisson"`).
-* Negative binomial (`likelihood="nb"`).
-* Binomial (`likelihood="binomial"`).
-* Beta-binomial (`likelihood="bb"`).
+
+* The **Poisson** observation model (`likelihood="poisson"`) for count data is $y_n \sim \text{Poisson}\left(\lambda_n \right)$, where the rate is 
+$\lambda_n = h_n$. 
+
+* In the **negative binomial** (`likelihood="nb"`) model, $\lambda_n$ is gamma-distributed with parameters
+\begin{equation}
+\begin{cases}
+\text{shape} &= \phi \\
+\text{scale} &= \frac{\phi}{h_n}
+\end{cases},
+\end{equation}
+and $\phi > 0$ controls overdispersion so that $\phi \rightarrow \infty$ corresponds to the Poisson model.
+
+* When selecting the binomial or beta-binomial observation model for count data, the number of trials $\eta_n$, for each $n=1, \ldots, N$ has to be supplied using the `num_trials` argument. The **binomial** model (`likelihood="binomial"`) is $y_n \sim \text{Binomial}(h_n, \eta_n)$, where the success probability $\rho_n = h_n$. 
+
+* In the **beta-binomial** model (`likelihood="bb"`), $\rho_i$ is random so that
+\begin{equation}
+\rho_n \sim \text{Beta}\left(h_n \cdot \frac{1 - \gamma}{\gamma}, \  (1-h_n) \cdot \frac{1 - \gamma}{\gamma}\right),
+\end{equation}
+and the parameter $\gamma \in  [0, 1]$ controls overdispersion so that $\gamma \rightarrow 0$ corresponds to the binomial model. 
+
+When using the Gaussian observation model with `sample_f=TRUE` the continuous response $y$ is normalized to unit variance and zero mean, and $\hat{c}_n = 0$ for all $n$ is set. In this case the `c_hat` argument has no effect. With 
+`sample_f = TRUE`, sensible defaults are used. See the documentation
+of the `c_hat` argument of `lgp()` for exact details, and the [Model inference] section below for more information about the `sample_f` argument.
 
 ## Additive GP regression
 
 The GP models of `lgpr` are additive, so that
 \begin{equation}
- k(\textbf{x}, \textbf{x}')  = \sum_{j=1}^J k_j(\textbf{x}, \textbf{x} \mid \theta_{\text{GP}}’).
+ k(\textbf{x}, \textbf{x}')  = \sum_{j=1}^J k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}}).
 \end{equation}
 This is equivalent to saying that we have $f = f^{(1)} + \ldots + f^{(J)}$
 modeled so that each component $j = 1, \ldots, J$ has a GP prior
@@ -95,7 +134,11 @@ f^{(j)} \sim \mathcal{GP}\left(0, k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text
 independently from other components. The number of components $J$ is equal
 to the number of terms that you specify in your `formula`. Each formula
 term defines what the corresponding kernel $k_j$ will be like, and what
-covariates and parameters it depends on.
+covariates and parameters it depends on. 
+
+See @timonen2021 for information about the different kernel functions and
+the "Basic usage" tutorial for information about how they are created based
+of the supplied `formula`.
 
 ## Model inference
 
@@ -122,5 +165,5 @@ and now sampling requires repeatedly evaluating the right-hand side of this equa
 p\left(\textbf{y} \mid \theta\right) = \mathcal{N}\left(\textbf{y} \mid \textbf{0}, \textbf{K} + \sigma^2 \textbf{I} \right).
 \end{equation}
 
-
+## References
 

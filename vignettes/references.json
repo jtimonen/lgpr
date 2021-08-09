@@ -1,0 +1,33 @@
+[
+{
+  "id": "timonen2021",
+  "type": "article-journal",
+  "title": "lgpr: an interpretable non-parametric method for inferring covariate effects from longitudinal data",
+  "container-title": "Bioinformatics",
+  "issued": {
+     "raw": "2021-07-01"
+  },
+  "issue": "13",
+  "volume": "37",
+  "page": "1860-1867",
+  "url": "https://doi.org/10.1093/bioinformatics/btab021",
+  "author": [
+    {
+      "family": "Timonen",
+      "given": "Juho"
+    },
+    {
+      "family": "Mannerström",
+      "given": "Henrik"
+    },
+        {
+      "family": "Vehtari",
+      "given": "Aki"
+    },
+    {
+      "family": "Lähdesmäki",
+      "given": "Harri"
+    }
+  ]
+}
+]
