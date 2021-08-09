@@ -1,5 +1,9 @@
 #' Create a model
 #'
+#' @description See the "Mathematical description of lgpr models" vignette
+#' (\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
+#' for more information about the connection between different options
+#' and the created statistical model.
 #' @export
 #' @inheritParams create_model.formula
 #' @inheritParams create_model.prior

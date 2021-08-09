@@ -4,6 +4,11 @@
 #' @description
 #' Creates an additive Gaussian process model using
 #' \code{\link{create_model}} and fits it using \code{\link{sample_model}}.
+#' See the "Mathematical description of lgpr models" vignette
+#' (\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
+#' for more information about the connection between different options
+#' and the created statistical model.
+#'
 #' @inheritParams create_model
 #' @inheritParams sample_model
 #' @inheritParams optimize_model

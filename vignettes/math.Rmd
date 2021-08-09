@@ -1,11 +1,11 @@
 ---
-title: "Mathematical description of the statistical models in lgpr"
+title: "Mathematical description of lgpr models"
 author: Juho Timonen
 output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Mathematical description of the statistical models in lgpr}
+  %\VignetteIndexEntry{Mathematical description of lgpr models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

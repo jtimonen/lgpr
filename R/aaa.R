@@ -54,7 +54,7 @@
 #'  \code{\link{adjusted_c_hat}}.
 #' }
 #'
-#' @section Tutorials and case studies:
+#' @section Vignettes and tutorials:
 #' See \url{https://jtimonen.github.io/lgpr-usage/index.html}.
 #'
 #' @section Citation:

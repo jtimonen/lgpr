@@ -93,7 +93,10 @@ Stan input created based on parsing the specified \code{formula},
 \code{prior}, and other options.
 }
 \description{
-Create a model
+See the "Mathematical description of lgpr models" vignette
+(\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
+for more information about the connection between different options
+and the created statistical model.
 }
 \seealso{
 Other main functions: 
