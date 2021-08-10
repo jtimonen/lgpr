@@ -1,5 +1,11 @@
 # lgpr 1.1
 
+## 1.1.4
+  * New vignette about mathematical description of models.
+  * Prediction and function posterior computation at `P` points where `P` is
+  larger than number of data points should be now much faster and take
+  less memory, as `P` x `P` matrices are not computed.
+  
 ## 1.1.3
   * First CRAN release.
   

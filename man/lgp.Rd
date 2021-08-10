@@ -2,7 +2,7 @@
 % Please edit documentation in R/main-fit_model.R
 \name{lgp}
 \alias{lgp}
-\title{Main function of the lgpr package}
+\title{Main function of the 'lgpr' package}
 \usage{
 lgp(
   formula,

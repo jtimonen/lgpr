@@ -1,6 +1,6 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 1.1.4.9000
+Version: 1.1.4
 Authors@R:
     c(person(given = "Juho",
            family = "Timonen",
@@ -14,7 +14,7 @@ Description: Interpretable nonparametric modeling of longitudinal data
     Models are specified using a convenient formula syntax, and can include
     shared, group-specific, non-stationary, heterogeneous and temporally
     uncertain effects. Bayesian inference for model parameters is performed
-    using Stan. The modeling approach and methods are described in detail in
+    using 'Stan'. The modeling approach and methods are described in detail in
     Timonen et al. (2021) <doi:10.1093/bioinformatics/btab021>.
 License: GPL (>=3)
 Encoding: UTF-8

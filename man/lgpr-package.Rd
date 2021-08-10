@@ -12,7 +12,7 @@ for inferring covariate effects and assessing covariate relevances.
 Models are specified using a convenient formula syntax, and can include
 shared, group-specific, non-stationary, heterogeneous and temporally
 uncertain effects. Bayesian inference for model parameters is performed
-using Stan (\code{\link[rstan]{rstan}}). The modeling approach and methods
+using 'Stan' (\code{\link[rstan]{rstan}}). The modeling approach and methods
 are described in detail in
 \href{https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btab021/6104850}{Timonen et al. (2021)}.
 }
@@ -47,7 +47,7 @@ additive GP model:
 
 \section{Data}{
 
-The data that you wish to analyze with \code{lgpr} should be in an R
+The data that you wish to analyze with 'lgpr' should be in an \R
 \code{data.frame} where columns correspond to measured variables and rows
 correspond to observations. Some functions that can help working with such
 data frames are:
@@ -67,7 +67,7 @@ See \url{https://jtimonen.github.io/lgpr-usage/index.html}. The
 tutorials focus on code and use cases, whereas the
 "Mathematical description of lgpr models" vignette
 (\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
-describes the statistical models and how they can be customized in `lgpr`.
+describes the statistical models and how they can be customized in 'lgpr'.
 }
 
 \section{Citation}{

@@ -1,4 +1,4 @@
-#' Main function of the lgpr package
+#' Main function of the 'lgpr' package
 #'
 #' @export
 #' @description
