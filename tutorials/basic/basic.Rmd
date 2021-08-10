@@ -19,10 +19,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#")
 knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```
 
-This vignette demonstrates the core functionality of the `lgpr` package. We
+This tutorial demonstrates the core functionality of the `lgpr` package. We
 demonstrate how to visualize data, create and fit and additive GP model,
 study the results, assess covariate relevances and visualize the inferred
-covariate effects. 
+covariate effects. This and other tutorials focus on writing `R` code with the
+package. To learn about the mathematical models, see the
 
 ```{r load}
 require("lgpr")
@@ -72,6 +73,10 @@ plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") + scale_color_
 
 
 # Creating a model
+
+The vignette ["Mathematical description of lgpr models"](https://cran.r-project.org/package=lgpr/vignettes/math.html)
+describes the statistical models and how they can be customized in `lgpr`.
+Here we have code examples.
 
 The class `lgpmodel` represents an additive Gaussian process model. Such models
 can be created in `lgpr` using the function `create_model()`, and they

@@ -63,7 +63,11 @@ data frames are:
 
 \section{Vignettes and tutorials}{
 
-See \url{https://jtimonen.github.io/lgpr-usage/index.html}.
+See \url{https://jtimonen.github.io/lgpr-usage/index.html}. The
+tutorials focus on code and use cases, whereas the
+"Mathematical description of lgpr models" vignette
+(\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
+describes the statistical models and how they can be customized in `lgpr`.
 }
 
 \section{Citation}{

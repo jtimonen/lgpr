@@ -19,15 +19,17 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, include = FALSE}
+```{r setup, include = TRUE}
 library(lgpr)
 ```
 
 This vignette describes mathematically the statistical models of `lgpr`. We
 study the different arguments of the `lgp()` or `create_model()` modeling
 functions and what parts of the probabilistic model they customize.
+This is a concise description, and the original publication (@timonen2021) has more information about the actual
+motivation for the used modeling approaches, and the [tutorials](https://jtimonen.github.io/lgpr-usage/) for code examples.
 
-## Bayesian GP regression
+## 1. Bayesian GP regression
 The models in `lgpr` are models for the conditional distribution 
 $$
 p(y \mid f(\textbf{x}), \theta),
@@ -38,7 +40,7 @@ $$
 f \sim \mathcal{GP}(0, k\left(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})\right),
 $$
 
-with covariance function $k(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})$
+with covariance (kernel) function $k(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})$
 that has hyperparameters $\theta_{\text{GP}}$. In addition to the GP prior for $f$, there is a parameter prior distribution $p(\theta)$ for $\theta = \left\{ \theta_{\text{GP}}, \theta_{\text{obs}} \right\}$. Given $N$ observations $\mathcal{D} = \{y_n, \textbf{x}_n\}_{n=1}^N$
 the probabilistic models in `lgpr` have the form
 \begin{align}
@@ -52,7 +54,7 @@ p\left(\textbf{f} \mid \theta\right) = \mathcal{N}\left(\textbf{f} \mid \textbf{
  \end{equation}
  where the $N \times N$ matrix $\textbf{K}$ has entries $\{ \textbf{K} \}_{in} = k(\textbf{x}_i, \textbf{x}_n \mid \theta_{\text{GP}})$.
 
-## Connection between lgpr arguments and different model parts
+## 2. Connection between lgpr arguments and different model parts
 
 The below table shows which parts of the above mathematical description
 are affected by which arguments to `lgp()` or `create_model()`. You can
@@ -69,78 +71,7 @@ read more about them in the documentation of said functions.
 | `options`     | $k(\textbf{x}, \textbf{x}')$                       |
 
 
-## Observation models
-The terms **observation  model** and **likelihood** are used to refer to the same formula, i.e. $p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}})$, though the former means it as a function of $\textbf{y}$ and the latter as a function of $\theta$. There
-are currently five observation models available and they all involve
-an inverse link function transformation
-$$
-h_n = g^{-1}\left(  f(\textbf{x}_n)+ \hat{c}_n \right)
-$$
-where $g$ is determined by the `likelihood` argument and $\hat{c}_n$ by the
-`c_hat` argument. The below table shows what the link function is in different
-cases, and what parameter the corresponding observation model has.
-
-| `likelihood`  | Link function $g$ | Parameter $\theta_{\text{obs}}$|
-| ------------- |-------------------|--------------------------------|
-| `gaussian`    | identity          | $\sigma$                       |
-| `poisson`     | logarithm         | -                              |
-| `nb`          | logarithm         | $\phi$                         |
-| `binomial`    | logit             | -                              |
-| `bb`          | logit             | $\gamma$                       |
-
-
-* In the Gaussian observation model (`likelihood="gaussian"`),
-\begin{equation}
-p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}}) = \mathcal{N}(y_n \mid h_n, \sigma^2)
-\end{equation}
-$\theta_{\text{obs}}=\sigma$ is a noise magnitude parameter.
-
-
-* The **Poisson** observation model (`likelihood="poisson"`) for count data is $y_n \sim \text{Poisson}\left(\lambda_n \right)$, where the rate is 
-$\lambda_n = h_n$. 
-
-* In the **negative binomial** (`likelihood="nb"`) model, $\lambda_n$ is gamma-distributed with parameters
-\begin{equation}
-\begin{cases}
-\text{shape} &= \phi \\
-\text{scale} &= \frac{\phi}{h_n}
-\end{cases},
-\end{equation}
-and $\phi > 0$ controls overdispersion so that $\phi \rightarrow \infty$ corresponds to the Poisson model.
-
-* When selecting the binomial or beta-binomial observation model for count data, the number of trials $\eta_n$, for each $n=1, \ldots, N$ has to be supplied using the `num_trials` argument. The **binomial** model (`likelihood="binomial"`) is $y_n \sim \text{Binomial}(h_n, \eta_n)$, where the success probability $\rho_n = h_n$. 
-
-* In the **beta-binomial** model (`likelihood="bb"`), $\rho_i$ is random so that
-\begin{equation}
-\rho_n \sim \text{Beta}\left(h_n \cdot \frac{1 - \gamma}{\gamma}, \  (1-h_n) \cdot \frac{1 - \gamma}{\gamma}\right),
-\end{equation}
-and the parameter $\gamma \in  [0, 1]$ controls overdispersion so that $\gamma \rightarrow 0$ corresponds to the binomial model. 
-
-When using the Gaussian observation model with `sample_f=TRUE` the continuous response $y$ is normalized to unit variance and zero mean, and $\hat{c}_n = 0$ for all $n$ is set. In this case the `c_hat` argument has no effect. With 
-`sample_f = TRUE`, sensible defaults are used. See the documentation
-of the `c_hat` argument of `lgp()` for exact details, and the [Model inference] section below for more information about the `sample_f` argument.
-
-## Additive GP regression
-
-The GP models of `lgpr` are additive, so that
-\begin{equation}
- k(\textbf{x}, \textbf{x}')  = \sum_{j=1}^J k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}}).
-\end{equation}
-This is equivalent to saying that we have $f = f^{(1)} + \ldots + f^{(J)}$
-modeled so that each component $j = 1, \ldots, J$ has a GP prior
-\begin{equation}
-f^{(j)} \sim \mathcal{GP}\left(0, k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}}) \right),
-\end{equation}
-independently from other components. The number of components $J$ is equal
-to the number of terms that you specify in your `formula`. Each formula
-term defines what the corresponding kernel $k_j$ will be like, and what
-covariates and parameters it depends on. 
-
-See @timonen2021 for information about the different kernel functions and
-the "Basic usage" tutorial for information about how they are created based
-of the supplied `formula`.
-
-## Model inference
+## 3. Model inference
 
 After the model is defined, `lgpr` uses the MCMC methods of Stan to obtain
 draws from the joint posterior $p\left(\theta, \textbf{f} \mid \mathcal{D}\right)$ or the marginal posterior of parameters, i.e. 
@@ -164,6 +95,168 @@ and now sampling requires repeatedly evaluating the right-hand side of this equa
 \begin{equation}
 p\left(\textbf{y} \mid \theta\right) = \mathcal{N}\left(\textbf{y} \mid \textbf{0}, \textbf{K} + \sigma^2 \textbf{I} \right).
 \end{equation}
+
+## 4. The `likelihood` argument and observation models
+The terms **observation  model** and **likelihood** are used to refer to the same formula, i.e. $p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}})$, though the former means it as a function of $\textbf{y}$ and the latter as a function of $\theta$. There
+are currently five observation models available and they all involve
+an inverse link function transformation
+$$
+h_n = g^{-1}\left(  f(\textbf{x}_n)+ \hat{c}_n \right)
+$$
+where $g$ is determined by the `likelihood` argument and $\hat{c}_n$ by the
+`c_hat` argument. The below table shows what the link function is in different
+cases, and what parameter the corresponding observation model has.
+
+| `likelihood`  | Link function $g$ | Parameter $\theta_{\text{obs}}$|
+| ------------- |-------------------|--------------------------------|
+| `gaussian`    | identity          | $\sigma$                       |
+| `poisson`     | logarithm         | -                              |
+| `nb`          | logarithm         | $\phi$                         |
+| `binomial`    | logit             | -                              |
+| `bb`          | logit             | $\gamma$                       |
+
+
+* In the **Gaussian** observation model (`likelihood="gaussian"`),
+$$
+p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}}) = \mathcal{N}(y_n \mid h_n, \sigma^2)
+$$
+$\theta_{\text{obs}}=\sigma$ is a noise magnitude parameter.
+
+
+* The **Poisson** observation model (`likelihood="poisson"`) for count data is 
+$$
+y_n \sim \text{Poisson}\left(\lambda_n \right),
+$$
+where the rate is $\lambda_n = h_n$. 
+
+* In the **negative binomial** (`likelihood="nb"`) model, $\lambda_n$ is gamma-distributed with parameters
+$$
+\begin{cases}
+\text{shape} &= \phi \\
+\text{scale} &= \frac{\phi}{h_n}
+\end{cases},
+$$
+and $\phi > 0$ controls overdispersion so that $\phi \rightarrow \infty$ corresponds to the Poisson model.
+
+* When selecting the binomial or beta-binomial observation model for count data, the number of trials $\eta_n$, for each $n=1, \ldots, N$ has to be supplied using the `num_trials` argument. The **binomial** model (`likelihood="binomial"`) is
+$$
+y_n \sim \text{Binomial}(h_n, \eta_n),
+$$
+where the success probability $\rho_n = h_n$. 
+
+* In the **beta-binomial** model (`likelihood="bb"`), $\rho_i$ is random so that
+$$
+\rho_n \sim \text{Beta}\left(h_n \cdot \frac{1 - \gamma}{\gamma}, \  (1-h_n) \cdot \frac{1 - \gamma}{\gamma}\right),
+$$
+and the parameter $\gamma \in  [0, 1]$ controls overdispersion so that $\gamma \rightarrow 0$ corresponds to the binomial model. 
+
+When using the Gaussian observation model with `sample_f=TRUE` the continuous response $y$ is normalized to unit variance and zero mean, and $\hat{c}_n = 0$ for all $n$ is set. In this case the `c_hat` argument has no effect. With 
+`sample_f = TRUE`, sensible defaults are used. See the documentation
+of the `c_hat` argument of `lgp()` for exact details.
+
+## 5. The `formula` argument and kernel functions
+
+### Additive GP regression
+
+The GP models of `lgpr` are additive, so that
+\begin{equation}
+ k(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})  = \sum_{j=1}^J \alpha_j^2 k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}}).
+\end{equation}
+This is equivalent to saying that we have $f = f^{(1)} + \ldots + f^{(J)}$
+modeled so that each component $j = 1, \ldots, J$ has a GP prior
+\begin{equation}
+f^{(j)} \sim \mathcal{GP}\left(0, \alpha_j^2 k_j(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}}) \right),
+\end{equation}
+independently from other components. 
+
+### Formulas and terms
+The number of components $J$ is equal to the number of terms in your `formula`. Terms are separated by a plus sign.
+An example formula with three terms could be 
+
+```{r formula, include = TRUE}
+my_formula <- y ~ gp(age) + gp(age)*zs(id) + cat(group)
+print(my_formula)
+```
+
+where `age`, `id` and `group` are columns of `data`. Each formula term defines what the corresponding kernel $k_j$ will be like, and what covariates and parameters it depends on. Each term adds one $\alpha$ parameter
+in the GP parameter vector $\theta_{\text{GP}}$, and
+possible additional parameters depending on the term.
+
+### Expressions and kernels
+Each term is a product (separated by `*`) of what we call expressions.
+At this point we are not using standard R formula terminology because terms
+in `lgpr` are parsed in a custom way. Each expression corresponds to one
+kernel, and the kernel $k_j$ is the product of all the kernels in
+term $j$. Inside parentheses, each expression must contain the name of one `data`
+variable, as in `gp(age)`. This determines what variable the kernel depends on. Most of the allowed expressions, their corresponding kernels, and allowed variable types are listed below.
+
+| Expression  | Corresponding kernel         | Allowed variable type |
+| ------------|------------------------------|-----------------------|
+| `gp()`      | Exponentiated quadratic (EQ) | Continuous            |  
+| `zs()`      | Zero-sum (ZS)                | Categorical           | 
+| `cat()`     | Categorical (CAT)            | Categorical           | 
+| `gp_ns()`   | Nonstationary (NS)           | Continuous            | 
+| `gp_vm()`   | Variance-mask (VM)           | Continuous            | 
+
+Continuous covariates should be represented in `data` as `numeric` and 
+categorical covariates as `factor`s. Equations for different kernels are
+listed here briefly. See @timonen2021 for more motivation and details
+about what kind of effects they can model alone and in combinations.
+
+* The EQ kernel is
+$$
+k_{\text{EQ}}(x,x' \mid \theta_{\text{GP}}) = \exp \left( -\frac{(x-x')^2}{2 \ell^2}\right)
+$$
+and it has the lengthscale parameter $\ell$. Each EQ kernel adds one lengthscale parameter to $\theta_{\text{GP}}$.
+
+* The ZS kernel is
+\begin{equation}
+    k_{\text{ZS}}(z, z') = 
+    \begin{cases} 1 \ \ \ \text{   if   } z = z' \\
+    \frac{1}{1 - M} \ \ \ \text{   if   } z \neq z'
+    \end{cases}
+\end{equation}
+where $M$ is the number of different categories for covariate $z$.
+
+* The CAT kernel is
+\begin{equation}
+    k_{\text{CAT}}(z, z') = 
+    \begin{cases} 1 \ \ \ \text{   if   } z = z' \\
+    0 \ \ \ \text{   if   } z \neq z'
+    \end{cases}
+\end{equation}
+
+* The NS kernel is
+\begin{equation}
+    k_{\text{NS}}(x, x' \mid a, \ell) =  k_{\text{EQ}}(\omega_a(x), \omega_a(x') \mid \ell),
+\end{equation}
+where $\omega_a: \mathbb{R} \rightarrow ]-1,1[$ is an input warping function
+\begin{equation}
+    \omega_a(x) = 2 \cdot \left(\frac{1}{1 + e^{-a x}} - \frac{1}{2} \right),
+\end{equation}
+Each NS kernel adds one lengthscale parameter $\ell$ and one warping steepness
+parameter $a$ to $\theta_{\text{GP}}$.
+
+* The VM kernel is
+\begin{equation}
+    k_{\text{VM}}(x, x' \mid a, \ell) = f^a_{\text{VM}}(x) \cdot  f^a_{\text{VM}}(x') \cdot k_{\text{NS}}(x, x' \mid a, \ell), 
+\end{equation}
+where $f^a_{\text{VM}}(x) = \frac{1}{1 + e^{-a h_2 (x-r)}}$ and
+$r = \frac{1}{a} \text{logit}(h_1)$. The parameters $h_1$ and $h_2$ are 
+determined by `opt$vm_params[1]` and `opt$vm_params[2]`, respectively,
+where `opt` is the `options` argument given to `lgp()`. Each VM kernel adds one lengthscale parameter $\ell$ and one warping steepness
+parameter $a$ to $\theta_{\text{GP}}$.
+
+### Masking missing covariates
+All kernels that work with continuous covariates are actually also multiplied by a binary mask (BIN) kernel $k_{\text{BIN}}(x,x')$ which returns $0$ if either $x$ or $x'$ is missing and $1$ if they are both available. Missing data should
+be encoded as `NA` or `NaN` in `data`.
+
+### Heterogeneous effects and covariate uncertainty
+There are also the `het()` and `unc()` expressions. They cannot be
+alone in a term but have to be multiplied by EQ, NS and VM. They are not 
+actually kernels alone but edit the covariate or kernel of their term
+and add additional parameters. See the tutorials
+for example use cases and @timonen2021 for their mathematical definition.
 
 ## References
 
