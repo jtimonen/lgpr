@@ -174,7 +174,7 @@ The number of components $J$ is equal to the number of terms in your `formula`. 
 An example formula with three terms could be 
 
 ```{r formula, include = TRUE}
-my_formula <- y ~ gp(age) + gp(age)*zs(id) + cat(group)
+my_formula <- y ~ gp(age) + gp(age)*zs(id) + categ(group)
 print(my_formula)
 ```
 
@@ -194,7 +194,7 @@ variable, as in `gp(age)`. This determines what variable the kernel depends on. 
 | ------------|------------------------------|-----------------------|
 | `gp()`      | Exponentiated quadratic (EQ) | Continuous            |  
 | `zs()`      | Zero-sum (ZS)                | Categorical           | 
-| `cat()`     | Categorical (CAT)            | Categorical           | 
+| `categ()`   | Categorical (CAT)            | Categorical           | 
 | `gp_ns()`   | Nonstationary (NS)           | Continuous            | 
 | `gp_vm()`   | Variance-mask (VM)           | Continuous            | 
 

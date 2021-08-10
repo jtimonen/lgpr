@@ -26,11 +26,11 @@ Installing from CRAN is probably the easiest option since they might have binari
 * The latest released version (which might not be in CRAN yet) can be installed via
 ```r
 install.packages('devtools') # if you don't have devtools already
-devtools::install_github('jtimonen/lgpr', dependencies = TRUE)
+devtools::install_github('jtimonen/lgpr', build_vignettes = TRUE)
 ```
 * The latest development version can be installed via
 ```r
-devtools::install_github('jtimonen/lgpr', dependencies = TRUE, ref = "develop")
+devtools::install_github('jtimonen/lgpr', ref = "develop")
 ``` 
 Github installations are source installations (they require a C++ compiler).
 
