@@ -259,13 +259,14 @@ prevent_too_large_mats <- function(fit, x, reduce, draws, verbose, force) {
   J <- length(component_names(fit@model))
   N <- get_num_obs(fit)
   P <- if (is.null(x)) N else nrow(x)
-  msg <- paste0(
-    "Computations will require creating and handling ",
-    P, " x ", N, " matrices ", S * (J + 1), " times."
-  )
-  P_LIMIT <- 6000
-  log_info(msg, verbose)
+
+  P_LIMIT <- 6000 # __HARDCODED__
   if (P > P_LIMIT) {
+    msg <- paste0(
+      "Computations will require creating and handling ",
+      P, " x ", N, " matrices ", S * (J + 1), " times."
+    )
+    log_info(msg, verbose)
     if (!force) {
       msg <- paste0(
         msg, "Computations might take very long. Give a smaller number of ",

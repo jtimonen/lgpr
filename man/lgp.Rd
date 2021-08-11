@@ -108,9 +108,9 @@ Returns an object of the S4 class \linkS4class{lgpfit}.
 \description{
 Creates an additive Gaussian process model using
 \code{\link{create_model}} and fits it using \code{\link{sample_model}}.
-See the "Mathematical description of lgpr models" vignette
-(\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
-for more information about the connection between different options
+See the
+\href{https://jtimonen.github.io/lgpr-usage/articles/math.html}{Mathematical description of lgpr models}
+vignette for more information about the connection between different options
 and the created statistical model.
 }
 \section{Model formula syntax}{

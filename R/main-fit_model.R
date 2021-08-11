@@ -4,9 +4,9 @@
 #' @description
 #' Creates an additive Gaussian process model using
 #' \code{\link{create_model}} and fits it using \code{\link{sample_model}}.
-#' See the "Mathematical description of lgpr models" vignette
-#' (\url{https://cran.r-project.org/package=lgpr/vignettes/math.html})
-#' for more information about the connection between different options
+#' See the
+#' \href{https://jtimonen.github.io/lgpr-usage/articles/math.html}{Mathematical description of lgpr models}
+#' vignette for more information about the connection between different options
 #' and the created statistical model.
 #'
 #' @inheritParams create_model
@@ -165,7 +165,8 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
                          skip_postproc = is_f_sampled(model), ...) {
   if (quiet) verbose <- FALSE
   num_obs <- get_num_obs(model)
-  large_data_msg(num_obs, 300)
+  LIMIT <- 300 # __HARDCODED__
+  large_data_msg(num_obs, LIMIT)
   object <- get_stan_model(model)
   data <- model@stan_input
 
