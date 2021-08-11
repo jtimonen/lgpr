@@ -14,7 +14,8 @@ create_model(
   options = NULL,
   prior_only = FALSE,
   verbose = FALSE,
-  sample_f = !(likelihood == "gaussian")
+  sample_f = !(likelihood == "gaussian"),
+  bf_options = NULL
 )
 }
 \arguments{
@@ -86,6 +87,8 @@ observations.}
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
 \code{TRUE}, the response variable will be normalized to have zero mean
 and unit variance.}
+
+\item{bf_options}{TODO!}
 }
 \value{
 An object of class \linkS4class{lgpmodel}, containing the
@@ -100,6 +103,7 @@ and the created statistical model.
 }
 \seealso{
 Other main functions: 
+\code{\link{approximate_model}()},
 \code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},

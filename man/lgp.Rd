@@ -17,6 +17,7 @@ lgp(
   sample_f = !(likelihood == "gaussian"),
   quiet = FALSE,
   skip_postproc = sample_f,
+  bf_options = NULL,
   ...
 )
 }
@@ -98,6 +99,8 @@ messages from \code{\link[rstan]{sampling}}.}
 \item{skip_postproc}{Should all postprocessing be skipped? If this is
 \code{TRUE}, the returned \linkS4class{lgpfit} object will likely be
 much smaller (if \code{sample_f=FALSE}).}
+
+\item{bf_options}{TODO!}
 
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}
@@ -188,6 +191,7 @@ Bayesian analysis. In \code{lgpr} this is especially important when
 
 \seealso{
 Other main functions: 
+\code{\link{approximate_model}()},
 \code{\link{create_model}()},
 \code{\link{draw_pred}()},
 \code{\link{get_draws}()},

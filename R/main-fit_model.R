@@ -12,6 +12,7 @@
 #' @inheritParams create_model
 #' @inheritParams sample_model
 #' @inheritParams optimize_model
+#' @inheritParams approximate_model
 #' @param verbose Can messages be printed during model creation? Has no
 #' effect if \code{quiet=TRUE}.
 #'
@@ -101,6 +102,7 @@ lgp <- function(formula,
                 sample_f = !(likelihood == "gaussian"),
                 quiet = FALSE,
                 skip_postproc = sample_f,
+                bf_options = NULL,
                 ...) {
   if (quiet) verbose <- FALSE
 
@@ -108,11 +110,15 @@ lgp <- function(formula,
   log_progress("Creating model...", verbose)
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
-    prior_only, verbose, sample_f
+    prior_only, verbose, sample_f, bf_options
   )
   if (verbose) {
     log_progress("\nModel created, printing it here.")
     print(model)
+  }
+  if (!is.null(bf_options)) {
+    log_progress("Creating approximation with given bf_options.")
+    model <- approximate_model(model, bf_options)
   }
 
   # Fit model

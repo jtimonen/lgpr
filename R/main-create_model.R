@@ -14,6 +14,7 @@
 #' \code{\link{sample_param_prior}} which can be used for any
 #' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
 #' observations.
+#' @param  bf_options TODO!
 #' @family main functions
 #' @return An object of class \linkS4class{lgpmodel}, containing the
 #' Stan input created based on parsing the specified \code{formula},
@@ -27,7 +28,8 @@ create_model <- function(formula,
                          options = NULL,
                          prior_only = FALSE,
                          verbose = FALSE,
-                         sample_f = !(likelihood == "gaussian")) {
+                         sample_f = !(likelihood == "gaussian"),
+                         bf_options = NULL) {
 
   # Parse common parts (formula, covariates, components, options)
   data <- convert_to_data_frame(data)

@@ -32,6 +32,7 @@ option \code{prior_only=TRUE} or not.
 }
 \seealso{
 Other main functions: 
+\code{\link{approximate_model}()},
 \code{\link{create_model}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},

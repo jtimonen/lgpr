@@ -4,7 +4,8 @@ FILES <- c(
   "_common/functions-utils.stan",
   "_common/functions-kernels.stan",
   "_common/functions-kernels_diag.stan",
-  "_common/functions-prior.stan"
+  "_common/functions-prior.stan",
+  "_bf/functions-basisfun.stan"
 )
 
 if (length(FILES) > 0) {

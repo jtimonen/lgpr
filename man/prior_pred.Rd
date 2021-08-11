@@ -60,6 +60,7 @@ These functions take an \linkS4class{lgpmodel} object, and
 }
 \seealso{
 Other main functions: 
+\code{\link{approximate_model}()},
 \code{\link{create_model}()},
 \code{\link{draw_pred}()},
 \code{\link{get_draws}()},
