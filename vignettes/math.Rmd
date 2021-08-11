@@ -1,7 +1,7 @@
 ---
 title: "Mathematical description of lgpr models"
 author: Juho Timonen
-date: 9th August 2021
+date: 11th August 2021
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -27,15 +27,16 @@ This vignette describes mathematically the statistical models of `lgpr`. We
 study the different arguments of the `lgp()` or `create_model()` modeling
 functions and what parts of the probabilistic model they customize.
 This is a concise description, and the original publication (@timonen2021) has more information about the actual
-motivation for the used modeling approaches, and the [tutorials](https://jtimonen.github.io/lgpr-usage/) for code examples.
+motivation for the used modeling approaches, and the [tutorials](https://jtimonen.github.io/lgpr-usage/) have code examples.
 
 ## 1. Bayesian GP regression
 The models in `lgpr` are models for the conditional distribution 
 $$
-p(y \mid f(\textbf{x}), \theta),
+p(y \mid f(\textbf{x}), \theta_{\text{obs}}),
 $$
 of response variable $y$ given covariates $\textbf{x}$, where $\theta_{\text{obs}}$ is a possible parameter of the observation model
-(like the magnitude of observation noise). The function $f$ has a GP prior 
+(like the magnitude of observation noise). The function $f$ has a Gaussian
+Process (GP) prior 
 $$
 f \sim \mathcal{GP}(0, k\left(\textbf{x}, \textbf{x}' \mid \theta_{\text{GP}})\right),
 $$
@@ -71,32 +72,7 @@ read more about them in the documentation of said functions.
 | `options`     | $k(\textbf{x}, \textbf{x}')$                       |
 
 
-## 3. Model inference
-
-After the model is defined, `lgpr` uses the MCMC methods of Stan to obtain
-draws from the joint posterior $p\left(\theta, \textbf{f} \mid \mathcal{D}\right)$ or the marginal posterior of parameters, i.e. 
-$p\left(\theta \mid \mathcal{D}\right)$. Which one of these is done is determined by the `sample_f` argument of `lgp()` or `create_model()`.
-
-### With sample_f = TRUE
-This option is always possible but not recommended if `likelihood == "gaussian"`. The joint posterior that is sampled from is
-\begin{equation}
-p\left(\theta, \textbf{f} \mid \mathcal{D}\right) \propto p\left(\theta, \textbf{f}\right) \cdot p(\textbf{y} \mid \textbf{f}, \theta) \\
-\end{equation}
-and sampling requires evaluating the right-hand side and its gradient thousands of times. 
-
-### With sample_f = FALSE
-This option is only possible, and is automatically selected by default,
-if `likelihood == "gaussian"`. This is because $p\left(\theta \mid \mathcal{D}\right)$ is analytically available only in this case. The
-distribution that is sampled from is
-\begin{equation}
-p\left(\theta \mid \mathcal{D}\right) \propto p\left(\theta\right) \cdot p(\textbf{y} \mid \theta) \\
-\end{equation}
-and now sampling requires repeatedly evaluating the right-hand side of this equation and its gradient. This analytical marginalization reduces the MCMC dimension by $N$ and likely improves sampling efficiency. The likelihood is
-\begin{equation}
-p\left(\textbf{y} \mid \theta\right) = \mathcal{N}\left(\textbf{y} \mid \textbf{0}, \textbf{K} + \sigma^2 \textbf{I} \right).
-\end{equation}
-
-## 4. The `likelihood` argument and observation models
+## 3. The `likelihood` argument and observation models
 The terms **observation  model** and **likelihood** are used to refer to the same formula, i.e. $p(y_n \mid f(\textbf{x}_n), \theta_{\text{obs}})$, though the former means it as a function of $\textbf{y}$ and the latter as a function of $\theta$. There
 are currently five observation models available and they all involve
 an inverse link function transformation
@@ -152,9 +128,10 @@ and the parameter $\gamma \in  [0, 1]$ controls overdispersion so that $\gamma \
 
 When using the Gaussian observation model with `sample_f=TRUE` the continuous response $y$ is normalized to unit variance and zero mean, and $\hat{c}_n = 0$ for all $n$ is set. In this case the `c_hat` argument has no effect. With 
 `sample_f = TRUE`, sensible defaults are used. See the documentation
-of the `c_hat` argument of `lgp()` for exact details.
+of the `c_hat` argument of `lgp()` for exact details and the
+[5. Model inference] section for information about the `sample_f` argument.
 
-## 5. The `formula` argument and kernel functions
+## 4. The `formula` argument and kernel functions
 
 ### Additive GP regression
 
@@ -173,12 +150,11 @@ independently from other components.
 The number of components $J$ is equal to the number of terms in your `formula`. Terms are separated by a plus sign.
 An example formula with three terms could be 
 
-```{r formula, include = TRUE}
-my_formula <- y ~ gp(age) + gp(age)*zs(id) + categ(group)
-print(my_formula)
+```
+y ~ gp(age) + gp(age)*zs(id) + categ(group)
 ```
 
-where `age`, `id` and `group` are columns of `data`. Each formula term defines what the corresponding kernel $k_j$ will be like, and what covariates and parameters it depends on. Each term adds one $\alpha$ parameter
+where `y`, `age`, `id` and `group` have to be columns of `data`. Each formula term defines what the corresponding kernel $k_j$ will be like, and what covariates and parameters it depends on. Each term adds one $\alpha$ parameter
 in the GP parameter vector $\theta_{\text{GP}}$, and
 possible additional parameters depending on the term.
 
@@ -253,10 +229,47 @@ be encoded as `NA` or `NaN` in `data`.
 
 ### Heterogeneous effects and covariate uncertainty
 There are also the `het()` and `unc()` expressions. They cannot be
-alone in a term but have to be multiplied by EQ, NS and VM. They are not 
+alone in a term but have to be multiplied by EQ, NS or VM. They are not 
 actually kernels alone but edit the covariate or kernel of their term
 and add additional parameters. See the tutorials
 for example use cases and @timonen2021 for their mathematical definition.
+
+
+## 5. Model inference
+
+After the model is defined, `lgpr` uses the MCMC methods of Stan to obtain
+draws from the joint posterior $p\left(\theta, \textbf{f} \mid \mathcal{D}\right)$ or the marginal posterior of parameters, i.e. 
+$p\left(\theta \mid \mathcal{D}\right)$. Which one of these is done is determined by the `sample_f` argument of `lgp()` or `create_model()`.
+
+### With sample_f = TRUE
+This option is always possible but not recommended with `likelihood = "gaussian"`. The joint posterior that is sampled from is
+\begin{equation}
+p\left(\theta, \textbf{f} \mid \mathcal{D}\right) \propto p\left(\theta, \textbf{f}\right) \cdot p(\textbf{y} \mid \textbf{f}, \theta) \\
+\end{equation}
+and sampling requires evaluating the right-hand side and its gradient thousands of times. 
+
+### With sample_f = FALSE
+This option is only possible (and is automatically selected by default)
+if `likelihood = "gaussian"`. This is because 
+\begin{equation}
+p\left(\textbf{y} \mid \theta\right) = \mathcal{N}\left(\textbf{y} \mid \textbf{0}, \textbf{K} + \sigma^2 \textbf{I} \right)
+\end{equation}
+is analytically available only in this case. The
+distribution that is sampled from is
+\begin{equation}
+p\left(\theta \mid \mathcal{D}\right) \propto p\left(\theta\right) \cdot p(\textbf{y} \mid \theta) \\
+\end{equation}
+and now sampling requires repeatedly evaluating the right-hand side of this equation and its gradient. This analytical marginalization reduces the MCMC dimension by $N$ and likely improves sampling efficiency. The 
+conditional posterior $p\left(\textbf{f} \mid \theta, \mathcal{D}\right)$ 
+also has an analytical form for a fixed $\theta$, so draws from the
+marginal posterior $p\left(\textbf{f} \mid \mathcal{D}\right)$ could be
+obtained by first drawing $\theta$ and then $\textbf{f}$, according to
+the process
+\begin{align}
+\theta &\sim p\left(\theta \mid \mathcal{D}\right) \\
+\textbf{f} & \sim p\left(\textbf{f} \mid \theta, \mathcal{D}\right).
+\end{align}
+By combining these, we again have draws from the joint posterior $p\left(\theta, \textbf{f} \mid \mathcal{D}\right)$, but likely with less computational effort.
 
 ## References
 
