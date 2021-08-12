@@ -22,12 +22,17 @@ data {
   real hyper_gamma[obs_model==5, 2];
   vector[num_obs] c_hat; // GP mean vector
   
+  // Categorical decomposition stuff
+  int<lower=1> len_eigvals;
+  int<lower=1> len_eigvecs;
+  int<lower=0> C_sizes[num_comps];
+  vector<lower=0>[len_eigvals] C_eigvals;
+  vector[len_eigvecs] C_eigvecs;
+  
   // Basis function stuff
-  real<lower=0> L_bf;
-  int<lower=1> B_bf;
-  int<lower=1> M_bf;
-  vector<lower=0>[M_bf] C_eigvals;
-  vector[M_bf*M_bf] C_eigvecs;
+  real<lower=0> scale_bf;
+  int<lower=1> num_bf;
+  int<lower=0> num_xi;
 }
 
 transformed data{
@@ -38,7 +43,7 @@ parameters {
   real<lower=1e-12> sigma[obs_model==1];
   real<lower=1e-12> phi[obs_model==3];
   real<lower=1e-12, upper=1-1e-12> gamma[obs_model==5];
-  vector[M_bf] xi; // bf multipliers
+  vector[num_xi] xi; // bf multipliers
 }
 
 transformed parameters {

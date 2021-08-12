@@ -75,7 +75,8 @@ model_summary <- function(object, digits = 3) {
     line1 <- paste0("Formula: ", str1)
     line2 <- paste0("Likelihood: ", str2)
     line3 <- paste0("Data: ", N, " observations, ", D, " variables")
-    out <- paste0(line1, "\n", line2, "\n", line3, "\n")
+    line4 <- approx_info(model)
+    out <- paste0(line1, "\n", line2, "\n", line3, "\n", line4, "\n")
     return(out)
   }
 
@@ -124,6 +125,22 @@ beta_teff_idx_info <- function(object) {
   a <- data.frame(a)
   colnames(a) <- NULL
   return(a)
+}
+
+# Information about used possible approximation
+approx_info <- function(object) {
+  model <- object_to_model(object)
+  if (is_approximate(model)) {
+    si <- get_stan_input(model)
+    num_bf <- dollar(si, "num_bf")
+    scale_bf <- dollar(si, "scale_bf")
+    s1 <- paste0("num_bf = [", paste(num_bf, collapse = ", "), "]")
+    s2 <- paste0("scale_bf = [", paste(scale_bf, collapse = ", "), "]")
+    desc <- paste0("Approximation info: ", s1, ", ", s2)
+  } else {
+    desc <- ""
+  }
+  return(desc)
 }
 
 misc_info <- function(object) {
@@ -215,7 +232,9 @@ get_y_name <- function(object) {
 # Get the Stan model used by a model
 get_stan_model <- function(object) {
   model <- object_to_model(object)
-  if (is_f_sampled(model)) {
+  if (is_approximate(model)) {
+    model_name <- "lgp_bf"
+  } else if (is_f_sampled(model)) {
     model_name <- "lgp_latent"
   } else {
     model_name <- "lgp"
@@ -263,6 +282,16 @@ get_num_trials <- function(object) {
   as.vector(num_trials)
 }
 
+# Determine if model is approximation
+is_approximate <- function(object) {
+  model <- object_to_model(object)
+  si <- get_stan_input(model)
+  num_bf <- dollar(si, "num_bf")
+  if (any(num_bf > 0)) {
+    return(TRUE)
+  }
+  FALSE
+}
 
 #' Helper function for plots
 #'

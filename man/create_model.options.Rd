@@ -13,10 +13,23 @@ create_model.options(options, verbose)
   covariance matrices.
   \item \code{vm_params} Variance mask function parameters (numeric
   vector of length 2).
+  \item \code{normalize_data} Boolean value determining if all continuous
+  variables in \code{data} should be normalized to have zero mean and
+  unit variance.
+  \item \code{num_bf} Number of basis functions (0 = no approximation).
+  \item \code{scale_bf} Scale of the domain to be used in basis
+  function approximation. Has no effect if \code{num_bf = 0}.
 }
 If \code{options} is \code{NULL}, default options are used. The defaults
 are equivalent to
-\code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
+\code{options = list(
+  delta = 1e-8,
+  vm_params = c(0.025, 1),
+  normalize_data = TRUE,
+  num_bf = 0,
+  scale_bf = 1.5
+)
+}.}
 
 \item{verbose}{Should some informative messages be printed?}
 }

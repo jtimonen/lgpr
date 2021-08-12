@@ -14,8 +14,7 @@ create_model(
   options = NULL,
   prior_only = FALSE,
   verbose = FALSE,
-  sample_f = !(likelihood == "gaussian"),
-  bf_options = NULL
+  sample_f = !(likelihood == "gaussian")
 )
 }
 \arguments{
@@ -71,10 +70,23 @@ equal to the number of data points. Setting \code{num_trials=1} and
   covariance matrices.
   \item \code{vm_params} Variance mask function parameters (numeric
   vector of length 2).
+  \item \code{normalize_data} Boolean value determining if all continuous
+  variables in \code{data} should be normalized to have zero mean and
+  unit variance.
+  \item \code{num_bf} Number of basis functions (0 = no approximation).
+  \item \code{scale_bf} Scale of the domain to be used in basis
+  function approximation. Has no effect if \code{num_bf = 0}.
 }
 If \code{options} is \code{NULL}, default options are used. The defaults
 are equivalent to
-\code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
+\code{options = list(
+  delta = 1e-8,
+  vm_params = c(0.025, 1),
+  normalize_data = TRUE,
+  num_bf = 0,
+  scale_bf = 1.5
+)
+}.}
 
 \item{prior_only}{Should likelihood be ignored? See also
 \code{\link{sample_param_prior}} which can be used for any
@@ -87,8 +99,6 @@ observations.}
 (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
 \code{TRUE}, the response variable will be normalized to have zero mean
 and unit variance.}
-
-\item{bf_options}{TODO!}
 }
 \value{
 An object of class \linkS4class{lgpmodel}, containing the
@@ -103,7 +113,6 @@ and the created statistical model.
 }
 \seealso{
 Other main functions: 
-\code{\link{approximate_model}()},
 \code{\link{draw_pred}()},
 \code{\link{get_draws}()},
 \code{\link{lgp}()},

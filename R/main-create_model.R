@@ -14,7 +14,6 @@
 #' \code{\link{sample_param_prior}} which can be used for any
 #' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
 #' observations.
-#' @param  bf_options TODO!
 #' @family main functions
 #' @return An object of class \linkS4class{lgpmodel}, containing the
 #' Stan input created based on parsing the specified \code{formula},
@@ -28,8 +27,7 @@ create_model <- function(formula,
                          options = NULL,
                          prior_only = FALSE,
                          verbose = FALSE,
-                         sample_f = !(likelihood == "gaussian"),
-                         bf_options = NULL) {
+                         sample_f = !(likelihood == "gaussian")) {
 
   # Parse common parts (formula, covariates, components, options)
   data <- convert_to_data_frame(data)
@@ -56,6 +54,10 @@ create_model <- function(formula,
     is_likelihood_skipped = as.numeric(prior_only)
   )
   stan_input <- c(stan_input, stan_switches)
+
+  # Add precomputed stuff related to approximation
+  si_approx <- stan_input_approx_precomp(stan_input)
+  stan_input <- c(stan_input, si_approx)
 
   # Variable info
   var_names <- dollar(cc_info, "var_names")
@@ -96,17 +98,36 @@ create_model <- function(formula,
 #'   covariance matrices.
 #'   \item \code{vm_params} Variance mask function parameters (numeric
 #'   vector of length 2).
+#'   \item \code{normalize_data} Boolean value determining if all continuous
+#'   variables in \code{data} should be normalized to have zero mean and
+#'   unit variance.
+#'   \item \code{num_bf} Number of basis functions (0 = no approximation).
+#'   \item \code{scale_bf} Scale of the domain to be used in basis
+#'   function approximation. Has no effect if \code{num_bf = 0}.
 #' }
 #' If \code{options} is \code{NULL}, default options are used. The defaults
 #' are equivalent to
-#' \code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.
+#' \code{options = list(
+#'   delta = 1e-8,
+#'   vm_params = c(0.025, 1),
+#'   normalize_data = TRUE,
+#'   num_bf = 0,
+#'   scale_bf = 1.5
+#' )
+#' }.
 #' @return a named list of parsed options
 create_model.options <- function(options, verbose) {
 
   # Default options
   log_progress("Parsing options...", verbose)
   input <- options
-  opts <- list(delta = 1e-8, vm_params = c(0.025, 1))
+  opts <- list(
+    delta = 1e-8,
+    vm_params = c(0.025, 1),
+    normalize_data = TRUE,
+    num_bf = 0,
+    scale_bf = 1.5
+  )
 
   # Replace defaults if found from input
   for (opt_name in names(opts)) {
@@ -117,12 +138,18 @@ create_model.options <- function(options, verbose) {
 
   # Validate and format for Stan input
   delta <- dollar(opts, "delta")
-  check_positive(delta)
   vm_params <- dollar(opts, "vm_params")
+  num_bf <- dollar(opts, "num_bf")
+  scale_bf <- dollar(opts, "scale_bf")
+  check_positive(delta)
   check_length(vm_params, 2)
   check_positive_all(vm_params)
   check_all_leq(vm_params, c(1, 1))
-  list(delta = delta, vm_params = vm_params)
+  check_non_negative_all(num_bf)
+  check_non_negative_all(scale_bf)
+
+  # Return full options
+  return(opts)
 }
 
 

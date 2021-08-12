@@ -12,7 +12,6 @@
 #' @inheritParams create_model
 #' @inheritParams sample_model
 #' @inheritParams optimize_model
-#' @inheritParams approximate_model
 #' @param verbose Can messages be printed during model creation? Has no
 #' effect if \code{quiet=TRUE}.
 #'
@@ -50,9 +49,9 @@
 #'  \item \code{"alpha"} = component magnitude parameters
 #'  \item \code{"ell"} = component lengthscale parameters
 #'  \item \code{"wrp"} = input warping steepness parameters
-#'  \item \code{"sigma"} = noise magnitude (Gaussian obs. model)
-#'  \item \code{"phi"} = inv. overdispersion (negative binomial obs. model)
-#'  \item \code{"gamma"} = overdispersion (beta-binomial obs. model)
+#'  \item \code{"sigma"} = noise magnitude (if \code{likelihood="gaussian"})
+#'  \item \code{"phi"} = inv. overdispersion (if \code{likelihood="nb"})
+#'  \item \code{"gamma"} = overdispersion (if \code{likelihood="bb"})
 #'  \item \code{"beta"} = heterogeneity parameters
 #'  \item \code{"effect_time"} = uncertain effect time parameters
 #'  \item \code{"effect_time_info"} = additional options for the above
@@ -65,24 +64,23 @@
 #'
 #' It is not recommended to use default priors blindly. Rather, priors should
 #' be specified according to the knowledge about the problem at hand, as in any
-#' Bayesian analysis. In \code{lgpr} this is especially important when
+#' Bayesian analysis. In \code{lgpr} this is especially important
 #' \enumerate{
-#'  \item Using a non-Gaussian likelihood or otherwise setting
-#'  \code{sample_f = TRUE}. In this case the response variable is not
-#'  normalized, so the scale on which the data varies must be taken into
-#'  account when defining priors of the signal magnitude parameters
-#'  \code{alpha} and possible noise parameters (\code{sigma}, \code{phi},
-#'  \code{gamma}). Also it should be checked if \code{c_hat} is set in a
-#'  sensible way.
-#'  \item Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
-#'  expression in its formula. In this case the corresponding covariate
-#'  \code{x} is not normalized, and the prior for the input warping steepness
-#'  parameter \code{wrp} must be set according to the expected width of the
-#'  window in which the nonstationary effect of \code{x} occurs. By default,
-#'  the width of this window is about 36, which has been set assuming that
-#'  the unit of \code{x} is months.
+#'  \item if the response variable is not normalized to zero mean and unit
+#'  variance (by default it is, if it is continuous and you don't specify
+#'  \code{normalize_data = FALSE} in \code{options}). In this case it should
+#'  be checked that the prior for the possible noise parameter
+#'  (\code{sigma}, \code{phi} or \code{gamma}) and the value of \code{c_hat}
+#'  make sense, given the scale of the response variable. \emph{NOTE:} if
+#'  \code{likelihood} is not \code{"gaussian"}, you always should check the
+#'  prior because the response variable cannot be normalized
+#'  and therefore it is difficult to craft generally good default priors.
+#'  \item if continuous covariates are not normalized to zero mean and unit
+#'  variance (by default they are unless you specify
+#'  \code{normalize_data = FALSE} in \code{options}). In this case you would
+#'  need to check that your lengthscale priors make sense, taking into account
+#'  the scale of the covariates.
 #' }
-#'
 #'
 #' @name lgp
 #' @family main functions
@@ -102,7 +100,6 @@ lgp <- function(formula,
                 sample_f = !(likelihood == "gaussian"),
                 quiet = FALSE,
                 skip_postproc = sample_f,
-                bf_options = NULL,
                 ...) {
   if (quiet) verbose <- FALSE
 
@@ -110,15 +107,11 @@ lgp <- function(formula,
   log_progress("Creating model...", verbose)
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
-    prior_only, verbose, sample_f, bf_options
+    prior_only, verbose, sample_f
   )
   if (verbose) {
     log_progress("\nModel created, printing it here.")
     print(model)
-  }
-  if (!is.null(bf_options)) {
-    log_progress("Creating approximation with given bf_options.")
-    model <- approximate_model(model, bf_options)
   }
 
   # Fit model
@@ -224,7 +217,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
 #' @export
 optimize_model <- function(model, ...) {
   num_obs <- get_num_obs(model)
-  large_data_msg(num_obs, 300)
+  large_data_msg(num_obs, 300) # __HARDCODED__
   object <- get_stan_model(model)
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)

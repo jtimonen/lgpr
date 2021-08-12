@@ -17,7 +17,6 @@ lgp(
   sample_f = !(likelihood == "gaussian"),
   quiet = FALSE,
   skip_postproc = sample_f,
-  bf_options = NULL,
   ...
 )
 }
@@ -74,10 +73,23 @@ equal to the number of data points. Setting \code{num_trials=1} and
   covariance matrices.
   \item \code{vm_params} Variance mask function parameters (numeric
   vector of length 2).
+  \item \code{normalize_data} Boolean value determining if all continuous
+  variables in \code{data} should be normalized to have zero mean and
+  unit variance.
+  \item \code{num_bf} Number of basis functions (0 = no approximation).
+  \item \code{scale_bf} Scale of the domain to be used in basis
+  function approximation. Has no effect if \code{num_bf = 0}.
 }
 If \code{options} is \code{NULL}, default options are used. The defaults
 are equivalent to
-\code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.}
+\code{options = list(
+  delta = 1e-8,
+  vm_params = c(0.025, 1),
+  normalize_data = TRUE,
+  num_bf = 0,
+  scale_bf = 1.5
+)
+}.}
 
 \item{prior_only}{Should likelihood be ignored? See also
 \code{\link{sample_param_prior}} which can be used for any
@@ -99,8 +111,6 @@ messages from \code{\link[rstan]{sampling}}.}
 \item{skip_postproc}{Should all postprocessing be skipped? If this is
 \code{TRUE}, the returned \linkS4class{lgpfit} object will likely be
 much smaller (if \code{sample_f=FALSE}).}
-
-\item{bf_options}{TODO!}
 
 \item{...}{Optional arguments passed to
 \code{\link[rstan]{sampling}} or \code{\link[rstan]{optimizing}}.}
@@ -153,9 +163,9 @@ Possible allowed names are
  \item \code{"alpha"} = component magnitude parameters
  \item \code{"ell"} = component lengthscale parameters
  \item \code{"wrp"} = input warping steepness parameters
- \item \code{"sigma"} = noise magnitude (Gaussian obs. model)
- \item \code{"phi"} = inv. overdispersion (negative binomial obs. model)
- \item \code{"gamma"} = overdispersion (beta-binomial obs. model)
+ \item \code{"sigma"} = noise magnitude (if \code{likelihood="gaussian"})
+ \item \code{"phi"} = inv. overdispersion (if \code{likelihood="nb"})
+ \item \code{"gamma"} = overdispersion (if \code{likelihood="bb"})
  \item \code{"beta"} = heterogeneity parameters
  \item \code{"effect_time"} = uncertain effect time parameters
  \item \code{"effect_time_info"} = additional options for the above
@@ -170,28 +180,27 @@ in this list, a default prior will be used for it.
 
 It is not recommended to use default priors blindly. Rather, priors should
 be specified according to the knowledge about the problem at hand, as in any
-Bayesian analysis. In \code{lgpr} this is especially important when
+Bayesian analysis. In \code{lgpr} this is especially important
 \enumerate{
- \item Using a non-Gaussian likelihood or otherwise setting
- \code{sample_f = TRUE}. In this case the response variable is not
- normalized, so the scale on which the data varies must be taken into
- account when defining priors of the signal magnitude parameters
- \code{alpha} and possible noise parameters (\code{sigma}, \code{phi},
- \code{gamma}). Also it should be checked if \code{c_hat} is set in a
- sensible way.
- \item Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
- expression in its formula. In this case the corresponding covariate
- \code{x} is not normalized, and the prior for the input warping steepness
- parameter \code{wrp} must be set according to the expected width of the
- window in which the nonstationary effect of \code{x} occurs. By default,
- the width of this window is about 36, which has been set assuming that
- the unit of \code{x} is months.
+ \item if the response variable is not normalized to zero mean and unit
+ variance (by default it is, if it is continuous and you don't specify
+ \code{normalize_data = FALSE} in \code{options}). In this case it should
+ be checked that the prior for the possible noise parameter
+ (\code{sigma}, \code{phi} or \code{gamma}) and the value of \code{c_hat}
+ make sense, given the scale of the response variable. \emph{NOTE:} if
+ \code{likelihood} is not \code{"gaussian"}, you always should check the
+ prior because the response variable cannot be normalized
+ and therefore it is difficult to craft generally good default priors.
+ \item if continuous covariates are not normalized to zero mean and unit
+ variance (by default they are unless you specify
+ \code{normalize_data = FALSE} in \code{options}). In this case you would
+ need to check that your lengthscale priors make sense, taking into account
+ the scale of the covariates.
 }
 }
 
 \seealso{
 Other main functions: 
-\code{\link{approximate_model}()},
 \code{\link{create_model}()},
 \code{\link{draw_pred}()},
 \code{\link{get_draws}()},

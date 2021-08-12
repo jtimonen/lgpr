@@ -3,7 +3,6 @@
 export(add_dis_age)
 export(add_factor)
 export(adjusted_c_hat)
-export(approximate_model)
 export(bet)
 export(create_model)
 export(draw_pred)

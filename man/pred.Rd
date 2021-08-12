@@ -79,7 +79,6 @@ An object of class \linkS4class{GaussianPrediction} or
 }
 \seealso{
 Other main functions: 
-\code{\link{approximate_model}()},
 \code{\link{create_model}()},
 \code{\link{draw_pred}()},
 \code{\link{get_draws}()},
