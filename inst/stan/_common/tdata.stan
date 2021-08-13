@@ -6,3 +6,6 @@
 
   // Delta vector for diagonal jitter
   vector[num_obs] delta_vec = rep_vector(delta, num_obs);
+  int num_het = 0;     // number of heterogeneous components
+  int num_unc = 0;     // number of uncertain continuous covariates
+  

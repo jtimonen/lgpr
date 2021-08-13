@@ -17,6 +17,11 @@ itself. They are supposed to be run while in the package root directory.
 
 ## Dev notes
 
+### Plans for 2.0
+
+- Remove `unc()` from formulas and instead have it as a covariate option
+- Restriction: only one covariate can be uncertain
+
 ### Test suite output
 
 * Version: `1.1.0`
