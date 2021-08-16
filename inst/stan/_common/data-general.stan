@@ -18,10 +18,10 @@
   Each additive function component can be related to at most one continuous and
   one categorical covariate. Properties of the components are specified by the 
   "columns" of the integer array <components>. The "rows" are
-    - [,1]: type of categorical kernel (0 = none, 1 = CAT, 2 = ZS)
+    - [,1]: type of categorical kernel (0 = none, 1 = CAT, 2 = ZS, 3 = bin0)
     - [,2]: type of continuous kernel (0 = none, 1 = EQ)
     - [,3]: index of the categorical covariate in <Z>, <Z_num_levels>
-    - [,4]: index of the continuous covariate in <X>, <X_mask>
+    - [,4]: index of the continuous covariate in <X>, <X_mask>, <X_scale>
     - [,5]: input warping (0 = no, 1 = yes, 2 = yes with variance mask)
     - [,6]: heterogeneity (0 = no, 1 = yes)
   */

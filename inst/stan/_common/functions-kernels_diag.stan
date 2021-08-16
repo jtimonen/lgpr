@@ -2,14 +2,14 @@
 // prediction computations.
 
   // Compute one constant kernel matrix diagonal.
-  vector STAN_kernel_const_diag(data int[] x, data int kernel_type) 
+  vector STAN_kernel_const_diag(data int[] z, data int kernel_type) 
   {
-    int n = num_elements(x);
-    vector[n] K_diag = rep_vector(1.0, n);
-    if (kernel_type == 2) {
-      vector[n] is_zero;
-      for(j in 1:n) {
-        is_zero[j] = (x[j]==0);
+    int P = num_elements(z);
+    vector[P] K_diag = rep_vector(1.0, P);
+    if (kernel_type == 3) {
+      vector[P] is_zero;
+      for(j in 1:P) {
+        is_zero[j] = (z[j]==0);
       }
       K_diag = is_zero; // binary mask: one if both inputs are 0
     }
@@ -18,33 +18,31 @@
   
   // Compute all constant kernel matrices' diagonals.
   vector[] STAN_kernel_const_all_diag(
-    data int n,
-    data int[,] x,
-    data int[,] x_mask,  
+    data int P,
+    data int[,] Z,
+    data int[,] X_mask,  
     data int[,] components)
   {
-    int num_comps = size(components);
-    vector[n] K_const_diag[num_comps];
-    for (j in 1:num_comps) {
-      vector[n] K_diag;
-      int opts[9] = components[j];
-      int ctype = opts[1];
-      int ktype = opts[2];
-      int idx_cat = opts[8];
-      int idx_cont = opts[9];
+    int J = size(components);
+    vector[P] K_const_diag[J];
+    for (j in 1:J) {
+      vector[P] Kj_diag;
+      int ker_cat = components[j, 1];
+      int idx_cat = components[j, 3];
+      int idx_cont = components[j, 4];
       
       // Compute mask kernel for continuous covariate
       if (idx_cont != 0) {
-        K_diag = STAN_kernel_const_diag(x_mask[idx_cont], 2); // 2=binary mask
+        Kj_diag = STAN_kernel_const_diag(X_mask[idx_cont], 3); // 3=binary mask
       } else {
-        K_diag = rep_vector(1.0, n);
+        Kj_diag = rep_vector(1.0, P);
       }
       
       // Compute kernel for categorical covariate
-      if (ctype == 0 || ctype == 2) {
-        K_diag = K_diag .* STAN_kernel_const_diag(x[idx_cat], ktype);
+      if (ker_cat != 0) {
+        Kj_diag = Kj_diag .* STAN_kernel_const_diag(Z[idx_cat], ker_cat);
       }
-      K_const_diag[j] = K_diag;
+      K_const_diag[j] = Kj_diag;
     }
     return(K_const_diag);
   }
@@ -77,80 +75,68 @@
     data int n,
     data vector[] K_const_diag,
     data int[,] components,
-    data vector[] x,
-    data vector[] x_unnorm,
+    data vector[] X,
+    data real[] X_scale,
     real[] alpha,
     real[] wrp,
     vector[] beta,
     vector[] teff,
     data real[] vm_params,
-    data int[] idx_expand,
+    data int[,] beta_idx,
+    data int idx_unc,
+    data int[,] teff_idx,
     data vector[] teff_zero)
   {
     int idx_wrp = 0;
     int idx_alpha = 0;
-    int num_comps = size(components);
-    vector[n] KX_diag[num_comps];
+    int J = size(components);
+    vector[n] KX_diag[J];
   
     // Loop through components
-    for(j in 1:num_comps){
+    for(j in 1:J){
       
       // 1. Initialize with constant part of the kernel diagonal
-      vector[n] K_diag = K_const_diag[j];
-      vector[n] X;
+      vector[n] Dj = K_const_diag[j];
+      vector[n] x;
   
       // 2. Get component properties
-      int opts[9] = components[j];
-      int ctype = opts[1];
-      int idx_cont = opts[9];
-      int is_heter = opts[4];
-      int is_warped = opts[5];
-      int is_var_masked = opts[6];
-      int is_uncrt = opts[7];
+      int ker_cont = components[j, 2];
+      int idx_cont = components[j, 4];
+      int is_warped = components[j, 5];
+      int is_heter = components[j, 6];
       
-      // 3. Pick the possible continuous covariate of this component
-      if(ctype != 0){
-        if(is_warped){
-          X = x_unnorm[idx_cont];
-        }else{
-          X = x[idx_cont];
+      // 3. Continuous covariate
+      if(idx_cont != 0){
+        x = X[idx_cont];
+        if(idx_unc>0 && idx_unc==idx_cont) {
+          x = STAN_edit_x_cont(x, teff_idx[1], teff_zero[1], teff[1]);
         }
+        x = x / X_scale[idx_cont];
       }
       
-      // 4. Handle possible nonstationarity
-      if(is_warped){
-        real s;
+      // 4. Possible nonstationarity
+      if(is_warped > 0){
         idx_wrp += 1;
-        
-        // 4.1 Handle possible uncertainty
-        if(is_uncrt){
-          X = STAN_edit_x_cont(X, idx_expand, teff_zero[1], teff[1]);
+        if(is_warped==2){
+          Dj = Dj .* STAN_kernel_varmask_diag(x, wrp[idx_wrp], vm_params);
         }
-        
-        // 4.2 Variance masking
-        s = wrp[idx_wrp];
-        if(is_var_masked){
-          K_diag = K_diag .* STAN_kernel_varmask_diag(X, s, vm_params);
-        }
-        
-        // 4.3 Input warping
-        X = STAN_warp_input(X, s);
+        x = STAN_warp_input(x, wrp[idx_wrp]);
       }
       
       // Compute the kernel matrix  diagonal
       idx_alpha += 1;
-      if(ctype != 0){
-        K_diag = K_diag .* STAN_kernel_eq_diag(n, alpha[idx_alpha]);
+      if(ker_cont != 0){
+        Dj = Dj .* STAN_kernel_eq_diag(n, alpha[idx_alpha]);
       } else {
-        K_diag = square(alpha[idx_alpha]) * K_diag;
+        Dj = square(alpha[idx_alpha]) * Dj;
       }
       
       // Possible heterogeneity
       if(is_heter){
-        K_diag = K_diag .* STAN_kernel_beta_diag(beta[1], idx_expand);
+        Dj = Dj .* STAN_kernel_beta_diag(beta[1], beta_idx[1]);
       }
       
-      KX_diag[j] = K_diag; // store kernel matrix diagonal
+      KX_diag[j] = Dj; // store kernel matrix diagonal
     }
     
     return(KX_diag);

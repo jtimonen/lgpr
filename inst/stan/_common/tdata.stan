@@ -1,11 +1,7 @@
   // Precompute fixed kernel matrices
-  matrix[num_obs, num_obs] K_const[num_comps] = STAN_kernel_const_all(
-    num_obs, num_obs, x_cat, x_cat, x_cont_mask, x_cont_mask, 
-    x_cat_num_levels, components
+  matrix[N, N] K_const[J] = STAN_kernel_const_all(
+    N, N, Z, Z, X_mask, X_mask, Z_M, components
   );
 
   // Delta vector for diagonal jitter
-  vector[num_obs] delta_vec = rep_vector(delta, num_obs);
-  int num_het = 0;     // number of heterogeneous components
-  int num_unc = 0;     // number of uncertain continuous covariates
-  
+  vector[N] delta_vec = rep_vector(delta, N);

@@ -182,7 +182,9 @@ It is not recommended to use default priors blindly. Rather, priors should
 be specified according to the knowledge about the problem at hand, as in any
 Bayesian analysis. In \code{lgpr} this is especially important
 \enumerate{
- \item if the response variable is not normalized to zero mean and unit
+ \item if using a kernel that works with unnormalized variables. By default,
+ the `gp()` kernel works with variables that are normalized to zero mean
+ and unit
  variance (by default it is, if it is continuous and you don't specify
  \code{normalize_data = FALSE} in \code{options}). In this case it should
  be checked that the prior for the possible noise parameter
@@ -197,6 +199,13 @@ Bayesian analysis. In \code{lgpr} this is especially important
  need to check that your lengthscale priors make sense, taking into account
  the scale of the covariates.
 }
+ \item Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
+ expression in its formula. These work with the unnormalized raw version
+ of \code{x} is not normalized, and the prior for the input warping
+ steepness parameter \code{wrp} must be set according to the expected
+ width of the window in which the nonstationary effect of \code{x} occurs.
+ With the default prior, the width of this window is about 36, which has
+ been set assuming that the unit of \code{x} is months.
 }
 
 \seealso{

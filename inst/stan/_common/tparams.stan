@@ -1,5 +1,5 @@
   // Transform raw effect times
-  vector[num_bt] teff[num_uncrt>0];
-  for(j in 1:num_uncrt){
-    teff[j] = teff_lb[j] + (teff_ub[j] - teff_lb[j]) .* teff_raw[j];
+  vector[num_teff] teff[idx_unc>0];
+  if(idx_unc > 0) {
+    teff[1] = teff_lb[1] + (teff_ub[1] - teff_lb[1]) .* teff_raw[1];
   }

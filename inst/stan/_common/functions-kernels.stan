@@ -43,19 +43,20 @@
   
   // Compute one constant kernel matrix. Does not depend on parameters and
   // therefore this function never needs to be evaluated during sampling.
-  matrix STAN_kernel_const(data int[] x1, data int[] x2, 
-    data int kernel_type,  data int ncat) 
+  matrix STAN_kernel_const(data int[] z1, data int[] z2, 
+    data int kernel_type,  data int num_cat) 
   {
-    int n1 = num_elements(x1);
-    int n2 = num_elements(x2);
+    int n1 = num_elements(z1);
+    int n2 = num_elements(z2);
     matrix[n1, n2] K;
     if (kernel_type == 1) {
-      K = STAN_kernel_cat(x1, x2);
+      K = STAN_kernel_cat(z1, z2);
     } else if (kernel_type == 2) {
-      K = STAN_kernel_bin(x1, x2);
+      K = STAN_kernel_zerosum(z1, z2, num_cat);
+    } else if (kernel_type == 3){
+      K = STAN_kernel_bin(z1, z2);
     } else {
-      // kernel_type should be 0
-      K = STAN_kernel_zerosum(x1, x2, ncat);
+      reject("kernel_type should be 1, 2 or 3, found =", kernel_type)
     }
     return(K);
   }
@@ -64,33 +65,32 @@
   // therefore this function never needs to be evaluated during sampling.
   matrix[] STAN_kernel_const_all(
     data int n1,           data int n2,
-    data int[,] x1,        data int[,] x2,
-    data int[,] x1_mask,   data int[,] x2_mask,
+    data int[,] Z1,        data int[,] Z2,
+    data int[,] X1_mask,   data int[,] X2_mask,
     data int[] num_levels, data int[,] components)
   {
-    int num_comps = size(components);
-    matrix[n1, n2] K_const[num_comps];
-    for (j in 1:num_comps) {
-      matrix[n1, n2] K;
-      int opts[9] = components[j];
-      int ctype = opts[1];
-      int ktype = opts[2];
-      int idx_cat = opts[8];
-      int idx_cont = opts[9];
+    int J = size(components);
+    matrix[n1, n2] K_const[J];
+    for (j in 1:J) {
+      matrix[n1, n2] Kj;
+      int ker_cat = components[j, 1];
+      int idx_cat = components[j, 3];
+      int idx_cont = components[j, 4];
       
       // Compute mask kernel for continuous covariate
       if (idx_cont != 0) {
-        K = STAN_kernel_const(x1_mask[idx_cont], x2_mask[idx_cont], 2, 0);
+        // binary mask
+        Kj = STAN_kernel_const(X1_mask[idx_cont], X2_mask[idx_cont], 3, 0);
       } else {
-        K = rep_matrix(1, n1, n2);
+        Kj = rep_matrix(1, n1, n2);
       }
       
       // Compute kernel for categorical covariate
-      if (ctype == 0 || ctype == 2) {
+      if (ker_cat != 0) {
         int M = num_levels[idx_cat];
-        K = K .* STAN_kernel_const(x1[idx_cat], x2[idx_cat], ktype, M);
+        Kj = Kj .* STAN_kernel_const(Z1[idx_cat], Z2[idx_cat], ker_cat, M);
       }
-      K_const[j] = K;
+      K_const[j] = Kj;
     }
     return(K_const);
   }
@@ -129,91 +129,87 @@
     data int n2,
     data matrix[] K_const,
     data int[,] components,
-    data vector[] x1,
-    data vector[] x2,
-    data vector[] x1_unnorm,
-    data vector[] x2_unnorm,
+    data vector[] X1,
+    data vector[] X2,
+    data real[] X_scale,
     real[] alpha,
     real[] ell,
     real[] wrp,
     vector[] beta,
     vector[] teff,
     data real[] vm_params,
-    data int[] idx1_expand,
-    data int[] idx2_expand,
+    data int[,] beta_idx1,
+    data int[,] beta_idx2,
+    data int idx_unc,
+    data int[,] teff_idx1,
+    data int[,] teff_idx2,
     data vector[] teff_zero)
   {
     int idx_ell = 0;
     int idx_wrp = 0;
     int idx_alpha = 0;
-    int num_comps = size(components);
-    matrix[n1, n2] KX[num_comps];
+    int J = size(components);
+    matrix[n1, n2] KX[J];
   
     // Loop through components
-    for(j in 1:num_comps){
+    for(j in 1:J){
       
       // 1. Initialize with constant part of the kernel matrix
-      matrix[n1, n2] K = K_const[j];
-      vector[n1] X1;
-      vector[n2] X2;
+      matrix[n1, n2] Kj = K_const[j];
+      vector[n1] x1;
+      vector[n2] x2;
   
       // 2. Get component properties
-      int opts[9] = components[j];
-      int ctype = opts[1];
-      int idx_cont = opts[9];
-      int is_heter = opts[4];
-      int is_warped = opts[5];
-      int is_var_masked = opts[6];
-      int is_uncrt = opts[7];
+      int ker_cont = components[j, 2];
+      int idx_cont = components[j, 4];
+      int is_warped = components[j, 5];
+      int is_heter = components[j, 6];
       
       // 3. Pick the possible continuous covariate of this component
-      if(ctype != 0){
-        if(is_warped){
-          X1 = x1_unnorm[idx_cont];
-          X2 = x2_unnorm[idx_cont];
-        }else{
-          X1 = x1[idx_cont];
-          X2 = x2[idx_cont];
+      if(idx_cont != 0){
+        x1 = X1[idx_cont];
+        x2 = X2[idx_cont];
+        
+        // 3.1 Handle possible uncertainty in covariate
+        if(idx_unc>0 && idx_unc==idx_cont) {
+          x1 = STAN_edit_x_cont(x1, teff_idx1[1], teff_zero[1], teff[1]);
+          x2 = STAN_edit_x_cont(x2, teff_idx2[1], teff_zero[1], teff[1]);
         }
+        
+        // 3.2 Normalize
+        x1 = x1 / X_scale[idx_cont];
+        x2 = x2 / X_scale[idx_cont];
       }
       
       // 4. Handle possible nonstationarity
-      if(is_warped){
-        real s;
+      if(is_warped > 0){
         idx_wrp += 1;
         
-        // 4.1 Handle possible uncertainty
-        if(is_uncrt){
-          X1 = STAN_edit_x_cont(X1, idx1_expand, teff_zero[1], teff[1]);
-          X2 = STAN_edit_x_cont(X2, idx2_expand, teff_zero[1], teff[1]);
+        // 4.1 Variance masking
+        if(is_warped==2){
+          Kj = Kj .* STAN_kernel_varmask(x1, x2, wrp[idx_wrp], vm_params);
         }
         
-        // 4.2 Variance masking
-        s = wrp[idx_wrp];
-        if(is_var_masked){
-          K = K .* STAN_kernel_varmask(X1, X2, s, vm_params);
-        }
-        
-        // 4.3 Input warping
-        X1 = STAN_warp_input(X1, s);
-        X2 = STAN_warp_input(X2, s);
+        // 4.2 Input warping
+        x1 = STAN_warp_input(x1, wrp[idx_wrp]);
+        x2 = STAN_warp_input(x2, wrp[idx_wrp]);
       }
       
       // Compute the kernel matrix
       idx_alpha += 1;
-      if(ctype != 0){
+      if(ker_cont != 0){
         idx_ell += 1;
-        K = K .* STAN_kernel_eq(X1, X2, alpha[idx_alpha], ell[idx_ell]);
+        Kj = Kj .* STAN_kernel_eq(x1, x2, alpha[idx_alpha], ell[idx_ell]);
       } else {
-        K = square(alpha[idx_alpha]) * K;
+        Kj = square(alpha[idx_alpha]) * Kj;
       }
       
       // Possible heterogeneity
       if(is_heter){
-        K = K .* STAN_kernel_beta(beta[1], idx1_expand, idx2_expand);
+        Kj = Kj .* STAN_kernel_beta(beta[1], beta_idx1[1], beta_idx2[1]);
       }
       
-      KX[j] = K; // store kernel matrix
+      KX[j] = Kj; // store kernel matrix
     }
     
     return(KX);
