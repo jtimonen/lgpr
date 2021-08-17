@@ -27,9 +27,9 @@
     vector[P] K_const_diag[J];
     for (j in 1:J) {
       vector[P] Kj_diag;
-      int ker_cat = components[j, 1];
-      int idx_cat = components[j, 3];
-      int idx_cont = components[j, 4];
+      int idx_cat = components[j, 1];
+      int ker_cat = components[j, 2];
+      int idx_cont = components[j, 3];
       
       // Compute mask kernel for continuous covariate
       if (idx_cont != 0) {
@@ -100,8 +100,8 @@
       vector[n] x;
   
       // 2. Get component properties
-      int ker_cont = components[j, 2];
-      int idx_cont = components[j, 4];
+      int idx_cont = components[j, 3];
+      int ker_cont = components[j, 4];
       int is_warped = components[j, 5];
       int is_heter = components[j, 6];
       

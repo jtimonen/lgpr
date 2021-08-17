@@ -35,6 +35,7 @@ create_model <- function(formula,
   cc_info <- create_model.covs_and_comps(data, lgp_formula, NA, verbose)
   stan_x <- dollar(cc_info, "to_stan")
   stan_opts <- create_model.options(options, verbose)
+  print(stan_opts)
 
   # Parse response and likelihood
   y_info <- create_model.likelihood(

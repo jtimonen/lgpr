@@ -73,9 +73,9 @@
     matrix[n1, n2] K_const[J];
     for (j in 1:J) {
       matrix[n1, n2] Kj;
-      int ker_cat = components[j, 1];
-      int idx_cat = components[j, 3];
-      int idx_cont = components[j, 4];
+      int idx_cat = components[j, 1];
+      int ker_cat = components[j, 2];
+      int idx_cont = components[j, 3];
       
       // Compute mask kernel for continuous covariate
       if (idx_cont != 0) {
@@ -160,8 +160,8 @@
       vector[n2] x2;
   
       // 2. Get component properties
-      int ker_cont = components[j, 2];
-      int idx_cont = components[j, 4];
+      int idx_cont = components[j, 3];
+      int ker_cont = components[j, 4];
       int is_warped = components[j, 5];
       int is_heter = components[j, 6];
       
