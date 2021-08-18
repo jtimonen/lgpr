@@ -60,21 +60,11 @@ the latent signal \code{f} (and its components).
 
 \item{\code{stan_input}}{The data to be given as input to \code{rstan::sampling}}
 
-\item{\code{var_names}}{List of variable names grouped by type.}
-
-\item{\code{var_scalings}}{A named list with fields
-\itemize{
-  \item \code{y} - Response variable normalization function and its
-  inverse operation. Must be an \linkS4class{lgpscaling} object.
-  \item \code{x_cont} - Continuous covariate normalization functions and
-  their inverse operations. Must be a named list with each element is an
-  \linkS4class{lgpscaling} object.
-}}
-
 \item{\code{var_info}}{A named list with fields
 \itemize{
-  \item \code{x_cat_levels} - Names of the levels of categorical covariates
-  before converting from factor to numeric.
+  \item \code{var_names} - List of variable names grouped by type.
+  \item \code{y_scaling} - Response variable normalization function and its
+  inverse operation. Is an \linkS4class{lgpscaling} object.
 }}
 
 \item{\code{info}}{Other info in text format.}

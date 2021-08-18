@@ -19,7 +19,7 @@
   }
   
   // Disease-related age uncertainty
-  if(idx_unc > 0) {
+  if(num_unc > 0) {
     int ptype = prior_teff[1][1];
     int is_backwards = prior_teff[1][2];
     real direction = (-1.0)^(is_backwards);

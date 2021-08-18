@@ -11,7 +11,7 @@ create_model.prior(prior, stan_input, verbose)
 (hyper)parameters. See the "Defining priors" section below
 (\code{\link{lgp}}).}
 
-\item{stan_input}{a list of stan input fields}
+\item{stan_input}{a list of 'Stan' input data fields}
 
 \item{verbose}{Should some informative messages be printed?}
 }

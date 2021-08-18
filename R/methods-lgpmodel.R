@@ -262,12 +262,12 @@ get_data <- function(object) {
 
 # Get number of observations
 get_num_obs <- function(object) {
-  dollar(get_stan_input(object), "num_obs")
+  dollar(get_stan_input(object), "N")
 }
 
 # Get number of components
 get_num_comps <- function(object) {
-  dollar(get_stan_input(object), "num_comps")
+  dollar(get_stan_input(object), "J")
 }
 
 # Get observation model (human readable string)

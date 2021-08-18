@@ -25,25 +25,16 @@ create_model.covs_and_comps <- function(data, model_formula,
   comps <- stan_data_components(model_formula, covs)
   expanding <- stan_data_expanding(covs, comps)
   stan_data <- c(covs, comps, expanding)
-  print(stan_data)
-
-  # Other info
-  Z_levels <- dollar(covariates, "Z_levels")
 
   # Variable names
   var_names <- list(
     y = model_formula@y_name,
-    x = rownames(dollar(covariates, "X")),
-    z = rownames(dollar(covariates, "Z")),
+    x = rownames(dollar(covs, "X")),
+    z = rownames(dollar(covs, "Z"))
   )
 
   # Return
-  list(
-    to_stan = to_stan,
-    Z_levels = Z_levels,
-    caseid_map = dollar(expanding, "caseid_map"),
-    var_names = var_names
-  )
+  list(to_stan = stan_data, var_names = var_names)
 }
 
 
@@ -140,7 +131,7 @@ stan_data_components <- function(model_formula, covariates) {
     num_ell = sum(components[, 4] != 0),
     num_wrp = sum(components[, 5] != 0),
     num_het = sum(components[, 6] != 0),
-    idx_unc = 0 # TODO
+    num_unc = sum(components[, 7] != 0)
   )
 }
 

@@ -4,20 +4,20 @@
 #' @param prior A named list, defining the prior distribution of model
 #' (hyper)parameters. See the "Defining priors" section below
 #' (\code{\link{lgp}}).
-#' @param stan_input a list of stan input fields
+#' @param stan_input a list of 'Stan' input data fields
 #' @return a named list of parsed options
 #' @family internal model creation functions
 create_model.prior <- function(prior, stan_input, verbose) {
   log_progress("Parsing prior...", verbose)
-  num_uncrt <- dollar(stan_input, "num_uncrt")
-  num_ns <- dollar(stan_input, "num_ns")
-  filled <- fill_prior(prior, num_uncrt)
+  num_unc <- dollar(stan_input, "num_unc")
+  num_wrp <- dollar(stan_input, "num_wrp")
+  filled <- fill_prior(prior, num_unc)
   spec <- dollar(filled, "specified")
   dflt <- dollar(filled, "defaulted")
   str1 <- paste(spec, collapse = ", ")
   str2 <- paste(dflt, collapse = ", ")
   wrp_defaulted <- "wrp" %in% dflt
-  if (num_ns > 0 && wrp_defaulted) {
+  if (num_wrp > 0 && wrp_defaulted) {
     model_desc <- "involves a gp_ns() or gp_vm() expression"
     msg <- warn_msg_default_prior("input warping steepness", "wrp", model_desc)
     warning(msg)
@@ -233,7 +233,7 @@ parse_prior_full <- function(prior, stan_input) {
 parse_prior_full_pos <- function(prior, stan_input) {
   obs_model <- dollar(stan_input, "obs_model")
   par_names <- c("alpha", "ell", "wrp", "sigma", "phi")
-  nums <- stan_input[c("num_comps", "num_ell", "num_ns")]
+  nums <- stan_input[c("J", "num_ell", "num_wrp")]
   num_sigma <- as.numeric(obs_model == 1)
   num_phi <- as.numeric(obs_model == 3)
   nums <- c(unlist(nums), num_sigma, num_phi)
@@ -257,9 +257,9 @@ parse_prior_full_unit <- function(prior, stan_input) {
   obs_model <- dollar(stan_input, "obs_model")
   par_names <- c("beta", "gamma")
   num_gamma <- as.numeric(obs_model == 5)
-  num_heter <- dollar(stan_input, "num_heter")
-  num_heter <- as.numeric(num_heter > 0)
-  nums <- c(num_heter, num_gamma)
+  num_het <- dollar(stan_input, "num_het")
+  DIM0 <- as.numeric(num_het > 0)
+  DIMS <- c(DIM0, num_gamma)
 
   parsed <- c()
   K <- length(par_names)
@@ -267,25 +267,25 @@ parse_prior_full_unit <- function(prior, stan_input) {
     desc <- dollar(prior, par_names[k])[[1]]
     hyper <- c(dollar(desc, "alpha"), dollar(desc, "beta"))
     f <- paste0("hyper_", par_names[k])
-    parsed[[f]] <- repvec(hyper, nums[k])
+    parsed[[f]] <- repvec(hyper, DIMS[k])
   }
   return(parsed)
 }
 
 # Parse a fully defined prior (effect time parameters)
 parse_prior_full_teff <- function(prior, stan_input) {
-  num_bt <- dollar(stan_input, "num_bt")
-  num_uncrt <- dollar(stan_input, "num_uncrt")
+  num_teff <- dollar(stan_input, "num_teff")
+  num_unc <- dollar(stan_input, "num_unc")
 
   effect_time_info <- dollar(prior, "effect_time_info")[[1]]
   is_backwards <- as.numeric(dollar(effect_time_info, "backwards"))
   lower <- dollar(effect_time_info, "lower")
   upper <- dollar(effect_time_info, "upper")
   zero <- dollar(effect_time_info, "zero")
-  lower <- ensure_len(lower, num_bt)
-  upper <- ensure_len(upper, num_bt)
-  zero <- ensure_len(zero, num_bt)
-  DIM <- as.numeric(num_uncrt > 0)
+  lower <- ensure_len(lower, num_teff)
+  upper <- ensure_len(upper, num_teff)
+  zero <- ensure_len(zero, num_teff)
+  DIM <- as.numeric(num_unc > 0)
 
   desc <- dollar(prior, "effect_time")[[1]]
   out <- prior_to_num(desc)

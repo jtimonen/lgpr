@@ -33,10 +33,11 @@
 #' \code{likelihood="binomial"} corresponds to Bernoulli observation model.
 #' @param y_name Name of response variable
 #' @param verbose Should some informative messages be printed?
+#' @param stan_opts Parsed list of options
 #' @return a list of parsed options
 #' @family internal model creation functions
 create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
-                                    y_name, sample_f, verbose) {
+                                    y_name, sample_f, verbose, stan_opts) {
   log_progress("Parsing response and likelihood...", verbose)
   LH <- likelihood_as_int(likelihood)
 
@@ -57,7 +58,7 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
     if (!is.null(num_trials)) {
       stop("<num_trials> must be NULL when <sample_f> is FALSE!")
     }
-    y_info <- parse_y.marginal(Y_RAW, y_name)
+    y_info <- parse_y.marginal(Y_RAW, y_name, stan_opts)
   } else {
     y_info <- parse_y.latent(Y_RAW, y_name, LH, c_hat, num_trials)
   }
@@ -65,38 +66,38 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
 }
 
 # Parse raw response taken from input data frame (marginal GP model)
-parse_y.marginal <- function(Y_RAW, y_name) {
-  num_obs <- length(Y_RAW)
-  normalizer <- create_scaling(Y_RAW, y_name) # create scaling
-  y_norm <- apply_scaling(normalizer, Y_RAW) # standardize the response
+parse_y.marginal <- function(Y_RAW, y_name, stan_opts) {
+  N <- length(Y_RAW)
+  if (dollar(stan_opts, "normalize_y")) {
+    normalizer <- create_scaling(Y_RAW, y_name) # create scaling
+  } else {
+    normalizer <- new("lgpscaling", var_name = y_name) # identity mapping
+  }
+  y <- apply_scaling(normalizer, Y_RAW)
 
   # Return Stan inputs and also the scaling and its inverse
   list(
-    to_stan = list(
-      num_obs = num_obs,
-      y_norm = y_norm,
-      obs_model = 1
-    ),
+    to_stan = list(N = N, y = y, obs_model = 1),
     scaling = normalizer
   )
 }
 
 # Parse raw response taken from input data frame (latent GP model)
 parse_y.latent <- function(Y_RAW, y_name, LH, c_hat, num_trials) {
-  num_obs <- length(Y_RAW)
+  N <- length(Y_RAW)
   if (LH == 1) {
-    y_int <- array(Y_RAW, dim = c(0, num_obs))
-    y_real <- array(Y_RAW, dim = c(1, num_obs))
+    y_int <- array(Y_RAW, dim = c(0, N))
+    y_real <- array(Y_RAW, dim = c(1, N))
   } else {
-    y_int <- array(Y_RAW, dim = c(1, num_obs))
-    y_real <- array(Y_RAW, dim = c(0, num_obs))
+    y_int <- array(Y_RAW, dim = c(1, N))
+    y_real <- array(Y_RAW, dim = c(0, N))
   }
   num_trials <- set_num_trials(num_trials, Y_RAW, LH)
   c_hat <- set_c_hat(c_hat, Y_RAW, LH, num_trials)
 
   # Create stan input parts
   to_stan <- list(
-    num_obs = num_obs,
+    N = N,
     y_int = y_int,
     y_real = y_real,
     obs_model = LH,
@@ -143,10 +144,10 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
 
 # Convert given num_trials input to Stan input format
 set_num_trials <- function(num_trials, y, LH) {
-  num_obs <- length(y)
+  N <- length(y)
   is_binom <- LH %in% c(4, 5)
   if (is.null(num_trials)) {
-    num_trials <- rep(1, num_obs)
+    num_trials <- rep(1, N)
   } else {
     if (!is_binom) {
       msg <- paste0(
@@ -157,16 +158,16 @@ set_num_trials <- function(num_trials, y, LH) {
     }
     L <- length(num_trials)
     if (L == 1) {
-      num_trials <- rep(num_trials, num_obs)
-    } else if (L != num_obs) {
+      num_trials <- rep(num_trials, N)
+    } else if (L != N) {
       stop(
         "Invalid length of <num_trials>! Must be 1 or equal to number ",
-        "of observartions (", num_obs, "). Found = ", L
+        "of observartions (", N, "). Found = ", L
       )
     }
   }
   DIM <- as.numeric(is_binom)
-  num_trials <- array(num_trials, dim = c(DIM, num_obs))
+  num_trials <- array(num_trials, dim = c(DIM, N))
   return(num_trials)
 }
 

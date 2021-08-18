@@ -35,11 +35,11 @@ create_model <- function(formula,
   cc_info <- create_model.covs_and_comps(data, lgp_formula, NA, verbose)
   stan_x <- dollar(cc_info, "to_stan")
   stan_opts <- create_model.options(options, verbose)
-  print(stan_opts)
 
   # Parse response and likelihood
   y_info <- create_model.likelihood(
-    data, likelihood, c_hat, num_trials, lgp_formula@y_name, sample_f, verbose
+    data, likelihood, c_hat, num_trials, lgp_formula@y_name, sample_f, verbose,
+    stan_opts
   )
   stan_y <- dollar(y_info, "to_stan")
   stan_input <- c(stan_x, stan_opts, stan_y)
@@ -61,27 +61,22 @@ create_model <- function(formula,
   stan_input <- c(stan_input, si_approx)
 
   # Variable info
-  var_names <- dollar(cc_info, "var_names")
-  var_scalings <- list(
-    y = dollar(y_info, "scaling"),
-    x_cont = dollar(cc_info, "x_cont_scalings")
+  var_info <- list(
+    var_names = dollar(cc_info, "var_names"),
+    y_scaling = dollar(y_info, "scaling")
   )
-  var_info <- list(x_cat_levels = dollar(cc_info, "x_cat_levels"))
 
   # Misc model info
   info <- list(
     created = date(),
-    lgpr_version = utils::packageVersion("lgpr"),
-    caseid_map = dollar(cc_info, "caseid_map")
+    lgpr_version = utils::packageVersion("lgpr")
   )
 
   # Create the 'lgpmodel' object
   out <- new("lgpmodel",
     model_formula = lgp_formula,
     data = data,
-    var_names = var_names,
     var_info = var_info,
-    var_scalings = var_scalings,
     stan_input = stan_input,
     info = info,
     sample_f = sample_f,
@@ -99,9 +94,9 @@ create_model <- function(formula,
 #'   covariance matrices.
 #'   \item \code{vm_params} Variance mask function parameters (numeric
 #'   vector of length 2).
-#'   \item \code{normalize_data} Boolean value determining if all continuous
-#'   variables in \code{data} should be normalized to have zero mean and
-#'   unit variance.
+#'   \item \code{normalize_y} Boolean value determining if the response
+#'   variable should be normalized to have zero mean and
+#'   unit variance. Only has effect if \code{"likelihood"} is \code{"gaussian"}.
 #'   \item \code{num_bf} Number of basis functions (0 = no approximation).
 #'   \item \code{scale_bf} Scale of the domain to be used in basis
 #'   function approximation. Has no effect if \code{num_bf = 0}.
@@ -111,7 +106,7 @@ create_model <- function(formula,
 #' \code{options = list(
 #'   delta = 1e-8,
 #'   vm_params = c(0.025, 1),
-#'   normalize_data = TRUE,
+#'   normalize_y = TRUE,
 #'   num_bf = 0,
 #'   scale_bf = 1.5
 #' )
@@ -125,7 +120,7 @@ create_model.options <- function(options, verbose) {
   opts <- list(
     delta = 1e-8,
     vm_params = c(0.025, 1),
-    normalize_data = TRUE,
+    normalize_y = TRUE,
     num_bf = 0,
     scale_bf = 1.5
   )

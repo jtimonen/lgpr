@@ -12,4 +12,4 @@
   // that should be used for observation n. If observation n doesn't
   //  correspond to any beta parameter, then *_IDX[n] should be 1.
   int<lower=1, upper=num_beta+1> BETA_IDX[num_het>0, N];
-  int<lower=1, upper=num_teff+1> TEFF_IDX[idx_unc>0, N];
+  int<lower=1, upper=num_teff+1> TEFF_IDX[num_unc>0, N];

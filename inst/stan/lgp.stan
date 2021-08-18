@@ -40,7 +40,7 @@ model {
     matrix[N, N] KX[J] = STAN_kernel_all(N, N,
       K_const, components, X, X, X_scale,
       alpha, ell, wrp, beta, teff, vm_params, 
-      BETA_IDX, BETA_IDX, idx_unc, TEFF_IDX, TEFF_IDX, teff_zero
+      BETA_IDX, BETA_IDX, TEFF_IDX, TEFF_IDX, teff_zero
     );
     for(j in 1:J){
       Ky += KX[j];

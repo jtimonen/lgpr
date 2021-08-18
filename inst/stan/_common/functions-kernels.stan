@@ -140,7 +140,6 @@
     data real[] vm_params,
     data int[,] beta_idx1,
     data int[,] beta_idx2,
-    data int idx_unc,
     data int[,] teff_idx1,
     data int[,] teff_idx2,
     data vector[] teff_zero)
@@ -163,7 +162,8 @@
       int idx_cont = components[j, 3];
       int ker_cont = components[j, 4];
       int is_warped = components[j, 5];
-      int is_heter = components[j, 6];
+      int is_het = components[j, 6];
+      int has_unc = components[j, 7];
       
       // 3. Pick the possible continuous covariate of this component
       if(idx_cont != 0){
@@ -171,7 +171,7 @@
         x2 = X2[idx_cont];
         
         // 3.1 Handle possible uncertainty in covariate
-        if(idx_unc>0 && idx_unc==idx_cont) {
+        if(has_unc==1) {
           x1 = STAN_edit_x_cont(x1, teff_idx1[1], teff_zero[1], teff[1]);
           x2 = STAN_edit_x_cont(x2, teff_idx2[1], teff_zero[1], teff[1]);
         }
@@ -205,7 +205,7 @@
       }
       
       // Possible heterogeneity
-      if(is_heter){
+      if(is_het){
         Kj = Kj .* STAN_kernel_beta(beta[1], beta_idx1[1], beta_idx2[1]);
       }
       

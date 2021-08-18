@@ -11,7 +11,8 @@ create_model.likelihood(
   num_trials,
   y_name,
   sample_f,
-  verbose
+  verbose,
+  stan_opts
 )
 }
 \arguments{
@@ -54,6 +55,8 @@ equal to the number of data points. Setting \code{num_trials=1} and
 and unit variance.}
 
 \item{verbose}{Should some informative messages be printed?}
+
+\item{stan_opts}{Parsed list of options}
 }
 \value{
 a list of parsed options

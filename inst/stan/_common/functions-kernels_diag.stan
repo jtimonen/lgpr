@@ -83,7 +83,6 @@
     vector[] teff,
     data real[] vm_params,
     data int[,] beta_idx,
-    data int idx_unc,
     data int[,] teff_idx,
     data vector[] teff_zero)
   {
@@ -103,12 +102,13 @@
       int idx_cont = components[j, 3];
       int ker_cont = components[j, 4];
       int is_warped = components[j, 5];
-      int is_heter = components[j, 6];
+      int is_het = components[j, 6];
+      int has_unc = components[j, 7];
       
       // 3. Continuous covariate
       if(idx_cont != 0){
         x = X[idx_cont];
-        if(idx_unc>0 && idx_unc==idx_cont) {
+        if(has_unc) {
           x = STAN_edit_x_cont(x, teff_idx[1], teff_zero[1], teff[1]);
         }
         x = x / X_scale[idx_cont];
@@ -132,7 +132,7 @@
       }
       
       // Possible heterogeneity
-      if(is_heter){
+      if(is_het){
         Dj = Dj .* STAN_kernel_beta_diag(beta[1], beta_idx[1]);
       }
       

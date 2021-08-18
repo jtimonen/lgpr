@@ -66,29 +66,15 @@
 #' be specified according to the knowledge about the problem at hand, as in any
 #' Bayesian analysis. In \code{lgpr} this is especially important
 #' \enumerate{
-#'  \item if using a kernel that works with unnormalized variables. By default,
-#'  the `gp()` kernel works with variables that are normalized to zero mean
-#'  and unit
-#'  variance (by default it is, if it is continuous and you don't specify
-#'  \code{normalize_data = FALSE} in \code{options}). In this case it should
-#'  be checked that the prior for the possible noise parameter
-#'  (\code{sigma}, \code{phi} or \code{gamma}) and the value of \code{c_hat}
-#'  make sense, given the scale of the response variable. \emph{NOTE:} if
-#'  \code{likelihood} is not \code{"gaussian"}, you always should check the
-#'  prior because the response variable cannot be normalized
+#'  \item if \code{likelihood} is not \code{"gaussian"}, because then the
+#'  response variable is not continuous and cannot be normalized
 #'  and therefore it is difficult to craft generally good default priors.
-#'  \item if continuous covariates are not normalized to zero mean and unit
-#'  variance (by default they are unless you specify
-#'  \code{normalize_data = FALSE} in \code{options}). In this case you would
-#'  need to check that your lengthscale priors make sense, taking into account
-#'  the scale of the covariates.
-#'  \item TODO: EDIT: Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
-#'  expression in its formula. These work with the unnormalized raw version
-#'  of \code{x} is not normalized, and the prior for the input warping
-#'  steepness parameter \code{wrp} must be set according to the expected
-#'  width of the window in which the nonstationary effect of \code{x} occurs.
-#'  With the default prior, the width of this window is about 36, which has
-#'  been set assuming that the unit of \code{x} is months.
+#'  The priors of the \code{alpha} parameters and possible noise level
+#'  parameters (\code{sigma}, \code{phi}, or \code{gamma}) should be set
+#'  taking into account the scale of the data and the value of \code{c_hat}.
+#'  \item if you specify \code{normalize_y = FALSE} in \code{options}),
+#'  because then the response variable is also not normalized, and the same
+#'  things as above apply.
 #'  }
 #'
 #' @name lgp

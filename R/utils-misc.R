@@ -486,11 +486,13 @@ example_fit_adv <- function(formula = example_adv_formula(),
   )
   data <- dat@data
   data$y <- round(exp(data$y))
+  et_prior_info <- list(backwards = FALSE, lower = 0, upper = 40, zero = 0)
   lgp(formula, data,
     likelihood = likelihood,
     chains = chains,
     iter = iter,
     num_trials = num_trials,
+    prior = list(effect_time_info = et_prior_info),
     ...
   )
 }

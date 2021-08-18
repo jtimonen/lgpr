@@ -2,12 +2,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp ;
-#include "stanExports_lgp_bf.h"
+#include "stanExports_lgp_latent_bf.h"
 
-RCPP_MODULE(stan_fit4lgp_bf_mod) {
+RCPP_MODULE(stan_fit4lgp_latent_bf_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_lgp_bf")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_lgp_latent_bf")
 
     .constructor<SEXP,SEXP,SEXP>()
 
