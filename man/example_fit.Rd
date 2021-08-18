@@ -2,6 +2,8 @@
 % Please edit documentation in R/utils-misc.R
 \name{example_fit}
 \alias{example_fit}
+\alias{example_fit_adv}
+\alias{example_adv_formula}
 \title{Quick way to create an example lgpfit, useful for debugging}
 \usage{
 example_fit(
@@ -13,6 +15,18 @@ example_fit(
   num_timepoints = 5,
   ...
 )
+
+example_fit_adv(
+  formula = example_adv_formula(),
+  likelihood = "nb",
+  chains = 1,
+  iter = 30,
+  num_indiv = 6,
+  num_timepoints = 5,
+  ...
+)
+
+example_adv_formula()
 }
 \arguments{
 \item{formula}{model formula}
@@ -36,3 +50,13 @@ the example model.
 \description{
 Quick way to create an example lgpfit, useful for debugging
 }
+\section{Functions}{
+\itemize{
+\item \code{example_fit}: Simple model
+
+\item \code{example_fit_adv}: Model with advanced features
+
+\item \code{example_adv_formula}: Create an example formula for a model with
+advanced features
+}}
+

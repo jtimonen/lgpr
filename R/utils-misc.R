@@ -151,6 +151,16 @@ matrix_to_list <- function(x) {
   return(L)
 }
 
+# Vector to R array
+vector_to_array <- function(x) {
+  if (!is.null(x)) {
+    x <- array(x, dim = length(x))
+  } else {
+    x <- array(0, dim = c(0))
+  }
+  return(x)
+}
+
 # Repeat a data frame vertically
 #
 # @param df a data frame
@@ -428,6 +438,10 @@ data_types <- function(data, y_name, verbose) {
 #' @param ... additional arguments to \code{\link{lgp}}
 #' @return An \linkS4class{lgpfit} object created by fitting
 #' the example model.
+#' @name example_fit
+NULL
+
+#' @describeIn example_fit Simple model
 example_fit <- function(formula = y ~ id + age + age | SEX + age | LOC,
                         likelihood = "gaussian",
                         chains = 1,
@@ -453,6 +467,39 @@ example_fit <- function(formula = y ~ id + age + age | SEX + age | LOC,
   )
 }
 
+#' @describeIn example_fit Model with advanced features
+example_fit_adv <- function(formula = example_adv_formula(),
+                            likelihood = "nb",
+                            chains = 1,
+                            iter = 30,
+                            num_indiv = 6,
+                            num_timepoints = 5,
+                            ...) {
+  num_trials <- if (is_bin_or_bb(likelihood)) 20 else NULL
+  dat <- simulate_data(
+    N = num_indiv, t_data = seq(12, 96, length.out = num_timepoints),
+    covariates = c(0, 2, 2),
+    relevances = c(0, 1, 0, 1, 1),
+    names = c("dis_age", "SEX", "LOC"),
+    noise_type = likelihood,
+    N_trials = num_trials
+  )
+  data <- dat@data
+  data$y <- round(exp(data$y))
+  lgp(formula, data,
+    likelihood = likelihood,
+    chains = chains,
+    iter = iter,
+    num_trials = num_trials,
+    ...
+  )
+}
+
+#' @describeIn example_fit Create an example formula for a model with
+#' advanced features
+example_adv_formula <- function() {
+  y ~ het(id) * gp(age) + categ(LOC) * unc(SEX) * gp_vm(dis_age)
+}
 
 # Get total number of post-warmup draws from stanfit
 get_num_postwarmup_draws <- function(stan_fit) {

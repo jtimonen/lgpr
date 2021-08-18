@@ -150,6 +150,29 @@ test_that("covariate must be same in unc() and het() expression", {
   )
 })
 
+test_that("multiple unc() or het() expressions cannot clash", {
+  dat <- testdata_001
+  msg <- paste0(
+    "their continuous covariates have to either all be missing ",
+    "or all be available for any given data row"
+  )
+  expect_error(
+    create_model(
+      y ~ unc(id) * gp(dis_age) + zs(id) + unc(id) * gp_vm(age),
+      dat
+    ),
+    msg
+  )
+  expect_error(
+    create_model(
+      y ~ het(id) * gp(age) + gp(age) + het(id) * gp_vm(dis_age),
+      dat
+    ),
+    msg
+  )
+})
+
+
 test_that("a formula term cannot have more than 4 expressions", {
   dat <- testdata_001
   expect_error(

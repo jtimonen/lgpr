@@ -198,14 +198,14 @@ Bayesian analysis. In \code{lgpr} this is especially important
  \code{normalize_data = FALSE} in \code{options}). In this case you would
  need to check that your lengthscale priors make sense, taking into account
  the scale of the covariates.
-}
- \item Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
+ \item TODO: EDIT: Using a model that contains a \code{gp_ns(x)} or \code{gp_vm(x)}
  expression in its formula. These work with the unnormalized raw version
  of \code{x} is not normalized, and the prior for the input warping
  steepness parameter \code{wrp} must be set according to the expected
  width of the window in which the nonstationary effect of \code{x} occurs.
  With the default prior, the width of this window is about 36, which has
  been set assuming that the unit of \code{x} is months.
+ }
 }
 
 \seealso{
