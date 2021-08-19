@@ -22,15 +22,10 @@ setMethod("parameter_info", "lgpmodel", function(object, digits = 3) {
 #' component.
 setMethod("component_info", "lgpmodel", function(object) {
   comps <- get_component_encoding(object)
-  nams <- colnames(comps)
-  p1 <- ensure_2dim(comps[, 1:2])
-  p2 <- ensure_2dim(comps[, 4:9])
-  a <- cbind(p1, p2)
-  Component <- rownames(comps)
-  a <- cbind(Component, a)
-  colnames(a) <- c("Component", nams[1:2], nams[4:9])
-  rownames(a) <- NULL
-  data.frame(a)
+  nam <- colnames(comps)
+  df <- data.frame(comps)
+  colnames(df) <- nam
+  return(df)
 })
 
 #' @export
@@ -76,13 +71,13 @@ model_summary <- function(object, digits = 3) {
     line2 <- paste0("Likelihood: ", str2)
     line3 <- paste0("Data: ", N, " observations, ", D, " variables")
     line4 <- approx_info(model)
-    out <- paste0(line1, "\n", line2, "\n", line3, "\n", line4, "\n")
+    out <- paste0(line1, "\n", line2, "\n", line3, "\n", line4)
     return(out)
   }
 
   brief <- model_info(model)
   cat(brief)
-  cat("\n")
+  cat("Components:\n")
   print(component_info(model))
   cat("\n")
   ci <- covariate_info(model)
@@ -98,9 +93,25 @@ model_summary <- function(object, digits = 3) {
   }
   print(parameter_info(model, digits))
   bi <- beta_teff_idx_info(model)
-  if (!is.null(bi)) {
-    cat("\n")
-    print(bi)
+  beta_map <- dollar(bi, "beta")
+  teff_map <- dollar(bi, "teff")
+  het_z <- dollar(model@stan_input, "het_z")
+  unc_z <- dollar(model@stan_input, "unc_z")
+  if (!is.null(beta_map)) {
+    cat(
+      "\nConnection between categories of <",
+      het_z, "> and beta parameter indices:\n",
+      sep = ""
+    )
+    print(beta_map)
+  }
+  if (!is.null(teff_map)) {
+    cat(
+      "\nConnection between categories of <",
+      unc_z, "> and teff parameter indices:\n",
+      sep = ""
+    )
+    print(teff_map)
   }
   cat("\n")
   cat(misc_info(model), "\n")
@@ -114,17 +125,12 @@ param_summary <- function(object, digits = 3) {
   parameter_info(model, digits)
 }
 
+# Info about mapping categories to parameter indices
 beta_teff_idx_info <- function(object) {
   model <- object_to_model(object)
-  a <- dollar(model@info, "caseid_map")
-  if (is.null(a)) {
-    return(a)
-  }
-  a <- t(a)
-  rownames(a)[2] <- "beta_or_teff_param_idx"
-  a <- data.frame(a)
-  colnames(a) <- NULL
-  return(a)
+  beta_map <- dollar(model@stan_input, "BETA_IDX_MAP")
+  teff_map <- dollar(model@stan_input, "TEFF_IDX_MAP")
+  list(beta = beta_map, teff = teff_map)
 }
 
 # Information about used possible approximation
@@ -156,13 +162,13 @@ misc_info <- function(object) {
 # Categorial covariate information
 covariate_info.cat <- function(object) {
   model <- object_to_model(object)
-  vn <- model@var_names
-  nam <- dollar(vn, "x_cat")
+  vn <- dollar(model@var_info, "var_names")
+  nam <- dollar(vn, "z")
   if (is.null(nam)) {
     return(NULL)
   }
-  num_levels <- dollar(model@stan_input, "x_cat_num_levels")
-  levels <- dollar(model@var_info, "x_cat_levels")
+  num_levels <- dollar(model@stan_input, "Z_M")
+  levels <- dollar(model@stan_input, "Z_levels")
   level_names <- c()
   J <- length(nam)
   for (j in seq_len(J)) {
@@ -179,12 +185,12 @@ covariate_info.cat <- function(object) {
 # Continuous covariate information
 covariate_info.cont <- function(object) {
   model <- object_to_model(object)
-  vn <- model@var_names
-  nam <- dollar(vn, "x_cont")
+  vn <- dollar(model@var_info, "var_names")
+  nam <- dollar(vn, "x")
   if (is.null(nam)) {
     return(NULL)
   }
-  mask <- dollar(model@stan_input, "x_cont_mask")
+  mask <- dollar(model@stan_input, "X_mask")
   num_nan <- rowSums(mask == 1)
   df <- data.frame(nam, num_nan)
   colnames(df) <- c("Variable", "#Missing")

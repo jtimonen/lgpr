@@ -173,8 +173,8 @@ stan_data_expanding <- function(covs, comps) {
   N <- ncol(Z)
   het <- stan_data_expanding.create(components, Z, X_mask, "het()", 6, Z_levs)
   unc <- stan_data_expanding.create(components, Z, X_mask, "unc()", 7, Z_levs)
-  het <- reduce_index_maps(het, "het()", N)
-  unc <- reduce_index_maps(unc, "unc()", N)
+  het <- reduce_index_maps(het, "het()", N, "beta")
+  unc <- reduce_index_maps(unc, "unc()", N, "teff")
   BETA_IDX <- dollar(het, "idx_expand")
   TEFF_IDX <- dollar(unc, "idx_expand")
 
@@ -185,7 +185,9 @@ stan_data_expanding <- function(covs, comps) {
     BETA_IDX_MAP = dollar(het, "map"),
     TEFF_IDX_MAP = dollar(unc, "map"),
     num_beta = length(unique(BETA_IDX[BETA_IDX > 1])),
-    num_teff = length(unique(TEFF_IDX[TEFF_IDX > 1]))
+    num_teff = length(unique(TEFF_IDX[TEFF_IDX > 1])),
+    het_z = dollar(het, "covariate_name"),
+    unc_z = dollar(unc, "covariate_name")
   )
 }
 
@@ -212,7 +214,7 @@ stan_data_expanding.create <- function(components, Z, X_mask, expr, icol,
     lst[[cntr]] <- maps
     names(lst)[cntr] <- rownames(components)[j]
   }
-  return(lst)
+  list(lst = lst, covariate_name = unames)
 }
 
 # Index maps for component j
@@ -236,13 +238,13 @@ category_inds_to_param_inds <- function(z, x_mask) {
   is_missing <- which(x_mask == 1)
   uval <- sort(unique(z))
   Q <- length(uval)
-  param_idx <- rep(1, Q)
+  param_idx <- rep(0, Q)
   pidx <- 0
   for (q in seq_len(Q)) {
     inds <- which(z == uval[q])
     if (any(x_mask[inds] == 0)) {
       pidx <- pidx + 1
-      param_idx[q] <- pidx + 1 # note the plus 1, cuz 1 means no param
+      param_idx[q] <- pidx
     }
   }
   arr <- rbind(uval, param_idx)
@@ -257,11 +259,13 @@ obs_inds_to_param_inds <- function(z, map) {
   for (n in seq_len(N)) {
     idx_expand[n] <- map[2, z[n]]
   }
-  return(idx_expand)
+  return(idx_expand + 1) # plus 1, because 1 means no param
 }
 
 # Check that the param_idx maps are same for each term, and reduce maps to one
-reduce_index_maps <- function(maps, expr, N) {
+reduce_index_maps <- function(idx_maps, expr, N, param_name) {
+  maps <- dollar(idx_maps, "lst")
+  cn <- dollar(idx_maps, "covariate_name")
   if (length(maps) == 0) {
     idx_expand <- array(0, dim = c(0, N)) # empty version
     map <- NULL
@@ -278,11 +282,14 @@ reduce_index_maps <- function(maps, expr, N) {
     }
     idx_expand <- array(as.vector(u), dim = c(1, N))
     map <- dollar(maps[[1]], "map")
+    rownames(map)[1] <- paste0(cn, "_idx")
+    rownames(map)[2] <- paste0(param_name, "_idx")
   }
 
   # Return
   list(
     idx_expand = idx_expand,
-    map = map
+    map = map,
+    covariate_name = cn
   )
 }

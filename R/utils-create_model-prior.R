@@ -90,10 +90,10 @@ prior_to_df <- function(stan_input, digits = 3) {
   }
 
   # Beta
-  num_heter <- dollar(stan_input, "num_heter")
-  if (num_heter > 0) {
-    num_bt <- dollar(stan_input, "num_bt")
-    df_bet <- prior_to_df_unit(stan_input, "beta", num_bt, digits)
+  num_het <- dollar(stan_input, "num_het")
+  if (num_het > 0) {
+    num_beta <- dollar(stan_input, "num_beta")
+    df_bet <- prior_to_df_unit(stan_input, "beta", num_beta, digits)
     df <- rbind(df, df_bet)
   }
 
@@ -105,8 +105,8 @@ prior_to_df <- function(stan_input, digits = 3) {
   }
 
   # Effect time
-  num_uncrt <- dollar(stan_input, "num_uncrt")
-  if (num_uncrt > 0) {
+  num_unc <- dollar(stan_input, "num_unc")
+  if (num_unc > 0) {
     df_p <- prior_to_df_teff(stan_input, digits)
     df <- rbind(df, df_p)
   }
@@ -154,7 +154,7 @@ prior_to_df_unit <- function(stan_input, parname, num, digits) {
 
 # Helper function for converting prior representation to human readable df
 prior_to_df_teff <- function(stan_input, digits) {
-  num_bt <- dollar(stan_input, "num_bt")
+  num_teff <- dollar(stan_input, "num_teff")
   prior <- dollar(stan_input, "prior_teff")
   type <- prior[1]
   backwards <- prior[2]
@@ -162,10 +162,10 @@ prior_to_df_teff <- function(stan_input, digits) {
   zero <- dollar(stan_input, "teff_zero")
   lower <- dollar(stan_input, "teff_lb")
   upper <- dollar(stan_input, "teff_ub")
-  pnames <- rep("foo", num_bt)
-  dnames <- rep("foo", num_bt)
-  bounds <- rep("foo", num_bt)
-  for (j in seq_len(num_bt)) {
+  pnames <- rep("foo", num_teff)
+  dnames <- rep("foo", num_teff)
+  bounds <- rep("foo", num_teff)
+  for (j in seq_len(num_teff)) {
     par <- paste0("teff[", j, "]")
     tpar <- par
     tpar <- minus.append(tpar, zero[j])

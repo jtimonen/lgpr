@@ -105,7 +105,7 @@ lgp <- function(formula,
     prior_only, verbose, sample_f
   )
   if (verbose) {
-    log_progress("\nModel created, printing it here.")
+    log_progress("===== Created the following model =====")
     print(model)
   }
 

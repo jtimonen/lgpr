@@ -4,6 +4,7 @@
 \alias{example_fit}
 \alias{example_fit_adv}
 \alias{example_adv_formula}
+\alias{example_effect_time_prior_info}
 \title{Quick way to create an example lgpfit, useful for debugging}
 \usage{
 example_fit(
@@ -27,6 +28,8 @@ example_fit_adv(
 )
 
 example_adv_formula()
+
+example_effect_time_prior_info()
 }
 \arguments{
 \item{formula}{model formula}
@@ -58,5 +61,7 @@ Quick way to create an example lgpfit, useful for debugging
 
 \item \code{example_adv_formula}: Create an example formula for a model with
 advanced features
+
+\item \code{example_effect_time_prior_info}: Create an example effect time prior info
 }}
 

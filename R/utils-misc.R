@@ -486,7 +486,7 @@ example_fit_adv <- function(formula = example_adv_formula(),
   )
   data <- dat@data
   data$y <- round(exp(data$y))
-  et_prior_info <- list(backwards = FALSE, lower = 0, upper = 40, zero = 0)
+  et_prior_info <- example_effect_time_prior_info()
   lgp(formula, data,
     likelihood = likelihood,
     chains = chains,
@@ -502,6 +502,12 @@ example_fit_adv <- function(formula = example_adv_formula(),
 example_adv_formula <- function() {
   y ~ het(id) * gp(age) + categ(LOC) * unc(SEX) * gp_vm(dis_age)
 }
+
+#' @describeIn example_fit Create an example effect time prior info
+example_effect_time_prior_info <- function() {
+  list(backwards = FALSE, lower = 10, upper = 40, zero = 0)
+}
+
 
 # Get total number of post-warmup draws from stanfit
 get_num_postwarmup_draws <- function(stan_fit) {
