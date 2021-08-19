@@ -13,8 +13,10 @@
 #' (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
 #' \code{TRUE}, the response variable will be normalized to have zero mean
 #' and unit variance.
-#' @param c_hat The GP mean. This should only be given if \code{sample_f} is
-#' \code{TRUE}, otherwise the GP will always have zero mean. If \code{sample_f}
+#' @param c_hat Constant added to the zero-mean GP before mapping through
+#' inverse link function. This should only be given if \code{sample_f} is
+#' \code{TRUE}, otherwise this is zero (as response is normalized to have
+#' zero mean and unit variance). If \code{sample_f}
 #' is \code{TRUE}, the given \code{c_hat} can be a vector of length
 #' \code{dim(data)[1]}, or a real number defining a constant GP mean. If not
 #' specified and \code{sample_f} is \code{TRUE}, \code{c_hat} is set to
@@ -68,11 +70,7 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
 # Parse raw response taken from input data frame (marginal GP model)
 parse_y.marginal <- function(Y_RAW, y_name, stan_opts) {
   N <- length(Y_RAW)
-  if (dollar(stan_opts, "normalize_y")) {
-    normalizer <- create_scaling(Y_RAW, y_name) # create scaling
-  } else {
-    normalizer <- new("lgpscaling", var_name = y_name) # identity mapping
-  }
+  normalizer <- create_scaling(Y_RAW, y_name) # create scaling
   y <- apply_scaling(normalizer, Y_RAW)
 
   # Return Stan inputs and also the scaling and its inverse

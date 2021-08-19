@@ -47,8 +47,10 @@ binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 (hyper)parameters. See the "Defining priors" section below
 (\code{\link{lgp}}).}
 
-\item{c_hat}{The GP mean. This should only be given if \code{sample_f} is
-\code{TRUE}, otherwise the GP will always have zero mean. If \code{sample_f}
+\item{c_hat}{Constant added to the zero-mean GP before mapping through
+inverse link function. This should only be given if \code{sample_f} is
+\code{TRUE}, otherwise this is zero (as response is normalized to have
+zero mean and unit variance). If \code{sample_f}
 is \code{TRUE}, the given \code{c_hat} can be a vector of length
 \code{dim(data)[1]}, or a real number defining a constant GP mean. If not
 specified and \code{sample_f} is \code{TRUE}, \code{c_hat} is set to
@@ -73,9 +75,6 @@ equal to the number of data points. Setting \code{num_trials=1} and
   covariance matrices.
   \item \code{vm_params} Variance mask function parameters (numeric
   vector of length 2).
-  \item \code{normalize_y} Boolean value determining if the response
-  variable should be normalized to have zero mean and
-  unit variance. Only has effect if \code{"likelihood"} is \code{"gaussian"}.
   \item \code{num_bf} Number of basis functions (0 = no approximation).
   \item \code{scale_bf} Scale of the domain to be used in basis
   function approximation. Has no effect if \code{num_bf = 0}.
@@ -85,7 +84,6 @@ are equivalent to
 \code{options = list(
   delta = 1e-8,
   vm_params = c(0.025, 1),
-  normalize_y = TRUE,
   num_bf = 0,
   scale_bf = 1.5
 )
@@ -182,15 +180,12 @@ It is not recommended to use default priors blindly. Rather, priors should
 be specified according to the knowledge about the problem at hand, as in any
 Bayesian analysis. In \code{lgpr} this is especially important
 \enumerate{
- \item if \code{likelihood} is not \code{"gaussian"}, because then the
- response variable is not continuous and cannot be normalized
+ \item if \code{sample_f=TRUE}, because then the
+ response variable is not automatically normalized
  and therefore it is difficult to craft generally good default priors.
  The priors of the \code{alpha} parameters and possible noise level
  parameters (\code{sigma}, \code{phi}, or \code{gamma}) should be set
  taking into account the scale of the data and the value of \code{c_hat}.
- \item if you specify \code{normalize_y = FALSE} in \code{options}),
- because then the response variable is also not normalized, and the same
- things as above apply.
  }
 }
 

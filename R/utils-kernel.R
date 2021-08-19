@@ -38,25 +38,24 @@ create_kernel_computer <- function(model,
 # Compute all constant kernel matrices of a model
 # Input is a list returned by fp_input
 kernel_const_all <- function(input, is_out1, is_out2, STREAM) {
-  A1 <- if (is_out1) "x_cat_OUT" else "x_cat"
-  A2 <- if (is_out2) "x_cat_OUT" else "x_cat"
-  B1 <- if (is_out1) "x_cont_mask_OUT" else "x_cont_mask"
-  B2 <- if (is_out2) "x_cont_mask_OUT" else "x_cont_mask"
-  C1 <- if (is_out1) "num_OUT" else "num_obs"
-  C2 <- if (is_out2) "num_OUT" else "num_obs"
+  A1 <- if (is_out1) "Z_OUT" else "Z"
+  A2 <- if (is_out2) "Z_OUT" else "Z"
+  B1 <- if (is_out1) "X_mask_OUT" else "X_mask"
+  B2 <- if (is_out2) "X_mask_OUT" else "X_mask"
+  C1 <- if (is_out1) "N_OUT" else "N"
+  C2 <- if (is_out2) "N_OUT" else "N"
 
-  x1_cat <- matrix_to_list(dollar(input, A1))
-  x2_cat <- matrix_to_list(dollar(input, A2))
-  x1_cont_mask <- matrix_to_list(dollar(input, B1))
-  x2_cont_mask <- matrix_to_list(dollar(input, B2))
-  n1 <- dollar(input, C1)
-  n2 <- dollar(input, C2)
+  Z1 <- matrix_to_list(dollar(input, A1))
+  Z2 <- matrix_to_list(dollar(input, A2))
+  X1_mask <- matrix_to_list(dollar(input, B1))
+  X2_mask <- matrix_to_list(dollar(input, B2))
+  N1 <- dollar(input, C1)
+  N2 <- dollar(input, C2)
 
   components <- matrix_to_list(dollar(input, "components"))
-  x_cat_num_levels <- dollar(input, "x_cat_num_levels")
+  Z_M <- dollar(input, "Z_M")
   STAN_kernel_const_all(
-    n1, n2, x1_cat, x2_cat, x1_cont_mask, x2_cont_mask,
-    x_cat_num_levels, components, STREAM
+    N1, N2, Z1, Z2, X1_mask, X2_mask, Z_M, components, STREAM
   )
 }
 
@@ -66,15 +65,13 @@ kernel_const_all <- function(input, is_out1, is_out2, STREAM) {
 kernel_const_all_diag <- function(input, STREAM) {
 
   # Get input
-  x_cat <- matrix_to_list(dollar(input, "x_cat_OUT"))
-  x_cont_mask <- matrix_to_list(dollar(input, "x_cont_mask_OUT"))
-  n <- dollar(input, "num_OUT")
+  Z <- matrix_to_list(dollar(input, "Z_OUT"))
+  X_mask <- matrix_to_list(dollar(input, "X_mask_OUT"))
+  n <- dollar(input, "N_OUT")
   components <- matrix_to_list(dollar(input, "components"))
 
   # Call Stan function
-  STAN_kernel_const_all_diag(
-    n, x_cat, x_cont_mask, components, STREAM
-  )
+  STAN_kernel_const_all_diag(n, Z, X_mask, components, STREAM)
 }
 
 # Compute all kernel matrices given draw idx
@@ -92,21 +89,22 @@ kernel_all <- function(init, input, idx, STREAM) {
 
   # Get covariate input in correct format
   K_const <- dollar(init, "K_const")
-  n1 <- dollar(init, "n1")
-  n2 <- dollar(init, "n2")
-  x1 <- dollar(init, "x1")
-  x2 <- dollar(init, "x2")
-  x1_unnorm <- dollar(init, "x1_unnorm")
-  x2_unnorm <- dollar(init, "x2_unnorm")
-  idx1_expand <- dollar(init, "idx1_expand")
-  idx2_expand <- dollar(init, "idx2_expand")
+  N1 <- dollar(init, "N1")
+  N2 <- dollar(init, "N2")
+  X1 <- dollar(init, "X1")
+  X2 <- dollar(init, "X2")
+  X_scale <- dollar(init, "X_scale")
+  beta_idx1 <- dollar(init, "BETA_IDX1")
+  beta_idx2 <- dollar(init, "BETA_IDX2")
+  teff_idx1 <- dollar(init, "TEFF_IDX1")
+  teff_idx2 <- dollar(init, "TEFF_IDX2")
 
   # Compute kernels for each component (a list with length num_comps)
   K_all <- STAN_kernel_all(
-    n1, n2, K_const, components,
-    x1, x2, x1_unnorm, x2_unnorm,
-    alpha_idx, ell_idx, wrp_idx, beta_idx, teff_idx,
-    vm_params, idx1_expand, idx2_expand, teff_zero, STREAM
+    N1, N2, K_const, components,
+    X1, X2, X_scale,
+    alpha_idx, ell_idx, wrp_idx, beta_idx, teff_idx, vm_params,
+    beta_idx1, beta_idx2, teff_idx1, teff_idx2, teff_zero, STREAM
   )
   return(K_all)
 }
@@ -126,16 +124,17 @@ kernel_all_diag <- function(init, input, idx, STREAM) {
 
   # Get covariate input in correct format
   K_const_diag <- dollar(init, "K_const")
-  n <- dollar(init, "n1")
-  x <- dollar(init, "x1")
-  x_unnorm <- dollar(init, "x1_unnorm")
-  idx_expand <- dollar(init, "idx1_expand")
+  N <- dollar(init, "N1")
+  X <- dollar(init, "X1")
+  X_scale <- dollar(init, "X_scale")
+  BETA_IDX <- dollar(init, "BETA_IDX1")
+  TEFF_IDX <- dollar(init, "TEFF_IDX1")
 
   # Compute kernel diagonals for each component (a list with length num_comps)
   K_all_diag <- STAN_kernel_all_diag(
-    n, K_const_diag, components,
-    x, x_unnorm, alpha_idx, wrp_idx, beta_idx, teff_idx,
-    vm_params, idx_expand, teff_zero, STREAM
+    N, K_const_diag, components,
+    X, X_scale, alpha_idx, wrp_idx, beta_idx, teff_idx,
+    vm_params, BETA_IDX, TEFF_IDX, teff_zero, STREAM
   )
   return(K_all_diag)
 }
@@ -155,36 +154,27 @@ kernelcomp.init <- function(input, is_out1, is_out2, STREAM, diag) {
   field_name <- function(is_out, base_name) {
     if (is_out) paste0(base_name, "_OUT") else base_name
   }
-  A1 <- field_name(is_out1, "x_cont")
-  A2 <- field_name(is_out2, "x_cont")
-  B1 <- field_name(is_out1, "x_cont_unnorm")
-  B2 <- field_name(is_out2, "x_cont_unnorm")
-  C1 <- if (is_out1) "num_OUT" else "num_obs"
-  C2 <- if (is_out2) "num_OUT" else "num_obs"
-  D1 <- field_name(is_out1, "idx_expand")
-  D2 <- field_name(is_out2, "idx_expand")
+  A1 <- field_name(is_out1, "X")
+  A2 <- field_name(is_out2, "X")
+  B1 <- field_name(is_out1, "N")
+  B2 <- field_name(is_out2, "N")
+  C1 <- field_name(is_out1, "BETA_IDX")
+  C2 <- field_name(is_out2, "BETA_IDX")
+  D1 <- field_name(is_out1, "TEFF_IDX")
+  D2 <- field_name(is_out2, "TEFF_IDX")
 
   # Get fields (possibly in list format)
-  x1 <- matrix_to_list(dollar(input, A1))
-  x2 <- matrix_to_list(dollar(input, A2))
-  x1_unnorm <- matrix_to_list(dollar(input, B1))
-  x2_unnorm <- matrix_to_list(dollar(input, B2))
-  n1 <- dollar(input, C1)
-  n2 <- dollar(input, C2)
-  idx1_expand <- dollar(input, D1)
-  idx2_expand <- dollar(input, D2)
-
-  # Return
   list(
     K_const = K_const,
-    x1 = x1,
-    x2 = x2,
-    x1_unnorm = x1_unnorm,
-    x2_unnorm = x2_unnorm,
-    n1 = n1,
-    n2 = n2,
-    idx1_expand = idx1_expand,
-    idx2_expand = idx2_expand,
+    X1 = matrix_to_list(dollar(input, A1)),
+    X2 = matrix_to_list(dollar(input, A2)),
+    X_scale = dollar(input, "X_scale"),
+    N1 = dollar(input, B1),
+    N2 = dollar(input, B2),
+    BETA_IDX1 = dollar(input, C1),
+    BETA_IDX2 = dollar(input, C2),
+    TEFF_IDX1 = dollar(input, D1),
+    TEFF_IDX2 = dollar(input, D2),
     is_diag = diag
   )
 }
@@ -203,30 +193,27 @@ kernelcomp.input_x <- function(model, x) {
   si <- get_stan_input(model)
   if (is.null(x)) {
     out <- list(
-      num_OUT = dollar(si, "num_obs"),
-      x_cont_OUT = dollar(si, "x_cont"),
-      x_cont_unnorm_OUT = dollar(si, "x_cont_unnorm"),
-      x_cont_mask_OUT = dollar(si, "x_cont_mask"),
-      x_cat_OUT = dollar(si, "x_cat"),
-      idx_expand_OUT = dollar(si, "idx_expand")
+      N_OUT = dollar(si, "N"),
+      X_OUT = dollar(si, "X"),
+      X_mask_OUT = dollar(si, "X_mask"),
+      Z_OUT = dollar(si, "Z"),
+      BETA_IDX_OUT = dollar(si, "BETA_IDX"),
+      TEFF_IDX_OUT = dollar(si, "TEFF_IDX")
     )
   } else {
     m <- model
     x_names <- unique(rhs_variables(m@model_formula@terms))
     check_df_with(x, x_names)
-    x_cont_scl <- dollar(m@var_scalings, "x_cont")
-    covariates <- stan_data_covariates(x, x_names, x_cont_scl)
-    covs_stan <- dollar(covariates, "to_stan")
-    comp_info <- get_component_encoding(m)
+    covs_stan <- stan_data_covariates(x, x_names)
+    comp_info <- list(components = get_component_encoding(m))
     expanding <- stan_data_expanding(covs_stan, comp_info)
-    si <- c(covs_stan, dollar(expanding, "to_stan"))
     out <- list(
-      num_OUT = nrow(x),
-      x_cont_OUT = dollar(si, "x_cont"),
-      x_cont_unnorm_OUT = dollar(si, "x_cont_unnorm"),
-      x_cont_mask_OUT = dollar(si, "x_cont_mask"),
-      x_cat_OUT = dollar(si, "x_cat"),
-      idx_expand_OUT = dollar(si, "idx_expand")
+      N_OUT = nrow(x),
+      X_OUT = dollar(covs_stan, "X"),
+      X_mask_OUT = dollar(covs_stan, "X_mask"),
+      Z_OUT = dollar(covs_stan, "Z"),
+      BETA_IDX_OUT = dollar(expanding, "BETA_IDX"),
+      TEFF_IDX_OUT = dollar(expanding, "TEFF_IDX")
     )
   }
   return(out)
@@ -238,21 +225,22 @@ kernelcomp.input_draws <- function(model, stan_fit, reduce, draws) {
   # Get dimensions
   S <- determine_num_paramsets(stan_fit, draws, reduce)
   si <- get_stan_input(model)
-  num_comps <- dollar(si, "num_comps")
+  J <- dollar(si, "J")
   num_ell <- dollar(si, "num_ell")
-  num_ns <- dollar(si, "num_ns")
-  UNC <- dollar(si, "num_uncrt") > 0
-  HET <- dollar(si, "num_heter") > 0
-  num_bt <- dollar(si, "num_bt")
+  num_wrp <- dollar(si, "num_wrp")
+  DH <- dollar(si, "num_het") > 0
+  DU <- dollar(si, "num_unc") > 0
+  num_beta <- dollar(si, "num_beta")
+  num_teff <- dollar(si, "num_teff")
 
   # Get draws
   list(
     num_paramsets = S,
-    d_alpha = get_draw_arr(stan_fit, draws, reduce, "alpha", S, num_comps),
+    d_alpha = get_draw_arr(stan_fit, draws, reduce, "alpha", S, J),
     d_ell = get_draw_arr(stan_fit, draws, reduce, "ell", S, num_ell),
-    d_wrp = get_draw_arr(stan_fit, draws, reduce, "wrp", S, num_ns),
-    d_beta = get_draw_arr_vec(stan_fit, draws, reduce, "beta", S, HET, num_bt),
-    d_teff = get_draw_arr_vec(stan_fit, draws, reduce, "teff", S, UNC, num_bt)
+    d_wrp = get_draw_arr(stan_fit, draws, reduce, "wrp", S, num_wrp),
+    d_beta = get_draw_arr_vec(stan_fit, draws, reduce, "beta", S, DH, num_beta),
+    d_teff = get_draw_arr_vec(stan_fit, draws, reduce, "teff", S, DU, num_teff)
   )
 }
 

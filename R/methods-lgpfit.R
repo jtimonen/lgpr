@@ -193,8 +193,8 @@ plot_draws <- function(fit,
 #'   individual-specific disease effect magnitude parameter draws
 plot_beta <- function(fit, type = "dens", verbose = TRUE, ...) {
   check_type(fit, "lgpfit")
-  num_heter <- dollar(get_stan_input(fit), "num_heter")
-  if (num_heter == 0) {
+  num_het <- dollar(get_stan_input(fit), "num_het")
+  if (num_het == 0) {
     stop("there are no heterogeneous effects in the model")
   }
   if (verbose) {
@@ -219,11 +219,11 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
                       color = colorset("red", "dark"), alpha = 0.5) {
   check_type(fit, "lgpfit")
   R <- window_size
-  num_ns <- dollar(get_stan_input(fit), "num_ns")
+  num_wrp <- dollar(get_stan_input(fit), "num_wrp")
   dis_age <- seq(-R / 2, R / 2, length.out = num_points)
   out <- list()
   sf <- get_stanfit(fit)
-  for (j in seq_len(num_ns)) {
+  for (j in seq_len(num_wrp)) {
     par_name <- paste0("wrp[", j, "]")
     draws <- rstan::extract(sf, pars = c(par_name))
     draws <- dollar(draws, par_name)
@@ -240,8 +240,8 @@ plot_warp <- function(fit, num_points = 300, window_size = 48,
 #' @describeIn plot_draws visualizes the input warping function for
 #'   different parameter draws
 plot_effect_times <- function(fit, type = "areas", verbose = TRUE, ...) {
-  num_uncrt <- dollar(get_stan_input(fit), "num_uncrt")
-  if (num_uncrt == 0) {
+  num_unc <- dollar(get_stan_input(fit), "num_unc")
+  if (num_unc == 0) {
     stop("there are no uncertain effect times in the model")
   }
   if (verbose) {

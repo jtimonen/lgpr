@@ -26,12 +26,12 @@ setMethod("num_components", "KernelComputer", function(object) {
 
 #' @describeIn KernelComputer Get number of evaluation points.
 setMethod("num_evalpoints", "KernelComputer", function(object) {
-  dollar(object@Ks_input, "n1")
+  dollar(object@Ks_input, "N1")
 })
 
 # Get number of observations from KernelComputer object
 get_num_obs_kc <- function(object) {
-  dollar(object@K_input, "n1")
+  dollar(object@K_input, "N1")
 }
 
 #' @describeIn KernelComputer Get number of parameter sets.

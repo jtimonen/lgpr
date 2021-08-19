@@ -4,7 +4,7 @@
 \alias{create_model.covs_and_comps}
 \title{Parse the covariates and model components from given data and formula}
 \usage{
-create_model.covs_and_comps(data, model_formula, X_scale, verbose)
+create_model.covs_and_comps(data, model_formula, verbose)
 }
 \arguments{
 \item{data}{A \code{data.frame} where each column corresponds to one
@@ -15,13 +15,6 @@ must have type \code{"factor"}. Missing values should be indicated with
 values. Column names should not contain trailing or leading underscores.}
 
 \item{model_formula}{an object of class \linkS4class{lgpformula}}
-
-\item{X_scale}{Scale factors for the continuous covariates
-\itemize{
-  \item an existing vector of scaling values
-  \item \code{NA}, in which case such vector is create by computing
-  the standard deviations from \code{data}
-}}
 
 \item{verbose}{Should some informative messages be printed?}
 }

@@ -32,7 +32,7 @@ create_model <- function(formula,
   # Parse common parts (formula, covariates, components, options)
   data <- convert_to_data_frame(data)
   lgp_formula <- create_model.formula(formula, data, verbose)
-  cc_info <- create_model.covs_and_comps(data, lgp_formula, NA, verbose)
+  cc_info <- create_model.covs_and_comps(data, lgp_formula, verbose)
   stan_x <- dollar(cc_info, "to_stan")
   stan_opts <- create_model.options(options, verbose)
 
@@ -94,9 +94,6 @@ create_model <- function(formula,
 #'   covariance matrices.
 #'   \item \code{vm_params} Variance mask function parameters (numeric
 #'   vector of length 2).
-#'   \item \code{normalize_y} Boolean value determining if the response
-#'   variable should be normalized to have zero mean and
-#'   unit variance. Only has effect if \code{"likelihood"} is \code{"gaussian"}.
 #'   \item \code{num_bf} Number of basis functions (0 = no approximation).
 #'   \item \code{scale_bf} Scale of the domain to be used in basis
 #'   function approximation. Has no effect if \code{num_bf = 0}.
@@ -106,7 +103,6 @@ create_model <- function(formula,
 #' \code{options = list(
 #'   delta = 1e-8,
 #'   vm_params = c(0.025, 1),
-#'   normalize_y = TRUE,
 #'   num_bf = 0,
 #'   scale_bf = 1.5
 #' )
@@ -120,7 +116,6 @@ create_model.options <- function(options, verbose) {
   opts <- list(
     delta = 1e-8,
     vm_params = c(0.025, 1),
-    normalize_y = TRUE,
     num_bf = 0,
     scale_bf = 1.5
   )

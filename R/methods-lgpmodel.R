@@ -225,7 +225,7 @@ get_y <- function(object, original = TRUE) {
     )
   }
   si <- get_stan_input(object)
-  out <- as.vector(dollar(si, "y_norm"))
+  out <- as.vector(dollar(si, "y"))
   return(out)
 }
 

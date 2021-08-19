@@ -44,8 +44,10 @@ binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 (hyper)parameters. See the "Defining priors" section below
 (\code{\link{lgp}}).}
 
-\item{c_hat}{The GP mean. This should only be given if \code{sample_f} is
-\code{TRUE}, otherwise the GP will always have zero mean. If \code{sample_f}
+\item{c_hat}{Constant added to the zero-mean GP before mapping through
+inverse link function. This should only be given if \code{sample_f} is
+\code{TRUE}, otherwise this is zero (as response is normalized to have
+zero mean and unit variance). If \code{sample_f}
 is \code{TRUE}, the given \code{c_hat} can be a vector of length
 \code{dim(data)[1]}, or a real number defining a constant GP mean. If not
 specified and \code{sample_f} is \code{TRUE}, \code{c_hat} is set to
@@ -70,9 +72,6 @@ equal to the number of data points. Setting \code{num_trials=1} and
   covariance matrices.
   \item \code{vm_params} Variance mask function parameters (numeric
   vector of length 2).
-  \item \code{normalize_y} Boolean value determining if the response
-  variable should be normalized to have zero mean and
-  unit variance. Only has effect if \code{"likelihood"} is \code{"gaussian"}.
   \item \code{num_bf} Number of basis functions (0 = no approximation).
   \item \code{scale_bf} Scale of the domain to be used in basis
   function approximation. Has no effect if \code{num_bf = 0}.
@@ -82,7 +81,6 @@ are equivalent to
 \code{options = list(
   delta = 1e-8,
   vm_params = c(0.025, 1),
-  normalize_y = TRUE,
   num_bf = 0,
   scale_bf = 1.5
 )

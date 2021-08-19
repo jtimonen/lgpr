@@ -66,15 +66,12 @@
 #' be specified according to the knowledge about the problem at hand, as in any
 #' Bayesian analysis. In \code{lgpr} this is especially important
 #' \enumerate{
-#'  \item if \code{likelihood} is not \code{"gaussian"}, because then the
-#'  response variable is not continuous and cannot be normalized
+#'  \item if \code{sample_f=TRUE}, because then the
+#'  response variable is not automatically normalized
 #'  and therefore it is difficult to craft generally good default priors.
 #'  The priors of the \code{alpha} parameters and possible noise level
 #'  parameters (\code{sigma}, \code{phi}, or \code{gamma}) should be set
 #'  taking into account the scale of the data and the value of \code{c_hat}.
-#'  \item if you specify \code{normalize_y = FALSE} in \code{options}),
-#'  because then the response variable is also not normalized, and the same
-#'  things as above apply.
 #'  }
 #'
 #' @name lgp
@@ -159,8 +156,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
                          skip_postproc = is_f_sampled(model), ...) {
   if (quiet) verbose <- FALSE
   num_obs <- get_num_obs(model)
-  LIMIT <- 300 # __HARDCODED__
-  large_data_msg(num_obs, LIMIT)
+  large_data_msg(num_obs, large_data_limit())
   object <- get_stan_model(model)
   data <- model@stan_input
 
@@ -198,7 +194,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
         fit <- postproc(fit, verbose = verbose_postproc)
       },
       error = function(e) {
-        warning("\nPostprocessing failed. Reason:")
+        warning("\n\nPostprocessing failed. Reason:")
         warning(e)
       }
     )
@@ -212,8 +208,13 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
 #' @export
 optimize_model <- function(model, ...) {
   num_obs <- get_num_obs(model)
-  large_data_msg(num_obs, 300) # __HARDCODED__
+  large_data_msg(num_obs, large_data_limit())
   object <- get_stan_model(model)
   data <- model@stan_input
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
+}
+
+# Limit after which warning message is shown
+large_data_limit <- function() {
+  300
 }

@@ -27,8 +27,10 @@ values. Column names should not contain trailing or leading underscores.}
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
 binomial), \code{"binomial"} or \code{"bb"} (beta binomial).}
 
-\item{c_hat}{The GP mean. This should only be given if \code{sample_f} is
-\code{TRUE}, otherwise the GP will always have zero mean. If \code{sample_f}
+\item{c_hat}{Constant added to the zero-mean GP before mapping through
+inverse link function. This should only be given if \code{sample_f} is
+\code{TRUE}, otherwise this is zero (as response is normalized to have
+zero mean and unit variance). If \code{sample_f}
 is \code{TRUE}, the given \code{c_hat} can be a vector of length
 \code{dim(data)[1]}, or a real number defining a constant GP mean. If not
 specified and \code{sample_f} is \code{TRUE}, \code{c_hat} is set to

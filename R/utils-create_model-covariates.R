@@ -4,16 +4,9 @@
 #'
 #' @inheritParams create_model.likelihood
 #' @param model_formula an object of class \linkS4class{lgpformula}
-#' @param X_scale Scale factors for the continuous covariates
-#' \itemize{
-#'   \item an existing vector of scaling values
-#'   \item \code{NA}, in which case such vector is create by computing
-#'   the standard deviations from \code{data}
-#' }
 #' @return parsed input to Stan and covariate scaling, and other info
 #' @family internal model creation functions
-create_model.covs_and_comps <- function(data, model_formula,
-                                        X_scale, verbose) {
+create_model.covs_and_comps <- function(data, model_formula, verbose) {
 
   # Check that data is a data.frame and that all covariates exist in it
   NAMES <- unique(rhs_variables(model_formula@terms))
@@ -21,7 +14,7 @@ create_model.covs_and_comps <- function(data, model_formula,
   check_df_with(data, NAMES)
 
   # Create the inputs to Stan
-  covs <- stan_data_covariates(data, NAMES, X_scale)
+  covs <- stan_data_covariates(data, NAMES)
   comps <- stan_data_components(model_formula, covs)
   expanding <- stan_data_expanding(covs, comps)
   stan_data <- c(covs, comps, expanding)
@@ -41,16 +34,14 @@ create_model.covs_and_comps <- function(data, model_formula,
 # COVARIATES --------------------------------------------------------------
 
 # Create covariate data for Stan input
-stan_data_covariates <- function(data, NAMES, X_scale) {
+stan_data_covariates <- function(data, NAMES) {
   check_unique(NAMES)
-  check_not_null(X_scale)
   N <- dim(data)[1]
-  scl_exists <- !is.na(X_scale)
 
   # Continuous
   X <- list()
   X_mask <- list()
-  X_scale_new <- c()
+  X_scale <- c()
   X_names <- c()
   num_X <- 0
 
@@ -86,7 +77,11 @@ stan_data_covariates <- function(data, NAMES, X_scale) {
       X_NONAN[is_na] <- 0 # create version where NA, NaN are replaced by 0
       X[[num_X]] <- X_NONAN
       X_names[num_X] <- name
-      X_scale_new[num_X] <- stats::sd(RAW, na.rm = TRUE)
+      x_sd <- stats::sd(RAW, na.rm = TRUE)
+      if (x_sd == 0) {
+        stop("the variable <", name, "> has zero variance")
+      }
+      X_scale[num_X] <- x_sd
     }
   }
 
@@ -95,8 +90,7 @@ stan_data_covariates <- function(data, NAMES, X_scale) {
   Z_M <- vector_to_array(Z_M)
   X <- list_to_matrix(X, N)
   X_mask <- list_to_matrix(X_mask, N)
-  X_scale_new <- vector_to_array(X_scale_new)
-  X_scale <- if (scl_exists) X_scale else X_scale_new
+  X_scale <- vector_to_array(X_scale)
 
   # Name things
   names(Z_levels) <- Z_names

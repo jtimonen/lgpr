@@ -121,9 +121,10 @@ parse_term_factors <- function(term) {
     msg <- paste0(
       "Invalid term with expressions: ", as.character(term),
       ". \nNote that each term can contain\n",
-      " * at most one het() or unc() expression,\n",
+      " * at most one het() expression,\n",
+      " * at most one unc() expression,\n",
       " * at most one gp(), gp_ns() or gp_vm() expression AND\n",
-      " * at most one zs() or categ() expression.\n",
+      " * at most one zs() or categ() expression.\n"
     )
     stop(msg)
   }

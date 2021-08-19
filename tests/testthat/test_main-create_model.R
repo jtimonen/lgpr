@@ -51,7 +51,7 @@ test_that("a heterogeneous component can be added", {
   dat <- testdata_001
   m <- create_model(y ~ het(id) * zs(sex) * gp(age) + categ(id), dat)
   si <- m@stan_input
-  idx_heter <- si$components[1, 4]
+  idx_heter <- si$components[1, 6]
   expect_equal(idx_heter, 1)
 })
 
@@ -105,7 +105,7 @@ test_that("one term can contain at most one expression of each type", {
   )
   expect_error(
     create_model(y ~ categ(id) * zs(sex), testdata_001),
-    "each term can contain at most one"
+    "Note that each term can contain"
   )
   expect_error(
     create_model(y ~ het(id) * gp_ns(age) * het(sex), testdata_001),
@@ -138,16 +138,19 @@ test_that("terms with unc() or het() must have other expressions", {
   )
 })
 
-test_that("covariate must be same in unc() and het() expression", {
+test_that("covariate doesn't have to be same in unc() and het() expression", {
   dat <- testdata_001
-  expect_error(
-    create_model(y ~ het(id) * unc(sex) * gp(age) + gp(dis_age), dat),
-    "Names of the covariates in"
+  my_prior <- list(effect_time_info = example_effect_time_prior_info())
+  m1 <- create_model(y ~ het(id) * unc(sex) * gp(age) + gp(dis_age), dat,
+    prior = my_prior
   )
-  expect_error(
-    create_model(y ~ het(id) * gp(age) + unc(sex) * gp(dis_age), dat),
-    "expressions must have the same categorical covariate in every term"
+  m2 <- create_model(y ~ het(sex) * gp(age) + unc(id) * gp(dis_age), dat,
+    prior = my_prior
   )
+  expect_equal(m1@stan_input$het_z, "id")
+  expect_equal(m2@stan_input$het_z, "sex")
+  expect_equal(m1@stan_input$unc_z, "sex")
+  expect_equal(m2@stan_input$unc_z, "id")
 })
 
 test_that("multiple unc() or het() expressions cannot clash", {
@@ -211,36 +214,19 @@ test_that("the num_trials argument works correctly", {
 test_that("only the covariates required by the model go to stan data", {
   m <- create_model(y ~ categ(sex) + zs(id), testdata_001)
   si <- get_stan_input(m)
-  expect_equal(si$num_cov_cat, 2)
-  expect_equal(dim(si$x_cont), c(0, 24))
+  expect_equal(si$num_Z, 2)
+  expect_equal(dim(si$X), c(0, 24))
 })
 
 test_that("covariate types are correctly parsed", {
   m <- create_model(y ~ gp(age) + categ(id) * gp(age) + zs(sex) +
     gp_ns(dis_age), testdata_001, prior = list(wrp = igam(14, 5)))
   si <- get_stan_input(m)
-  expect_equal(si$num_cov_cat, 2)
-  expect_equal(si$num_cov_cont, 2)
-  ts <- as.numeric(si$x_cat_num_levels)
+  expect_equal(si$num_Z, 2)
+  expect_equal(si$num_X, 2)
+  ts <- as.numeric(si$Z_M)
   expect_equal(ts, c(4, 2))
-  expect_equal(sum(si$x_cont_mask), 12)
-})
-
-
-test_that("cannot have NaNs on differing rows", {
-  newdat <- testdata_001
-  newdat$new_x <- rev(newdat$dis_age)
-  reason <- paste0(
-    "NaNs of the continuous covariate must be on the same rows.",
-    " Found discrepancy between dis_age and new_x"
-  )
-  expect_error(
-    create_model(
-      formula = y ~ het(id) * gp(dis_age) + het(id) * gp(new_x),
-      data = newdat
-    ),
-    reason
-  )
+  expect_equal(sum(si$X_mask), 12)
 })
 
 test_that("cannot have missing values for a factor", {
@@ -304,38 +290,38 @@ test_that("response variable cannot be also a covariate", {
 
 test_that("advanced formula parsing works with a single lgpexpr", {
   m <- create_model(y ~ gp(age), testdata_001)
-  types <- as.numeric(component_info(m)$type)
+  ix <- as.numeric(component_info(m)$ix)
   cn <- component_names(m)
   expect_equal(cn, c("gp(age)"))
-  expect_equal(types, 1)
+  expect_equal(ix, 1)
 })
 
 test_that("two lgpterms can be summed", {
   m <- create_model(age ~ gp(y) * categ(sex) + gp(y) * zs(id), testdata_001)
-  types <- as.numeric(component_info(m)$type)
+  iz <- as.numeric(component_info(m)$iz)
   cn <- component_names(m)
   expect_equal(cn, c("gp(y)*categ(sex)", "gp(y)*zs(id)"))
-  expect_equal(types, c(2, 2))
+  expect_equal(iz, c(1, 2))
 })
 
 test_that("lgpterm and lgpexpr can be summed", {
   m <- create_model(y ~ gp(age) * zs(sex) + categ("id"), testdata_001)
-  types <- as.numeric(component_info(m)$type)
+  ix <- as.numeric(component_info(m)$ix)
   cn <- component_names(m)
   expect_equal(cn, c("gp(age)*zs(sex)", "categ(id)"))
-  expect_equal(types, c(2, 0))
+  expect_equal(ix, c(1, 0))
 })
 
 test_that("lgpexpr and lgpterm can be summed", {
   m <- create_model(y ~ gp(age) + categ(sex) * gp_ns(dis_age), testdata_001,
     prior = list(wrp = normal(1, 0.1))
   )
-  types <- as.numeric(component_info(m)$type)
-  ns <- as.numeric(component_info(m)$ns)
+  ix <- as.numeric(component_info(m)$ix)
+  wrp <- as.numeric(component_info(m)$wrp)
   cn <- component_names(m)
   expect_equal(cn, c("gp(age)", "categ(sex)*gp_ns(dis_age)"))
-  expect_equal(types, c(1, 2))
-  expect_equal(ns, c(0, 1))
+  expect_equal(ix, c(1, 2))
+  expect_equal(wrp, c(0, 1))
 })
 
 test_that("error is thrown when formula is not a formula", {
@@ -395,12 +381,12 @@ test_that("y_scaling is created and and applied, original data staying as is", {
   ADD <- 300
   dat$y <- 100 * dat$y + ADD
   m <- create_model(y ~ gp(age) + zs(id), dat)
-  y_scl <- m@var_scalings$y
+  y_scl <- m@var_info$y_scaling
   expect_true(class(y_scl) == "lgpscaling")
   expect_equal(mean(get_data(m)$y), ADD) # should be original
 
   # Check zero mean and unit variance of y_norm
-  y_norm <- get_stan_input(m)$y_norm
+  y_norm <- get_stan_input(m)$y
   expect_equal(mean(y_norm), 0.0)
   expect_equal(var(y_norm), 1.0)
 })
@@ -442,13 +428,8 @@ test_that("a model with uncertain disease age needs prior specified", {
   expect_error(create_model(formula = formula, data = data), reason)
 })
 
-test_that("can't have only partly missing vals for group when using het()", {
-  formula <- y ~ gp(age) + het(id) * gp(dis_age)
-  dat <- testdata_001
-  dat$dis_age[20] <- 1.1
-  reason <- "inconsistent x_cont_mask values for observations where id = 4"
-  expect_error(create_model(formula = formula, data = dat), reason)
-})
+# REMOVED TEST:
+# can't have only partly missing vals for group when using het()
 
 test_that("options can be specified", {
   form <- y ~ age + id

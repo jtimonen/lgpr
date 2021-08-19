@@ -71,8 +71,7 @@ pred <- function(fit,
 
   # Function posterior computations (requires kernel computations)
   fp <- posterior_f(
-    fit, x, reduce, draws, verbose, STREAM,
-    force, debug_kc
+    fit, x, reduce, draws, verbose, STREAM, force, debug_kc
   )
   if (debug_kc) {
     return(fp)
@@ -93,7 +92,7 @@ pred_gaussian <- function(fit, fp, verbose) {
   f_mean <- dollar(fp, "f_mean")
   f_std <- dollar(fp, "f_std")
   sigma2 <- dollar(fp, "sigma2")
-  y_scl <- dollar(fit@model@var_scalings, "y")
+  y_scl <- dollar(fit@model@var_info, "y_scaling")
   y_pred <- map_f_to_y(f_mean, f_std, sigma2, y_scl)
   new("GaussianPrediction",
     f_comp_mean = dollar(fp, "f_comp_mean"),
