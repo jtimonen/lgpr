@@ -94,10 +94,10 @@ kernel_all <- function(init, input, idx, STREAM) {
   X1 <- dollar(init, "X1")
   X2 <- dollar(init, "X2")
   X_scale <- dollar(init, "X_scale")
-  beta_idx1 <- dollar(init, "BETA_IDX1")
-  beta_idx2 <- dollar(init, "BETA_IDX2")
-  teff_idx1 <- dollar(init, "TEFF_IDX1")
-  teff_idx2 <- dollar(init, "TEFF_IDX2")
+  beta_idx1 <- matrix_to_list(dollar(init, "BETA_IDX1"))
+  beta_idx2 <- matrix_to_list(dollar(init, "BETA_IDX2"))
+  teff_idx1 <- matrix_to_list(dollar(init, "TEFF_IDX1"))
+  teff_idx2 <- matrix_to_list(dollar(init, "TEFF_IDX2"))
 
   # Compute kernels for each component (a list with length num_comps)
   K_all <- STAN_kernel_all(
@@ -127,10 +127,10 @@ kernel_all_diag <- function(init, input, idx, STREAM) {
   N <- dollar(init, "N1")
   X <- dollar(init, "X1")
   X_scale <- dollar(init, "X_scale")
-  BETA_IDX <- dollar(init, "BETA_IDX1")
-  TEFF_IDX <- dollar(init, "TEFF_IDX1")
+  BETA_IDX <- matrix_to_list(dollar(init, "BETA_IDX1"))
+  TEFF_IDX <- matrix_to_list(dollar(init, "TEFF_IDX1"))
 
-  # Compute kernel diagonals for each component (a list with length num_comps)
+  # Compute kernel diagonals for each component (a list with length J)
   K_all_diag <- STAN_kernel_all_diag(
     N, K_const_diag, components,
     X, X_scale, alpha_idx, wrp_idx, beta_idx, teff_idx,

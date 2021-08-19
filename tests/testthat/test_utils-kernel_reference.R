@@ -140,7 +140,7 @@ test_that("STAN_kernel_eq_diag works correctly", {
 })
 
 test_that("STAN_kernel_const_diag works correctly (zerosum kernel)", {
-  ktype <- 0 # 0 = zs, 1 = cat, 2 = bin
+  ktype <- 2 # 1 = cat, 2 = zs, 3 = bin
   x <- sample.int(n = num_categ, size = n1, replace = TRUE)
   K1 <- STAN_kernel_const(x, x, ktype, 0, get_stream())
   D1 <- diag(K1)
@@ -151,7 +151,7 @@ test_that("STAN_kernel_const_diag works correctly (zerosum kernel)", {
 })
 
 test_that("STAN_kernel_const_diag works correctly (categorical kernel)", {
-  ktype <- 1 # 0 = zs, 1 = cat, 2 = bin
+  ktype <- 1 # 1 = cat, 2 = zs, 3 = bin
   x <- sample.int(n = num_categ, size = n1, replace = TRUE)
   K1 <- STAN_kernel_const(x, x, ktype, num_categ, get_stream())
   D1 <- diag(K1)
@@ -162,7 +162,7 @@ test_that("STAN_kernel_const_diag works correctly (categorical kernel)", {
 })
 
 test_that("STAN_kernel_const_diag works correctly (binary mask kernel)", {
-  ktype <- 2 # 0 = zs, 1 = cat, 2 = bin
+  ktype <- 3 # 1 = cat, 2 = zs, 3 = bin
   x <- sample.int(n = num_categ, size = n1, replace = TRUE) - 1
   K1 <- STAN_kernel_const(x, x, ktype, 0, get_stream())
   D1 <- diag(K1)

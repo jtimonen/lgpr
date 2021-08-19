@@ -149,7 +149,7 @@ test_that("f can be sampled with binomial likelihood", {
 test_that("f can be sampled with beta-binomial likelihood", {
   SW({
     fit <- lgp(
-      formula = y ~ gp(age) + categ(id) * gp(age) + categ(id),
+      formula = y ~ gp(age) + zs(id) * gp(age) + categ(id),
       likelihood = "bb",
       data = NEWDAT,
       iter = N_ITER,
@@ -159,8 +159,8 @@ test_that("f can be sampled with beta-binomial likelihood", {
     )
   })
   ci <- get_component_encoding(fit)
-  expect_equal(as.numeric(ci[, 1]), c(1, 2, 0)) # types
-  expect_equal(as.numeric(ci[, 2]), c(0, 1, 1)) # kernels
+  expect_equal(as.numeric(ci[, 1]), c(0, 1, 1)) # iz
+  expect_equal(as.numeric(ci[, 2]), c(0, 2, 1)) # k(z)
   expect_s4_class(fit, "lgpfit")
   expect_output(show(fit@model))
   expect_equal(get_obs_model(fit), "bb")

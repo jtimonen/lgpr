@@ -232,14 +232,14 @@ get_y <- function(object, original = TRUE) {
 # Get response variable name
 get_y_name <- function(object) {
   model <- object_to_model(object)
-  dollar(model@var_names, "y")
+  dollar(model@var_info$var_names, "y")
 }
 
 # Get the Stan model used by a model
 get_stan_model <- function(object) {
   model <- object_to_model(object)
   if (is_approximate(model)) {
-    model_name <- "lgp_bf"
+    model_name <- "lgp_latent_bf"
   } else if (is_f_sampled(model)) {
     model_name <- "lgp_latent"
   } else {

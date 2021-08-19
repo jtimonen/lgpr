@@ -56,7 +56,7 @@
     } else if (kernel_type == 3){
       K = STAN_kernel_bin(z1, z2);
     } else {
-      reject("kernel_type should be 1, 2 or 3, found =", kernel_type)
+      reject("kernel_type should be 1, 2 or 3, found = ", kernel_type)
     }
     return(K);
   }

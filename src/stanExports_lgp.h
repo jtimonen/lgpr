@@ -602,7 +602,7 @@ STAN_kernel_const(const std::vector<int>& z1,
         } else {
             current_statement_begin__ = 153;
             std::stringstream errmsg_stream__;
-            errmsg_stream__ << "kernel_type should be 1, 2 or 3, found =";
+            errmsg_stream__ << "kernel_type should be 1, 2 or 3, found = ";
             errmsg_stream__ << kernel_type;
             throw std::domain_error(errmsg_stream__.str());
         }
