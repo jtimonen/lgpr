@@ -24,20 +24,19 @@ stan_input_approx_precomp <- function(stan_input) {
 # Compute the C x C matrix for each term
 create_C_matrices <- function(si) {
   STREAM <- get_stream()
-  comp <- data.frame(dollar(si, "components"))
-  x_cat <- dollar(si, "x_cat")
-  x_cat_num_levels <- dollar(si, "x_cat_num_levels")
+  comp <- dollar(si, "components")
+  Z <- dollar(si, "Z")
+  Z_M <- dollar(si, "Z_M")
   C_matrices <- list()
   J <- nrow(comp)
-  type <- dollar(comp, "type")
-  ktype <- dollar(comp, "ker")
-  icat <- dollar(comp, "cat")
+  iz <- comp[, 1]
+  kz <- comp[, 2]
   for (j in seq_len(J)) {
-    idx <- icat[j]
+    idx <- iz[j]
     if (idx != 0) {
-      z <- unique(x_cat[idx, ])
-      M <- x_cat_num_levels[idx]
-      C_j <- STAN_kernel_const(z, z, ktype[j], M, STREAM)
+      z <- unique(Z[idx, ])
+      M <- Z_M[idx]
+      C_j <- STAN_kernel_const(z, z, kz[j], M, STREAM)
     } else {
       C_j <- matrix(1.0, 1, 1)
     }

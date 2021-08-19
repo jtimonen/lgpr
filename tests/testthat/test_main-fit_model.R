@@ -160,7 +160,7 @@ test_that("f can be sampled with beta-binomial likelihood", {
   })
   ci <- get_component_encoding(fit)
   expect_equal(as.numeric(ci[, 1]), c(0, 1, 1)) # iz
-  expect_equal(as.numeric(ci[, 2]), c(0, 2, 1)) # k(z)
+  expect_equal(as.numeric(ci[, 2]), c(0, 2, 1)) # kz
   expect_s4_class(fit, "lgpfit")
   expect_output(show(fit@model))
   expect_equal(get_obs_model(fit), "bb")

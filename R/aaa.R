@@ -58,7 +58,8 @@
 #' See \url{https://jtimonen.github.io/lgpr-usage/index.html}. The
 #' tutorials focus on code and use cases, whereas the
 #' \href{https://jtimonen.github.io/lgpr-usage/articles/math.html}{Mathematical description of lgpr models}
-#' vignette describes the statistical models and how they can be customized in 'lgpr'.
+#' vignette describes the statistical models and how they can be customized
+#' in 'lgpr'.
 #'
 #' @section Citation:
 #' Run \code{citation("lgpr")} to get citation information.
@@ -468,7 +469,8 @@ Prediction <- setClass("Prediction",
 #' points (\code{P} x \code{P}). A list, empty if \code{full_covariance=FALSE}.
 #' @slot comp_names Component names (character vector).
 #' @slot full_covariance Boolean value determining if this can compute
-#' full predictive covariance matrices (or just marginal variance at each point).
+#' full predictive covariance matrices (or just marginal variance at each
+#' point).
 #' @slot no_separate_output_points Boolean value determining if
 #' \code{Ks_input} and \code{Kss_input} are the same thing. Using this
 #' knowledge can reduce unnecessary computations of kernel matrices.

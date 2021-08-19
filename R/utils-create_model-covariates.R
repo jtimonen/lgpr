@@ -139,12 +139,12 @@ stan_data_components.create <- function(model_formula, covariates) {
     comps[j, ] <- term_to_numeric(terms[[j]], covariates)
   }
   colnames(comps) <- c("iz", "k(z)", "ix", "k(x)", "wrp", "het", "unc")
-  rownames(comps) <- stan_data_components.term_names(model_formula@terms)
+  rownames(comps) <- term_names(model_formula@terms)
   as.matrix(comps)
 }
 
 # Map a list of terms to their "names"
-stan_data_components.term_names <- function(rhs) {
+term_names <- function(rhs) {
   terms <- rhs@summands
   J <- length(terms)
   names <- c()
@@ -229,7 +229,6 @@ stan_data_expanding.maps <- function(components, j, icol, X_mask, Z, Z_levels) {
 
 # Create a map from category to parameter index
 category_inds_to_param_inds <- function(z, x_mask) {
-  is_missing <- which(x_mask == 1)
   uval <- sort(unique(z))
   Q <- length(uval)
   param_idx <- rep(0, Q)
