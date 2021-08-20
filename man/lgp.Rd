@@ -15,6 +15,7 @@ lgp(
   prior_only = FALSE,
   verbose = FALSE,
   sample_f = "auto",
+  approx = NULL,
   quiet = FALSE,
   skip_postproc = FALSE,
   ...

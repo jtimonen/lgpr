@@ -31,7 +31,7 @@
 #' @return An object of class \linkS4class{lgpmodel}.
 #' @family internal model creation functions
 create_model.base <- function(formula, data, prior, options, prior_only,
-                                verbose) {
+                              verbose) {
 
   # Data, formula and common Stan inputs
   data <- convert_to_data_frame(data)

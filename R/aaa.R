@@ -356,6 +356,17 @@ MarginalGPModel <- setClass("MarginalGPModel",
   )
 )
 
+#' An S4 class to represent a latent GP model
+#'
+#' @slot stan_input Model specific Stan input list.
+#' @param object The object for which to apply a class method.
+LatentGPModel <- setClass("LatentGPModel",
+  contains = "lgpmodel",
+  representation = representation(
+    stan_input = "list"
+  )
+)
+
 #' An S4 class to represent the output of the \code{lgp} function
 #'
 #' @slot stan_fit An object of class \code{stanfit}.

@@ -4,7 +4,21 @@
 \name{MarginalGPModel-class}
 \alias{MarginalGPModel-class}
 \alias{MarginalGPModel}
-\title{An lgpmodel where the signal f is marginalized}
-\description{
-An lgpmodel where the signal f is marginalized
+\alias{LatentGPModel}
+\title{An S4 class to represent a marginal GP model}
+\arguments{
+\item{object}{The object for which to apply a class method.}
 }
+\description{
+An S4 class to represent a marginal GP model
+
+An S4 class to represent a latent GP model
+}
+\section{Slots}{
+
+\describe{
+\item{\code{stan_input}}{Model specific Stan input list.}
+
+\item{\code{stan_input}}{Model specific Stan input list.}
+}}
+

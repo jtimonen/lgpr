@@ -24,8 +24,8 @@ create_model <- function(formula,
                          sample_f = "auto",
                          approx = NULL) {
   mb <- create_model.base(formula, data, options, prior, prior_only, verbose)
-  sample_f <- determine_sample_f(mb@parsed_input, likelihood, sample_f)
-  if(!sample_f) {
+  sample_f <- determine_sample_f(approx, likelihood, sample_f)
+  if (!sample_f) {
     m <- create_model.marginal(mb, likelihood, prior, verbose)
   } else {
     m <- create_model.latent(mb, likelihood, prior, approx, verbose)
@@ -34,13 +34,12 @@ create_model <- function(formula,
 }
 
 # Convert sample_f input to TRUE or FALSE
-determine_sample_f <- function(parsed_input, likelihood, sample_f_input) {
+determine_sample_f <- function(approx, likelihood, sample_f_input) {
   if (is.logical(sample_f_input)) {
     val <- sample_f_input
   } else {
     if (sample_f_input == "auto") {
-      num_bf <- dollar(stan_opts, "num_bf")
-      val <- (likelihood != "gaussian") || any(num_bf > 0)
+      val <- (likelihood != "gaussian") || !is.null(approx)
     } else {
       stop("unrecognized argument sample_f=", sample_f_input)
     }

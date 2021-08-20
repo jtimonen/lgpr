@@ -10,7 +10,7 @@
 \alias{covariate_info,lgpmodel-method}
 \alias{component_names,lgpmodel-method}
 \alias{is_f_sampled,lgpmodel-method}
-\title{An S4 class to represent an additive GP model}
+\title{An S4 base class for all models}
 \usage{
 \S4method{show}{lgpmodel}(object)
 
@@ -30,7 +30,7 @@
 \item{digits}{number of digits to show for floating point numbers}
 }
 \description{
-An S4 class to represent an additive GP model
+An S4 base class for all models
 }
 \section{Methods (by generic)}{
 \itemize{

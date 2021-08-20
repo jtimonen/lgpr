@@ -14,7 +14,8 @@ create_model(
   options = NULL,
   prior_only = FALSE,
   verbose = FALSE,
-  sample_f = "auto"
+  sample_f = "auto",
+  approx = NULL
 )
 }
 \arguments{
