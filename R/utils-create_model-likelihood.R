@@ -69,21 +69,6 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
   return(y_info)
 }
 
-# Convert sample_f input to TRUE or FALSE
-determine_sample_f <- function(LH, stan_opts, sample_f_input) {
-  if (is.logical(sample_f_input)) {
-    val <- sample_f_input
-  } else {
-    if (sample_f_input == "auto") {
-      num_bf <- dollar(stan_opts, "num_bf")
-      val <- (LH != 1) || any(num_bf > 0)
-    } else {
-      stop("unrecognized argument sample_f=", sample_f_input)
-    }
-  }
-  return(val)
-}
-
 # Parse raw response taken from input data frame (marginal GP model)
 parse_y.marginal <- function(Y_RAW, y_name, stan_opts) {
   N <- length(Y_RAW)

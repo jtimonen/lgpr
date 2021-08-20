@@ -5,7 +5,8 @@
 #' vignette for more information about the connection between different options
 #' and the created statistical model.
 #' @export
-#' @inheritParams create_model.common
+#' @inheritParams create_model.base
+#' @inheritParams create_model.base
 #' @inheritParams create_model.likelihood
 #' @family main functions
 #' @return An object of class \linkS4class{lgpmodel}, containing the
@@ -20,11 +21,32 @@ create_model <- function(formula,
                          options = NULL,
                          prior_only = FALSE,
                          verbose = FALSE,
-                         sample_f = "auto") {
-  m <- create_model.common(formula, data, options, prior, prior_only, verbose)
+                         sample_f = "auto",
+                         approx = NULL) {
+  mb <- create_model.base(formula, data, options, prior, prior_only, verbose)
+  sample_f <- determine_sample_f(mb@parsed_input, likelihood, sample_f)
+  if(!sample_f) {
+    m <- create_model.marginal(mb, likelihood, prior, verbose)
+  } else {
+    m <- create_model.latent(mb, likelihood, prior, approx, verbose)
+  }
   return(m)
 }
 
+# Convert sample_f input to TRUE or FALSE
+determine_sample_f <- function(parsed_input, likelihood, sample_f_input) {
+  if (is.logical(sample_f_input)) {
+    val <- sample_f_input
+  } else {
+    if (sample_f_input == "auto") {
+      num_bf <- dollar(stan_opts, "num_bf")
+      val <- (likelihood != "gaussian") || any(num_bf > 0)
+    } else {
+      stop("unrecognized argument sample_f=", sample_f_input)
+    }
+  }
+  return(val)
+}
 
 #' Prior definitions
 #'

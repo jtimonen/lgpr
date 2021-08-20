@@ -442,7 +442,7 @@ get_stan_model <- function(object) {
 # Get Stan input
 get_stan_input <- function(object) {
   model <- object_to_model(object)
-  return(model@stan_input)
+  return(model@parsed_input)
 }
 
 # Get integer matrix encoding component types

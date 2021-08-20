@@ -326,7 +326,7 @@ validate_Prediction <- function(object) {
   return(out)
 }
 
-#' An S4 class to represent an additive GP model
+#' An S4 base class for all models
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot data The original unmodified data.
@@ -345,13 +345,16 @@ lgpmodel <- setClass("lgpmodel",
   )
 )
 
-
-#' An lgpmodel where the signal f is marginalized
+#' An S4 class to represent a marginal GP model
 #'
+#' @slot stan_input Model specific Stan input list.
+#' @param object The object for which to apply a class method.
 MarginalGPModel <- setClass("MarginalGPModel",
-  contains = "lgpmodel"
+  contains = "lgpmodel",
+  representation = representation(
+    stan_input = "list"
+  )
 )
-
 
 #' An S4 class to represent the output of the \code{lgp} function
 #'

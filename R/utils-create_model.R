@@ -272,6 +272,7 @@ standata_covariates <- function(data, lgp_formula) {
 
   # Return list
   list(
+    N = N,
     num_X = num_X,
     num_Z = num_Z,
     Z = Z,

@@ -90,6 +90,7 @@ lgp <- function(formula,
                 prior_only = FALSE,
                 verbose = FALSE,
                 sample_f = "auto",
+                approx = NULL,
                 quiet = FALSE,
                 skip_postproc = FALSE,
                 ...) {
@@ -99,7 +100,7 @@ lgp <- function(formula,
   log_progress("Creating model...", verbose)
   model <- create_model(
     formula, data, likelihood, prior, c_hat, num_trials, options,
-    prior_only, verbose, sample_f
+    prior_only, verbose, sample_f, approx
   )
   if (verbose) {
     log_progress("===== Created the following model =====")

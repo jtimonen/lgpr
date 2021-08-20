@@ -30,7 +30,7 @@
 #' observations.
 #' @return An object of class \linkS4class{lgpmodel}.
 #' @family internal model creation functions
-create_model.common <- function(formula, data, prior, options, prior_only,
+create_model.base <- function(formula, data, prior, options, prior_only,
                                 verbose) {
 
   # Data, formula and common Stan inputs
