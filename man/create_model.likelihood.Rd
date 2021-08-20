@@ -68,8 +68,6 @@ Parse the response variable and its likelihood model
 }
 \seealso{
 Other internal model creation functions: 
-\code{\link{create_model.common}()},
-\code{\link{create_model.formula}()},
-\code{\link{create_model.prior}()}
+\code{\link{create_model.common}()}
 }
 \concept{internal model creation functions}

@@ -23,7 +23,7 @@ lgp(
 \arguments{
 \item{formula}{The model formula, where
 \itemize{
-  \item it must contain exatly one tilde (\code{~}), with response
+  \item it must contain exactly one tilde (\code{~}), with response
   variable on the left-hand side and model terms on the right-hand side
   \item terms are be separated by a plus (\code{+}) sign
   \item all variables appearing in \code{formula} must be

@@ -196,3 +196,29 @@ check_response <- function(y, LH) {
   }
   return(TRUE)
 }
+
+
+# Create a standardizing transform
+create_scaling <- function(x, name) {
+  check_length_geq(x, 2)
+  loc <- mean(x, na.rm = TRUE)
+  scale <- stats::sd(x, na.rm = TRUE)
+  if (scale == 0) {
+    msg <- paste0("the variable <", name, "> has zero variance!")
+    stop(msg)
+  }
+  new("lgpscaling", loc = loc, scale = scale, var_name = name)
+}
+
+
+# Apply variable scaling
+apply_scaling <- function(scaling, x, inverse = FALSE) {
+  loc <- scaling@loc
+  scale <- scaling@scale
+  if (inverse) {
+    x <- scale * x + loc
+  } else {
+    x <- (x - loc) / scale
+  }
+  return(x)
+}
