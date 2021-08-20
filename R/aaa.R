@@ -330,28 +330,28 @@ validate_Prediction <- function(object) {
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot data The original unmodified data.
-#' @slot stan_input The data to be given as input to \code{rstan::sampling}
-#' @slot var_info A named list with fields
-#' \itemize{
-#'   \item \code{var_names} - List of variable names grouped by type.
-#'   \item \code{y_scaling} - Response variable normalization function and its
-#'   inverse operation. Is an \linkS4class{lgpscaling} object.
-#' }
+#' @slot parsed_input Model, data, options and prior in a format that
+#' can be given as input to \code{rstan::sampling}.
+#' @slot var_names List of variable names grouped by type.
 #' @slot info Other info in text format.
-#' @slot sample_f Whether the signal \code{f} is sampled or marginalized.
-#' @slot full_prior Complete prior information.
 #' @param object The object for which to apply a class method.
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
     data = "data.frame",
-    stan_input = "list",
-    var_info = "list",
-    info = "list",
-    sample_f = "logical",
-    full_prior = "list"
+    parsed_input = "list",
+    var_names = "list",
+    info = "list"
   )
 )
+
+
+#' An lgpmodel where the signal f is marginalized
+#'
+MarginalGPModel <- setClass("MarginalGPModel",
+  contains = "lgpmodel"
+)
+
 
 #' An S4 class to represent the output of the \code{lgp} function
 #'

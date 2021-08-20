@@ -9,10 +9,10 @@
 #' @param likelihood Determines the observation model. Must be either
 #' \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
 #' binomial), \code{"binomial"} or \code{"bb"} (beta binomial).
-#' @param sample_f Determines if the latent function values are sampled
-#' (must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
-#' \code{TRUE}, the response variable will be normalized to have zero mean
-#' and unit variance.
+#' @param sample_f Determines if the latent function values are sampled.
+#' Can be either \code{TRUE}, \code{FALSE} or \code{"auto"} (default). In
+#' the latter case, this is set to \code{TRUE} if likelihood is not
+#' \code{"gaussian"}, or if a basis function approximation is specified.
 #' @param c_hat Constant added to the zero-mean GP before mapping through
 #' inverse link function. This should only be given if \code{sample_f} is
 #' \code{TRUE}, otherwise this is zero (as response is normalized to have
@@ -42,6 +42,7 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
                                     y_name, sample_f, verbose, stan_opts) {
   log_progress("Parsing response and likelihood...", verbose)
   LH <- likelihood_as_int(likelihood)
+  sample_f <- determine_sample_f(LH, stan_opts, sample_f)
 
   # Check that data contains the response variable,
   # which is numeric and compatible with observation model
@@ -64,7 +65,23 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
   } else {
     y_info <- parse_y.latent(Y_RAW, y_name, LH, c_hat, num_trials)
   }
+  y_info$sample_f <- sample_f
   return(y_info)
+}
+
+# Convert sample_f input to TRUE or FALSE
+determine_sample_f <- function(LH, stan_opts, sample_f_input) {
+  if (is.logical(sample_f_input)) {
+    val <- sample_f_input
+  } else {
+    if (sample_f_input == "auto") {
+      num_bf <- dollar(stan_opts, "num_bf")
+      val <- (LH != 1) || any(num_bf > 0)
+    } else {
+      stop("unrecognized argument sample_f=", sample_f_input)
+    }
+  }
+  return(val)
 }
 
 # Parse raw response taken from input data frame (marginal GP model)

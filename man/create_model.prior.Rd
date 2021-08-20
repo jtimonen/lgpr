@@ -23,7 +23,7 @@ Parse given prior
 }
 \seealso{
 Other internal model creation functions: 
-\code{\link{create_model.covs_and_comps}()},
+\code{\link{create_model.common}()},
 \code{\link{create_model.formula}()},
 \code{\link{create_model.likelihood}()}
 }

@@ -1,40 +1,42 @@
-# MAIN LEVEL --------------------------------------------------------------
+# COMMON OPTIONS ------------------------------------------------------------
 
-#' Parse the covariates and model components from given data and formula
-#'
-#' @inheritParams create_model.likelihood
-#' @param model_formula an object of class \linkS4class{lgpformula}
-#' @return parsed input to Stan and covariate scaling, and other info
-#' @family internal model creation functions
-create_model.covs_and_comps <- function(data, model_formula, verbose) {
+# Parse the given common modeling options
+standata_common_options <- function(options, prior_only) {
 
-  # Check that data is a data.frame and that all covariates exist in it
-  NAMES <- unique(rhs_variables(model_formula@terms))
-  log_progress("Parsing covariates and components...", verbose)
-  check_df_with(data, NAMES)
-
-  # Create the inputs to Stan
-  covs <- stan_data_covariates(data, NAMES)
-  comps <- stan_data_components(model_formula, covs)
-  expanding <- stan_data_expanding(covs, comps)
-  stan_data <- c(covs, comps, expanding)
-
-  # Variable names
-  var_names <- list(
-    y = model_formula@y_name,
-    x = rownames(dollar(covs, "X")),
-    z = rownames(dollar(covs, "Z"))
+  # Default options
+  input <- options
+  opts <- list(
+    delta = 1e-8,
+    vm_params = c(0.025, 1)
   )
 
-  # Return
-  list(to_stan = stan_data, var_names = var_names)
+  # Replace defaults if found from input
+  for (opt_name in names(opts)) {
+    if (opt_name %in% names(input)) {
+      opts[[opt_name]] <- input[[opt_name]]
+    }
+  }
+
+  # Validate and format for Stan input
+  delta <- dollar(opts, "delta")
+  vm_params <- dollar(opts, "vm_params")
+  check_positive(delta)
+  check_length(vm_params, 2)
+  check_positive_all(vm_params)
+  check_all_leq(vm_params, c(1, 1))
+
+  # Return full options
+  opts$is_likelihood_skipped <- as.numeric(prior_only)
+  return(opts)
 }
 
 
 # COVARIATES --------------------------------------------------------------
 
 # Create covariate data for Stan input
-stan_data_covariates <- function(data, NAMES) {
+standata_covariates <- function(data, lgp_formula) {
+  NAMES <- unique(rhs_variables(lgp_formula@terms))
+  check_df_with(data, NAMES)
   check_unique(NAMES)
   N <- dim(data)[1]
 
@@ -117,8 +119,8 @@ stan_data_covariates <- function(data, NAMES) {
 # COMPONENTS --------------------------------------------------------------
 
 # Create model components data for Stan input
-stan_data_components <- function(model_formula, covariates) {
-  components <- stan_data_components.create(model_formula, covariates)
+standata_components <- function(model_formula, covariates) {
+  components <- create_components_encoding(model_formula, covariates)
   list(
     J = nrow(components),
     components = components,
@@ -131,7 +133,7 @@ stan_data_components <- function(model_formula, covariates) {
 
 # Create an integer matrix that encodes component type info, and some other
 # Stan inputs
-stan_data_components.create <- function(model_formula, covariates) {
+create_components_encoding <- function(model_formula, covariates) {
   terms <- model_formula@terms@summands
   J <- length(terms)
   comps <- array(0, dim = c(J, 7))
@@ -159,14 +161,14 @@ term_names <- function(rhs) {
 # EXPANDING ---------------------------------------------------------------
 
 # Create mapping from observation index to index of beta or teff parameter
-stan_data_expanding <- function(covs, comps) {
+standata_expanding <- function(covs, comps) {
   components <- dollar(comps, "components")
   Z <- dollar(covs, "Z")
   X_mask <- dollar(covs, "X_mask")
   Z_levs <- dollar(covs, "Z_levels")
   N <- ncol(Z)
-  het <- stan_data_expanding.create(components, Z, X_mask, "het()", 6, Z_levs)
-  unc <- stan_data_expanding.create(components, Z, X_mask, "unc()", 7, Z_levs)
+  het <- standata_expanding.create(components, Z, X_mask, "het()", 6, Z_levs)
+  unc <- standata_expanding.create(components, Z, X_mask, "unc()", 7, Z_levs)
   het <- reduce_index_maps(het, "het()", N, "beta")
   unc <- reduce_index_maps(unc, "unc()", N, "teff")
   BETA_IDX <- dollar(het, "idx_expand")
@@ -186,8 +188,8 @@ stan_data_expanding <- function(covs, comps) {
 }
 
 # Helper function
-stan_data_expanding.create <- function(components, Z, X_mask, expr, icol,
-                                       Z_levels) {
+standata_expanding.create <- function(components, Z, X_mask, expr, icol,
+                                      Z_levels) {
   inds <- which(components[, icol] > 0) # indices of needed components
   inside_hets <- components[inds, icol]
   het_names <- rownames(Z)[inside_hets]
@@ -204,7 +206,7 @@ stan_data_expanding.create <- function(components, Z, X_mask, expr, icol,
   cntr <- 0
   for (j in inds) {
     cntr <- cntr + 1
-    maps <- stan_data_expanding.maps(components, j, icol, X_mask, Z, Z_levels)
+    maps <- standata_expanding.maps(components, j, icol, X_mask, Z, Z_levels)
     lst[[cntr]] <- maps
     names(lst)[cntr] <- rownames(components)[j]
   }
@@ -212,7 +214,7 @@ stan_data_expanding.create <- function(components, Z, X_mask, expr, icol,
 }
 
 # Index maps for component j
-stan_data_expanding.maps <- function(components, j, icol, X_mask, Z, Z_levels) {
+standata_expanding.maps <- function(components, j, icol, X_mask, Z, Z_levels) {
   Z_names <- rownames(Z)
   idx_x <- components[j, 3]
   idx_z <- components[j, icol]
@@ -285,4 +287,25 @@ reduce_index_maps <- function(idx_maps, expr, N, param_name) {
     map = map,
     covariate_name = cn
   )
+}
+
+
+# PRIOR -------------------------------------------------------------------
+
+# Parse given prior (common parameters)
+standata_common_prior <- function(prior, stan_input, verbose) {
+  num_unc <- dollar(stan_input, "num_unc")
+  num_wrp <- dollar(stan_input, "num_wrp")
+  par_names <- c("alpha", "ell", "wrp", "beta", 
+                 "effect_time", "effect_time_info")
+  filled <- fill_prior(prior, num_unc, par_names)
+  defaulted <- defaulting_info(filled, verbose)
+  wrp_defaulted <- "wrp" %in% defaulted
+  if (num_wrp > 0 && wrp_defaulted) {
+    model_desc <- "involves a gp_ns() or gp_vm() expression"
+    msg <- warn_msg_default_prior("input warping steepness", "wrp", model_desc)
+    warning(msg)
+  }
+  raw <- dollar(filled, "prior")
+  parse_prior_common(raw, stan_input)
 }

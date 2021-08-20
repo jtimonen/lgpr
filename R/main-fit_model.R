@@ -89,9 +89,9 @@ lgp <- function(formula,
                 options = NULL,
                 prior_only = FALSE,
                 verbose = FALSE,
-                sample_f = !(likelihood == "gaussian"),
+                sample_f = "auto",
                 quiet = FALSE,
-                skip_postproc = sample_f,
+                skip_postproc = FALSE,
                 ...) {
   if (quiet) verbose <- FALSE
 

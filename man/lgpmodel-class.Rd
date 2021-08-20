@@ -58,19 +58,11 @@ the latent signal \code{f} (and its components).
 
 \item{\code{data}}{The original unmodified data.}
 
-\item{\code{stan_input}}{The data to be given as input to \code{rstan::sampling}}
+\item{\code{parsed_input}}{Model, data, options and prior in a format that
+can be given as input to \code{rstan::sampling}.}
 
-\item{\code{var_info}}{A named list with fields
-\itemize{
-  \item \code{var_names} - List of variable names grouped by type.
-  \item \code{y_scaling} - Response variable normalization function and its
-  inverse operation. Is an \linkS4class{lgpscaling} object.
-}}
+\item{\code{var_names}}{List of variable names grouped by type.}
 
 \item{\code{info}}{Other info in text format.}
-
-\item{\code{sample_f}}{Whether the signal \code{f} is sampled or marginalized.}
-
-\item{\code{full_prior}}{Complete prior information.}
 }}
 

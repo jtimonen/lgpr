@@ -1,3 +1,5 @@
+# MAIN LEVEL ----------------------------------------------------------
+
 #' Create a model
 #'
 #' @description See the
@@ -5,15 +7,8 @@
 #' vignette for more information about the connection between different options
 #' and the created statistical model.
 #' @export
-#' @inheritParams create_model.formula
-#' @inheritParams create_model.prior
-#' @inheritParams create_model.covs_and_comps
+#' @inheritParams create_model.common
 #' @inheritParams create_model.likelihood
-#' @inheritParams create_model.options
-#' @param prior_only Should likelihood be ignored? See also
-#' \code{\link{sample_param_prior}} which can be used for any
-#' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
-#' observations.
 #' @family main functions
 #' @return An object of class \linkS4class{lgpmodel}, containing the
 #' Stan input created based on parsing the specified \code{formula},
@@ -27,98 +22,111 @@ create_model <- function(formula,
                          options = NULL,
                          prior_only = FALSE,
                          verbose = FALSE,
-                         sample_f = !(likelihood == "gaussian")) {
-
-  # Parse common parts (formula, covariates, components, options)
-  data <- convert_to_data_frame(data)
-  lgp_formula <- create_model.formula(formula, data, verbose)
-  cc_info <- create_model.covs_and_comps(data, lgp_formula, verbose)
-  stan_x <- dollar(cc_info, "to_stan")
-  stan_opts <- create_model.options(options, verbose)
-
-  # Parse response and likelihood
-  y_info <- create_model.likelihood(
-    data, likelihood, c_hat, num_trials, lgp_formula@y_name, sample_f, verbose,
-    stan_opts
-  )
-  stan_y <- dollar(y_info, "to_stan")
-  stan_input <- c(stan_x, stan_opts, stan_y)
-
-  # Parse the prior
-  prior_info <- create_model.prior(prior, stan_input, verbose)
-  full_prior <- dollar(prior_info, "raw")
-  stan_input <- c(stan_input, dollar(prior_info, "to_stan"))
-
-  # Binary option switches
-  stan_switches <- list(
-    is_verbose = as.numeric(verbose),
-    is_likelihood_skipped = as.numeric(prior_only)
-  )
-  stan_input <- c(stan_input, stan_switches)
-
-  # Add precomputed stuff related to approximation
-  si_approx <- stan_input_approx_precomp(stan_input)
-  stan_input <- c(stan_input, si_approx)
-
-  # Variable info
-  var_info <- list(
-    var_names = dollar(cc_info, "var_names"),
-    y_scaling = dollar(y_info, "scaling")
-  )
-
-  # Misc model info
-  info <- list(
-    created = date(),
-    lgpr_version = utils::packageVersion("lgpr")
-  )
-
-  # Create the 'lgpmodel' object
-  out <- new("lgpmodel",
-    model_formula = lgp_formula,
-    data = data,
-    var_info = var_info,
-    stan_input = stan_input,
-    info = info,
-    sample_f = sample_f,
-    full_prior = full_prior
-  )
-  return(out)
+                         sample_f = "auto") {
+  m <- create_model.common(formula, data, options, prior, prior_only, verbose)
+  return(m)
 }
 
-#' Parse the given modeling options
+
+
+
+# COMMON --------------------------------------------------------------
+
+#' Create common Stan input needed for all models
 #'
-#' @inheritParams create_model.likelihood
+#' @inheritParams create_model.formula
+#' @param data A data frame.
 #' @param options A named list with the following possible fields:
 #' \itemize{
 #'   \item \code{delta} Amount of added jitter to ensure positive definite
 #'   covariance matrices.
 #'   \item \code{vm_params} Variance mask function parameters (numeric
 #'   vector of length 2).
+#' }
+#' If \code{options} is \code{NULL}, default options are used. The defaults
+#' are equivalent to
+#' \code{options = list(delta = 1e-8, vm_params = c(0.025, 1))}.
+#' @param prior A named list, defining the prior distribution of model
+#' (hyper)parameters. See the "Defining priors" section below
+#' (\code{\link{lgp}}).
+#' @param prior_only Should likelihood be ignored? See also
+#' \code{\link{sample_param_prior}} which can be used for any
+#' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
+#' observations.
+#' @return An object of class \linkS4class{lgpmodel}
+#' @family internal model creation functions
+create_model.common <- function(formula, data, prior, options, prior_only,
+                                verbose) {
+
+  # Data, formula and common Stan inputs
+  data <- convert_to_data_frame(data)
+  lgp_formula <- create_model.formula(formula, data, verbose)
+  standata_common <- standata_common(
+    data, lgp_formula, options, prior, prior_only, verbose
+  )
+
+  # Variable names
+  var_names <- list(
+    y = lgp_formula@y_name,
+    x = rownames(dollar(standata_common, "X")),
+    z = rownames(dollar(standata_common, "Z"))
+  )
+
+  # Create the 'lgpmodel' object
+  new("lgpmodel",
+    model_formula = lgp_formula,
+    data = data,
+    parsed_input = standata_common,
+    var_names = var_names,
+    info = creation_info()
+  )
+}
+
+# Misc info for created objects
+creation_info <- function() {
+  list(
+    created = date(),
+    lgpr_version = utils::packageVersion("lgpr")
+  )
+}
+
+# Create common Stan input needed for all models
+standata_common <- function(data, lgp_formula, opts, prior, prior_only, vrb) {
+  opts <- standata_common_options(opts, prior_only)
+  covs <- standata_covariates(data, lgp_formula)
+  comps <- standata_components(lgp_formula, covs)
+  expanding <- standata_expanding(covs, comps)
+  si <- c(opts, covs, comps, expanding)
+  pri <- standata_common_prior(prior, si, vrb)
+  lst <- c(si, pri)
+  return(lst)
+}
+
+
+# APPROXIMATION -----------------------------------------------------------
+
+
+#' Parse the given approximation options
+#'
+#' @param approx A named list with the following possible fields:
+#' \itemize{
 #'   \item \code{num_bf} Number of basis functions (0 = no approximation).
 #'   \item \code{scale_bf} Scale of the domain to be used in basis
 #'   function approximation. Has no effect if \code{num_bf = 0}.
 #' }
-#' If \code{options} is \code{NULL}, default options are used. The defaults
+#' If \code{approx} is \code{NULL}, default options are used. The defaults
 #' are equivalent to
 #' \code{options = list(
-#'   delta = 1e-8,
-#'   vm_params = c(0.025, 1),
 #'   num_bf = 0,
 #'   scale_bf = 1.5
 #' )
 #' }.
 #' @return a named list of parsed options
-create_model.options <- function(options, verbose) {
+create_model.approx_options <- function(approx) {
 
   # Default options
-  log_progress("Parsing options...", verbose)
-  input <- options
-  opts <- list(
-    delta = 1e-8,
-    vm_params = c(0.025, 1),
-    num_bf = 0,
-    scale_bf = 1.5
-  )
+  input <- approx
+  opts <- list(num_bf = 0, scale_bf = 1.5)
 
   # Replace defaults if found from input
   for (opt_name in names(opts)) {
@@ -127,22 +135,15 @@ create_model.options <- function(options, verbose) {
     }
   }
 
-  # Validate and format for Stan input
-  delta <- dollar(opts, "delta")
-  vm_params <- dollar(opts, "vm_params")
+  # Validate
   num_bf <- dollar(opts, "num_bf")
   scale_bf <- dollar(opts, "scale_bf")
-  check_positive(delta)
-  check_length(vm_params, 2)
-  check_positive_all(vm_params)
-  check_all_leq(vm_params, c(1, 1))
   check_non_negative_all(num_bf)
   check_non_negative_all(scale_bf)
-
-  # Return full options
   return(opts)
 }
 
+# PRIOR DEFINITIONS -------------------------------------------------------
 
 #' Prior definitions
 #'

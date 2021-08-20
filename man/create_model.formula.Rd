@@ -35,7 +35,7 @@ Checks if formula is in advanced format and translates if not.
 }
 \seealso{
 Other internal model creation functions: 
-\code{\link{create_model.covs_and_comps}()},
+\code{\link{create_model.common}()},
 \code{\link{create_model.likelihood}()},
 \code{\link{create_model.prior}()}
 }

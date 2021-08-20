@@ -51,10 +51,10 @@ equal to the number of data points. Setting \code{num_trials=1} and
 
 \item{y_name}{Name of response variable}
 
-\item{sample_f}{Determines if the latent function values are sampled
-(must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
-\code{TRUE}, the response variable will be normalized to have zero mean
-and unit variance.}
+\item{sample_f}{Determines if the latent function values are sampled.
+Can be either \code{TRUE}, \code{FALSE} or \code{"auto"} (default). In
+the latter case, this is set to \code{TRUE} if likelihood is not
+\code{"gaussian"}, or if a basis function approximation is specified.}
 
 \item{verbose}{Should some informative messages be printed?}
 
@@ -68,7 +68,7 @@ Parse the response variable and its likelihood model
 }
 \seealso{
 Other internal model creation functions: 
-\code{\link{create_model.covs_and_comps}()},
+\code{\link{create_model.common}()},
 \code{\link{create_model.formula}()},
 \code{\link{create_model.prior}()}
 }

@@ -14,9 +14,9 @@ lgp(
   options = NULL,
   prior_only = FALSE,
   verbose = FALSE,
-  sample_f = !(likelihood == "gaussian"),
+  sample_f = "auto",
   quiet = FALSE,
-  skip_postproc = sample_f,
+  skip_postproc = FALSE,
   ...
 )
 }
@@ -32,12 +32,7 @@ lgp(
 See the "Model formula syntax" section below (\code{\link{lgp}}) for
 instructions on how to specify the model terms.}
 
-\item{data}{A \code{data.frame} where each column corresponds to one
-variable, and each row is one observation. Continuous covariates and the
-response variable must have type \code{"numeric"} and categorical covariates
-must have type \code{"factor"}. Missing values should be indicated with
-\code{NaN} or \code{NA}. The response variable cannot contain missing
-values. Column names should not contain trailing or leading underscores.}
+\item{data}{A data frame.}
 
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
@@ -75,19 +70,10 @@ equal to the number of data points. Setting \code{num_trials=1} and
   covariance matrices.
   \item \code{vm_params} Variance mask function parameters (numeric
   vector of length 2).
-  \item \code{num_bf} Number of basis functions (0 = no approximation).
-  \item \code{scale_bf} Scale of the domain to be used in basis
-  function approximation. Has no effect if \code{num_bf = 0}.
 }
 If \code{options} is \code{NULL}, default options are used. The defaults
 are equivalent to
-\code{options = list(
-  delta = 1e-8,
-  vm_params = c(0.025, 1),
-  num_bf = 0,
-  scale_bf = 1.5
-)
-}.}
+\code{options = list(delta = 1e-8, vm_params = c(0.025, 1))}.}
 
 \item{prior_only}{Should likelihood be ignored? See also
 \code{\link{sample_param_prior}} which can be used for any
@@ -97,10 +83,10 @@ observations.}
 \item{verbose}{Can messages be printed during model creation? Has no
 effect if \code{quiet=TRUE}.}
 
-\item{sample_f}{Determines if the latent function values are sampled
-(must be \code{TRUE} if likelihood is not \code{"gaussian"}). If this is
-\code{TRUE}, the response variable will be normalized to have zero mean
-and unit variance.}
+\item{sample_f}{Determines if the latent function values are sampled.
+Can be either \code{TRUE}, \code{FALSE} or \code{"auto"} (default). In
+the latter case, this is set to \code{TRUE} if likelihood is not
+\code{"gaussian"}, or if a basis function approximation is specified.}
 
 \item{quiet}{Should all output messages be suppressed? You need to set
 also \code{refresh=0} if you want to suppress also the progress update
