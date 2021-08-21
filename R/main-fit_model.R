@@ -158,13 +158,13 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
   if (quiet) verbose <- FALSE
   num_obs <- get_num_obs(model)
   large_data_msg(num_obs, large_data_limit())
-  object <- get_stan_model(model)
-  data <- model@stan_input
+  stan_object <- get_stanmodel(model)
+  stan_data <- get_stan_input(model)
 
   # Run sampling
   stan_fit <- rstan::sampling(
-    object = object,
-    data = data,
+    object = stan_object,
+    data = stan_data,
     check_data = TRUE,
     pars = "eta",
     include = FALSE,

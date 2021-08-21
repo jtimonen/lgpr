@@ -169,7 +169,7 @@ rhs_variables <- function(rhs) {
 # COMMON OPTIONS ------------------------------------------------------------
 
 # Parse the given common modeling options
-standata_common_options <- function(options, prior_only) {
+standata_common_options <- function(options, prior_only, verbose) {
 
   # Default options
   input <- options
@@ -194,7 +194,11 @@ standata_common_options <- function(options, prior_only) {
   check_all_leq(vm_params, c(1, 1))
 
   # Return full options
-  opts$is_likelihood_skipped <- as.numeric(prior_only)
+  stan_switches <- list(
+    is_likelihood_skipped = as.numeric(prior_only),
+    is_verbose = as.numeric(verbose)
+  )
+  opts <- c(opts, stan_switches)
   return(opts)
 }
 

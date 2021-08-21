@@ -8,6 +8,12 @@ setMethod("show", "lgpfit", function(object) {
 })
 
 #' @export
+#' @describeIn lgpmodel Get number of model components.
+setMethod("num_components", "lgpmodel", function(object) {
+  dollar(get_stan_input(object), "J")
+})
+
+#' @export
 #' @describeIn lgpfit Get names of model components.
 setMethod("component_names", "lgpfit", function(object) {
   component_names(get_model(object))

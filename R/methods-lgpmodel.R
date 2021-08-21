@@ -39,6 +39,12 @@ setMethod("covariate_info", "lgpmodel", function(object) {
 })
 
 #' @export
+#' @describeIn lgpmodel Get number of model components.
+setMethod("num_components", "lgpmodel", function(object) {
+  dollar(get_stan_input(object), "J")
+})
+
+#' @export
 #' @describeIn lgpmodel Get names of model components.
 setMethod("component_names", "lgpmodel", function(object) {
   rownames(get_component_encoding(object))
@@ -49,6 +55,24 @@ setMethod("component_names", "lgpmodel", function(object) {
 #' the latent signal \code{f} (and its components).
 setMethod("is_f_sampled", "lgpmodel", function(object) {
   object@sample_f
+})
+
+#' @export
+#' @describeIn MarginalGPModel Get name of corresponding 'Stan' model.
+setMethod("get_stanmodel", "MarginalGPModel", function(object) {
+  stanmodels[["lgp"]]
+})
+
+#' @export
+#' @describeIn LatentGPModel Get name of corresponding 'Stan' model.
+setMethod("get_stanmodel", "LatentGPModel", function(object) {
+  stanmodels[["lgp_latent"]]
+})
+
+#' @export
+#' @describeIn LatentGPModelApprox Get name of corresponding 'Stan' model.
+setMethod("get_stanmodel", "LatentGPModelApprox", function(object) {
+  stanmodels[["lgp_latent_bf"]]
 })
 
 
@@ -426,19 +450,6 @@ get_y_name <- function(object) {
   dollar(model@var_names, "y")
 }
 
-# Get the Stan model used by a model
-get_stan_model <- function(object) {
-  model <- object_to_model(object)
-  if (is_approximate(model)) {
-    model_name <- "lgp_latent_bf"
-  } else if (is_f_sampled(model)) {
-    model_name <- "lgp_latent"
-  } else {
-    model_name <- "lgp"
-  }
-  stanmodels[[model_name]] # global variable (list of all pkg models)
-}
-
 # Get Stan input
 get_stan_input <- function(object) {
   model <- object_to_model(object)
@@ -462,13 +473,9 @@ get_num_obs <- function(object) {
   dollar(get_stan_input(object), "N")
 }
 
-# Get number of components
-get_num_comps <- function(object) {
-  dollar(get_stan_input(object), "J")
-}
-
 # Get observation model (human readable string)
 get_obs_model <- function(object) {
+  model <- object_to_model(m)
   lh <- dollar(get_stan_input(object), "obs_model")
   likelihood_as_str(lh)
 }

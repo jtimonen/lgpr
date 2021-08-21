@@ -69,7 +69,7 @@ create_lgpformula <- function(formula, data, verbose = FALSE) {
 
 # Create common Stan input needed for all models
 standata_common <- function(data, lgp_formula, opts, prior, prior_only, vrb) {
-  opts <- standata_common_options(opts, prior_only)
+  opts <- standata_common_options(opts, prior_only, vrb)
   covs <- standata_covariates(data, lgp_formula)
   comps <- standata_components(lgp_formula, covs)
   expanding <- standata_expanding(covs, comps)

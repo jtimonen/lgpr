@@ -8,6 +8,7 @@
 \alias{component_names}
 \alias{get_model}
 \alias{is_f_sampled}
+\alias{get_stanmodel}
 \alias{get_stanfit}
 \alias{postproc}
 \alias{contains_postproc}
@@ -28,6 +29,8 @@ component_names(object)
 get_model(object)
 
 is_f_sampled(object)
+
+get_stanmodel(object)
 
 get_stanfit(object)
 
@@ -93,6 +96,8 @@ S4 generics for lgpfit, lgpmodel, and other objects
 \item \code{get_model}: Get \linkS4class{lgpmodel} object.
 
 \item \code{is_f_sampled}: Determine if signal f is sampled or marginalized.
+
+\item \code{get_stanmodel}: Get name of corresponding Stan model.
 
 \item \code{get_stanfit}: Extract stanfit object.
 

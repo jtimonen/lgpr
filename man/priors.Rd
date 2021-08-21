@@ -59,6 +59,23 @@ documentation. See the docs for
 \href{https://mc-stan.org/docs/2_24/functions-reference/gamma-distribution.html}{gamma} and
 \href{https://mc-stan.org/docs/2_24/functions-reference/inverse-gamma-distribution.html}{inverse gamma} distributions.
 }
+\section{Prior distributions}{
+
+\itemize{
+   \item \code{normal} - normal distribution
+   \item \code{log_normal} - log-normal distribution
+   \item \code{student_t} - Student-\emph{t} distribution
+   \item \code{gam} - gamma distribution
+   \item \code{igam} - inverse gamma distribution
+   \item \code{bet} - beta distribution
+}
+The beta prior can be specified only for parameters that are restricted
+on the unit interval (i.e for the \code{beta} and \code{gamma} parameters).
+Other priors can be used for any other parameters. Note that for example
+if the parameter is restricted to  be positive, then for example the
+normal prior is actually a half-normal prior.
+}
+
 \examples{
 # Log-normal prior
 log_normal(mu = 1, sigma = 1)

@@ -334,37 +334,41 @@ validate_Prediction <- function(object) {
 #' can be given as input to \code{rstan::sampling}.
 #' @slot var_names List of variable names grouped by type.
 #' @slot info Other info in text format.
+#' @slot y_scaling Response variable scaling function and its inverse,
+#' stored in an object of class \linkS4class{lgpscaling}.
 #' @param object The object for which to apply a class method.
+#' @seealso Inheriting S4 classes:
+#' \itemize{
+#'   \item \linkS4class{MarginalGPModel}
+#'   \item \linkS4class{LatentGPModel}
+#' }
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
     model_formula = "lgpformula",
     data = "data.frame",
     parsed_input = "list",
     var_names = "list",
+    y_scaling = "lgpscaling",
     info = "list"
   )
 )
 
 #' An S4 class to represent a marginal GP model
 #'
-#' @slot stan_input Model specific Stan input list.
 #' @param object The object for which to apply a class method.
-MarginalGPModel <- setClass("MarginalGPModel",
-  contains = "lgpmodel",
-  representation = representation(
-    stan_input = "list"
-  )
-)
+MarginalGPModel <- setClass("MarginalGPModel", contains = "lgpmodel")
 
 #' An S4 class to represent a latent GP model
 #'
-#' @slot stan_input Model specific Stan input list.
 #' @param object The object for which to apply a class method.
-LatentGPModel <- setClass("LatentGPModel",
-  contains = "lgpmodel",
-  representation = representation(
-    stan_input = "list"
-  )
+#' @seealso Inheriting S4 class: \linkS4class{LatentGPModelApprox}
+LatentGPModel <- setClass("LatentGPModel", contains = "lgpmodel")
+
+#' An S4 class to represent an approximate latent GP model
+#'
+#' @param object The object for which to apply a class method.
+LatentGPModelApprox <- setClass("LatentGPModelApprox",
+  contains = "LatentGPModel"
 )
 
 #' An S4 class to represent the output of the \code{lgp} function
@@ -624,6 +628,12 @@ setGeneric(
 setGeneric(
   "is_f_sampled",
   function(object) standardGeneric("is_f_sampled")
+)
+
+#' @describeIn s4_generics Get name of corresponding Stan model.
+setGeneric(
+  "get_stanmodel",
+  function(object) standardGeneric("get_stanmodel")
 )
 
 #' @describeIn s4_generics Extract stanfit object.
