@@ -337,10 +337,11 @@ validate_Prediction <- function(object) {
 #' @slot y_scaling Response variable scaling function and its inverse,
 #' stored in an object of class \linkS4class{lgpscaling}.
 #' @param object The object for which to apply a class method.
-#' @seealso Inheriting S4 classes:
+#' @seealso Subclasses:
 #' \itemize{
-#'   \item \linkS4class{MarginalGPModel}
 #'   \item \linkS4class{LatentGPModel}
+#'   \item \linkS4class{MarginalGPModel}
+#'   \item \linkS4class{MarginalGPModelApprox}
 #' }
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
@@ -356,17 +357,23 @@ lgpmodel <- setClass("lgpmodel",
 #' An S4 class to represent a marginal GP model
 #'
 #' @param object The object for which to apply a class method.
+#' @seealso This class inherits from \linkS4class{lgpmodel}, so also the
+#' methods of that class work for \code{MarginalGPModel}s.
 MarginalGPModel <- setClass("MarginalGPModel", contains = "lgpmodel")
 
 #' An S4 class to represent a latent GP model
 #'
 #' @param object The object for which to apply a class method.
-#' @seealso Inheriting S4 class: \linkS4class{LatentGPModelApprox}
+#' @seealso This class inherits from \linkS4class{lgpmodel}, so also the
+#' methods of that class work for \code{LatentGPModel}s.
 LatentGPModel <- setClass("LatentGPModel", contains = "lgpmodel")
 
 #' An S4 class to represent an approximate latent GP model
 #'
 #' @param object The object for which to apply a class method.
+#' @seealso This class inherits from \linkS4class{lgpmodel} and
+#' \linkS4class{LatentGPModel} so also the
+#' methods of those classes work for \code{LatentGPModelApprox} objects.
 LatentGPModelApprox <- setClass("LatentGPModelApprox",
   contains = "LatentGPModel"
 )

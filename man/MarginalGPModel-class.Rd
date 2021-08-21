@@ -20,3 +20,7 @@ An S4 class to represent a marginal GP model
 \item \code{get_stanmodel}: Get name of corresponding 'Stan' model.
 }}
 
+\seealso{
+This class inherits from \linkS4class{lgpmodel}, so also the
+methods of that class work for \code{MarginalGPModel}s.
+}

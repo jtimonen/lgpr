@@ -1,7 +1,6 @@
   if(obs_model==1 && is_likelihood_skipped==0) {
     // 1. Gaussian
-    real MU[N] = to_array_1d(f_sum); // means
-    target += normal_lpdf(y_real[1] | MU, sigma[1]);
+    target += normal_lpdf(y[1] | f_sum, sigma[1]);
   }else if(obs_model==2 && is_likelihood_skipped==0){
     // 2. Poisson
     real LOG_MU[N] = to_array_1d(f_sum); // means (log-scale)

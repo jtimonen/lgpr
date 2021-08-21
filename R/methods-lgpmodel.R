@@ -4,7 +4,7 @@
 #' @describeIn lgpmodel Print information and summary about the object.
 #' Returns \code{object} invisibly.
 setMethod("show", "lgpmodel", function(object) {
-  desc <- class_info("lgpmodel")
+  desc <- class_info(class(object))
   cat(desc)
   cat("\n")
   model_summary(object)
@@ -60,7 +60,7 @@ setMethod("is_f_sampled", "lgpmodel", function(object) {
 #' @export
 #' @describeIn MarginalGPModel Get name of corresponding 'Stan' model.
 setMethod("get_stanmodel", "MarginalGPModel", function(object) {
-  stanmodels[["lgp"]]
+  stanmodels[["lgp_marginal"]]
 })
 
 #' @export
@@ -72,7 +72,7 @@ setMethod("get_stanmodel", "LatentGPModel", function(object) {
 #' @export
 #' @describeIn LatentGPModelApprox Get name of corresponding 'Stan' model.
 setMethod("get_stanmodel", "LatentGPModelApprox", function(object) {
-  stanmodels[["lgp_latent_bf"]]
+  stanmodels[["lgp_latent_approx"]]
 })
 
 
@@ -86,29 +86,36 @@ setMethod("get_stanmodel", "LatentGPModelApprox", function(object) {
 #' @return \code{object} invisibly.
 model_summary <- function(object, digits = 3) {
   model <- object_to_model(object)
+  stan_list <- get_stan_input(model)
+  misc_summary(model)
+  model_summary_brief(model)
+  component_summary(model)
+  covariate_summary(model)
+  parameter_summary(model, digits)
+  invisible(object)
+}
 
-  # Helper function
-  model_info <- function(object) {
-    model <- object_to_model(object)
-    stan_list <- get_stan_input(object)
-    str1 <- as.character(model@model_formula)
-    str2 <- likelihood_as_str(dollar(stan_list, "obs_model"))
-    dat <- get_data(object)
-    N <- nrow(dat)
-    D <- ncol(dat)
-    line1 <- paste0("Formula: ", str1)
-    line2 <- paste0("Likelihood: ", str2)
-    line3 <- paste0("Data: ", N, " observations, ", D, " variables")
-    line4 <- approx_info(model)
-    out <- paste0(line1, "\n", line2, "\n", line3, "\n", line4)
-    return(out)
-  }
+# Print brief model summary
+model_summary_brief <- function(object) {
+  model <- object_to_model(object)
+  stan_list <- get_stan_input(object)
+  str <- as.character(model@model_formula)
+  N <- get_num_obs(object)
+  line1 <- paste("Formula:", str)
+  line2 <- paste("Data:", N, "observations")
+  out <- paste0(line1, "\n", line2, "\n")
+  cat(out)
+}
 
-  brief <- model_info(model)
-  cat(brief)
-  cat("Components:\n")
+# Print component summary
+component_summary <- function(model) {
+  cat("Components: (", num_components(model), ")\n", sep = "")
   print(component_info(model))
   cat("\n")
+}
+
+# Print covariate summary
+covariate_summary <- function(model) {
   ci <- covariate_info(model)
   info_cont <- dollar(ci, "continuous")
   info_cat <- dollar(ci, "categorical")
@@ -120,12 +127,17 @@ model_summary <- function(object, digits = 3) {
     print(info_cat)
     cat("\n")
   }
+}
+
+# Print a parameter summary of a model
+parameter_summary <- function(model, digits) {
   print(parameter_info(model, digits))
+  stan_list <- get_stan_input(model)
   bi <- beta_teff_idx_info(model)
   beta_map <- dollar(bi, "beta")
   teff_map <- dollar(bi, "teff")
-  het_z <- dollar(model@stan_input, "het_z")
-  unc_z <- dollar(model@stan_input, "unc_z")
+  het_z <- dollar(stan_list, "het_z")
+  unc_z <- dollar(stan_list, "unc_z")
   if (!is.null(beta_map)) {
     cat(
       "\nConnection between categories of <",
@@ -143,61 +155,39 @@ model_summary <- function(object, digits = 3) {
     print(teff_map)
   }
   cat("\n")
-  cat(misc_info(model), "\n")
-  invisible(object)
 }
 
-#' @export
-#' @rdname model_summary
-param_summary <- function(object, digits = 3) {
+# Print information about used possible approximation
+approx_summary <- function(object) {
   model <- object_to_model(object)
-  parameter_info(model, digits)
-}
-
-# Info about mapping categories to parameter indices
-beta_teff_idx_info <- function(object) {
-  model <- object_to_model(object)
-  beta_map <- dollar(model@stan_input, "BETA_IDX_MAP")
-  teff_map <- dollar(model@stan_input, "TEFF_IDX_MAP")
-  list(beta = beta_map, teff = teff_map)
-}
-
-# Information about used possible approximation
-approx_info <- function(object) {
-  model <- object_to_model(object)
-  if (is_approximate(model)) {
-    si <- get_stan_input(model)
-    num_bf <- dollar(si, "num_bf")
-    scale_bf <- dollar(si, "scale_bf")
-    s1 <- paste0("num_bf = [", paste(num_bf, collapse = ", "), "]")
-    s2 <- paste0("scale_bf = [", paste(scale_bf, collapse = ", "), "]")
-    desc <- paste0("Approximation info: ", s1, ", ", s2)
-  } else {
-    desc <- ""
-  }
+  si <- get_stan_input(model)
+  num_bf <- dollar(si, "num_bf")
+  scale_bf <- dollar(si, "scale_bf")
+  s1 <- paste0("num_bf = [", paste(num_bf, collapse = ", "), "]")
+  s2 <- paste0("scale_bf = [", paste(scale_bf, collapse = ", "), "]")
+  desc <- paste0("Approximation info: ", s1, ", ", s2, "\n")
   return(desc)
 }
 
-misc_info <- function(object) {
+# Print misc info about a model
+misc_summary <- function(object) {
   model <- object_to_model(object)
   info <- model@info
-  desc <- paste0(
-    "Created on ", dollar(info, "created"), " with lgpr ",
-    dollar(info, "lgpr_version"), "."
-  )
-  return(desc)
+  desc <- paste0("Created with lgpr ", dollar(info, "lgpr_version"), ".\n")
+  cat(desc)
 }
 
 # Categorial covariate information
 covariate_info.cat <- function(object) {
   model <- object_to_model(object)
-  vn <- dollar(model@var_info, "var_names")
+  vn <- model@var_names
   nam <- dollar(vn, "z")
   if (is.null(nam)) {
     return(NULL)
   }
-  num_levels <- dollar(model@stan_input, "Z_M")
-  levels <- dollar(model@stan_input, "Z_levels")
+  si <- get_stan_input(object)
+  num_levels <- dollar(si, "Z_M")
+  levels <- dollar(si, "Z_levels")
   level_names <- c()
   J <- length(nam)
   for (j in seq_len(J)) {
@@ -205,38 +195,35 @@ covariate_info.cat <- function(object) {
     a <- if (length(a) > 4) "..." else paste(a, collapse = ", ")
     level_names[j] <- a
   }
-  df <- data.frame(nam, num_levels, level_names)
-  colnames(df) <- c("Factor", "#Levels", "Values")
-  rownames(df) <- seq_len(dim(df)[1])
+  df <- data.frame(num_levels, level_names)
+  colnames(df) <- c("#Categories", "Values")
+  rownames(df) <- nam
   return(df)
 }
 
 # Continuous covariate information
 covariate_info.cont <- function(object) {
   model <- object_to_model(object)
-  vn <- dollar(model@var_info, "var_names")
+  vn <- model@var_names
   nam <- dollar(vn, "x")
   if (is.null(nam)) {
     return(NULL)
   }
-  mask <- dollar(model@stan_input, "X_mask")
+  si <- get_stan_input(object)
+  mask <- dollar(si, "X_mask")
   num_nan <- rowSums(mask == 1)
-  df <- data.frame(nam, num_nan)
-  colnames(df) <- c("Variable", "#Missing")
-  rownames(df) <- seq_len(dim(df)[1])
+  df <- data.frame(num_nan)
+  colnames(df) <- c("#Missing")
+  rownames(df) <- nam
   return(df)
 }
 
-
-# Determine if model is approximation
-is_approximate <- function(object) {
-  model <- object_to_model(object)
-  si <- get_stan_input(model)
-  num_bf <- dollar(si, "num_bf")
-  if (any(num_bf > 0)) {
-    return(TRUE)
-  }
-  FALSE
+# Info about mapping categories to parameter indices
+beta_teff_idx_info <- function(object) {
+  stan_list <- get_stan_input(object)
+  beta_map <- dollar(stan_list, "BETA_IDX_MAP")
+  teff_map <- dollar(stan_list, "TEFF_IDX_MAP")
+  list(beta = beta_map, teff = teff_map)
 }
 
 # Helper function for plots
@@ -279,19 +266,16 @@ prior_to_df <- function(stan_input, digits = 3) {
     df <- rbind(df, prior_to_df_pos(stan_input, p, digits))
   }
 
+  # Gamma
+  df_gam <- prior_to_df_unit(stan_input, "gamma", 1, digits)
+  df <- rbind(df, df_gam)
+
   # Beta
   num_het <- dollar(stan_input, "num_het")
   if (num_het > 0) {
     num_beta <- dollar(stan_input, "num_beta")
     df_bet <- prior_to_df_unit(stan_input, "beta", num_beta, digits)
     df <- rbind(df, df_bet)
-  }
-
-  # Gamma
-  obs_model <- dollar(stan_input, "obs_model")
-  if (obs_model == 5) {
-    df_gam <- prior_to_df_unit(stan_input, "gamma", 1, digits)
-    df <- rbind(df, df_gam)
   }
 
   # Effect time
@@ -306,7 +290,10 @@ prior_to_df <- function(stan_input, digits = 3) {
 
 # Helper function for converting prior representation to human readable df
 prior_to_df_pos <- function(stan_input, parname, digits) {
-  prior <- dollar(stan_input, paste0("prior_", parname))
+  prior <- stan_input[[paste0("prior_", parname)]]
+  if (is.null(prior)) {
+    return(NULL)
+  }
   hyper <- dollar(stan_input, paste0("hyper_", parname))
   D <- dim(prior)[1]
   pnames <- rep("foo", D)
@@ -327,7 +314,10 @@ prior_to_df_pos <- function(stan_input, parname, digits) {
 
 # Helper function for converting prior representation to human readable df
 prior_to_df_unit <- function(stan_input, parname, num, digits) {
-  hyper <- dollar(stan_input, paste0("hyper_", parname))
+  hyper <- stan_input[[paste0("hyper_", parname)]]
+  if (is.null(hyper)) {
+    return(NULL)
+  }
   check_positive(digits)
   a <- round(hyper[1], digits = digits)
   b <- round(hyper[2], digits = digits)
@@ -345,6 +335,9 @@ prior_to_df_unit <- function(stan_input, parname, num, digits) {
 # Helper function for converting prior representation to human readable df
 prior_to_df_teff <- function(stan_input, digits) {
   num_teff <- dollar(stan_input, "num_teff")
+  if (num_teff == 0) {
+    return(NULL)
+  }
   prior <- dollar(stan_input, "prior_teff")
   type <- prior[1]
   backwards <- prior[2]

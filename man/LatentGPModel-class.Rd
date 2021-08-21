@@ -21,5 +21,6 @@ An S4 class to represent a latent GP model
 }}
 
 \seealso{
-Inheriting S4 class: \linkS4class{LatentGPModelApprox}
+This class inherits from \linkS4class{lgpmodel}, so also the
+methods of that class work for \code{LatentGPModel}s.
 }

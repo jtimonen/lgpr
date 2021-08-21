@@ -42,7 +42,7 @@ transformed parameters {
 }
 
 model {
-  vector[N] f_sum = rep_vector(0.0, N); //STAN_vectorsum(f_latent, N) + c_hat;
+  vector[N] f_sum = rep_vector(0.0, N);
 #include _common/priors.stan
 #include _latent/priors.stan
 #include _latent/likelihood.stan

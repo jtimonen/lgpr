@@ -41,7 +41,8 @@ transformed parameters {
 }
 
 model {
-  vector[N] f_sum = STAN_vectorsum(f_latent, N) + c_hat;
+  vector[N] f_sum = STAN_vectorsum(f_latent, N);
+  if(obs_model>1) {f_sum = f_sum + c_hat[1];}
   for(j in 1:J){ target += normal_lpdf(eta[j] | 0, 1); }
 #include _common/priors.stan
 #include _latent/priors.stan

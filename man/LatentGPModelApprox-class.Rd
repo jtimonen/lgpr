@@ -20,3 +20,8 @@ An S4 class to represent an approximate latent GP model
 \item \code{get_stanmodel}: Get name of corresponding 'Stan' model.
 }}
 
+\seealso{
+This class inherits from \linkS4class{lgpmodel} and
+\linkS4class{LatentGPModel} so also the
+methods of those classes work for \code{LatentGPModelApprox} objects.
+}

@@ -69,18 +69,6 @@ create_model.likelihood <- function(data, likelihood, c_hat, num_trials,
   return(y_info)
 }
 
-# Parse raw response taken from input data frame (marginal GP model)
-parse_y.marginal <- function(Y_RAW, y_name, stan_opts) {
-  N <- length(Y_RAW)
-  normalizer <- create_scaling(Y_RAW, y_name) # create scaling
-  y <- apply_scaling(normalizer, Y_RAW)
-
-  # Return Stan inputs and also the scaling and its inverse
-  list(
-    to_stan = list(N = N, y = y, obs_model = 1),
-    scaling = normalizer
-  )
-}
 
 # Parse raw response taken from input data frame (latent GP model)
 parse_y.latent <- function(Y_RAW, y_name, LH, c_hat, num_trials) {

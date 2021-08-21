@@ -10,7 +10,7 @@ data {
 #include _common/data-general.stan
 #include _common/data-covariates.stan
 #include _common/data-priors.stan
-  vector[N] y;
+  vector[N] y[1];
   int<lower=0> prior_sigma[1, 2];
   real hyper_sigma[1, 3];
 }
@@ -46,6 +46,6 @@ model {
       Ky += KX[j];
     }
     Ky = add_diag(Ky, square(sigma[1]));
-    y ~ multi_normal_cholesky(m0, cholesky_decompose(Ky));
+    y[1] ~ multi_normal_cholesky(m0, cholesky_decompose(Ky));
   }
 }

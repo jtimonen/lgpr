@@ -79,9 +79,10 @@ stored in an object of class \linkS4class{lgpscaling}.}
 }}
 
 \seealso{
-Inheriting S4 classes:
+Subclasses:
 \itemize{
-  \item \linkS4class{MarginalGPModel}
   \item \linkS4class{LatentGPModel}
+  \item \linkS4class{MarginalGPModel}
+  \item \linkS4class{MarginalGPModelApprox}
 }
 }

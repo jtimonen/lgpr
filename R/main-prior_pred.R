@@ -64,7 +64,7 @@ prior_pred <- function(model,
 sample_param_prior <- function(model, verbose = TRUE, quiet = FALSE, ...) {
   check_type(model, "lgpmodel")
   if (quiet) verbose <- FALSE
-  object <- dollar(stanmodels, "parameter_prior")
+  object <- dollar(stanmodels, "lgp_param_prior")
   data <- model@stan_input
 
   # Run parameter prior sampling

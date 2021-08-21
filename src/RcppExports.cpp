@@ -565,10 +565,10 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_mod();
-RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_bf_mod();
-RcppExport SEXP _rcpp_module_boot_stan_fit4parameter_prior_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_latent_approx_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_marginal_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4lgp_param_prior_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_vectorsum", (DL_FUNC) &_lgpr_STAN_vectorsum, 3},
@@ -609,10 +609,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_lgpr_STAN_D_matrix", (DL_FUNC) &_lgpr_STAN_D_matrix, 5},
     {"_lgpr_STAN_V_matrix", (DL_FUNC) &_lgpr_STAN_V_matrix, 4},
     {"_lgpr_STAN_multi_normal_bfa_logpdf", (DL_FUNC) &_lgpr_STAN_multi_normal_bfa_logpdf, 5},
-    {"_rcpp_module_boot_stan_fit4lgp_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_mod, 0},
     {"_rcpp_module_boot_stan_fit4lgp_latent_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_mod, 0},
-    {"_rcpp_module_boot_stan_fit4lgp_latent_bf_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_bf_mod, 0},
-    {"_rcpp_module_boot_stan_fit4parameter_prior_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4parameter_prior_mod, 0},
+    {"_rcpp_module_boot_stan_fit4lgp_latent_approx_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_latent_approx_mod, 0},
+    {"_rcpp_module_boot_stan_fit4lgp_marginal_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_marginal_mod, 0},
+    {"_rcpp_module_boot_stan_fit4lgp_param_prior_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4lgp_param_prior_mod, 0},
     {NULL, NULL, 0}
 };
 
