@@ -28,7 +28,10 @@ create_model <- function(formula,
   if (!sample_f) {
     m <- create_model.marginal(bm, prior, verbose)
   } else {
-    m <- create_model.latent(bm, likelihood, prior, approx, verbose)
+    m <- create_model.latent(
+      bm, likelihood, prior, c_hat, num_trials,
+      approx, verbose
+    )
   }
   return(m)
 }

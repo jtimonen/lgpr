@@ -1,6 +1,6 @@
 # Create a marginal GP model from base model
 create_model.marginal <- function(base_model, prior, verbose) {
-  si <- base_model@parsed_input
+  si <- get_stan_input(base_model)
   si_add <- standata_marginal(base_model, prior, verbose)
   si <- c(si, si_add)
   new("MarginalGPModel",
