@@ -1,13 +1,11 @@
 # Create a latent GP model from base model
 create_model.latent <- function(base_model, likelihood, prior,
                                 c_hat, num_trials, approx, verbose) {
-  stan_input <- list(approx = approx)
   si <- get_stan_input(base_model)
-
-  # Base latent model
-  parsed <- standata_latent(base_model, likelihood, prior, c_hat, num_trials)
-  si_add <- dollar(parsed, "to_stan")
-  si <- c(si, si_add)
+  parsed <- standata_latent.y(base_model, likelihood, c_hat, num_trials)
+  si_y <- dollar(parsed, "to_stan")
+  si_prior <- standata_latent.prior(base_model, prior)
+  si <- c(si, si_y, si_prior)
   model <- new("LatentGPModel",
     base_model,
     parsed_input = si,
@@ -22,41 +20,41 @@ create_model.latent <- function(base_model, likelihood, prior,
   return(model)
 }
 
-# Parse Stan data for latent model
-standata_latent <- function(base_model, likelihood, prior, c_hat, num_trials) {
-  dat <- get_data(base_model)
-  y_name <- get_y_name(base_model)
-  y_info <- standata_latent.likelihood(
-    dat, likelihood, c_hat, num_trials, y_name
-  )
-  return(y_info)
+# Parse the prior for the additional parameters of latent GP model
+standata_latent.prior <- function(base_model, prior) {
+  return(list(moi = "joo"))
 }
 
 # Parse the response variable and its likelihood model
-standata_latent.likelihood <- function(data, likelihood, c_hat, num_trials,
-                                       y_name) {
+standata_latent.y <- function(base_model, likelihood, c_hat,
+                              num_trials) {
+  dat <- get_data(base_model)
+  y_name <- get_y_name(base_model)
   LH <- likelihood_as_int(likelihood)
 
   # Check that data contains the response variable,
   # which is numeric and compatible with observation model
-  check_in_data(y_name, data, "data")
-  Y_RAW <- dollar(data, y_name)
+  check_in_data(y_name, dat, "data")
+  Y_RAW <- dollar(dat, y_name)
   check_response(Y_RAW, LH)
 
-  # Parse y and related inputs
-  parse_y_latent(Y_RAW, y_name, LH, c_hat, num_trials)
-}
-
-
-# Parse raw response taken from input data frame (latent GP model)
-parse_y_latent <- function(Y_RAW, y_name, LH, c_hat, num_trials) {
-  N <- length(Y_RAW)
+  # Normalize response
   if (LH == 1) {
-    y_int <- array(Y_RAW, dim = c(0, N))
-    y_real <- array(Y_RAW, dim = c(1, N))
+    normalizer <- create_scaling(Y_RAW, y_name) # create scaling
   } else {
-    y_int <- array(Y_RAW, dim = c(1, N))
-    y_real <- array(Y_RAW, dim = c(0, N))
+    # dummy normalizer, which is identity mapping
+    normalizer <- new("lgpscaling", var_name = y_name)
+  }
+  y <- apply_scaling(normalizer, Y_RAW)
+  N <- length(y)
+
+  # Format response variable for Stan model
+  if (LH == 1) {
+    y_int <- array(y, dim = c(0, N))
+    y <- array(y, dim = c(1, N))
+  } else {
+    y_int <- array(y, dim = c(1, N))
+    y <- array(y, dim = c(0, N))
   }
   num_trials <- set_num_trials(num_trials, Y_RAW, LH)
   c_hat <- set_c_hat(c_hat, Y_RAW, LH, num_trials)
@@ -65,21 +63,30 @@ parse_y_latent <- function(Y_RAW, y_name, LH, c_hat, num_trials) {
   to_stan <- list(
     N = N,
     y_int = y_int,
-    y_real = y_real,
+    y = y,
     obs_model = LH,
     y_num_trials = num_trials,
     c_hat = c_hat
   )
 
-  # Return stan input and dummy normalizer, which is identity mapping
-  list(to_stan = to_stan, y_scaling = new("lgpscaling", var_name = y_name))
+  # Return
+  list(to_stan = to_stan, y_scaling = normalizer)
 }
+
 
 # Convert given c_hat input to Stan input format
 set_c_hat <- function(c_hat, response, LH, num_trials) {
+  N <- length(response)
   nb_or_pois <- LH %in% c(2, 3)
   binomial <- LH %in% c(4, 5)
   gaussian <- LH == 1
+  if (gaussian) {
+    if (!is.null(c_hat)) {
+      stop("<c_hat> should be NULL if <likelihood> is 'gaussian'!")
+    }
+    c_hat <- array(0, dim = c(0, N))
+    return(c_hat)
+  }
 
   # Create  c_hat if it is NULL
   if (is.null(c_hat)) {
@@ -90,21 +97,23 @@ set_c_hat <- function(c_hat, response, LH, num_trials) {
       p <- mean(response / num_trials)
       c_hat <- log(p / (1 - p)) # Binomial or BB
     } else {
-      stopifnot(gaussian)
-      c_hat <- mean(response) # Gaussian
+      stop("Error!")
     }
   }
-  n <- length(response)
+
   L <- length(c_hat)
 
   # Throw error if given c_hat is misspecified
-  if (L != 1 && L != n) {
+  if (L != 1 && L != N) {
     stop(
       "Invalid length of <c_hat>! Must be 1 or equal to number ",
-      "of observartions (", n, "). Found = ", L
+      "of observartions (", N, "). Found = ", L
     )
   }
-  if (L == 1) c_hat <- rep(c_hat, n) # given c_hat is one number
+  if (L == 1) c_hat <- rep(c_hat, N) # given c_hat is one number
+
+  # Format c_hat for Stan input
+  c_hat <- array(c_hat, dim = c(1, N))
   return(c_hat)
 }
 

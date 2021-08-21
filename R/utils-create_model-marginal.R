@@ -1,9 +1,10 @@
 # Create a marginal GP model from base model
 create_model.marginal <- function(base_model, prior, verbose) {
-  si_base <- get_stan_input(base_model)
-  parsed <- standata_marginal(base_model, prior, verbose)
-  si_add <- dollar(parsed, "to_stan")
-  si <- c(si_base, si_add)
+  si <- get_stan_input(base_model)
+  parsed <- standata_marginal.y(base_model)
+  si_y <- dollar(parsed, "to_stan")
+  si_prior <- standata_marginal.prior(base_model, prior, verbose)
+  si <- c(si, si_y, si_prior)
   new("MarginalGPModel",
     base_model,
     parsed_input = si,
@@ -13,14 +14,15 @@ create_model.marginal <- function(base_model, prior, verbose) {
 }
 
 # Create additional Stan input
-standata_marginal <- function(base_model, prior, verbose) {
-
-  # Prior for sigma
+standata_marginal.prior <- function(base_model, prior, verbose) {
   filled <- fill_prior(prior, 0, "sigma")
   defaulting_info(filled, verbose)
   raw <- dollar(filled, "prior")
-  stan_prior <- parse_prior_pos(raw, 1, "sigma")
+  parse_prior_pos(raw, 1, "sigma")
+}
 
+# Create additional Stan input
+standata_marginal.y <- function(base_model) {
   # Check that data contains the response variable which is numeric
   dat <- get_data(base_model)
   y_name <- get_y_name(base_model)
@@ -35,8 +37,5 @@ standata_marginal <- function(base_model, prior, verbose) {
   y <- array(y, dim = c(1, N))
 
   # Return
-  list(
-    to_stan = c(stan_prior, list(y = y)),
-    y_scaling = normalizer
-  )
+  list(to_stan = list(y = y), y_scaling = normalizer)
 }
