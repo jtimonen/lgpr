@@ -109,7 +109,7 @@ model_summary_brief <- function(object) {
 
 # Print component summary
 component_summary <- function(model) {
-  cat("Components: (", num_components(model), ")\n", sep = "")
+  cat("Components (", num_components(model), "):\n", sep = "")
   print(component_info(model))
   cat("\n")
 }

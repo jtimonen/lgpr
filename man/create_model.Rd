@@ -30,7 +30,12 @@ create_model(
 See the "Model formula syntax" section below (\code{\link{lgp}}) for
 instructions on how to specify the model terms.}
 
-\item{data}{A data frame.}
+\item{data}{A \code{data.frame} where each column corresponds to one
+variable, and each row is one observation. Continuous covariates and the
+response variable must have type \code{"numeric"} and categorical covariates
+must have type \code{"factor"}. Missing values should be indicated with
+\code{NaN} or \code{NA}. The response variable cannot contain missing
+values. Column names should not contain trailing or leading underscores.}
 
 \item{likelihood}{Determines the observation model. Must be either
 \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
@@ -78,7 +83,7 @@ are equivalent to
 \linkS4class{lgpmodel}, and whose runtime is independent of the number of
 observations.}
 
-\item{verbose}{Should some informative messages be printed?}
+\item{verbose}{Should more informational messages be printed?}
 
 \item{sample_f}{Determines if the latent function values are sampled.
 Can be either \code{TRUE}, \code{FALSE} or \code{"auto"} (default). In

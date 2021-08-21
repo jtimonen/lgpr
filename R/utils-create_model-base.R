@@ -1,35 +1,4 @@
-#' Create common Stan input needed for all models
-#'
-#' @param formula The model formula, where
-#' \itemize{
-#'   \item it must contain exactly one tilde (\code{~}), with response
-#'   variable on the left-hand side and model terms on the right-hand side
-#'   \item terms are be separated by a plus (\code{+}) sign
-#'   \item all variables appearing in \code{formula} must be
-#'   found in \code{data}
-#' }
-#' See the "Model formula syntax" section below (\code{\link{lgp}}) for
-#' instructions on how to specify the model terms.
-#' @param data A data frame.
-#' @param options A named list with the following possible fields:
-#' \itemize{
-#'   \item \code{delta} Amount of added jitter to ensure positive definite
-#'   covariance matrices.
-#'   \item \code{vm_params} Variance mask function parameters (numeric
-#'   vector of length 2).
-#' }
-#' If \code{options} is \code{NULL}, default options are used. The defaults
-#' are equivalent to
-#' \code{options = list(delta = 1e-8, vm_params = c(0.025, 1))}.
-#' @param prior A named list, defining the prior distribution of model
-#' (hyper)parameters. See the "Defining priors" section below
-#' (\code{\link{lgp}}).
-#' @param prior_only Should likelihood be ignored? See also
-#' \code{\link{sample_param_prior}} which can be used for any
-#' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
-#' observations.
-#' @return An object of class \linkS4class{lgpmodel}.
-#' @family internal model creation functions
+# Create common Stan input needed for all models
 create_model.base <- function(formula, data, prior, options, prior_only,
                               verbose) {
 

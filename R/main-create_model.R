@@ -5,9 +5,67 @@
 #' vignette for more information about the connection between different options
 #' and the created statistical model.
 #' @export
-#' @inheritParams create_model.base
-#' @inheritParams create_model.base
-#' @inheritParams create_model.likelihood
+#' @param formula The model formula, where
+#' \itemize{
+#'   \item it must contain exactly one tilde (\code{~}), with response
+#'   variable on the left-hand side and model terms on the right-hand side
+#'   \item terms are be separated by a plus (\code{+}) sign
+#'   \item all variables appearing in \code{formula} must be
+#'   found in \code{data}
+#' }
+#' See the "Model formula syntax" section below (\code{\link{lgp}}) for
+#' instructions on how to specify the model terms.
+#' @param data A \code{data.frame} where each column corresponds to one
+#' variable, and each row is one observation. Continuous covariates and the
+#' response variable must have type \code{"numeric"} and categorical covariates
+#' must have type \code{"factor"}. Missing values should be indicated with
+#' \code{NaN} or \code{NA}. The response variable cannot contain missing
+#' values. Column names should not contain trailing or leading underscores.
+#' @param likelihood Determines the observation model. Must be either
+#' \code{"gaussian"} (default), \code{"poisson"}, \code{"nb"} (negative
+#' binomial), \code{"binomial"} or \code{"bb"} (beta binomial).
+#' @param prior A named list, defining the prior distribution of model
+#' (hyper)parameters. See the "Defining priors" section below
+#' (\code{\link{lgp}}).
+#' @param c_hat Constant added to the zero-mean GP before mapping through
+#' inverse link function. This should only be given if \code{sample_f} is
+#' \code{TRUE}, otherwise this is zero (as response is normalized to have
+#' zero mean and unit variance). If \code{sample_f}
+#' is \code{TRUE}, the given \code{c_hat} can be a vector of length
+#' \code{dim(data)[1]}, or a real number defining a constant GP mean. If not
+#' specified and \code{sample_f} is \code{TRUE}, \code{c_hat} is set to
+#'  \itemize{
+#'    \item \code{c_hat = mean(y)}, if \code{likelihood} is \code{"gaussian"},
+#'    \item \code{c_hat = } \code{log(mean(y))} if \code{likelihood} is
+#'    \code{"poisson"} or \code{"nb"},
+#'    \item \code{c_hat = } \code{log(p/(1-p))}, where
+#'    \code{p = mean(y/num_trials)} if \code{likelihood} is \code{"binomial"}
+#'    or \code{"bb"},
+#'  }
+#' where \code{y} denotes the response variable measurements.
+#' @param num_trials This argument (number of trials) is only needed when
+#' likelihood is \code{"binomial"} or \code{"bb"}. Must have length one or
+#' equal to the number of data points. Setting \code{num_trials=1} and
+#' \code{likelihood="binomial"} corresponds to Bernoulli observation model.
+#' @param options A named list with the following possible fields:
+#' \itemize{
+#'   \item \code{delta} Amount of added jitter to ensure positive definite
+#'   covariance matrices.
+#'   \item \code{vm_params} Variance mask function parameters (numeric
+#'   vector of length 2).
+#' }
+#' If \code{options} is \code{NULL}, default options are used. The defaults
+#' are equivalent to
+#' \code{options = list(delta = 1e-8, vm_params = c(0.025, 1))}.
+#' @param prior_only Should likelihood be ignored? See also
+#' \code{\link{sample_param_prior}} which can be used for any
+#' \linkS4class{lgpmodel}, and whose runtime is independent of the number of
+#' observations.
+#' @param verbose Should more informational messages be printed?
+#' @param sample_f Determines if the latent function values are sampled.
+#' Can be either \code{TRUE}, \code{FALSE} or \code{"auto"} (default). In
+#' the latter case, this is set to \code{TRUE} if likelihood is not
+#' \code{"gaussian"}, or if a basis function approximation is specified.
 #' @family main functions
 #' @return An object of class \linkS4class{lgpmodel}, containing the
 #' Stan input created based on parsing the specified \code{formula},
