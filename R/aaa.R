@@ -280,7 +280,7 @@ lgpscaling <- setClass("lgpscaling",
     scale = "numeric",
     var_name = "character"
   ),
-  prototype = prototype(loc = 1.0, scale = 1.0, var_name = "unknown"),
+  prototype = prototype(loc = 0.0, scale = 1.0, var_name = "unknown"),
   validity = validate_lgpscaling
 )
 

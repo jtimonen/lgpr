@@ -15,8 +15,33 @@ setMethod("show", "lgpmodel", function(object) {
 #' priors). Returns a \code{data.frame}.
 #' @param digits number of digits to show for floating point numbers
 setMethod("parameter_info", "lgpmodel", function(object, digits = 3) {
-  si <- get_stan_input(object)
-  prior_to_df(si, digits = digits)
+  check_positive(digits)
+  stan_input <- get_stan_input(object)
+  prior_to_df.common(stan_input, digits)
+})
+
+#' @export
+#' @describeIn MarginalGPModel Get a parameter summary (bounds and
+#' priors). Returns a \code{data.frame}.
+#' @param digits number of digits to show for floating point numbers
+setMethod("parameter_info", "MarginalGPModel", function(object, digits = 3) {
+  check_positive(digits)
+  stan_input <- get_stan_input(object)
+  df_common <- prior_to_df.common(stan_input, digits)
+  df_add <- prior_to_df.marginal(stan_input, digits)
+  rbind(df_common, df_add)
+})
+
+#' @export
+#' @describeIn LatentGPModel Get a parameter summary (bounds and
+#' priors). Returns a \code{data.frame}.
+#' @param digits number of digits to show for floating point numbers
+setMethod("parameter_info", "LatentGPModel", function(object, digits = 3) {
+  check_positive(digits)
+  stan_input <- get_stan_input(object)
+  df_common <- prior_to_df.common(stan_input, digits)
+  df_add <- prior_to_df.latent(stan_input, digits)
+  rbind(df_common, df_add)
 })
 
 #' @export
@@ -54,7 +79,10 @@ setMethod("component_names", "lgpmodel", function(object) {
 #' @describeIn lgpmodel Determine if inference of the model requires sampling
 #' the latent signal \code{f} (and its components).
 setMethod("is_f_sampled", "lgpmodel", function(object) {
-  object@sample_f
+  if (isa(object, "MarginalGPModel")) {
+    return(FALSE)
+  }
+  TRUE
 })
 
 #' @export
@@ -256,19 +284,15 @@ create_plot_df <- function(object, x = "age", group_by = "id") {
 # PRIOR TO DF -------------------------------------------------------------
 
 # Convert the Stan input encoding of a prior to a human-readable data frame
-prior_to_df <- function(stan_input, digits = 3) {
+prior_to_df.common <- function(stan_input, digits = 3) {
 
   # Positive parameters
   check_positive(digits)
-  pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
+  pnames <- c("alpha", "ell", "wrp")
   df <- NULL
   for (p in pnames) {
     df <- rbind(df, prior_to_df_pos(stan_input, p, digits))
   }
-
-  # Gamma
-  df_gam <- prior_to_df_unit(stan_input, "gamma", 1, digits)
-  df <- rbind(df, df_gam)
 
   # Beta
   num_het <- dollar(stan_input, "num_het")
@@ -288,12 +312,30 @@ prior_to_df <- function(stan_input, digits = 3) {
   return(df)
 }
 
+# Convert the Stan input encoding of a prior to a human-readable data frame
+prior_to_df.marginal <- function(stan_input, digits = 3) {
+  df <- prior_to_df_pos(stan_input, "sigma", digits)
+  return(df)
+}
+
+# Convert the Stan input encoding of a prior to a human-readable data frame
+prior_to_df.latent <- function(stan_input, digits = 3) {
+  LH <- dollar(stan_input, "obs_model")
+  if (LH == 1) {
+    df <- prior_to_df_pos(stan_input, "sigma", digits)
+  } else if (LH == 3) {
+    df <- prior_to_df_pos(stan_input, "phi", digits)
+  } else if (LH == 5) {
+    df <- prior_to_df_unit(stan_input, "gamma", 1, digits)
+  } else {
+    df <- NULL
+  }
+  return(df)
+}
+
 # Helper function for converting prior representation to human readable df
 prior_to_df_pos <- function(stan_input, parname, digits) {
-  prior <- stan_input[[paste0("prior_", parname)]]
-  if (is.null(prior)) {
-    return(NULL)
-  }
+  prior <- dollar(stan_input, paste0("prior_", parname))
   hyper <- dollar(stan_input, paste0("hyper_", parname))
   D <- dim(prior)[1]
   pnames <- rep("foo", D)
@@ -468,9 +510,13 @@ get_num_obs <- function(object) {
 
 # Get observation model (human readable string)
 get_obs_model <- function(object) {
-  model <- object_to_model(m)
-  lh <- dollar(get_stan_input(object), "obs_model")
-  likelihood_as_str(lh)
+  model <- object_to_model(object)
+  if (isa(model, "MarginalGPModel")) {
+    LH <- 1
+  } else {
+    LH <- dollar(get_stan_input(object), "obs_model")
+  }
+  likelihood_as_str(LH)
 }
 
 # Get number of trials (binomial or BB model)

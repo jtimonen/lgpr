@@ -4,19 +4,27 @@
 \name{LatentGPModel-class}
 \alias{LatentGPModel-class}
 \alias{LatentGPModel}
+\alias{parameter_info,LatentGPModel-method}
 \alias{get_stanmodel,LatentGPModel-method}
 \title{An S4 class to represent a latent GP model}
 \usage{
+\S4method{parameter_info}{LatentGPModel}(object, digits = 3)
+
 \S4method{get_stanmodel}{LatentGPModel}(object)
 }
 \arguments{
 \item{object}{The object for which to apply a class method.}
+
+\item{digits}{number of digits to show for floating point numbers}
 }
 \description{
 An S4 class to represent a latent GP model
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{parameter_info}: Get a parameter summary (bounds and
+priors). Returns a \code{data.frame}.
+
 \item \code{get_stanmodel}: Get name of corresponding 'Stan' model.
 }}
 

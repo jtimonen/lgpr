@@ -4,19 +4,27 @@
 \name{MarginalGPModel-class}
 \alias{MarginalGPModel-class}
 \alias{MarginalGPModel}
+\alias{parameter_info,MarginalGPModel-method}
 \alias{get_stanmodel,MarginalGPModel-method}
 \title{An S4 class to represent a marginal GP model}
 \usage{
+\S4method{parameter_info}{MarginalGPModel}(object, digits = 3)
+
 \S4method{get_stanmodel}{MarginalGPModel}(object)
 }
 \arguments{
 \item{object}{The object for which to apply a class method.}
+
+\item{digits}{number of digits to show for floating point numbers}
 }
 \description{
 An S4 class to represent a marginal GP model
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{parameter_info}: Get a parameter summary (bounds and
+priors). Returns a \code{data.frame}.
+
 \item \code{get_stanmodel}: Get name of corresponding 'Stan' model.
 }}
 
