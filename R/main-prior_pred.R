@@ -64,13 +64,14 @@ prior_pred <- function(model,
 sample_param_prior <- function(model, verbose = TRUE, quiet = FALSE, ...) {
   check_type(model, "lgpmodel")
   if (quiet) verbose <- FALSE
-  object <- dollar(stanmodels, "lgp_param_prior")
-  data <- model@stan_input
+  stan_object <- dollar(stanmodels, "lgp_param_prior")
+  stan_data <- get_stan_input(model)
+  stan_data["obs_model"] <- likelihood_as_int(get_obs_model(model))
 
   # Run parameter prior sampling
   rstan::sampling(
-    object = object,
-    data = data,
+    object = stan_object,
+    data = stan_data,
     check_data = TRUE,
     ...
   )
@@ -113,7 +114,8 @@ draw_prior_pred <- function(model, stan_fit, f_draws, verbose) {
 # @inheritParams pred
 # @return A named list.
 draw_f_prior <- function(model, stan_fit, verbose, STREAM) {
-  kc <- create_kernel_computer(model, stan_fit, NULL, NULL, NULL, FALSE, STREAM)
+  x <- get_data(model)
+  kc <- create_kernel_computer(model, stan_fit, x, TRUE, NULL, NULL, STREAM)
   input <- kc@input
   K_input <- kc@K_input
   S <- num_paramsets(kc) # number of parameter sets

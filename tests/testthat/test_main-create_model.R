@@ -26,7 +26,7 @@ test_that("created model is valid", {
 test_that("cannot create nb model where sample_f is FALSE", {
   dat <- testdata_001
   dat$y <- round(exp(dat$y))
-  reason <- "<sample_f> must be TRUE if <likelihood> is nb"
+  reason <- "<sample_f> must be TRUE if <likelihood> is not 'gaussian'"
   expect_error(create_model(
     formula = y ~ gp(age) + categ(sex) * gp(age),
     likelihood = "nb",
@@ -356,13 +356,12 @@ test_that("formula parsing throws error if mixing syntaxes", {
 
 test_that("parsing likelihood and response errors correctly", {
   dat <- testdata_001
-  reason <- "<c_hat> must be NULL when <sample_f> is FALSE"
+  reason <- "<c_hat> must be NULL if <likelihood> is 'gaussian'"
   expect_error(create_model(y ~ age, dat, c_hat = 0), reason)
-  reason <- "<num_trials> must be NULL when <sample_f> is FALSE"
+  reason <- "<num_trials> must be NULL unless <likelihood> is 'binomial' or"
   expect_error(create_model(y ~ age, dat, num_trials = 100), reason)
 
   dat$y <- round(exp(dat$y))
-  reason <- "<num_trials> argument if likelihood is 'binomial' or 'bb'"
   expect_error(create_model(y ~ age, dat,
     num_trials = 0,
     likelihood = "nb"
@@ -387,12 +386,12 @@ test_that("y_scaling is created and and applied, original data staying as is", {
   ADD <- 300
   dat$y <- 100 * dat$y + ADD
   m <- create_model(y ~ gp(age) + zs(id), dat)
-  y_scl <- m@var_info$y_scaling
+  y_scl <- m@y_scaling
   expect_true(class(y_scl) == "lgpscaling")
   expect_equal(mean(get_data(m)$y), ADD) # should be original
 
   # Check zero mean and unit variance of y_norm
-  y_norm <- get_stan_input(m)$y
+  y_norm <- as.vector(get_stan_input(m)$y)
   expect_equal(mean(y_norm), 0.0)
   expect_equal(var(y_norm), 1.0)
 })
@@ -445,6 +444,7 @@ test_that("options can be specified", {
   si <- get_stan_input(model)
   expect_equal(si$delta, DVAL)
   model <- create_model(form, dat, options = list(vm_params = c(0.1, 0.3)))
+  si <- get_stan_input(model)
   expect_equal(si$vm_params, c(0.1, 0.3))
 })
 

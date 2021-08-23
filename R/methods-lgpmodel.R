@@ -179,7 +179,7 @@ covariate_summary <- function(model) {
 }
 
 # Print a parameter summary of a model
-parameter_summary <- function(model, digits) {
+parameter_summary <- function(model, digits = 3) {
   print(parameter_info(model, digits))
   stan_list <- get_stan_input(model)
   bi <- beta_teff_idx_info(model)

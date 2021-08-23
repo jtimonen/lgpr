@@ -25,7 +25,7 @@ draw_pred <- function(fit, pred = NULL) {
     stop("fit has been created with sample_f = FALSE")
   }
   if (is.null(pred)) {
-    pred <- get_pred(fit)
+    pred <- pred(fit)
   }
   model <- get_model(fit)
   stan_fit <- get_stanfit(fit)

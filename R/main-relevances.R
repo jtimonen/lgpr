@@ -29,7 +29,7 @@ relevances.default <- function(fit, reduce, verbose, ...) {
 
 # returns a data frame of size (num_draws) x (num_comps + 1)
 relevances.default.all <- function(fit, verbose) {
-  pred <- get_pred(fit, reduce = NULL, verbose = verbose)
+  pred <- pred(fit, reduce = NULL, verbose = verbose)
   p_noise <- relevances.default.noise(fit, pred)
   p_comps <- relevances.default.comp(fit, pred)
   num_comps <- ncol(p_comps)

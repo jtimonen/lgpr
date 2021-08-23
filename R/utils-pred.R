@@ -2,7 +2,9 @@
 # component, and their sum.
 posterior_f_gaussian <- function(fit, x, x_is_data,
                                  reduce, draws, verbose, STREAM) {
-  kc <- create_kernel_computer(fit, x, x_is_data, reduce, draws, STREAM)
+  model <- get_model(fit)
+  sf <- get_stanfit(fit)
+  kc <- create_kernel_computer(model, sf, x, x_is_data, reduce, draws, STREAM)
   y <- get_y(fit, original = FALSE) # normalized y
   d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
   sigma2 <- as.vector(d_sigma^2)
@@ -16,7 +18,9 @@ posterior_f_latent <- function(fit, x, x_is_data,
                                reduce, draws, verbose, STREAM) {
   fp_at_data <- get_f_draws(fit, reduce = reduce, draws = draws)
   if (!x_is_data) {
-    kc <- create_kernel_computer(fit, x, x_is_data, reduce, draws, STREAM)
+    model <- get_model(fit)
+    sf <- get_stanfit(fit)
+    kc <- create_kernel_computer(model, sf, x, x_is_data, reduce, draws, STREAM)
     out <- fp_extrapolate(kc, fp_at_data, verbose)
   } else {
     out <- fp_at_data

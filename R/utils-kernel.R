@@ -1,5 +1,6 @@
 # Create a kernel computer
-create_kernel_computer <- function(fit,
+create_kernel_computer <- function(model,
+                                   stan_fit,
                                    x,
                                    x_is_data,
                                    reduce,
@@ -9,8 +10,6 @@ create_kernel_computer <- function(fit,
   # Settings
   check_not_null(x)
   full_covariance <- FALSE
-  model <- object_to_model(fit)
-  stan_fit <- get_stanfit(fit)
   input <- kernelcomp.create_input(model, stan_fit, x, reduce, draws)
 
   # Constant kernel computations and covariate-dependent inputs

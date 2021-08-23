@@ -82,7 +82,10 @@ create_model <- function(formula,
                          sample_f = "auto",
                          approx = NULL) {
   bm <- create_model.base(formula, data, options, prior, prior_only, verbose)
-  sample_f <- determine_sample_f(approx, likelihood, sample_f)
+  sample_f <- determine_sample_f(
+    approx, likelihood, sample_f, c_hat,
+    num_trials
+  )
   if (!sample_f) {
     m <- create_model.marginal(bm, prior, verbose)
   } else {
@@ -95,13 +98,28 @@ create_model <- function(formula,
 }
 
 # Convert sample_f input to TRUE or FALSE
-determine_sample_f <- function(approx, likelihood, sample_f_input) {
+determine_sample_f <- function(approx, likelihood, sample_f_input, c_hat,
+                               num_trials) {
+  LH <- tolower(likelihood)
+
+  if (!is.null(c_hat)) {
+    if (LH == "gaussian") {
+      stop("<c_hat> must be NULL if <likelihood> is 'gaussian'")
+    }
+  }
+  if (!is.null(num_trials)) {
+    if (!is_bin_or_bb(LH)) {
+      stop(
+        "<num_trials> must be NULL unless <likelihood> is ",
+        "'binomial' or 'bb'"
+      )
+    }
+  }
   if (is.logical(sample_f_input)) {
     val <- sample_f_input
-    a <- tolower(likelihood)
     if (!sample_f_input) {
-      if (a != "gaussian") {
-        stop("<sample_f> must be TRUE if <likelihood> is ", a)
+      if (LH != "gaussian") {
+        stop("<sample_f> must be TRUE if <likelihood> is not 'gaussian'")
       }
     }
   } else {

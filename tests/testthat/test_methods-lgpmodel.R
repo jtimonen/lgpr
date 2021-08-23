@@ -5,7 +5,7 @@ dat <- testdata_001
 
 context("Methods for lgpmodel objects")
 
-test_that("param_summary works for models with uncertain effect time", {
+test_that("parameter_summary works for models with uncertain effect time", {
   et_info <- list(backwards = TRUE, lower = 3, upper = 23, zero = 10)
   my_prior <- list(
     effect_time_info = et_info,
@@ -15,12 +15,12 @@ test_that("param_summary works for models with uncertain effect time", {
     dat,
     prior = my_prior
   )
-  expect_output(print(param_summary(mod)), "- 10) ~ uniform")
+  expect_output(print(parameter_summary(mod)), "- 10) ~ uniform")
 })
 
-test_that("param_summary works for models with heterogeneous effects", {
+test_that("parameter_summary works for models with heterogeneous effects", {
   mod <- create_model(y ~ gp(age) + het(id) * gp_vm(dis_age), dat,
     prior = list(wrp = igam(14, 3))
   )
-  expect_output(print(param_summary(mod)), " ~ beta")
+  expect_output(print(parameter_summary(mod)), " ~ beta")
 })
