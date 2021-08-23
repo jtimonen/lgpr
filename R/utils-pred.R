@@ -193,7 +193,7 @@ fp_extrapolate <- function(kc, fp_at_data, verbose) {
   out <- list(
     comp = arr3_to_list(f_ext_comp, comp_names), # list with len J
     sum = f_ext, # dim (S, P),
-    extapolated = TRUE,
+    extrapolated = TRUE,
     x = kc@x
   )
   return(out)

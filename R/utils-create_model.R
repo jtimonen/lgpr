@@ -555,10 +555,11 @@ default_prior_effect_time_info <- function(num_uncrt) {
 
 # Check that the response is numeric and compatible with observation model
 check_response <- function(y, LH) {
+  response <- y # to give better error messages
   check_type(y, "numeric")
   if (LH != 1) {
-    check_non_negative_all(y)
-    check_integer_all(y)
+    check_non_negative_all(response)
+    check_integer_all(response)
   }
   return(TRUE)
 }

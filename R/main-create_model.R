@@ -98,6 +98,12 @@ create_model <- function(formula,
 determine_sample_f <- function(approx, likelihood, sample_f_input) {
   if (is.logical(sample_f_input)) {
     val <- sample_f_input
+    a <- tolower(likelihood)
+    if (!sample_f_input) {
+      if (a != "gaussian") {
+        stop("<sample_f> must be TRUE if <likelihood> is ", a)
+      }
+    }
   } else {
     if (sample_f_input == "auto") {
       val <- (likelihood != "gaussian") || !is.null(approx)

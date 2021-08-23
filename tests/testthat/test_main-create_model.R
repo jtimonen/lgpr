@@ -6,7 +6,10 @@ context("Creating a model")
 
 test_that("a model can be created using verbose mode", {
   f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
-  expect_output(create_model(f, testdata_001, verbose = TRUE))
+  expect_message(
+    create_model(f, testdata_001, verbose = TRUE),
+    "Formula interpreted as"
+  )
 })
 
 test_that("created model is valid", {
@@ -23,7 +26,7 @@ test_that("created model is valid", {
 test_that("cannot create nb model where sample_f is FALSE", {
   dat <- testdata_001
   dat$y <- round(exp(dat$y))
-  reason <- "<sample_f> must be TRUE when <likelihood> is nb"
+  reason <- "<sample_f> must be TRUE if <likelihood> is nb"
   expect_error(create_model(
     formula = y ~ gp(age) + categ(sex) * gp(age),
     likelihood = "nb",
@@ -35,7 +38,7 @@ test_that("cannot create nb model where sample_f is FALSE", {
 test_that("prior can be parsed from stan_input", {
   f <- y ~ gp(age) + categ(id) + categ(id) * gp(age)
   m <- create_model(f, testdata_001)
-  df <- prior_to_df(m@stan_input)
+  df <- parameter_info(m, 3)
   expect_equal(class(df), "data.frame")
 })
 
@@ -50,7 +53,7 @@ test_that("quotes can be used in gp(), gp_ns() etc", {
 test_that("a heterogeneous component can be added", {
   dat <- testdata_001
   m <- create_model(y ~ het(id) * zs(sex) * gp(age) + categ(id), dat)
-  si <- m@stan_input
+  si <- get_stan_input(m)
   idx_heter <- si$components[1, 6]
   expect_equal(idx_heter, 1)
 })
@@ -147,10 +150,12 @@ test_that("covariate doesn't have to be same in unc() and het() expression", {
   m2 <- create_model(y ~ het(sex) * gp(age) + unc(id) * gp(dis_age), dat,
     prior = my_prior
   )
-  expect_equal(m1@stan_input$het_z, "id")
-  expect_equal(m2@stan_input$het_z, "sex")
-  expect_equal(m1@stan_input$unc_z, "sex")
-  expect_equal(m2@stan_input$unc_z, "id")
+  si1 <- get_stan_input(m1)
+  si2 <- get_stan_input(m2)
+  expect_equal(si1$het_z, "id")
+  expect_equal(si2$het_z, "sex")
+  expect_equal(si1$unc_z, "sex")
+  expect_equal(si2$unc_z, "id")
 })
 
 test_that("multiple unc() or het() expressions cannot clash", {
@@ -251,11 +256,12 @@ test_that("cannot have wrong length of prior list", {
 })
 
 test_that("verbose mode prints output", {
-  expect_output(
+  expect_message(
     create_model(y ~ id + age + sex,
       data = testdata_001,
       verbose = TRUE
-    )
+    ),
+    "Variable type"
   )
 })
 
@@ -436,9 +442,10 @@ test_that("options can be specified", {
   dat <- testdata_001
   DVAL <- stats::runif(1, 0, 0.01)
   model <- create_model(form, dat, options = list(delta = DVAL))
-  expect_equal(model@stan_input$delta, DVAL)
+  si <- get_stan_input(model)
+  expect_equal(si$delta, DVAL)
   model <- create_model(form, dat, options = list(vm_params = c(0.1, 0.3)))
-  expect_equal(model@stan_input$vm_params, c(0.1, 0.3))
+  expect_equal(si$vm_params, c(0.1, 0.3))
 })
 
 # -------------------------------------------------------------------------

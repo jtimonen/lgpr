@@ -1,5 +1,5 @@
 # Create common Stan input needed for all models
-create_model.base <- function(formula, data, prior, options, prior_only,
+create_model.base <- function(formula, data, options, prior, prior_only,
                               verbose) {
 
   # Data, formula and common Stan inputs
