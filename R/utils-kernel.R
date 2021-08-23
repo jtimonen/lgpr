@@ -1,19 +1,21 @@
 # Create a kernel computer
-create_kernel_computer <- function(model,
-                                   stan_fit,
+create_kernel_computer <- function(fit,
                                    x,
+                                   x_is_data,
                                    reduce,
                                    draws,
-                                   full_covariance,
                                    STREAM) {
 
   # Settings
-  if (!is.null(draws)) reduce <- NULL
+  check_not_null(x)
+  full_covariance <- FALSE
+  model <- object_to_model(fit)
+  stan_fit <- get_stanfit(fit)
   input <- kernelcomp.create_input(model, stan_fit, x, reduce, draws)
 
   # Constant kernel computations and covariate-dependent inputs
   K_input <- kernelcomp.init(input, FALSE, FALSE, STREAM, FALSE)
-  no_separate_output_points <- is.null(x)
+  no_separate_output_points <- x_is_data
   if (no_separate_output_points) {
     x <- get_data(model)
     Ks_input <- K_input
@@ -24,6 +26,7 @@ create_kernel_computer <- function(model,
 
   # Return
   new("KernelComputer",
+    x = x,
     input = input,
     K_input = K_input,
     Ks_input = Ks_input,
@@ -201,12 +204,10 @@ kernelcomp.input_x <- function(model, x) {
       TEFF_IDX_OUT = dollar(si, "TEFF_IDX")
     )
   } else {
-    m <- model
-    x_names <- unique(rhs_variables(m@model_formula@terms))
-    check_df_with(x, x_names)
-    covs_stan <- stan_data_covariates(x, x_names)
-    comp_info <- list(components = get_component_encoding(m))
-    expanding <- stan_data_expanding(covs_stan, comp_info)
+    form <- model@model_formula
+    covs_stan <- standata_base.covariates(x, form)
+    comps_stan <- standata_base.components(form, covs_stan)
+    expanding <- standata_base.expanding(covs_stan, comps_stan)
     out <- list(
       N_OUT = nrow(x),
       X_OUT = dollar(covs_stan, "X"),

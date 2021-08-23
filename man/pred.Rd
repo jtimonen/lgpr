@@ -9,11 +9,11 @@ pred(
   x = NULL,
   reduce = function(x) base::mean(x),
   draws = NULL,
+  use_f_draws = is_f_sampled(fit),
   verbose = TRUE,
   STREAM = get_stream(),
   c_hat_pred = NULL,
-  force = FALSE,
-  debug_kc = FALSE
+  force = FALSE
 )
 }
 \arguments{
@@ -31,6 +31,9 @@ is applied to reduce all parameter draws into one parameter set, or
 \item{draws}{Indices of parameter draws to use, or \code{NULL} to use all
 draws.}
 
+\item{use_f_draws}{Should function posterior draws be used. These only
+exist if they were sampled in the first place (i.e. f was not marginalized).}
+
 \item{verbose}{Should more information and a possible progress bar be
 printed?}
 
@@ -46,11 +49,7 @@ use the same constant.}
 
 \item{force}{This is by default \code{FALSE} to prevent unintended
 large computations that might crash R or take forever. Set it to \code{TRUE}
-try computing no matter what.}
-
-\item{debug_kc}{If this is \code{TRUE}, this only returns a
-\linkS4class{KernelComputer} object that is created internally. Meant for
-debugging.}
+try computing anyway.}
 }
 \value{
 An object of class \linkS4class{GaussianPrediction} or
@@ -58,21 +57,19 @@ An object of class \linkS4class{GaussianPrediction} or
 }
 \description{
 \itemize{
-  \item If \code{fit} is for a model that marginalizes the latent
-  signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{FALSE}), this
-  computes the analytic conditional posterior
+  \item If \code{use_f_draws} is \code{FALSE}, this
+  computes the conditional posterior
   distributions of each model component, their sum, and the conditional
-  predictive distribution. All these are computed for
+  predictive distribution. All these are computed given
   each (hyper)parameter draw (defined by \code{draws}), or other parameter
   set (obtained by a reduction defined by \code{reduce}). Results are stored
   in a \linkS4class{GaussianPrediction} object which is then returned.
 
-  \item If \code{fit} is for a model that samples the latent
-  signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
-  extract these function samples, compute their sum, and a version of the
-  sum \code{f} that is transformed through the inverse link function.
-  If \code{x} is not \code{NULL}, the function draws are extrapolated
-  to the points specified by \code{x} using kernel regression.
+  \item If \code{use_f_draws} is \code{TRUE}, this will
+  extract the function component samples, compute their sum, and a
+  version of the sum \code{f} that is transformed through the inverse
+  link function. If \code{x} is not \code{NULL}, the function draws are
+  extrapolated to the points specified by \code{x} using kernel regression.
   Results are stored in a \linkS4class{Prediction}
   object which is then returned.
 }

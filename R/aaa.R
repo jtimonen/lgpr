@@ -485,6 +485,7 @@ Prediction <- setClass("Prediction",
 
 #' An S4 class to represent input for kernel matrix computations
 #'
+#' @slot x original data frame used to create the object
 #' @slot input Common input (for example parameter values).
 #' @slot K_input Input for computing kernel matrices between data points
 #' (\code{N} x \code{N}). A list.
@@ -503,6 +504,7 @@ Prediction <- setClass("Prediction",
 #' @param object The object for which to call a class method.
 KernelComputer <- setClass("KernelComputer",
   representation = representation(
+    x = "data.frame",
     input = "list",
     K_input = "list",
     Ks_input = "list",

@@ -2,21 +2,19 @@
 #'
 #' @description
 #' \itemize{
-#'   \item If \code{fit} is for a model that marginalizes the latent
-#'   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{FALSE}), this
-#'   computes the analytic conditional posterior
+#'   \item If \code{use_f_draws} is \code{FALSE}, this
+#'   computes the conditional posterior
 #'   distributions of each model component, their sum, and the conditional
-#'   predictive distribution. All these are computed for
+#'   predictive distribution. All these are computed given
 #'   each (hyper)parameter draw (defined by \code{draws}), or other parameter
 #'   set (obtained by a reduction defined by \code{reduce}). Results are stored
 #'   in a \linkS4class{GaussianPrediction} object which is then returned.
 #'
-#'   \item If \code{fit} is for a model that samples the latent
-#'   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
-#'   extract these function samples, compute their sum, and a version of the
-#'   sum \code{f} that is transformed through the inverse link function.
-#'   If \code{x} is not \code{NULL}, the function draws are extrapolated
-#'   to the points specified by \code{x} using kernel regression.
+#'   \item If \code{use_f_draws} is \code{TRUE}, this will
+#'   extract the function component samples, compute their sum, and a
+#'   version of the sum \code{f} that is transformed through the inverse
+#'   link function. If \code{x} is not \code{NULL}, the function draws are
+#'   extrapolated to the points specified by \code{x} using kernel regression.
 #'   Results are stored in a \linkS4class{Prediction}
 #'   object which is then returned.
 #' }
@@ -42,12 +40,11 @@
 #' \code{rstan::get_stream()}.
 #' @param verbose Should more information and a possible progress bar be
 #' printed?
+#' @param use_f_draws Should function posterior draws be used. These only
+#' exist if they were sampled in the first place (i.e. f was not marginalized).
 #' @param force This is by default \code{FALSE} to prevent unintended
 #' large computations that might crash R or take forever. Set it to \code{TRUE}
-#' try computing no matter what.
-#' @param debug_kc If this is \code{TRUE}, this only returns a
-#' \linkS4class{KernelComputer} object that is created internally. Meant for
-#' debugging.
+#' try computing anyway.
 #' @return An object of class \linkS4class{GaussianPrediction} or
 #' \linkS4class{Prediction}.
 #' @family main functions
@@ -55,44 +52,55 @@ pred <- function(fit,
                  x = NULL,
                  reduce = function(x) base::mean(x),
                  draws = NULL,
+                 use_f_draws = is_f_sampled(fit),
                  verbose = TRUE,
                  STREAM = get_stream(),
                  c_hat_pred = NULL,
-                 force = FALSE,
-                 debug_kc = FALSE) {
-  f_sampled <- is_f_sampled(fit)
+                 force = FALSE) {
+  vrb <- verbose
   if (!is.null(draws)) reduce <- NULL
-
-  # If f is sampled and no x given, call get_pred()
-  if (f_sampled && is.null(x)) {
-    out <- get_pred(fit, draws = draws, reduce = reduce, verbose = verbose)
-    return(out)
+  is_marg <- is_f_marginalized(fit)
+  if (is_marg && use_f_draws) {
+    stop("f was not sampled, so cannot set use_f_draws=TRUE!")
   }
 
-  # Function posterior computations (requires kernel computations)
-  fp <- posterior_f(
-    fit, x, reduce, draws, verbose, STREAM, force, debug_kc
-  )
-  if (debug_kc) {
-    return(fp)
-  }
-
-  # Predictive computations (requires kernel computations)
-  if (f_sampled) {
-    out <- pred_extrapolated_draws(fit, fp, c_hat_pred, verbose)
+  # If x=NULL, return existing pred or use x = data
+  check_type(fit, "lgpfit")
+  if (is.null(x)) {
+    if (contains_postproc(fit)) {
+      pr <- fit@postproc_results
+      return(dollar(pr, "pred"))
+    } else {
+      x <- get_data(fit)
+      x_is_data <- TRUE
+    }
   } else {
-    out <- pred_gaussian(fit, fp, verbose)
+    prevent_too_large_mats(fit, x, reduce, draws, vrb, force)
+    x_is_data <- FALSE
   }
-  log_progress("Done.", verbose)
+  check_not_null(x)
+
+  # Call subroutine
+  if (!use_f_draws) {
+    if (get_obs_model(fit) != "gaussian") {
+      stop("Cannot set use_f_draws=FALSE unless likelihood is gaussian!")
+    }
+    fp <- posterior_f_gaussian(fit, x, x_is_data, reduce, draws, vrb, STREAM)
+    out <- posterior_pred_gaussian(fit, fp, verbose)
+  } else {
+    fp <- posterior_f_latent(fit, x, x_is_data, reduce, draws, vrb, STREAM)
+    out <- posterior_pred_latent(fit, fp, c_hat_pred, verbose)
+  }
   return(out)
 }
 
-# pred when sample_f = FALSE
-pred_gaussian <- function(fit, fp, verbose) {
+
+# Gaussian function posteriors to posterior pred
+posterior_pred_gaussian <- function(fit, fp, verbose) {
   f_mean <- dollar(fp, "f_mean")
   f_std <- dollar(fp, "f_std")
   sigma2 <- dollar(fp, "sigma2")
-  y_scl <- dollar(fit@model@var_info, "y_scaling")
+  y_scl <- fit@model@y_scaling
   y_pred <- map_f_to_y(f_mean, f_std, sigma2, y_scl)
   new("GaussianPrediction",
     f_comp_mean = dollar(fp, "f_comp_mean"),
@@ -106,19 +114,19 @@ pred_gaussian <- function(fit, fp, verbose) {
 }
 
 # pred when sample_f = TRUE
-pred_extrapolated_draws <- function(fit, fp, c_hat_pred, verbose) {
-  f_ext <- dollar(fp, "f_ext")
+posterior_pred_latent <- function(fit, fp, c_hat_pred, verbose) {
+  f <- dollar(fp, "sum")
   model <- fit@model
-  c_hat_pred <- set_c_hat_pred(model, f_ext, c_hat_pred, verbose)
-  h_ext <- map_f_to_h(model, f_ext, c_hat_pred, reduce = NULL)
+  c_hat_pred <- set_c_hat_pred(model, f, c_hat_pred, verbose)
+  h <- map_f_to_h(fit, f, c_hat_pred, reduce = NULL)
 
   # Return
   new("Prediction",
-    f_comp = dollar(fp, "f_ext_comp"),
-    f = f_ext,
-    h = h_ext,
+    f_comp = dollar(fp, "comp"),
+    f = f,
+    h = h,
     x = dollar(fp, "x"),
-    extrapolated = TRUE
+    extrapolated = dollar(fp, "extrapolated")
   )
 }
 

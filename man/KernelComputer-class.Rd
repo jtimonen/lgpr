@@ -43,6 +43,8 @@ An S4 class to represent input for kernel matrix computations
 \section{Slots}{
 
 \describe{
+\item{\code{x}}{original data frame used to create the object}
+
 \item{\code{input}}{Common input (for example parameter values).}
 
 \item{\code{K_input}}{Input for computing kernel matrices between data points

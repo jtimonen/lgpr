@@ -79,11 +79,32 @@ setMethod("component_names", "lgpmodel", function(object) {
 #' @describeIn lgpmodel Determine if inference of the model requires sampling
 #' the latent signal \code{f} (and its components).
 setMethod("is_f_sampled", "lgpmodel", function(object) {
-  if (isa(object, "MarginalGPModel")) {
-    return(FALSE)
-  }
-  TRUE
+  !is_f_marginalized(object)
 })
+
+# Is f marginalized?
+is_f_marginalized <- function(object) {
+  m <- object_to_model(object)
+  if (isa(m, "MarginalGPModel")) {
+    return(TRUE)
+  }
+  FALSE
+}
+
+# Is the response variable normalized during inference?
+is_y_normalized <- function(object) {
+  om <- get_obs_model(object)
+  return(om == "gaussian")
+}
+
+# Is the model approximate?
+is_approx <- function(object) {
+  m <- object_to_model(object)
+  if (isa(m, "LatentGPModelApprox")) {
+    return(TRUE)
+  }
+  FALSE
+}
 
 #' @export
 #' @describeIn MarginalGPModel Get name of corresponding 'Stan' model.
@@ -114,7 +135,6 @@ setMethod("get_stanmodel", "LatentGPModelApprox", function(object) {
 #' @return \code{object} invisibly.
 model_summary <- function(object, digits = 3) {
   model <- object_to_model(object)
-  stan_list <- get_stan_input(model)
   misc_summary(model)
   model_summary_brief(model)
   component_summary(model)
@@ -129,10 +149,11 @@ model_summary_brief <- function(object) {
   stan_list <- get_stan_input(object)
   str <- as.character(model@model_formula)
   N <- get_num_obs(object)
-  line1 <- paste("Formula:", str)
-  line2 <- paste("Data:", N, "observations")
-  out <- paste0(line1, "\n", line2, "\n")
-  cat(out)
+  cat("Data:", N, "observations\n")
+  cat("Normalize response:", is_y_normalized(object), "\n")
+  cat("Marginalize f:", is_f_marginalized(object), "\n")
+  cat("Approximation:", is_approx(object), "\n")
+  cat("Formula:", str, "\n")
 }
 
 # Print component summary
@@ -204,6 +225,7 @@ misc_summary <- function(object) {
   desc <- paste0("Created with lgpr ", dollar(info, "lgpr_version"), ".\n")
   cat(desc)
 }
+
 
 # Categorial covariate information
 covariate_info.cat <- function(object) {
@@ -468,9 +490,9 @@ get_y <- function(object, original = TRUE) {
     dat <- get_data(object)
     return(dollar(dat, y_name))
   }
-  if (is_f_sampled(object)) {
+  if (!is_y_normalized(object)) {
     stop(
-      "Response variable is not normalized if f is sampled! Set ",
+      "Response variable is not normalized! Set ",
       "original = TRUE."
     )
   }

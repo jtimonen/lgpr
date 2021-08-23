@@ -1,64 +1,27 @@
-# Function posterior distributions
-#
-# @description
-# \itemize{
-#   \item If \code{fit} is for a model that marginalizes the latent
-#   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{FALSE}), this
-#   computes the analytic conditional posterior
-#   distributions of each model component, and their sum.
-#
-#   \item If \code{fit} is for a model that samples the latent
-#   signal \code{f} (i.e. \code{is_f_sampled(fit)} is \code{TRUE}), this will
-#   extract these function samples and compute their sum. If \code{x} is not
-#   \code{NULL}, the function draws are extrapolated to the points \code{x}
-#   using kernel regression.
-# }
-#
-# @inheritParams pred
-# @param force This is by default \code{FALSE} to prevent unintended
-# large computations that might crash R or take forever.
-# @return A named list.
-posterior_f <- function(fit,
-                        x = NULL,
-                        reduce = function(x) base::mean(x),
-                        draws = NULL,
-                        verbose = TRUE,
-                        STREAM = get_stream(),
-                        force = FALSE,
-                        full_covariance = FALSE,
-                        debug_kc = FALSE) {
+# Computes the analytic conditional posterior distributions of each model
+# component, and their sum.
+posterior_f_gaussian <- function(fit, x, x_is_data,
+                                 reduce, draws, verbose, STREAM) {
+  kc <- create_kernel_computer(fit, x, x_is_data, reduce, draws, STREAM)
+  y <- get_y(fit, original = FALSE) # normalized y
+  d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
+  sigma2 <- as.vector(d_sigma^2)
+  fp_gaussian(kc, sigma2, y, verbose)
+}
 
-  # Settings
-  if (!is.null(draws)) reduce <- NULL
-
-  # Stop if potentially going to crash the computer
-  prevent_too_large_mats(fit, x, reduce, draws, verbose, force)
-
-  # Create kernel computer
-  model <- get_model(fit)
-  stan_fit <- get_stanfit(fit)
-  full_covariance <- FALSE
-  kc <- create_kernel_computer(
-    model, stan_fit, x, reduce, draws, full_covariance, STREAM
-  )
-  if (debug_kc) {
-    return(kc)
-  }
-
-  # Compute the function posteriors for each parameter set
-  if (is_f_sampled(fit)) {
-    fp_at_data <- get_pred(fit, reduce = reduce, draws = draws)
+#  Extract function samples and compute their sum. If \code{x_is_data} is not
+#  \code{TRUE}, the function draws are extrapolated to the points \code{x}
+#  using kernel regression.
+posterior_f_latent <- function(fit, x, x_is_data,
+                               reduce, draws, verbose, STREAM) {
+  fp_at_data <- get_f_draws(fit, reduce = reduce, draws = draws)
+  if (!x_is_data) {
+    kc <- create_kernel_computer(fit, x, x_is_data, reduce, draws, STREAM)
     out <- fp_extrapolate(kc, fp_at_data, verbose)
   } else {
-    y <- get_y(fit, original = FALSE) # normalized y
-    d_sigma <- get_draws(fit, pars = "sigma[1]", reduce = reduce, draws = draws)
-    sigma2 <- as.vector(d_sigma^2)
-    out <- fp_gaussian(kc, sigma2, y, verbose)
+    out <- fp_at_data
   }
-  if (is.null(x)) {
-    x <- get_data(model)
-  }
-  out[["x"]] <- x
+
   return(out)
 }
 
@@ -122,7 +85,8 @@ fp_gaussian <- function(kc, sigma2, y, verbose) {
     f_comp_std = arr3_to_list(f_comp_std, comp_names), # list with len J
     f_mean = f_mean, # dim (S, P)
     f_std = f_std, # dim (S, P)
-    sigma2 = sigma2
+    sigma2 = sigma2,
+    x = kc@x
   )
 }
 
@@ -188,7 +152,7 @@ fp_extrapolate <- function(kc, fp_at_data, verbose) {
   J <- num_components(kc) # number of components
   comp_names <- component_names(kc)
   delta <- dollar(input, "delta")
-  fp_comp_draws <- fp_at_data@f_comp
+  fp_comp_draws <- dollar(fp_at_data, "comp")
   take_row <- function(A, idx) A[idx, ]
 
   # Create output arrays
@@ -227,8 +191,10 @@ fp_extrapolate <- function(kc, fp_at_data, verbose) {
   # Return
   f_ext_comp <- aperm(f_ext_comp, c(3, 1, 2)) # dim (S, P, J) -> (J, S, P)
   out <- list(
-    f_ext_comp = arr3_to_list(f_ext_comp, comp_names), # list with len J
-    f_ext = f_ext # dim (S, P)
+    comp = arr3_to_list(f_ext_comp, comp_names), # list with len J
+    sum = f_ext, # dim (S, P),
+    extapolated = TRUE,
+    x = kc@x
   )
   return(out)
 }
@@ -251,6 +217,30 @@ fp_extrapolate.compute <- function(K, Ks, delta, fp_comp) {
     out[, j] <- fj_ext
   }
   return(out)
+}
+
+
+# Gets draws of the total \code{f}
+# Returns an array of shape \code{num_draws} x \code{num_obs}
+get_f_draws <- function(fit, draws, reduce) {
+  f_comp <- get_f_draws.comp(fit, draws, reduce)
+  list(
+    comp = f_comp,
+    sum = STAN_matrix_array_sum(f_comp, get_stream()),
+    extrapolated = FALSE,
+    x = get_data(fit)
+  )
+}
+
+# Get the draws of each component of \code{f}
+# Returns a list of arrays of shape \code{num_draws} x \code{num_obs}
+get_f_draws.comp <- function(fit, draws, reduce) {
+  nams <- component_names(fit)
+  D <- length(nams)
+  fp <- get_draws(fit, pars = "f_latent", draws = draws, reduce = reduce)
+  fp <- array_to_arraylist(fp, D)
+  names(fp) <- nams
+  return(fp)
 }
 
 # Safeguard
