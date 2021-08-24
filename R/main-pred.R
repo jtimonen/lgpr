@@ -68,9 +68,11 @@ pred <- function(fit,
   check_type(fit, "lgpfit")
   if (is.null(x)) {
     if (contains_postproc(fit)) {
+      log_info("Using existing postprocessing information.", verbose)
       pr <- fit@postproc_results
       return(dollar(pr, "pred"))
     } else {
+      log_info("Using x = data since x was NULL.", verbose)
       x <- get_data(fit)
       x_is_data <- TRUE
     }
