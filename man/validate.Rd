@@ -6,6 +6,7 @@
 \alias{validate_lgpformula}
 \alias{validate_lgpscaling}
 \alias{validate_lgpfit}
+\alias{validate_lgpparams}
 \alias{validate_GaussianPrediction}
 \alias{validate_Prediction}
 \title{Validate S4 class objects}
@@ -17,6 +18,8 @@ validate_lgpformula(object)
 validate_lgpscaling(object)
 
 validate_lgpfit(object)
+
+validate_lgpparams(object)
 
 validate_GaussianPrediction(object)
 

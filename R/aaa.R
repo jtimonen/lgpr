@@ -216,6 +216,21 @@ validate_lgpfit <- function(object) {
   return_true_or_errors(errors)
 }
 
+#' @rdname validate
+validate_lgpparams <- function(object) {
+  S <- num_paramsets(object)
+  errors <- character()
+  if (S < 1) {
+    msg <- "number of parameter sets must be positive"
+    errors <- c(errors, msg)
+  }
+  allowed <- c("sampled", "optimized", "thinned", "reduced")
+  if (!(object@origin %in% allowed)) {
+    errors <- c(errors, "invalid origin!")
+  }
+  return_true_or_errors(errors)
+}
+
 return_true_or_errors <- function(errors) {
   if (length(errors) > 0) errors else TRUE
 }
@@ -515,6 +530,55 @@ KernelComputer <- setClass("KernelComputer",
     no_separate_output_points = "logical"
   )
 )
+
+
+#' An S4 class to represent a set of model parameters
+#'
+#' @slot num_paramsets number of parameter sets
+#' @slot origin how the parameters were obtained
+#' @slot alpha marginal standard deviation parameters
+#' @slot ell lengthscale parameters
+#' @slot wrp input warping steepness parameters
+#' @slot beta heterogeneity parameters
+#' @slot xunc covariate uncertainty parameters
+lgpparams <- setClass("lgpparams",
+  representation = representation(
+    num_paramsets = "integer",
+    origin = "character",
+    alpha = "array",
+    ell = "array",
+    wrp = "array",
+    beta = "array",
+    xunc = "array"
+  ),
+  validity = validate_lgpparams
+)
+
+#' An S4 class to represent a set of marginal GP model parameters
+#'
+#' @slot sigma noise standard deviation
+MarginalGPModelParams <- setClass("MarginalGPModelParams",
+  contains = "lgpparams",
+  representation = representation(
+    sigma = "array"
+  )
+)
+
+#' An S4 class to represent a set of latent GP model parameters
+#'
+#' @slot sigma Gaussian observation model param
+#' @slot phi Negative binomial observation model param
+#' @slot sigma Beta-binomial observation model param
+LatentGPModelParams <- setClass("LatentGPModelParams",
+  contains = "lgpparams",
+  representation = representation(
+    sigma = "array",
+    phi = "array",
+    gamma = "array",
+    f = "array"
+  )
+)
+
 
 # Class info for show methods
 class_info <- function(class_name) {
