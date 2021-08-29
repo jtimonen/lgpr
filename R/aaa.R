@@ -344,9 +344,12 @@ validate_Prediction <- function(object) {
 #' An S4 base class for all models
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
-#' @slot data The original unmodified data.
-#' @slot parsed_input Model, data, options and prior in a format that
-#' can be given as input to \code{rstan::sampling}.
+#' @slot raw_data The original unmodified data.
+#' @slot options List of parsed options.
+#' @slot covariates Covariates included in the model.
+#' @slot components Component information.
+#' @slot idx_maps Parameter index maps.
+#' @slot prior Prior in parsed format.
 #' @slot var_names List of variable names grouped by type.
 #' @slot info Other info in text format.
 #' @slot y_scaling Response variable scaling function and its inverse,
@@ -360,9 +363,49 @@ validate_Prediction <- function(object) {
 #' }
 lgpmodel <- setClass("lgpmodel",
   representation = representation(
+    # Formula and original data
     model_formula = "lgpformula",
-    data = "data.frame",
-    parsed_input = "list",
+    raw_data = "data.frame",
+    # Dimensions
+    N = "integer",
+    J = "integer",
+    num_X = "integer",
+    num_Z = "integer",
+    num_ell = "integer",
+    num_wrp = "integer",
+    num_beta = "integer",
+    num_xpar = "integer",
+    num_het = "integer",
+    num_unc = "integer",
+    # Component encoding and param bounds
+    components = "matrix",
+    xpar_zero = "array",
+    xpar_lb = "array",
+    xpar_ub = "array",
+    # Covariates
+    X = "matrix",
+    X_mask = "matrix",
+    X_scale = "numeric",
+    Z = "array",
+    Z_M = "integer",
+    BETA_IDX = "array",
+    XPAR_IDX = "array",
+    # Options
+    delta = "numeric",
+    vm_params = "numeric",
+    is_verbose = "integer",
+    is_likelihood_skipped = "integer",
+    # Prior
+    prior_alpha = "array",
+    prior_ell = "array",
+    prior_wrp = "array",
+    prior_xpar = "array",
+    hyper_alpha = "array",
+    hyper_ell = "array",
+    hyper_wrp = "array",
+    hyper_xpar = "array",
+    hyper_beta = "array",
+    # Other
     var_names = "list",
     y_scaling = "lgpscaling",
     info = "list"
@@ -371,17 +414,40 @@ lgpmodel <- setClass("lgpmodel",
 
 #' An S4 class to represent a marginal GP model
 #'
+#' @slot response Response variable information.
 #' @param object The object for which to apply a class method.
 #' @seealso This class inherits from \linkS4class{lgpmodel}, so also the
 #' methods of that class work for \code{MarginalGPModel}s.
-MarginalGPModel <- setClass("MarginalGPModel", contains = "lgpmodel")
+MarginalGPModel <- setClass("MarginalGPModel",
+  contains = "lgpmodel",
+  representation = representation(
+    y = "array",
+    prior_sigma = "array",
+    hyper_sigma = "array"
+  )
+)
 
 #' An S4 class to represent a latent GP model
 #'
 #' @param object The object for which to apply a class method.
+#' @slot response Response variable information.
 #' @seealso This class inherits from \linkS4class{lgpmodel}, so also the
 #' methods of that class work for \code{LatentGPModel}s.
-LatentGPModel <- setClass("LatentGPModel", contains = "lgpmodel")
+LatentGPModel <- setClass("LatentGPModel",
+  contains = "lgpmodel",
+  representation = representation(
+    y_int = "array",
+    y = "array",
+    c_hat = "array",
+    y_num_trials = "array",
+    obs_model = "integer",
+    prior_sigma = "array",
+    prior_phi = "array",
+    hyper_sigma = "array",
+    hyper_phi = "array",
+    hyper_gamma = "array"
+  )
+)
 
 #' An S4 class to represent an approximate latent GP model
 #'

@@ -136,13 +136,13 @@
     real[] ell,
     real[] wrp,
     vector[] beta,
-    vector[] teff,
+    vector[] xpar,
     data real[] vm_params,
     data int[,] beta_idx1,
     data int[,] beta_idx2,
-    data int[,] teff_idx1,
-    data int[,] teff_idx2,
-    data vector[] teff_zero)
+    data int[,] xpar_idx1,
+    data int[,] xpar_idx2,
+    data vector[] xpar_zero)
   {
     int idx_ell = 0;
     int idx_wrp = 0;
@@ -172,8 +172,8 @@
         
         // 3.1 Handle possible uncertainty in covariate
         if(has_unc==1) {
-          x1 = STAN_edit_x_cont(x1, teff_idx1[1], teff_zero[1], teff[1]);
-          x2 = STAN_edit_x_cont(x2, teff_idx2[1], teff_zero[1], teff[1]);
+          x1 = STAN_edit_x_cont(x1, xpar_idx1[1], xpar_zero[1], xpar[1]);
+          x2 = STAN_edit_x_cont(x2, xpar_idx2[1], xpar_zero[1], xpar[1]);
         }
         
         // 3.2 Normalize

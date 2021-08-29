@@ -4,48 +4,42 @@ create_model.base <- function(formula, data, options, prior, prior_only,
 
   # Data, formula and common Stan inputs
   data <- convert_to_data_frame(data)
-  lgp_formula <- create_lgpformula(formula, data, verbose)
-  parsed_input <- standata_base(
-    data, lgp_formula, options, prior, prior_only, verbose
-  )
+  lgp_formula <- parse_formula(formula, data, verbose)
+  opts <- parse_options(opts, prior_only, verbose)
+  covariates <- parse_covariates(data, lgp_formula)
+  components <- parse_components(lgp_formula, covariates)
+  idx_maps <- create_index_maps(covariates, components)
+  pri <- parse_prior(prior, si, verbose)
 
   # Variable names
   var_names <- list(
     y = lgp_formula@y_name,
-    x = rownames(dollar(parsed_input, "X")),
-    z = rownames(dollar(parsed_input, "Z"))
+    x = rownames(dollar(covariates, "X")),
+    z = rownames(dollar(covariates, "Z"))
   )
 
   # Create the 'lgpmodel' object
   new("lgpmodel",
     model_formula = lgp_formula,
     data = data,
-    parsed_input = parsed_input,
+    options = opts,
+    covariates = covariates,
+    components = components,
+    idx_maps = idx_maps,
+    prior = pri,
     var_names = var_names,
     info = creation_info()
   )
 }
 
 # Checks if formula is in advanced format and translates if not
-create_lgpformula <- function(formula, data, verbose = FALSE) {
+parse_formula <- function(formula, data, verbose = FALSE) {
   advanced <- is_advanced_formula(formula)
   if (!advanced) formula <- formula_to_advanced(formula, data, verbose)
   fp <- as.character(formula)
   formula_str <- paste(fp[2], fp[1], fp[3])
   log_info(paste0("Formula interpreted as: ", formula_str), verbose)
   parse_formula_advanced(formula)
-}
-
-# Create common Stan input needed for all models
-standata_base <- function(data, lgp_formula, opts, prior, prior_only, vrb) {
-  opts <- standata_base.options(opts, prior_only, vrb)
-  covs <- standata_base.covariates(data, lgp_formula)
-  comps <- standata_base.components(lgp_formula, covs)
-  expanding <- standata_base.expanding(covs, comps)
-  si <- c(opts, covs, comps, expanding)
-  pri <- standata_base.prior(prior, si, vrb)
-  lst <- c(si, pri)
-  return(lst)
 }
 
 # Misc info for created objects
@@ -58,9 +52,9 @@ creation_info <- function() {
 
 
 # Parse given prior (common parameters)
-standata_base.prior <- function(prior, stan_input, verbose) {
-  num_unc <- dollar(stan_input, "num_unc")
-  num_wrp <- dollar(stan_input, "num_wrp")
+parse_prior <- function(prior, components, verbose) {
+  num_unc <- dollar(components, "num_unc")
+  num_wrp <- dollar(components, "num_wrp")
   par_names <- c(
     "alpha", "ell", "wrp", "beta",
     "effect_time", "effect_time_info"
@@ -74,12 +68,12 @@ standata_base.prior <- function(prior, stan_input, verbose) {
     warning(msg)
   }
   raw <- dollar(filled, "prior")
-  parse_prior_common(raw, stan_input)
+  parse_prior_common(raw, components)
 }
 
 
 # Create mapping from observation index to index of beta or teff parameter
-standata_base.expanding <- function(covs, comps) {
+create_index_maps <- function(covs, comps) {
   components <- dollar(comps, "components")
   Z <- dollar(covs, "Z")
   X_mask <- dollar(covs, "X_mask")
@@ -106,7 +100,7 @@ standata_base.expanding <- function(covs, comps) {
 }
 
 # Parse the given common modeling options
-standata_base.options <- function(options, prior_only, verbose) {
+parse_options <- function(options, prior_only, verbose) {
 
   # Default options
   input <- options
@@ -141,7 +135,7 @@ standata_base.options <- function(options, prior_only, verbose) {
 
 
 # Create covariate data for Stan input
-standata_base.covariates <- function(data, lgp_formula) {
+parse_covariates <- function(data, lgp_formula) {
   NAMES <- unique(rhs_variables(lgp_formula@terms))
   check_df_with(data, NAMES)
   check_unique(NAMES)
@@ -224,7 +218,7 @@ standata_base.covariates <- function(data, lgp_formula) {
 }
 
 # Create model components data for Stan input
-standata_base.components <- function(model_formula, covariates) {
+parse_components <- function(model_formula, covariates) {
   components <- create_components_encoding(model_formula, covariates)
   list(
     J = nrow(components),

@@ -80,11 +80,11 @@
     real[] alpha,
     real[] wrp,
     vector[] beta,
-    vector[] teff,
+    vector[] xpar,
     data real[] vm_params,
     data int[,] beta_idx,
-    data int[,] teff_idx,
-    data vector[] teff_zero)
+    data int[,] xpar_idx,
+    data vector[] xpar_zero)
   {
     int idx_wrp = 0;
     int idx_alpha = 0;
@@ -109,7 +109,7 @@
       if(idx_cont != 0){
         x = X[idx_cont];
         if(has_unc) {
-          x = STAN_edit_x_cont(x, teff_idx[1], teff_zero[1], teff[1]);
+          x = STAN_edit_x_cont(x, xpar_idx[1], xpar_zero[1], xpar[1]);
         }
         x = x / X_scale[idx_cont];
       }

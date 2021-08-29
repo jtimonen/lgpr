@@ -57,8 +57,8 @@ STAN_kernel_beta <- function(beta, idx1_expand, idx2_expand, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_beta`, beta, idx1_expand, idx2_expand, pstream__)
 }
 
-STAN_kernel_all <- function(n1, n2, K_const, components, X1, X2, X_scale, alpha, ell, wrp, beta, teff, vm_params, beta_idx1, beta_idx2, teff_idx1, teff_idx2, teff_zero, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, X1, X2, X_scale, alpha, ell, wrp, beta, teff, vm_params, beta_idx1, beta_idx2, teff_idx1, teff_idx2, teff_zero, pstream__)
+STAN_kernel_all <- function(n1, n2, K_const, components, X1, X2, X_scale, alpha, ell, wrp, beta, xpar, vm_params, beta_idx1, beta_idx2, xpar_idx1, xpar_idx2, xpar_zero, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_all`, n1, n2, K_const, components, X1, X2, X_scale, alpha, ell, wrp, beta, xpar, vm_params, beta_idx1, beta_idx2, xpar_idx1, xpar_idx2, xpar_zero, pstream__)
 }
 
 STAN_kernel_const_diag <- function(z, kernel_type, pstream__ = 0L) {
@@ -81,8 +81,8 @@ STAN_kernel_beta_diag <- function(beta, idx_expand, pstream__ = 0L) {
     .Call(`_lgpr_STAN_kernel_beta_diag`, beta, idx_expand, pstream__)
 }
 
-STAN_kernel_all_diag <- function(n, K_const_diag, components, X, X_scale, alpha, wrp, beta, teff, vm_params, beta_idx, teff_idx, teff_zero, pstream__ = 0L) {
-    .Call(`_lgpr_STAN_kernel_all_diag`, n, K_const_diag, components, X, X_scale, alpha, wrp, beta, teff, vm_params, beta_idx, teff_idx, teff_zero, pstream__)
+STAN_kernel_all_diag <- function(n, K_const_diag, components, X, X_scale, alpha, wrp, beta, xpar, vm_params, beta_idx, xpar_idx, xpar_zero, pstream__ = 0L) {
+    .Call(`_lgpr_STAN_kernel_all_diag`, n, K_const_diag, components, X, X_scale, alpha, wrp, beta, xpar, vm_params, beta_idx, xpar_idx, xpar_zero, pstream__)
 }
 
 STAN_log_prior <- function(x, types, p, pstream__ = 0L) {

@@ -216,7 +216,7 @@ create_expanding <- function(components, Z, X_mask, expr, icol,
   cntr <- 0
   for (j in inds) {
     cntr <- cntr + 1
-    maps <- create_idx_maps(components, j, icol, X_mask, Z, Z_levels)
+    maps <- map_indices(components, j, icol, X_mask, Z, Z_levels)
     lst[[cntr]] <- maps
     names(lst)[cntr] <- rownames(components)[j]
   }
@@ -224,7 +224,7 @@ create_expanding <- function(components, Z, X_mask, expr, icol,
 }
 
 # Index maps for component j
-create_idx_maps <- function(components, j, icol, X_mask, Z, Z_levels) {
+map_indices <- function(components, j, icol, X_mask, Z, Z_levels) {
   Z_names <- rownames(Z)
   idx_x <- components[j, 3]
   idx_z <- components[j, icol]

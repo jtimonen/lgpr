@@ -20,11 +20,11 @@
   
   // Disease-related age uncertainty
   if(num_unc > 0) {
-    int ptype = prior_teff[1][1];
-    int is_backwards = prior_teff[1][2];
+    int ptype = prior_xpar[1][1];
+    int is_backwards = prior_xpar[1][2];
     real direction = (-1.0)^(is_backwards);
-    vector[num_teff] tx = direction * (teff[1] - teff_zero[1]);
-    for(k in 1:num_teff){
-      target += STAN_log_prior(tx[k], {ptype, 0}, hyper_teff[1]);
+    vector[num_xpar] tx = direction * (xpar[1] - xpar_zero[1]);
+    for(k in 1:num_xpar){
+      target += STAN_log_prior(tx[k], {ptype, 0}, hyper_xpar[1]);
     }
   }

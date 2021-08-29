@@ -65,10 +65,17 @@ the latent signal \code{f} (and its components).
 \describe{
 \item{\code{formula}}{An object of class \linkS4class{lgpformula}}
 
-\item{\code{data}}{The original unmodified data.}
+\item{\code{raw_data}}{The original unmodified data.}
 
-\item{\code{parsed_input}}{Model, data, options and prior in a format that
-can be given as input to \code{rstan::sampling}.}
+\item{\code{options}}{List of parsed options.}
+
+\item{\code{covariates}}{Covariates included in the model.}
+
+\item{\code{components}}{Component information.}
+
+\item{\code{idx_maps}}{Parameter index maps.}
+
+\item{\code{prior}}{Prior in parsed format.}
 
 \item{\code{var_names}}{List of variable names grouped by type.}
 

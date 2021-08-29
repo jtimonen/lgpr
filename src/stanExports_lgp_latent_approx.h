@@ -1810,13 +1810,13 @@ private:
         int num_ell;
         int num_wrp;
         int num_beta;
-        int num_teff;
+        int num_xpar;
         int num_het;
         int num_unc;
         std::vector<std::vector<int> > components;
-        std::vector<vector_d> teff_zero;
-        std::vector<vector_d> teff_lb;
-        std::vector<vector_d> teff_ub;
+        std::vector<vector_d> xpar_zero;
+        std::vector<vector_d> xpar_lb;
+        std::vector<vector_d> xpar_ub;
         double delta;
         std::vector<double> vm_params;
         std::vector<vector_d> X;
@@ -1825,15 +1825,15 @@ private:
         std::vector<std::vector<int> > Z;
         std::vector<int> Z_M;
         std::vector<std::vector<int> > BETA_IDX;
-        std::vector<std::vector<int> > TEFF_IDX;
+        std::vector<std::vector<int> > XPAR_IDX;
         std::vector<std::vector<int> > prior_alpha;
         std::vector<std::vector<int> > prior_ell;
         std::vector<std::vector<int> > prior_wrp;
-        std::vector<std::vector<int> > prior_teff;
+        std::vector<std::vector<int> > prior_xpar;
         std::vector<std::vector<double> > hyper_alpha;
         std::vector<std::vector<double> > hyper_ell;
         std::vector<std::vector<double> > hyper_wrp;
-        std::vector<std::vector<double> > hyper_teff;
+        std::vector<std::vector<double> > hyper_xpar;
         std::vector<std::vector<double> > hyper_beta;
         int obs_model;
         std::vector<std::vector<int> > prior_sigma;
@@ -1949,12 +1949,12 @@ public:
             num_beta = vals_i__[pos__++];
             check_greater_or_equal(function__, "num_beta", num_beta, 0);
             current_statement_begin__ = 476;
-            context__.validate_dims("data initialization", "num_teff", "int", context__.to_vec());
-            num_teff = int(0);
-            vals_i__ = context__.vals_i("num_teff");
+            context__.validate_dims("data initialization", "num_xpar", "int", context__.to_vec());
+            num_xpar = int(0);
+            vals_i__ = context__.vals_i("num_xpar");
             pos__ = 0;
-            num_teff = vals_i__[pos__++];
-            check_greater_or_equal(function__, "num_teff", num_teff, 0);
+            num_xpar = vals_i__[pos__++];
+            check_greater_or_equal(function__, "num_xpar", num_xpar, 0);
             current_statement_begin__ = 477;
             context__.validate_dims("data initialization", "num_het", "int", context__.to_vec());
             num_het = int(0);
@@ -1991,45 +1991,45 @@ public:
                 }
             }
             current_statement_begin__ = 495;
-            validate_non_negative_index("teff_zero", "num_teff", num_teff);
-            validate_non_negative_index("teff_zero", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            context__.validate_dims("data initialization", "teff_zero", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_teff));
-            teff_zero = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_teff));
-            vals_r__ = context__.vals_r("teff_zero");
+            validate_non_negative_index("xpar_zero", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_zero", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            context__.validate_dims("data initialization", "xpar_zero", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+            xpar_zero = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            vals_r__ = context__.vals_r("xpar_zero");
             pos__ = 0;
-            size_t teff_zero_j_1_max__ = num_teff;
-            size_t teff_zero_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < teff_zero_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < teff_zero_k_0_max__; ++k_0__) {
-                    teff_zero[k_0__](j_1__) = vals_r__[pos__++];
+            size_t xpar_zero_j_1_max__ = num_xpar;
+            size_t xpar_zero_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_zero_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_zero_k_0_max__; ++k_0__) {
+                    xpar_zero[k_0__](j_1__) = vals_r__[pos__++];
                 }
             }
             current_statement_begin__ = 496;
-            validate_non_negative_index("teff_lb", "num_teff", num_teff);
-            validate_non_negative_index("teff_lb", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            context__.validate_dims("data initialization", "teff_lb", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_teff));
-            teff_lb = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_teff));
-            vals_r__ = context__.vals_r("teff_lb");
+            validate_non_negative_index("xpar_lb", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_lb", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            context__.validate_dims("data initialization", "xpar_lb", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+            xpar_lb = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            vals_r__ = context__.vals_r("xpar_lb");
             pos__ = 0;
-            size_t teff_lb_j_1_max__ = num_teff;
-            size_t teff_lb_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < teff_lb_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < teff_lb_k_0_max__; ++k_0__) {
-                    teff_lb[k_0__](j_1__) = vals_r__[pos__++];
+            size_t xpar_lb_j_1_max__ = num_xpar;
+            size_t xpar_lb_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_lb_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_lb_k_0_max__; ++k_0__) {
+                    xpar_lb[k_0__](j_1__) = vals_r__[pos__++];
                 }
             }
             current_statement_begin__ = 497;
-            validate_non_negative_index("teff_ub", "num_teff", num_teff);
-            validate_non_negative_index("teff_ub", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            context__.validate_dims("data initialization", "teff_ub", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_teff));
-            teff_ub = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_teff));
-            vals_r__ = context__.vals_r("teff_ub");
+            validate_non_negative_index("xpar_ub", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_ub", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            context__.validate_dims("data initialization", "xpar_ub", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+            xpar_ub = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            vals_r__ = context__.vals_r("xpar_ub");
             pos__ = 0;
-            size_t teff_ub_j_1_max__ = num_teff;
-            size_t teff_ub_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < teff_ub_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < teff_ub_k_0_max__; ++k_0__) {
-                    teff_ub[k_0__](j_1__) = vals_r__[pos__++];
+            size_t xpar_ub_j_1_max__ = num_xpar;
+            size_t xpar_ub_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_ub_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_ub_k_0_max__; ++k_0__) {
+                    xpar_ub[k_0__](j_1__) = vals_r__[pos__++];
                 }
             }
             current_statement_begin__ = 500;
@@ -2152,25 +2152,25 @@ public:
                 }
             }
             current_statement_begin__ = 516;
-            validate_non_negative_index("TEFF_IDX", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            validate_non_negative_index("TEFF_IDX", "N", N);
-            context__.validate_dims("data initialization", "TEFF_IDX", "int", context__.to_vec(logical_gt(num_unc, 0),N));
-            TEFF_IDX = std::vector<std::vector<int> >(logical_gt(num_unc, 0), std::vector<int>(N, int(0)));
-            vals_i__ = context__.vals_i("TEFF_IDX");
+            validate_non_negative_index("XPAR_IDX", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            validate_non_negative_index("XPAR_IDX", "N", N);
+            context__.validate_dims("data initialization", "XPAR_IDX", "int", context__.to_vec(logical_gt(num_unc, 0),N));
+            XPAR_IDX = std::vector<std::vector<int> >(logical_gt(num_unc, 0), std::vector<int>(N, int(0)));
+            vals_i__ = context__.vals_i("XPAR_IDX");
             pos__ = 0;
-            size_t TEFF_IDX_k_0_max__ = logical_gt(num_unc, 0);
-            size_t TEFF_IDX_k_1_max__ = N;
-            for (size_t k_1__ = 0; k_1__ < TEFF_IDX_k_1_max__; ++k_1__) {
-                for (size_t k_0__ = 0; k_0__ < TEFF_IDX_k_0_max__; ++k_0__) {
-                    TEFF_IDX[k_0__][k_1__] = vals_i__[pos__++];
+            size_t XPAR_IDX_k_0_max__ = logical_gt(num_unc, 0);
+            size_t XPAR_IDX_k_1_max__ = N;
+            for (size_t k_1__ = 0; k_1__ < XPAR_IDX_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < XPAR_IDX_k_0_max__; ++k_0__) {
+                    XPAR_IDX[k_0__][k_1__] = vals_i__[pos__++];
                 }
             }
-            size_t TEFF_IDX_i_0_max__ = logical_gt(num_unc, 0);
-            size_t TEFF_IDX_i_1_max__ = N;
-            for (size_t i_0__ = 0; i_0__ < TEFF_IDX_i_0_max__; ++i_0__) {
-                for (size_t i_1__ = 0; i_1__ < TEFF_IDX_i_1_max__; ++i_1__) {
-                    check_greater_or_equal(function__, "TEFF_IDX[i_0__][i_1__]", TEFF_IDX[i_0__][i_1__], 1);
-                    check_less_or_equal(function__, "TEFF_IDX[i_0__][i_1__]", TEFF_IDX[i_0__][i_1__], (num_teff + 1));
+            size_t XPAR_IDX_i_0_max__ = logical_gt(num_unc, 0);
+            size_t XPAR_IDX_i_1_max__ = N;
+            for (size_t i_0__ = 0; i_0__ < XPAR_IDX_i_0_max__; ++i_0__) {
+                for (size_t i_1__ = 0; i_1__ < XPAR_IDX_i_1_max__; ++i_1__) {
+                    check_greater_or_equal(function__, "XPAR_IDX[i_0__][i_1__]", XPAR_IDX[i_0__][i_1__], 1);
+                    check_less_or_equal(function__, "XPAR_IDX[i_0__][i_1__]", XPAR_IDX[i_0__][i_1__], (num_xpar + 1));
                 }
             }
             current_statement_begin__ = 518;
@@ -2237,24 +2237,24 @@ public:
                 }
             }
             current_statement_begin__ = 521;
-            validate_non_negative_index("prior_teff", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            validate_non_negative_index("prior_teff", "2", 2);
-            context__.validate_dims("data initialization", "prior_teff", "int", context__.to_vec(logical_gt(num_unc, 0),2));
-            prior_teff = std::vector<std::vector<int> >(logical_gt(num_unc, 0), std::vector<int>(2, int(0)));
-            vals_i__ = context__.vals_i("prior_teff");
+            validate_non_negative_index("prior_xpar", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            validate_non_negative_index("prior_xpar", "2", 2);
+            context__.validate_dims("data initialization", "prior_xpar", "int", context__.to_vec(logical_gt(num_unc, 0),2));
+            prior_xpar = std::vector<std::vector<int> >(logical_gt(num_unc, 0), std::vector<int>(2, int(0)));
+            vals_i__ = context__.vals_i("prior_xpar");
             pos__ = 0;
-            size_t prior_teff_k_0_max__ = logical_gt(num_unc, 0);
-            size_t prior_teff_k_1_max__ = 2;
-            for (size_t k_1__ = 0; k_1__ < prior_teff_k_1_max__; ++k_1__) {
-                for (size_t k_0__ = 0; k_0__ < prior_teff_k_0_max__; ++k_0__) {
-                    prior_teff[k_0__][k_1__] = vals_i__[pos__++];
+            size_t prior_xpar_k_0_max__ = logical_gt(num_unc, 0);
+            size_t prior_xpar_k_1_max__ = 2;
+            for (size_t k_1__ = 0; k_1__ < prior_xpar_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < prior_xpar_k_0_max__; ++k_0__) {
+                    prior_xpar[k_0__][k_1__] = vals_i__[pos__++];
                 }
             }
-            size_t prior_teff_i_0_max__ = logical_gt(num_unc, 0);
-            size_t prior_teff_i_1_max__ = 2;
-            for (size_t i_0__ = 0; i_0__ < prior_teff_i_0_max__; ++i_0__) {
-                for (size_t i_1__ = 0; i_1__ < prior_teff_i_1_max__; ++i_1__) {
-                    check_greater_or_equal(function__, "prior_teff[i_0__][i_1__]", prior_teff[i_0__][i_1__], 0);
+            size_t prior_xpar_i_0_max__ = logical_gt(num_unc, 0);
+            size_t prior_xpar_i_1_max__ = 2;
+            for (size_t i_0__ = 0; i_0__ < prior_xpar_i_0_max__; ++i_0__) {
+                for (size_t i_1__ = 0; i_1__ < prior_xpar_i_1_max__; ++i_1__) {
+                    check_greater_or_equal(function__, "prior_xpar[i_0__][i_1__]", prior_xpar[i_0__][i_1__], 0);
                 }
             }
             current_statement_begin__ = 522;
@@ -2300,17 +2300,17 @@ public:
                 }
             }
             current_statement_begin__ = 525;
-            validate_non_negative_index("hyper_teff", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            validate_non_negative_index("hyper_teff", "3", 3);
-            context__.validate_dims("data initialization", "hyper_teff", "double", context__.to_vec(logical_gt(num_unc, 0),3));
-            hyper_teff = std::vector<std::vector<double> >(logical_gt(num_unc, 0), std::vector<double>(3, double(0)));
-            vals_r__ = context__.vals_r("hyper_teff");
+            validate_non_negative_index("hyper_xpar", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            validate_non_negative_index("hyper_xpar", "3", 3);
+            context__.validate_dims("data initialization", "hyper_xpar", "double", context__.to_vec(logical_gt(num_unc, 0),3));
+            hyper_xpar = std::vector<std::vector<double> >(logical_gt(num_unc, 0), std::vector<double>(3, double(0)));
+            vals_r__ = context__.vals_r("hyper_xpar");
             pos__ = 0;
-            size_t hyper_teff_k_0_max__ = logical_gt(num_unc, 0);
-            size_t hyper_teff_k_1_max__ = 3;
-            for (size_t k_1__ = 0; k_1__ < hyper_teff_k_1_max__; ++k_1__) {
-                for (size_t k_0__ = 0; k_0__ < hyper_teff_k_0_max__; ++k_0__) {
-                    hyper_teff[k_0__][k_1__] = vals_r__[pos__++];
+            size_t hyper_xpar_k_0_max__ = logical_gt(num_unc, 0);
+            size_t hyper_xpar_k_1_max__ = 3;
+            for (size_t k_1__ = 0; k_1__ < hyper_xpar_k_1_max__; ++k_1__) {
+                for (size_t k_0__ = 0; k_0__ < hyper_xpar_k_0_max__; ++k_0__) {
+                    hyper_xpar[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
             current_statement_begin__ = 526;
@@ -2579,9 +2579,9 @@ public:
             validate_non_negative_index("beta", "logical_gt(num_het, 0)", logical_gt(num_het, 0));
             num_params_r__ += (num_beta * logical_gt(num_het, 0));
             current_statement_begin__ = 559;
-            validate_non_negative_index("teff_raw", "num_teff", num_teff);
-            validate_non_negative_index("teff_raw", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            num_params_r__ += (num_teff * logical_gt(num_unc, 0));
+            validate_non_negative_index("xpar_raw", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_raw", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            num_params_r__ += (num_xpar * logical_gt(num_unc, 0));
             current_statement_begin__ = 560;
             validate_non_negative_index("sigma", "logical_eq(obs_model, 1)", logical_eq(obs_model, 1));
             num_params_r__ += (1 * logical_eq(obs_model, 1));
@@ -2696,27 +2696,27 @@ public:
             }
         }
         current_statement_begin__ = 559;
-        if (!(context__.contains_r("teff_raw")))
-            stan::lang::rethrow_located(std::runtime_error(std::string("Variable teff_raw missing")), current_statement_begin__, prog_reader__());
-        vals_r__ = context__.vals_r("teff_raw");
+        if (!(context__.contains_r("xpar_raw")))
+            stan::lang::rethrow_located(std::runtime_error(std::string("Variable xpar_raw missing")), current_statement_begin__, prog_reader__());
+        vals_r__ = context__.vals_r("xpar_raw");
         pos__ = 0U;
-        validate_non_negative_index("teff_raw", "num_teff", num_teff);
-        validate_non_negative_index("teff_raw", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-        context__.validate_dims("parameter initialization", "teff_raw", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_teff));
-        std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > teff_raw(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_teff));
-        size_t teff_raw_j_1_max__ = num_teff;
-        size_t teff_raw_k_0_max__ = logical_gt(num_unc, 0);
-        for (size_t j_1__ = 0; j_1__ < teff_raw_j_1_max__; ++j_1__) {
-            for (size_t k_0__ = 0; k_0__ < teff_raw_k_0_max__; ++k_0__) {
-                teff_raw[k_0__](j_1__) = vals_r__[pos__++];
+        validate_non_negative_index("xpar_raw", "num_xpar", num_xpar);
+        validate_non_negative_index("xpar_raw", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+        context__.validate_dims("parameter initialization", "xpar_raw", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+        std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > xpar_raw(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+        size_t xpar_raw_j_1_max__ = num_xpar;
+        size_t xpar_raw_k_0_max__ = logical_gt(num_unc, 0);
+        for (size_t j_1__ = 0; j_1__ < xpar_raw_j_1_max__; ++j_1__) {
+            for (size_t k_0__ = 0; k_0__ < xpar_raw_k_0_max__; ++k_0__) {
+                xpar_raw[k_0__](j_1__) = vals_r__[pos__++];
             }
         }
-        size_t teff_raw_i_0_max__ = logical_gt(num_unc, 0);
-        for (size_t i_0__ = 0; i_0__ < teff_raw_i_0_max__; ++i_0__) {
+        size_t xpar_raw_i_0_max__ = logical_gt(num_unc, 0);
+        for (size_t i_0__ = 0; i_0__ < xpar_raw_i_0_max__; ++i_0__) {
             try {
-                writer__.vector_lub_unconstrain(1e-12, (1 - 1e-12), teff_raw[i_0__]);
+                writer__.vector_lub_unconstrain(1e-12, (1 - 1e-12), xpar_raw[i_0__]);
             } catch (const std::exception& e) {
-                stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable teff_raw: ") + e.what()), current_statement_begin__, prog_reader__());
+                stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable xpar_raw: ") + e.what()), current_statement_begin__, prog_reader__());
             }
         }
         current_statement_begin__ = 560;
@@ -2862,14 +2862,14 @@ public:
                     beta.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_beta));
             }
             current_statement_begin__ = 559;
-            std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > teff_raw;
-            size_t teff_raw_d_0_max__ = logical_gt(num_unc, 0);
-            teff_raw.reserve(teff_raw_d_0_max__);
-            for (size_t d_0__ = 0; d_0__ < teff_raw_d_0_max__; ++d_0__) {
+            std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > xpar_raw;
+            size_t xpar_raw_d_0_max__ = logical_gt(num_unc, 0);
+            xpar_raw.reserve(xpar_raw_d_0_max__);
+            for (size_t d_0__ = 0; d_0__ < xpar_raw_d_0_max__; ++d_0__) {
                 if (jacobian__)
-                    teff_raw.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_teff, lp__));
+                    xpar_raw.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_xpar, lp__));
                 else
-                    teff_raw.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_teff));
+                    xpar_raw.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_xpar));
             }
             current_statement_begin__ = 560;
             std::vector<local_scalar_t__> sigma;
@@ -2916,19 +2916,19 @@ public:
             stan::math::initialize(f_latent, DUMMY_VAR__);
             stan::math::fill(f_latent, DUMMY_VAR__);
             current_statement_begin__ = 569;
-            validate_non_negative_index("teff", "num_teff", num_teff);
-            validate_non_negative_index("teff", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > teff(logical_gt(num_unc, 0), Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(num_teff));
-            stan::math::initialize(teff, DUMMY_VAR__);
-            stan::math::fill(teff, DUMMY_VAR__);
+            validate_non_negative_index("xpar", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            std::vector<Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> > xpar(logical_gt(num_unc, 0), Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>(num_xpar));
+            stan::math::initialize(xpar, DUMMY_VAR__);
+            stan::math::fill(xpar, DUMMY_VAR__);
             // transformed parameters block statements
             current_statement_begin__ = 570;
             if (as_bool(logical_gt(num_unc, 0))) {
                 current_statement_begin__ = 571;
-                stan::model::assign(teff, 
+                stan::model::assign(xpar, 
                             stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
-                            add(get_base1(teff_lb, 1, "teff_lb", 1), elt_multiply(subtract(get_base1(teff_ub, 1, "teff_ub", 1), get_base1(teff_lb, 1, "teff_lb", 1)), get_base1(teff_raw, 1, "teff_raw", 1))), 
-                            "assigning variable teff");
+                            add(get_base1(xpar_lb, 1, "xpar_lb", 1), elt_multiply(subtract(get_base1(xpar_ub, 1, "xpar_ub", 1), get_base1(xpar_lb, 1, "xpar_lb", 1)), get_base1(xpar_raw, 1, "xpar_raw", 1))), 
+                            "assigning variable xpar");
             }
             // validate transformed parameters
             const char* function__ = "validate transformed params";
@@ -2946,14 +2946,14 @@ public:
                 }
             }
             current_statement_begin__ = 569;
-            size_t teff_k_0_max__ = logical_gt(num_unc, 0);
-            size_t teff_j_1_max__ = num_teff;
-            for (size_t k_0__ = 0; k_0__ < teff_k_0_max__; ++k_0__) {
-                for (size_t j_1__ = 0; j_1__ < teff_j_1_max__; ++j_1__) {
-                    if (stan::math::is_uninitialized(teff[k_0__](j_1__))) {
+            size_t xpar_k_0_max__ = logical_gt(num_unc, 0);
+            size_t xpar_j_1_max__ = num_xpar;
+            for (size_t k_0__ = 0; k_0__ < xpar_k_0_max__; ++k_0__) {
+                for (size_t j_1__ = 0; j_1__ < xpar_j_1_max__; ++j_1__) {
+                    if (stan::math::is_uninitialized(xpar[k_0__](j_1__))) {
                         std::stringstream msg__;
-                        msg__ << "Undefined transformed parameter: teff" << "[" << k_0__ << "]" << "(" << j_1__ << ")";
-                        stan::lang::rethrow_located(std::runtime_error(std::string("Error initializing variable teff: ") + msg__.str()), current_statement_begin__, prog_reader__());
+                        msg__ << "Undefined transformed parameter: xpar" << "[" << k_0__ << "]" << "(" << j_1__ << ")";
+                        stan::lang::rethrow_located(std::runtime_error(std::string("Error initializing variable xpar: ") + msg__.str()), current_statement_begin__, prog_reader__());
                     }
                 }
             }
@@ -2992,12 +2992,12 @@ public:
                 int ptype(0);
                 (void) ptype;  // dummy to suppress unused var warning
                 stan::math::fill(ptype, std::numeric_limits<int>::min());
-                stan::math::assign(ptype,get_base1(get_base1(prior_teff, 1, "prior_teff", 1), 1, "prior_teff", 2));
+                stan::math::assign(ptype,get_base1(get_base1(prior_xpar, 1, "prior_xpar", 1), 1, "prior_xpar", 2));
                 current_statement_begin__ = 600;
                 int is_backwards(0);
                 (void) is_backwards;  // dummy to suppress unused var warning
                 stan::math::fill(is_backwards, std::numeric_limits<int>::min());
-                stan::math::assign(is_backwards,get_base1(get_base1(prior_teff, 1, "prior_teff", 1), 2, "prior_teff", 2));
+                stan::math::assign(is_backwards,get_base1(get_base1(prior_xpar, 1, "prior_xpar", 1), 2, "prior_xpar", 2));
                 current_statement_begin__ = 601;
                 local_scalar_t__ direction(DUMMY_VAR__);
                 (void) direction;  // dummy to suppress unused var warning
@@ -3005,15 +3005,15 @@ public:
                 stan::math::fill(direction, DUMMY_VAR__);
                 stan::math::assign(direction,pow(-(1.0), is_backwards));
                 current_statement_begin__ = 602;
-                validate_non_negative_index("tx", "num_teff", num_teff);
-                Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> tx(num_teff);
+                validate_non_negative_index("tx", "num_xpar", num_xpar);
+                Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> tx(num_xpar);
                 stan::math::initialize(tx, DUMMY_VAR__);
                 stan::math::fill(tx, DUMMY_VAR__);
-                stan::math::assign(tx,multiply(direction, subtract(get_base1(teff, 1, "teff", 1), get_base1(teff_zero, 1, "teff_zero", 1))));
+                stan::math::assign(tx,multiply(direction, subtract(get_base1(xpar, 1, "xpar", 1), get_base1(xpar_zero, 1, "xpar_zero", 1))));
                 current_statement_begin__ = 603;
-                for (int k = 1; k <= num_teff; ++k) {
+                for (int k = 1; k <= num_xpar; ++k) {
                     current_statement_begin__ = 604;
-                    lp_accum__.add(STAN_log_prior(get_base1(tx, k, "tx", 1), static_cast<std::vector<int> >(stan::math::array_builder<int >().add(ptype).add(0).array()), get_base1(hyper_teff, 1, "hyper_teff", 1), pstream__));
+                    lp_accum__.add(STAN_log_prior(get_base1(tx, k, "tx", 1), static_cast<std::vector<int> >(stan::math::array_builder<int >().add(ptype).add(0).array()), get_base1(hyper_xpar, 1, "hyper_xpar", 1), pstream__));
                 }
                 }
             }
@@ -3126,13 +3126,13 @@ public:
         names__.push_back("ell");
         names__.push_back("wrp");
         names__.push_back("beta");
-        names__.push_back("teff_raw");
+        names__.push_back("xpar_raw");
         names__.push_back("sigma");
         names__.push_back("phi");
         names__.push_back("gamma");
         names__.push_back("xi");
         names__.push_back("f_latent");
-        names__.push_back("teff");
+        names__.push_back("xpar");
     }
     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
         dimss__.resize(0);
@@ -3152,7 +3152,7 @@ public:
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(logical_gt(num_unc, 0));
-        dims__.push_back(num_teff);
+        dims__.push_back(num_xpar);
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(logical_eq(obs_model, 1));
@@ -3172,7 +3172,7 @@ public:
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(logical_gt(num_unc, 0));
-        dims__.push_back(num_teff);
+        dims__.push_back(num_xpar);
         dimss__.push_back(dims__);
     }
     template <typename RNG>
@@ -3232,17 +3232,17 @@ public:
                 vars__.push_back(beta[k_0__](j_1__));
             }
         }
-        std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > teff_raw;
-        size_t teff_raw_d_0_max__ = logical_gt(num_unc, 0);
-        teff_raw.reserve(teff_raw_d_0_max__);
-        for (size_t d_0__ = 0; d_0__ < teff_raw_d_0_max__; ++d_0__) {
-            teff_raw.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_teff));
+        std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > xpar_raw;
+        size_t xpar_raw_d_0_max__ = logical_gt(num_unc, 0);
+        xpar_raw.reserve(xpar_raw_d_0_max__);
+        for (size_t d_0__ = 0; d_0__ < xpar_raw_d_0_max__; ++d_0__) {
+            xpar_raw.push_back(in__.vector_lub_constrain(1e-12, (1 - 1e-12), num_xpar));
         }
-        size_t teff_raw_j_1_max__ = num_teff;
-        size_t teff_raw_k_0_max__ = logical_gt(num_unc, 0);
-        for (size_t j_1__ = 0; j_1__ < teff_raw_j_1_max__; ++j_1__) {
-            for (size_t k_0__ = 0; k_0__ < teff_raw_k_0_max__; ++k_0__) {
-                vars__.push_back(teff_raw[k_0__](j_1__));
+        size_t xpar_raw_j_1_max__ = num_xpar;
+        size_t xpar_raw_k_0_max__ = logical_gt(num_unc, 0);
+        for (size_t j_1__ = 0; j_1__ < xpar_raw_j_1_max__; ++j_1__) {
+            for (size_t k_0__ = 0; k_0__ < xpar_raw_k_0_max__; ++k_0__) {
+                vars__.push_back(xpar_raw[k_0__](j_1__));
             }
         }
         std::vector<double> sigma;
@@ -3295,19 +3295,19 @@ public:
             stan::math::initialize(f_latent, DUMMY_VAR__);
             stan::math::fill(f_latent, DUMMY_VAR__);
             current_statement_begin__ = 569;
-            validate_non_negative_index("teff", "num_teff", num_teff);
-            validate_non_negative_index("teff", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > teff(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_teff));
-            stan::math::initialize(teff, DUMMY_VAR__);
-            stan::math::fill(teff, DUMMY_VAR__);
+            validate_non_negative_index("xpar", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> > xpar(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            stan::math::initialize(xpar, DUMMY_VAR__);
+            stan::math::fill(xpar, DUMMY_VAR__);
             // do transformed parameters statements
             current_statement_begin__ = 570;
             if (as_bool(logical_gt(num_unc, 0))) {
                 current_statement_begin__ = 571;
-                stan::model::assign(teff, 
+                stan::model::assign(xpar, 
                             stan::model::cons_list(stan::model::index_uni(1), stan::model::nil_index_list()), 
-                            add(get_base1(teff_lb, 1, "teff_lb", 1), elt_multiply(subtract(get_base1(teff_ub, 1, "teff_ub", 1), get_base1(teff_lb, 1, "teff_lb", 1)), get_base1(teff_raw, 1, "teff_raw", 1))), 
-                            "assigning variable teff");
+                            add(get_base1(xpar_lb, 1, "xpar_lb", 1), elt_multiply(subtract(get_base1(xpar_ub, 1, "xpar_ub", 1), get_base1(xpar_lb, 1, "xpar_lb", 1)), get_base1(xpar_raw, 1, "xpar_raw", 1))), 
+                            "assigning variable xpar");
             }
             if (!include_gqs__ && !include_tparams__) return;
             // validate transformed parameters
@@ -3322,11 +3322,11 @@ public:
                         vars__.push_back(f_latent[k_0__](j_1__));
                     }
                 }
-                size_t teff_j_1_max__ = num_teff;
-                size_t teff_k_0_max__ = logical_gt(num_unc, 0);
-                for (size_t j_1__ = 0; j_1__ < teff_j_1_max__; ++j_1__) {
-                    for (size_t k_0__ = 0; k_0__ < teff_k_0_max__; ++k_0__) {
-                        vars__.push_back(teff[k_0__](j_1__));
+                size_t xpar_j_1_max__ = num_xpar;
+                size_t xpar_k_0_max__ = logical_gt(num_unc, 0);
+                for (size_t j_1__ = 0; j_1__ < xpar_j_1_max__; ++j_1__) {
+                    for (size_t k_0__ = 0; k_0__ < xpar_k_0_max__; ++k_0__) {
+                        vars__.push_back(xpar[k_0__](j_1__));
                     }
                 }
             }
@@ -3388,12 +3388,12 @@ public:
                 param_names__.push_back(param_name_stream__.str());
             }
         }
-        size_t teff_raw_j_1_max__ = num_teff;
-        size_t teff_raw_k_0_max__ = logical_gt(num_unc, 0);
-        for (size_t j_1__ = 0; j_1__ < teff_raw_j_1_max__; ++j_1__) {
-            for (size_t k_0__ = 0; k_0__ < teff_raw_k_0_max__; ++k_0__) {
+        size_t xpar_raw_j_1_max__ = num_xpar;
+        size_t xpar_raw_k_0_max__ = logical_gt(num_unc, 0);
+        for (size_t j_1__ = 0; j_1__ < xpar_raw_j_1_max__; ++j_1__) {
+            for (size_t k_0__ = 0; k_0__ < xpar_raw_k_0_max__; ++k_0__) {
                 param_name_stream__.str(std::string());
-                param_name_stream__ << "teff_raw" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
+                param_name_stream__ << "xpar_raw" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                 param_names__.push_back(param_name_stream__.str());
             }
         }
@@ -3432,12 +3432,12 @@ public:
                     param_names__.push_back(param_name_stream__.str());
                 }
             }
-            size_t teff_j_1_max__ = num_teff;
-            size_t teff_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < teff_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < teff_k_0_max__; ++k_0__) {
+            size_t xpar_j_1_max__ = num_xpar;
+            size_t xpar_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_k_0_max__; ++k_0__) {
                     param_name_stream__.str(std::string());
-                    param_name_stream__ << "teff" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
+                    param_name_stream__ << "xpar" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                     param_names__.push_back(param_name_stream__.str());
                 }
             }
@@ -3475,12 +3475,12 @@ public:
                 param_names__.push_back(param_name_stream__.str());
             }
         }
-        size_t teff_raw_j_1_max__ = num_teff;
-        size_t teff_raw_k_0_max__ = logical_gt(num_unc, 0);
-        for (size_t j_1__ = 0; j_1__ < teff_raw_j_1_max__; ++j_1__) {
-            for (size_t k_0__ = 0; k_0__ < teff_raw_k_0_max__; ++k_0__) {
+        size_t xpar_raw_j_1_max__ = num_xpar;
+        size_t xpar_raw_k_0_max__ = logical_gt(num_unc, 0);
+        for (size_t j_1__ = 0; j_1__ < xpar_raw_j_1_max__; ++j_1__) {
+            for (size_t k_0__ = 0; k_0__ < xpar_raw_k_0_max__; ++k_0__) {
                 param_name_stream__.str(std::string());
-                param_name_stream__ << "teff_raw" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
+                param_name_stream__ << "xpar_raw" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                 param_names__.push_back(param_name_stream__.str());
             }
         }
@@ -3519,12 +3519,12 @@ public:
                     param_names__.push_back(param_name_stream__.str());
                 }
             }
-            size_t teff_j_1_max__ = num_teff;
-            size_t teff_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < teff_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < teff_k_0_max__; ++k_0__) {
+            size_t xpar_j_1_max__ = num_xpar;
+            size_t xpar_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_k_0_max__; ++k_0__) {
                     param_name_stream__.str(std::string());
-                    param_name_stream__ << "teff" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
+                    param_name_stream__ << "xpar" << '.' << k_0__ + 1 << '.' << j_1__ + 1;
                     param_names__.push_back(param_name_stream__.str());
                 }
             }

@@ -10,7 +10,7 @@
   int<lower=0> num_ell;     // number of lengthscale parameters
   int<lower=0> num_wrp;     // number of input warping parameters
   int<lower=0> num_beta;    // number of beta params
-  int<lower=0> num_teff;    // number of effect time params
+  int<lower=0> num_xpar;    // number of covariate uncertainty parameters
   int<lower=0> num_het;     // number of heterogeneous components
   int<lower=0> num_unc;     // number of components with uncertain x covariate
 
@@ -29,9 +29,9 @@
   int<lower=0> components[J, 7];
 
   // Observed effect times and uncertainty bounds
-  vector[num_teff] teff_zero[num_unc>0];
-  vector[num_teff] teff_lb[num_unc>0];
-  vector[num_teff] teff_ub[num_unc>0];
+  vector[num_xpar] xpar_zero[num_unc>0];
+  vector[num_xpar] xpar_lb[num_unc>0];
+  vector[num_xpar] xpar_ub[num_unc>0];
 
   // Misc
   real delta; // jitter to ensure pos. def. kernel matrices

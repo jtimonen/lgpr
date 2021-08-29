@@ -28,6 +28,12 @@ priors). Returns a \code{data.frame}.
 \item \code{get_stanmodel}: Get name of corresponding 'Stan' model.
 }}
 
+\section{Slots}{
+
+\describe{
+\item{\code{response}}{Response variable information.}
+}}
+
 \seealso{
 This class inherits from \linkS4class{lgpmodel}, so also the
 methods of that class work for \code{MarginalGPModel}s.
