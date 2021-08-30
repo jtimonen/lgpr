@@ -159,7 +159,7 @@ sample_model <- function(model, verbose = TRUE, quiet = FALSE,
   num_obs <- get_num_obs(model)
   large_data_msg(num_obs, large_data_limit())
   stan_object <- get_stanmodel(model)
-  stan_data <- get_stan_input(model)
+  stan_data <- create_standata(model)
 
   # Run sampling
   stan_fit <- rstan::sampling(
@@ -211,7 +211,7 @@ optimize_model <- function(model, ...) {
   num_obs <- get_num_obs(model)
   large_data_msg(num_obs, large_data_limit())
   object <- get_stanmodel(model)
-  data <- get_stan_input(model)
+  data <- create_standata(model)
   rstan::optimizing(object = object, data = data, check_data = TRUE, ...)
 }
 

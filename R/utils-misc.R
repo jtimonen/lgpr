@@ -486,13 +486,13 @@ example_fit_adv <- function(formula = example_adv_formula(),
   )
   data <- dat@data
   data$y <- round(exp(data$y))
-  et_prior_info <- example_effect_time_prior_info()
+  xp_info <- example_xpar_prior_info()
   lgp(formula, data,
     likelihood = likelihood,
     chains = chains,
     iter = iter,
     num_trials = num_trials,
-    prior = list(effect_time_info = et_prior_info),
+    prior = list(xpar_info = xp_info),
     ...
   )
 }
@@ -503,8 +503,8 @@ example_adv_formula <- function() {
   y ~ het(id) * gp(age) + categ(LOC) * unc(SEX) * gp_vm(dis_age)
 }
 
-#' @describeIn example_fit Create an example effect time prior info
-example_effect_time_prior_info <- function() {
+#' @describeIn example_fit Create an example covariate uncertainty prior info
+example_xpar_prior_info <- function() {
   list(backwards = FALSE, lower = 10, upper = 40, zero = 0)
 }
 

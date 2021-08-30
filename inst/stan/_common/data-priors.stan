@@ -8,3 +8,8 @@
   real hyper_wrp[num_wrp, 3];
   real hyper_xpar[num_unc>0, 3];
   real hyper_beta[num_het>0, 2];
+  
+  // Observed effect times and uncertainty bounds
+  vector[num_xpar] xpar_zero[num_unc>0];
+  vector[num_xpar] xpar_lb[num_unc>0];
+  vector[num_xpar] xpar_ub[num_unc>0];

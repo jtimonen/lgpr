@@ -5,6 +5,7 @@
 \alias{validate_lgpexpr}
 \alias{validate_lgpformula}
 \alias{validate_lgpscaling}
+\alias{validate_lgpmodel}
 \alias{validate_lgpfit}
 \alias{validate_lgpparams}
 \alias{validate_GaussianPrediction}
@@ -16,6 +17,8 @@ validate_lgpexpr(object)
 validate_lgpformula(object)
 
 validate_lgpscaling(object)
+
+validate_lgpmodel(object)
 
 validate_lgpfit(object)
 

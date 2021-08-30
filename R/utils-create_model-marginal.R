@@ -1,13 +1,13 @@
 # Create a marginal GP model from base model
 create_model.marginal <- function(base_model, prior, verbose) {
-  si <- get_stan_input(base_model)
-  parsed <- parse_obs_model.marginal(base_model)
-  si_y <- dollar(parsed, "to_stan")
-  si_prior <- parse_prior.marginal(base_model, prior, verbose)
-  si <- c(si, si_y, si_prior)
+  obs_model <- parse_obs_model.marginal(base_model)
+  pri <- parse_prior.marginal(base_model, prior, verbose)
   new("MarginalGPModel",
     base_model,
-    y_scaling = dollar(parsed, "y_scaling"),
+    y = dollar(obs_model, "y"),
+    y_scaling = dollar(obs_model, "y_scaling"),
+    prior_sigma = dollar(pri, "prior_sigma"),
+    hyper_sigma = dollar(pri, "hyper_sigma"),
     info = creation_info()
   )
 }
@@ -36,5 +36,5 @@ parse_obs_model.marginal <- function(base_model) {
   y <- array(y, dim = c(1, N))
 
   # Return
-  list(to_stan = list(y = y), y_scaling = normalizer)
+  list(y = y, y_scaling = normalizer)
 }

@@ -28,11 +28,6 @@
   */
   int<lower=0> components[J, 7];
 
-  // Observed effect times and uncertainty bounds
-  vector[num_xpar] xpar_zero[num_unc>0];
-  vector[num_xpar] xpar_lb[num_unc>0];
-  vector[num_xpar] xpar_ub[num_unc>0];
-
   // Misc
   real delta; // jitter to ensure pos. def. kernel matrices
   real vm_params[2]; // variance mask parameters (nonstat comps)

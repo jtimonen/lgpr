@@ -37,15 +37,15 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(310, 6, "restart", "model_lgp_marginal");
     reader.add_event(313, 9, "include", "_common/data-general.stan");
     reader.add_event(313, 0, "start", "_common/data-general.stan");
-    reader.add_event(351, 38, "end", "_common/data-general.stan");
-    reader.add_event(351, 10, "restart", "model_lgp_marginal");
-    reader.add_event(351, 10, "include", "_common/data-covariates.stan");
-    reader.add_event(351, 0, "start", "_common/data-covariates.stan");
-    reader.add_event(366, 15, "end", "_common/data-covariates.stan");
-    reader.add_event(366, 11, "restart", "model_lgp_marginal");
-    reader.add_event(366, 11, "include", "_common/data-priors.stan");
-    reader.add_event(366, 0, "start", "_common/data-priors.stan");
-    reader.add_event(376, 10, "end", "_common/data-priors.stan");
+    reader.add_event(346, 33, "end", "_common/data-general.stan");
+    reader.add_event(346, 10, "restart", "model_lgp_marginal");
+    reader.add_event(346, 10, "include", "_common/data-covariates.stan");
+    reader.add_event(346, 0, "start", "_common/data-covariates.stan");
+    reader.add_event(361, 15, "end", "_common/data-covariates.stan");
+    reader.add_event(361, 11, "restart", "model_lgp_marginal");
+    reader.add_event(361, 11, "include", "_common/data-priors.stan");
+    reader.add_event(361, 0, "start", "_common/data-priors.stan");
+    reader.add_event(376, 15, "end", "_common/data-priors.stan");
     reader.add_event(376, 12, "restart", "model_lgp_marginal");
     reader.add_event(383, 19, "include", "_common/tdata.stan");
     reader.add_event(383, 0, "start", "_common/tdata.stan");
@@ -1042,9 +1042,6 @@ private:
         int num_het;
         int num_unc;
         std::vector<std::vector<int> > components;
-        std::vector<vector_d> xpar_zero;
-        std::vector<vector_d> xpar_lb;
-        std::vector<vector_d> xpar_ub;
         double delta;
         std::vector<double> vm_params;
         std::vector<vector_d> X;
@@ -1063,6 +1060,9 @@ private:
         std::vector<std::vector<double> > hyper_wrp;
         std::vector<std::vector<double> > hyper_xpar;
         std::vector<std::vector<double> > hyper_beta;
+        std::vector<vector_d> xpar_zero;
+        std::vector<vector_d> xpar_lb;
+        std::vector<vector_d> xpar_ub;
         std::vector<vector_d> y;
         std::vector<std::vector<int> > prior_sigma;
         std::vector<std::vector<double> > hyper_sigma;
@@ -1207,54 +1207,12 @@ public:
                 }
             }
             current_statement_begin__ = 345;
-            validate_non_negative_index("xpar_zero", "num_xpar", num_xpar);
-            validate_non_negative_index("xpar_zero", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            context__.validate_dims("data initialization", "xpar_zero", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
-            xpar_zero = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
-            vals_r__ = context__.vals_r("xpar_zero");
-            pos__ = 0;
-            size_t xpar_zero_j_1_max__ = num_xpar;
-            size_t xpar_zero_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < xpar_zero_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < xpar_zero_k_0_max__; ++k_0__) {
-                    xpar_zero[k_0__](j_1__) = vals_r__[pos__++];
-                }
-            }
-            current_statement_begin__ = 346;
-            validate_non_negative_index("xpar_lb", "num_xpar", num_xpar);
-            validate_non_negative_index("xpar_lb", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            context__.validate_dims("data initialization", "xpar_lb", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
-            xpar_lb = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
-            vals_r__ = context__.vals_r("xpar_lb");
-            pos__ = 0;
-            size_t xpar_lb_j_1_max__ = num_xpar;
-            size_t xpar_lb_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < xpar_lb_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < xpar_lb_k_0_max__; ++k_0__) {
-                    xpar_lb[k_0__](j_1__) = vals_r__[pos__++];
-                }
-            }
-            current_statement_begin__ = 347;
-            validate_non_negative_index("xpar_ub", "num_xpar", num_xpar);
-            validate_non_negative_index("xpar_ub", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
-            context__.validate_dims("data initialization", "xpar_ub", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
-            xpar_ub = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
-            vals_r__ = context__.vals_r("xpar_ub");
-            pos__ = 0;
-            size_t xpar_ub_j_1_max__ = num_xpar;
-            size_t xpar_ub_k_0_max__ = logical_gt(num_unc, 0);
-            for (size_t j_1__ = 0; j_1__ < xpar_ub_j_1_max__; ++j_1__) {
-                for (size_t k_0__ = 0; k_0__ < xpar_ub_k_0_max__; ++k_0__) {
-                    xpar_ub[k_0__](j_1__) = vals_r__[pos__++];
-                }
-            }
-            current_statement_begin__ = 350;
             context__.validate_dims("data initialization", "delta", "double", context__.to_vec());
             delta = double(0);
             vals_r__ = context__.vals_r("delta");
             pos__ = 0;
             delta = vals_r__[pos__++];
-            current_statement_begin__ = 351;
+            current_statement_begin__ = 346;
             validate_non_negative_index("vm_params", "2", 2);
             context__.validate_dims("data initialization", "vm_params", "double", context__.to_vec(2));
             vm_params = std::vector<double>(2, double(0));
@@ -1264,7 +1222,7 @@ public:
             for (size_t k_0__ = 0; k_0__ < vm_params_k_0_max__; ++k_0__) {
                 vm_params[k_0__] = vals_r__[pos__++];
             }
-            current_statement_begin__ = 353;
+            current_statement_begin__ = 348;
             validate_non_negative_index("X", "N", N);
             validate_non_negative_index("X", "num_X", num_X);
             context__.validate_dims("data initialization", "X", "vector_d", context__.to_vec(num_X,N));
@@ -1278,7 +1236,7 @@ public:
                     X[k_0__](j_1__) = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 354;
+            current_statement_begin__ = 349;
             validate_non_negative_index("X_mask", "num_X", num_X);
             validate_non_negative_index("X_mask", "N", N);
             context__.validate_dims("data initialization", "X_mask", "int", context__.to_vec(num_X,N));
@@ -1300,7 +1258,7 @@ public:
                     check_less_or_equal(function__, "X_mask[i_0__][i_1__]", X_mask[i_0__][i_1__], 1);
                 }
             }
-            current_statement_begin__ = 355;
+            current_statement_begin__ = 350;
             validate_non_negative_index("X_scale", "num_X", num_X);
             context__.validate_dims("data initialization", "X_scale", "double", context__.to_vec(num_X));
             X_scale = std::vector<double>(num_X, double(0));
@@ -1310,7 +1268,7 @@ public:
             for (size_t k_0__ = 0; k_0__ < X_scale_k_0_max__; ++k_0__) {
                 X_scale[k_0__] = vals_r__[pos__++];
             }
-            current_statement_begin__ = 358;
+            current_statement_begin__ = 353;
             validate_non_negative_index("Z", "num_Z", num_Z);
             validate_non_negative_index("Z", "N", N);
             context__.validate_dims("data initialization", "Z", "int", context__.to_vec(num_Z,N));
@@ -1331,7 +1289,7 @@ public:
                     check_greater_or_equal(function__, "Z[i_0__][i_1__]", Z[i_0__][i_1__], 1);
                 }
             }
-            current_statement_begin__ = 359;
+            current_statement_begin__ = 354;
             validate_non_negative_index("Z_M", "num_Z", num_Z);
             context__.validate_dims("data initialization", "Z_M", "int", context__.to_vec(num_Z));
             Z_M = std::vector<int>(num_Z, int(0));
@@ -1345,7 +1303,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < Z_M_i_0_max__; ++i_0__) {
                 check_greater_or_equal(function__, "Z_M[i_0__]", Z_M[i_0__], 0);
             }
-            current_statement_begin__ = 365;
+            current_statement_begin__ = 360;
             validate_non_negative_index("BETA_IDX", "logical_gt(num_het, 0)", logical_gt(num_het, 0));
             validate_non_negative_index("BETA_IDX", "N", N);
             context__.validate_dims("data initialization", "BETA_IDX", "int", context__.to_vec(logical_gt(num_het, 0),N));
@@ -1367,7 +1325,7 @@ public:
                     check_less_or_equal(function__, "BETA_IDX[i_0__][i_1__]", BETA_IDX[i_0__][i_1__], (num_beta + 1));
                 }
             }
-            current_statement_begin__ = 366;
+            current_statement_begin__ = 361;
             validate_non_negative_index("XPAR_IDX", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
             validate_non_negative_index("XPAR_IDX", "N", N);
             context__.validate_dims("data initialization", "XPAR_IDX", "int", context__.to_vec(logical_gt(num_unc, 0),N));
@@ -1389,7 +1347,7 @@ public:
                     check_less_or_equal(function__, "XPAR_IDX[i_0__][i_1__]", XPAR_IDX[i_0__][i_1__], (num_xpar + 1));
                 }
             }
-            current_statement_begin__ = 368;
+            current_statement_begin__ = 363;
             validate_non_negative_index("prior_alpha", "J", J);
             validate_non_negative_index("prior_alpha", "2", 2);
             context__.validate_dims("data initialization", "prior_alpha", "int", context__.to_vec(J,2));
@@ -1410,7 +1368,7 @@ public:
                     check_greater_or_equal(function__, "prior_alpha[i_0__][i_1__]", prior_alpha[i_0__][i_1__], 0);
                 }
             }
-            current_statement_begin__ = 369;
+            current_statement_begin__ = 364;
             validate_non_negative_index("prior_ell", "num_ell", num_ell);
             validate_non_negative_index("prior_ell", "2", 2);
             context__.validate_dims("data initialization", "prior_ell", "int", context__.to_vec(num_ell,2));
@@ -1431,7 +1389,7 @@ public:
                     check_greater_or_equal(function__, "prior_ell[i_0__][i_1__]", prior_ell[i_0__][i_1__], 0);
                 }
             }
-            current_statement_begin__ = 370;
+            current_statement_begin__ = 365;
             validate_non_negative_index("prior_wrp", "num_wrp", num_wrp);
             validate_non_negative_index("prior_wrp", "2", 2);
             context__.validate_dims("data initialization", "prior_wrp", "int", context__.to_vec(num_wrp,2));
@@ -1452,7 +1410,7 @@ public:
                     check_greater_or_equal(function__, "prior_wrp[i_0__][i_1__]", prior_wrp[i_0__][i_1__], 0);
                 }
             }
-            current_statement_begin__ = 371;
+            current_statement_begin__ = 366;
             validate_non_negative_index("prior_xpar", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
             validate_non_negative_index("prior_xpar", "2", 2);
             context__.validate_dims("data initialization", "prior_xpar", "int", context__.to_vec(logical_gt(num_unc, 0),2));
@@ -1473,7 +1431,7 @@ public:
                     check_greater_or_equal(function__, "prior_xpar[i_0__][i_1__]", prior_xpar[i_0__][i_1__], 0);
                 }
             }
-            current_statement_begin__ = 372;
+            current_statement_begin__ = 367;
             validate_non_negative_index("hyper_alpha", "J", J);
             validate_non_negative_index("hyper_alpha", "3", 3);
             context__.validate_dims("data initialization", "hyper_alpha", "double", context__.to_vec(J,3));
@@ -1487,7 +1445,7 @@ public:
                     hyper_alpha[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 373;
+            current_statement_begin__ = 368;
             validate_non_negative_index("hyper_ell", "num_ell", num_ell);
             validate_non_negative_index("hyper_ell", "3", 3);
             context__.validate_dims("data initialization", "hyper_ell", "double", context__.to_vec(num_ell,3));
@@ -1501,7 +1459,7 @@ public:
                     hyper_ell[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 374;
+            current_statement_begin__ = 369;
             validate_non_negative_index("hyper_wrp", "num_wrp", num_wrp);
             validate_non_negative_index("hyper_wrp", "3", 3);
             context__.validate_dims("data initialization", "hyper_wrp", "double", context__.to_vec(num_wrp,3));
@@ -1515,7 +1473,7 @@ public:
                     hyper_wrp[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 375;
+            current_statement_begin__ = 370;
             validate_non_negative_index("hyper_xpar", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
             validate_non_negative_index("hyper_xpar", "3", 3);
             context__.validate_dims("data initialization", "hyper_xpar", "double", context__.to_vec(logical_gt(num_unc, 0),3));
@@ -1529,7 +1487,7 @@ public:
                     hyper_xpar[k_0__][k_1__] = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 376;
+            current_statement_begin__ = 371;
             validate_non_negative_index("hyper_beta", "logical_gt(num_het, 0)", logical_gt(num_het, 0));
             validate_non_negative_index("hyper_beta", "2", 2);
             context__.validate_dims("data initialization", "hyper_beta", "double", context__.to_vec(logical_gt(num_het, 0),2));
@@ -1541,6 +1499,48 @@ public:
             for (size_t k_1__ = 0; k_1__ < hyper_beta_k_1_max__; ++k_1__) {
                 for (size_t k_0__ = 0; k_0__ < hyper_beta_k_0_max__; ++k_0__) {
                     hyper_beta[k_0__][k_1__] = vals_r__[pos__++];
+                }
+            }
+            current_statement_begin__ = 374;
+            validate_non_negative_index("xpar_zero", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_zero", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            context__.validate_dims("data initialization", "xpar_zero", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+            xpar_zero = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            vals_r__ = context__.vals_r("xpar_zero");
+            pos__ = 0;
+            size_t xpar_zero_j_1_max__ = num_xpar;
+            size_t xpar_zero_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_zero_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_zero_k_0_max__; ++k_0__) {
+                    xpar_zero[k_0__](j_1__) = vals_r__[pos__++];
+                }
+            }
+            current_statement_begin__ = 375;
+            validate_non_negative_index("xpar_lb", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_lb", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            context__.validate_dims("data initialization", "xpar_lb", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+            xpar_lb = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            vals_r__ = context__.vals_r("xpar_lb");
+            pos__ = 0;
+            size_t xpar_lb_j_1_max__ = num_xpar;
+            size_t xpar_lb_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_lb_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_lb_k_0_max__; ++k_0__) {
+                    xpar_lb[k_0__](j_1__) = vals_r__[pos__++];
+                }
+            }
+            current_statement_begin__ = 376;
+            validate_non_negative_index("xpar_ub", "num_xpar", num_xpar);
+            validate_non_negative_index("xpar_ub", "logical_gt(num_unc, 0)", logical_gt(num_unc, 0));
+            context__.validate_dims("data initialization", "xpar_ub", "vector_d", context__.to_vec(logical_gt(num_unc, 0),num_xpar));
+            xpar_ub = std::vector<Eigen::Matrix<double, Eigen::Dynamic, 1> >(logical_gt(num_unc, 0), Eigen::Matrix<double, Eigen::Dynamic, 1>(num_xpar));
+            vals_r__ = context__.vals_r("xpar_ub");
+            pos__ = 0;
+            size_t xpar_ub_j_1_max__ = num_xpar;
+            size_t xpar_ub_k_0_max__ = logical_gt(num_unc, 0);
+            for (size_t j_1__ = 0; j_1__ < xpar_ub_j_1_max__; ++j_1__) {
+                for (size_t k_0__ = 0; k_0__ < xpar_ub_k_0_max__; ++k_0__) {
+                    xpar_ub[k_0__](j_1__) = vals_r__[pos__++];
                 }
             }
             current_statement_begin__ = 377;

@@ -1,15 +1,21 @@
 # Create a latent GP model from base model
 create_model.latent <- function(base_model, likelihood, prior,
                                 c_hat, num_trials, approx, verbose) {
-  si <- get_stan_input(base_model)
-  parsed <- standata_latent.y(base_model, likelihood, c_hat, num_trials)
-  si_y <- dollar(parsed, "to_stan")
-  si_prior <- standata_latent.prior(base_model, prior, likelihood, verbose)
-  si <- c(si, si_y, si_prior)
+  obs_model <- parse_obs_model.latent(base_model, likelihood, c_hat, num_trials)
+  pri <- parse_prior.latent(base_model, prior, likelihood, verbose)
   model <- new("LatentGPModel",
     base_model,
-    parsed_input = si,
-    y_scaling = dollar(parsed, "y_scaling"),
+    y = dollar(obs_model, "y"),
+    y_int = dollar(obs_model, "y_int"),
+    c_hat = dollar(obs_model, "c_hat"),
+    y_num_trials = dollar(obs_model, "y_num_trials"),
+    obs_model = dollar(obs_model, "obs_model"),
+    prior_sigma = dollar(pri, "prior_sigma"),
+    prior_phi = dollar(pri, "prior_phi"),
+    hyper_sigma = dollar(pri, "hyper_sigma"),
+    hyper_phi = dollar(pri, "hyper_phi"),
+    hyper_gamma = dollar(pri, "hyper_gamma"),
+    y_scaling = dollar(obs_model, "y_scaling"),
     info = creation_info()
   )
 
@@ -21,7 +27,7 @@ create_model.latent <- function(base_model, likelihood, prior,
 }
 
 # Parse the prior for the additional parameters of latent GP model
-standata_latent.prior <- function(base_model, prior, likelihood, verbose) {
+parse_prior.latent <- function(base_model, prior, likelihood, verbose) {
   LH <- likelihood_as_int(likelihood)
   par_names <- c("sigma", "phi", "gamma")
   filled <- fill_prior(prior, 0, par_names)
@@ -35,8 +41,7 @@ standata_latent.prior <- function(base_model, prior, likelihood, verbose) {
 }
 
 # Parse the response variable and its likelihood model
-standata_latent.y <- function(base_model, likelihood, c_hat,
-                              num_trials) {
+parse_obs_model.latent <- function(base_model, likelihood, c_hat, num_trials) {
   dat <- get_data(base_model)
   y_name <- get_y_name(base_model)
   LH <- likelihood_as_int(likelihood)
@@ -68,18 +73,16 @@ standata_latent.y <- function(base_model, likelihood, c_hat,
   num_trials <- set_num_trials(num_trials, Y_RAW, LH)
   c_hat <- set_c_hat(c_hat, Y_RAW, LH, num_trials)
 
-  # Create Stan input parts
-  to_stan <- list(
+  # Return list
+  list(
     N = N,
     y_int = y_int,
     y = y,
     obs_model = LH,
     y_num_trials = num_trials,
-    c_hat = c_hat
+    c_hat = c_hat,
+    y_scaling = normalizer
   )
-
-  # Return
-  list(to_stan = to_stan, y_scaling = normalizer)
 }
 
 # Convert given c_hat input to Stan input format

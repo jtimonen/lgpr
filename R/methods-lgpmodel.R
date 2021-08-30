@@ -16,8 +16,7 @@ setMethod("show", "lgpmodel", function(object) {
 #' @param digits number of digits to show for floating point numbers
 setMethod("parameter_info", "lgpmodel", function(object, digits = 3) {
   check_positive(digits)
-  stan_input <- get_stan_input(object)
-  prior_to_df.common(stan_input, digits)
+  prior_to_df.common(object, digits)
 })
 
 #' @export
@@ -26,9 +25,8 @@ setMethod("parameter_info", "lgpmodel", function(object, digits = 3) {
 #' @param digits number of digits to show for floating point numbers
 setMethod("parameter_info", "MarginalGPModel", function(object, digits = 3) {
   check_positive(digits)
-  stan_input <- get_stan_input(object)
-  df_common <- prior_to_df.common(stan_input, digits)
-  df_add <- prior_to_df.marginal(stan_input, digits)
+  df_common <- prior_to_df.common(object, digits)
+  df_add <- prior_to_df.marginal(object, digits)
   rbind(df_common, df_add)
 })
 
@@ -38,9 +36,8 @@ setMethod("parameter_info", "MarginalGPModel", function(object, digits = 3) {
 #' @param digits number of digits to show for floating point numbers
 setMethod("parameter_info", "LatentGPModel", function(object, digits = 3) {
   check_positive(digits)
-  stan_input <- get_stan_input(object)
-  df_common <- prior_to_df.common(stan_input, digits)
-  df_add <- prior_to_df.latent(stan_input, digits)
+  df_common <- prior_to_df.common(object, digits)
+  df_add <- prior_to_df.latent(object, digits)
   rbind(df_common, df_add)
 })
 
@@ -66,7 +63,7 @@ setMethod("covariate_info", "lgpmodel", function(object) {
 #' @export
 #' @describeIn lgpmodel Get number of model components.
 setMethod("num_components", "lgpmodel", function(object) {
-  dollar(get_stan_input(object), "J")
+  object@J
 })
 
 #' @export
@@ -146,9 +143,8 @@ model_summary <- function(object, digits = 3) {
 # Print brief model summary
 model_summary_brief <- function(object) {
   model <- object_to_model(object)
-  stan_list <- get_stan_input(object)
   str <- as.character(model@model_formula)
-  N <- get_num_obs(object)
+  N <- get_num_obs(model)
   cat("Data:", N, "observations\n")
   cat("Normalize response:", is_y_normalized(object), "\n")
   cat("Marginalize f:", is_f_marginalized(object), "\n")
@@ -181,13 +177,11 @@ covariate_summary <- function(model) {
 # Print a parameter summary of a model
 parameter_summary <- function(model, digits = 3) {
   print(parameter_info(model, digits))
-  stan_list <- get_stan_input(model)
-  bi <- beta_teff_idx_info(model)
+  bi <- beta_xpar_idx_info(model)
   beta_map <- dollar(bi, "beta")
-  teff_map <- dollar(bi, "teff")
-  het_z <- dollar(stan_list, "het_z")
-  unc_z <- dollar(stan_list, "unc_z")
+  xpar_map <- dollar(bi, "xpar")
   if (!is.null(beta_map)) {
+    het_z <- dollar(model@var_names, "het_z")
     cat(
       "\nConnection between categories of <",
       het_z, "> and beta parameter indices:\n",
@@ -195,13 +189,14 @@ parameter_summary <- function(model, digits = 3) {
     )
     print(beta_map)
   }
-  if (!is.null(teff_map)) {
+  if (!is.null(xpar_map)) {
+    unc_z <- dollar(model@var_names, "unc_z")
     cat(
       "\nConnection between categories of <",
-      unc_z, "> and teff parameter indices:\n",
+      unc_z, "> and xpar parameter indices:\n",
       sep = ""
     )
-    print(teff_map)
+    print(xpar_map)
   }
   cat("\n")
 }
@@ -209,9 +204,8 @@ parameter_summary <- function(model, digits = 3) {
 # Print information about used possible approximation
 approx_summary <- function(object) {
   model <- object_to_model(object)
-  si <- get_stan_input(model)
-  num_bf <- dollar(si, "num_bf")
-  scale_bf <- dollar(si, "scale_bf")
+  num_bf <- model@num_bf
+  scale_bf <- model@scale_bf
   s1 <- paste0("num_bf = [", paste(num_bf, collapse = ", "), "]")
   s2 <- paste0("scale_bf = [", paste(scale_bf, collapse = ", "), "]")
   desc <- paste0("Approximation info: ", s1, ", ", s2, "\n")
@@ -235,9 +229,8 @@ covariate_info.cat <- function(object) {
   if (is.null(nam)) {
     return(NULL)
   }
-  si <- get_stan_input(object)
-  num_levels <- dollar(si, "Z_M")
-  levels <- dollar(si, "Z_levels")
+  num_levels <- model@Z_M
+  levels <- model@Z_levels
   level_names <- c()
   J <- length(nam)
   for (j in seq_len(J)) {
@@ -259,8 +252,7 @@ covariate_info.cont <- function(object) {
   if (is.null(nam)) {
     return(NULL)
   }
-  si <- get_stan_input(object)
-  mask <- dollar(si, "X_mask")
+  mask <- model@X_mask
   num_nan <- rowSums(mask == 1)
   df <- data.frame(num_nan)
   colnames(df) <- c("#Missing")
@@ -269,11 +261,11 @@ covariate_info.cont <- function(object) {
 }
 
 # Info about mapping categories to parameter indices
-beta_teff_idx_info <- function(object) {
-  stan_list <- get_stan_input(object)
-  beta_map <- dollar(stan_list, "BETA_IDX_MAP")
-  teff_map <- dollar(stan_list, "TEFF_IDX_MAP")
-  list(beta = beta_map, teff = teff_map)
+beta_xpar_idx_info <- function(object) {
+  object <- object_to_model(object)
+  beta_map <- dollar(object@idx_maps, "beta")
+  xpar_map <- dollar(object@idx_maps, "xpar")
+  list(beta = beta_map, xpar = xpar_map)
 }
 
 # Helper function for plots
@@ -305,50 +297,50 @@ create_plot_df <- function(object, x = "age", group_by = "id") {
 
 # PRIOR TO DF -------------------------------------------------------------
 
-# Convert the Stan input encoding of a prior to a human-readable data frame
-prior_to_df.common <- function(stan_input, digits = 3) {
+# Convert parsed prior to a human-readable data frame
+prior_to_df.common <- function(model, digits = 3) {
 
   # Positive parameters
   check_positive(digits)
   pnames <- c("alpha", "ell", "wrp")
   df <- NULL
   for (p in pnames) {
-    df <- rbind(df, prior_to_df_pos(stan_input, p, digits))
+    df <- rbind(df, prior_to_df_pos(model, p, digits))
   }
 
   # Beta
-  num_het <- dollar(stan_input, "num_het")
+  num_het <- model@num_het
   if (num_het > 0) {
-    num_beta <- dollar(stan_input, "num_beta")
-    df_bet <- prior_to_df_unit(stan_input, "beta", num_beta, digits)
+    num_beta <- model@num_beta
+    df_bet <- prior_to_df_unit(model, "beta", num_beta, digits)
     df <- rbind(df, df_bet)
   }
 
   # Effect time
-  num_unc <- dollar(stan_input, "num_unc")
+  num_unc <- model@num_unc
   if (num_unc > 0) {
-    df_p <- prior_to_df_teff(stan_input, digits)
+    df_p <- prior_to_df_xpar(model, digits)
     df <- rbind(df, df_p)
   }
 
   return(df)
 }
 
-# Convert the Stan input encoding of a prior to a human-readable data frame
-prior_to_df.marginal <- function(stan_input, digits = 3) {
-  df <- prior_to_df_pos(stan_input, "sigma", digits)
+# Convert parsed prior to a human-readable data frame
+prior_to_df.marginal <- function(model, digits = 3) {
+  df <- prior_to_df_pos(model, "sigma", digits)
   return(df)
 }
 
-# Convert the Stan input encoding of a prior to a human-readable data frame
-prior_to_df.latent <- function(stan_input, digits = 3) {
-  LH <- dollar(stan_input, "obs_model")
+# Convert parsed prior to a human-readable data frame
+prior_to_df.latent <- function(model, digits = 3) {
+  LH <- model@obs_model
   if (LH == 1) {
-    df <- prior_to_df_pos(stan_input, "sigma", digits)
+    df <- prior_to_df_pos(model, "sigma", digits)
   } else if (LH == 3) {
-    df <- prior_to_df_pos(stan_input, "phi", digits)
+    df <- prior_to_df_pos(model, "phi", digits)
   } else if (LH == 5) {
-    df <- prior_to_df_unit(stan_input, "gamma", 1, digits)
+    df <- prior_to_df_unit(model, "gamma", 1, digits)
   } else {
     df <- NULL
   }
@@ -356,9 +348,9 @@ prior_to_df.latent <- function(stan_input, digits = 3) {
 }
 
 # Helper function for converting prior representation to human readable df
-prior_to_df_pos <- function(stan_input, parname, digits) {
-  prior <- dollar(stan_input, paste0("prior_", parname))
-  hyper <- dollar(stan_input, paste0("hyper_", parname))
+prior_to_df_pos <- function(model, parname, digits) {
+  prior <- slot(model, paste0("prior_", parname))
+  hyper <- slot(model, paste0("hyper_", parname))
   D <- dim(prior)[1]
   pnames <- rep("foo", D)
   dnames <- rep("foo", D)
@@ -377,11 +369,8 @@ prior_to_df_pos <- function(stan_input, parname, digits) {
 }
 
 # Helper function for converting prior representation to human readable df
-prior_to_df_unit <- function(stan_input, parname, num, digits) {
-  hyper <- stan_input[[paste0("hyper_", parname)]]
-  if (is.null(hyper)) {
-    return(NULL)
-  }
+prior_to_df_unit <- function(model, parname, num, digits) {
+  hyper <- slot(model, paste0("hyper_", parname))
   check_positive(digits)
   a <- round(hyper[1], digits = digits)
   b <- round(hyper[2], digits = digits)
@@ -397,23 +386,23 @@ prior_to_df_unit <- function(stan_input, parname, num, digits) {
 }
 
 # Helper function for converting prior representation to human readable df
-prior_to_df_teff <- function(stan_input, digits) {
-  num_teff <- dollar(stan_input, "num_teff")
-  if (num_teff == 0) {
+prior_to_df_xpar <- function(model, digits) {
+  num_xpar <- model@num_xpar
+  if (num_xpar == 0) {
     return(NULL)
   }
-  prior <- dollar(stan_input, "prior_teff")
+  prior <- model@prior_xpar
   type <- prior[1]
   backwards <- prior[2]
-  hyper <- dollar(stan_input, "hyper_teff")
-  zero <- dollar(stan_input, "teff_zero")
-  lower <- dollar(stan_input, "teff_lb")
-  upper <- dollar(stan_input, "teff_ub")
-  pnames <- rep("foo", num_teff)
-  dnames <- rep("foo", num_teff)
-  bounds <- rep("foo", num_teff)
-  for (j in seq_len(num_teff)) {
-    par <- paste0("teff[", j, "]")
+  hyper <- model@hyper_xpar
+  zero <- model@xpar_zero
+  lower <- model@xpar_lb
+  upper <- model@xpar_ub
+  pnames <- rep("foo", num_xpar)
+  dnames <- rep("foo", num_xpar)
+  bounds <- rep("foo", num_xpar)
+  for (j in seq_len(num_xpar)) {
+    par <- paste0("xpar[", j, "]")
     tpar <- par
     tpar <- minus.append(tpar, zero[j])
     tpar <- minus.prepend(tpar, backwards)
@@ -470,12 +459,11 @@ prior_to_str <- function(parname, prior, hyper, digits) {
 
 # GETTERS -----------------------------------------------------------------
 
-# Get the c_chat Stan input or a vector of zeros
+# Get the c_hat vector a vector of zeros
 get_chat <- function(object) {
-  si <- get_stan_input(object)
   model <- object_to_model(object)
   if (is_f_sampled(model)) {
-    c_hat <- dollar(si, "c_hat")
+    c_hat <- as.vector(model@c_hat)
   } else {
     N <- get_num_obs(model)
     c_hat <- rep(0.0, N)
@@ -496,8 +484,7 @@ get_y <- function(object, original = TRUE) {
       "original = TRUE."
     )
   }
-  si <- get_stan_input(object)
-  out <- as.vector(dollar(si, "y"))
+  out <- as.vector(object_to_model(object)@y)
   return(out)
 }
 
@@ -507,42 +494,87 @@ get_y_name <- function(object) {
   dollar(model@var_names, "y")
 }
 
-# Get Stan input
-get_stan_input <- function(object) {
-  model <- object_to_model(object)
-  return(model@parsed_input)
-}
-
 # Get integer matrix encoding component types
 get_component_encoding <- function(object) {
-  si <- get_stan_input(object)
-  dollar(si, "components")
+  object_to_model(object)@components
 }
 
 # Get raw original data
 get_data <- function(object) {
-  model <- object_to_model(object)
-  return(model@data)
+  object_to_model(object)@raw_data
 }
 
 # Get number of observations
 get_num_obs <- function(object) {
-  dollar(get_stan_input(object), "N")
+  object_to_model(object)@N
 }
 
 # Get observation model (human readable string)
 get_obs_model <- function(object) {
   model <- object_to_model(object)
   if (isa(model, "MarginalGPModel")) {
-    LH <- 1
+    LH <- 1L
   } else {
-    LH <- dollar(get_stan_input(object), "obs_model")
+    LH <- model@obs_model
   }
   likelihood_as_str(LH)
 }
 
 # Get number of trials (binomial or BB model)
 get_num_trials <- function(object) {
-  num_trials <- dollar(get_stan_input(object), "y_num_trials")
-  as.vector(num_trials)
+  as.vector(object_to_model(object)@y_num_trials)
+}
+
+# CREATING STAN DATA ------------------------------------------------------
+
+# Create Stan data list for a model
+create_standata <- function(model) {
+  slots <- standata_slotnames(model)
+  dat <- list()
+  j <- 0
+  for (s in slots) {
+    j <- j + 1
+    dat[[j]] <- slot(model, s)
+  }
+  names(dat) <- slots
+  return(dat)
+}
+
+# Get names of needed slots for Stan data list
+standata_slotnames <- function(model) {
+
+  # Names defined in inst/stan/_common/data-general.stan
+  common_general <- c(
+    "is_verbose", "is_likelihood_skipped", "N", "J", "num_X", "num_Z",
+    "num_ell", "num_wrp", "num_beta", "num_xpar", "num_het", "num_unc",
+    "components", "delta", "vm_params"
+  )
+
+  # Names defined in inst/stan/_common/data-covariates.stan
+  common_covariates <- c(
+    "X", "X_mask", "X_scale", "Z", "Z_M", "BETA_IDX", "XPAR_IDX"
+  )
+
+  # Names defined in inst/stan/_common/data-priors.stan
+  common_priors <- c(
+    "prior_alpha", "prior_ell", "prior_wrp", "prior_xpar",
+    "hyper_alpha", "hyper_ell", "hyper_wrp", "hyper_beta",
+    "hyper_xpar", "xpar_zero", "xpar_lb", "xpar_ub"
+  )
+
+  slots <- c(common_general, common_covariates, common_priors)
+  if (isa(model, "MarginalGPModel")) {
+    # Names defined in inst/stan/lgp_marginal.stan
+    slots_add <- c("y", "prior_sigma", "hyper_sigma")
+  } else if (isa(model, "LatentGPModel")) {
+    # Names defined in inst/stan/_latent/data-*.stan
+    slots_add <- c(
+      "y_int", "y", "c_hat", "y_num_trials", "obs_model",
+      "prior_sigma", "prior_phi", "hyper_sigma", "hyper_phi", "hyper_gamma"
+    )
+  } else {
+    slots_add <- c("y_int", "y", "c_hat", "y_num_trials")
+  }
+  slots <- c(slots, slots_add)
+  return(slots)
 }

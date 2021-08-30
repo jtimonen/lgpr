@@ -192,6 +192,11 @@ validate_lgpscaling <- function(object) {
 }
 
 #' @rdname validate
+validate_lgpmodel <- function(object) {
+  TRUE
+}
+
+#' @rdname validate
 validate_lgpfit <- function(object) {
   errors <- character()
 
@@ -362,6 +367,7 @@ validate_Prediction <- function(object) {
 #'   \item \linkS4class{MarginalGPModelApprox}
 #' }
 lgpmodel <- setClass("lgpmodel",
+  validity = validate_lgpmodel,
   representation = representation(
     # Formula and original data
     model_formula = "lgpformula",
@@ -385,11 +391,13 @@ lgpmodel <- setClass("lgpmodel",
     # Covariates
     X = "matrix",
     X_mask = "matrix",
-    X_scale = "numeric",
+    X_scale = "array",
     Z = "array",
     Z_M = "integer",
+    Z_levels = "list",
     BETA_IDX = "array",
     XPAR_IDX = "array",
+    idx_maps = "list",
     # Options
     delta = "numeric",
     vm_params = "numeric",

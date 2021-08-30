@@ -2,31 +2,74 @@
 create_model.base <- function(formula, data, options, prior, prior_only,
                               verbose) {
 
-  # Data, formula and common Stan inputs
+  # Data, formula and properties common for all models
   data <- convert_to_data_frame(data)
   lgp_formula <- parse_formula(formula, data, verbose)
-  opts <- parse_options(opts, prior_only, verbose)
+  opts <- parse_options(options, prior_only, verbose)
   covariates <- parse_covariates(data, lgp_formula)
   components <- parse_components(lgp_formula, covariates)
   idx_maps <- create_index_maps(covariates, components)
-  pri <- parse_prior(prior, si, verbose)
+  DIMS <- c(components, idx_maps)
+  pri <- parse_prior(prior, DIMS, verbose)
 
   # Variable names
   var_names <- list(
     y = lgp_formula@y_name,
     x = rownames(dollar(covariates, "X")),
-    z = rownames(dollar(covariates, "Z"))
+    z = rownames(dollar(covariates, "Z")),
+    het_z = dollar(idx_maps, "het_z"),
+    unc_z = dollar(idx_maps, "unc_z")
   )
 
   # Create the 'lgpmodel' object
   new("lgpmodel",
     model_formula = lgp_formula,
-    data = data,
-    options = opts,
-    covariates = covariates,
-    components = components,
-    idx_maps = idx_maps,
-    prior = pri,
+    raw_data = data,
+    # Dimensions
+    N = dollar(covariates, "N"),
+    J = dollar(components, "J"),
+    num_X = dollar(covariates, "num_X"),
+    num_Z = dollar(covariates, "num_Z"),
+    num_ell = dollar(components, "num_ell"),
+    num_wrp = dollar(components, "num_wrp"),
+    num_beta = dollar(idx_maps, "num_beta"),
+    num_xpar = dollar(idx_maps, "num_xpar"),
+    num_het = dollar(components, "num_het"),
+    num_unc = dollar(components, "num_unc"),
+    # Component encoding and param bounds
+    components = dollar(components, "components"),
+    # Covariates
+    X = dollar(covariates, "X"),
+    X_mask = dollar(covariates, "X_mask"),
+    X_scale = dollar(covariates, "X_scale"),
+    Z = dollar(covariates, "Z"),
+    Z_M = dollar(covariates, "Z_M"),
+    Z_levels = dollar(covariates, "Z_levels"),
+    BETA_IDX = dollar(idx_maps, "BETA_IDX"),
+    XPAR_IDX = dollar(idx_maps, "XPAR_IDX"),
+    idx_maps = list(
+      beta = dollar(idx_maps, "BETA_IDX_MAP"),
+      xpar = dollar(idx_maps, "XPAR_IDX_MAP")
+    ),
+    # Options
+    delta = dollar(opts, "delta"),
+    vm_params = dollar(opts, "vm_params"),
+    is_verbose = dollar(opts, "is_verbose"),
+    is_likelihood_skipped = dollar(opts, "is_likelihood_skipped"),
+    # Prior
+    prior_alpha = dollar(pri, "prior_alpha"),
+    prior_ell = dollar(pri, "prior_ell"),
+    prior_wrp = dollar(pri, "prior_wrp"),
+    prior_xpar = dollar(pri, "prior_xpar"),
+    hyper_alpha = dollar(pri, "hyper_alpha"),
+    hyper_ell = dollar(pri, "hyper_ell"),
+    hyper_wrp = dollar(pri, "hyper_wrp"),
+    hyper_xpar = dollar(pri, "hyper_xpar"),
+    hyper_beta = dollar(pri, "hyper_beta"),
+    xpar_zero = dollar(pri, "xpar_zero"),
+    xpar_lb = dollar(pri, "xpar_lb"),
+    xpar_ub = dollar(pri, "xpar_ub"),
+    # Other
     var_names = var_names,
     info = creation_info()
   )
@@ -52,13 +95,10 @@ creation_info <- function() {
 
 
 # Parse given prior (common parameters)
-parse_prior <- function(prior, components, verbose) {
-  num_unc <- dollar(components, "num_unc")
-  num_wrp <- dollar(components, "num_wrp")
-  par_names <- c(
-    "alpha", "ell", "wrp", "beta",
-    "effect_time", "effect_time_info"
-  )
+parse_prior <- function(prior, DIMS, verbose) {
+  num_unc <- dollar(DIMS, "num_unc")
+  num_wrp <- dollar(DIMS, "num_wrp")
+  par_names <- c("alpha", "ell", "wrp", "beta", "xpar", "xpar_info")
   filled <- fill_prior(prior, num_unc, par_names)
   defaulted <- defaulting_info(filled, verbose)
   wrp_defaulted <- "wrp" %in% defaulted
@@ -68,11 +108,11 @@ parse_prior <- function(prior, components, verbose) {
     warning(msg)
   }
   raw <- dollar(filled, "prior")
-  parse_prior_common(raw, components)
+  parse_prior_common(raw, DIMS)
 }
 
 
-# Create mapping from observation index to index of beta or teff parameter
+# Create mapping from observation index to index of beta or xpar parameter
 create_index_maps <- function(covs, comps) {
   components <- dollar(comps, "components")
   Z <- dollar(covs, "Z")
@@ -82,18 +122,18 @@ create_index_maps <- function(covs, comps) {
   het <- create_expanding(components, Z, X_mask, "het()", 6, Z_levs)
   unc <- create_expanding(components, Z, X_mask, "unc()", 7, Z_levs)
   het <- reduce_index_maps(het, "het()", N, "beta")
-  unc <- reduce_index_maps(unc, "unc()", N, "teff")
+  unc <- reduce_index_maps(unc, "unc()", N, "xpar")
   BETA_IDX <- dollar(het, "idx_expand")
-  TEFF_IDX <- dollar(unc, "idx_expand")
+  XPAR_IDX <- dollar(unc, "idx_expand")
 
   # Return
   list(
     BETA_IDX = BETA_IDX,
-    TEFF_IDX = TEFF_IDX,
+    XPAR_IDX = XPAR_IDX,
     BETA_IDX_MAP = dollar(het, "map"),
-    TEFF_IDX_MAP = dollar(unc, "map"),
+    XPAR_IDX_MAP = dollar(unc, "map"),
     num_beta = length(unique(BETA_IDX[BETA_IDX > 1])),
-    num_teff = length(unique(TEFF_IDX[TEFF_IDX > 1])),
+    num_xpar = length(unique(XPAR_IDX[XPAR_IDX > 1])),
     het_z = dollar(het, "covariate_name"),
     unc_z = dollar(unc, "covariate_name")
   )
@@ -104,10 +144,7 @@ parse_options <- function(options, prior_only, verbose) {
 
   # Default options
   input <- options
-  opts <- list(
-    delta = 1e-8,
-    vm_params = c(0.025, 1)
-  )
+  opts <- list(delta = 1e-8, vm_params = c(0.025, 1))
 
   # Replace defaults if found from input
   for (opt_name in names(opts)) {
@@ -126,8 +163,8 @@ parse_options <- function(options, prior_only, verbose) {
 
   # Return full options
   stan_switches <- list(
-    is_likelihood_skipped = as.numeric(prior_only),
-    is_verbose = as.numeric(verbose)
+    is_likelihood_skipped = as.integer(prior_only),
+    is_verbose = as.integer(verbose)
   )
   opts <- c(opts, stan_switches)
   return(opts)
@@ -205,11 +242,11 @@ parse_covariates <- function(data, lgp_formula) {
 
   # Return list
   list(
-    N = N,
-    num_X = num_X,
-    num_Z = num_Z,
+    N = as.integer(N),
+    num_X = as.integer(num_X),
+    num_Z = as.integer(num_Z),
     Z = Z,
-    Z_M = Z_M,
+    Z_M = as.integer(Z_M),
     Z_levels = Z_levels,
     X = X,
     X_mask = X_mask,
@@ -223,9 +260,9 @@ parse_components <- function(model_formula, covariates) {
   list(
     J = nrow(components),
     components = components,
-    num_ell = sum(components[, 4] != 0),
-    num_wrp = sum(components[, 5] != 0),
-    num_het = sum(components[, 6] != 0),
-    num_unc = sum(components[, 7] != 0)
+    num_ell = as.integer(sum(components[, 4] != 0)),
+    num_wrp = as.integer(sum(components[, 5] != 0)),
+    num_het = as.integer(sum(components[, 6] != 0)),
+    num_unc = as.integer(sum(components[, 7] != 0))
   )
 }

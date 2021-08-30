@@ -357,16 +357,16 @@ defaulting_info <- function(filled, verbose) {
 }
 
 # Parse common parameters of a prior
-parse_prior_common <- function(prior, si) {
-  DIM_BETA <- as.numeric(dollar(si, "num_het") > 0)
-  DIM_TEFF <- as.numeric(dollar(si, "num_unc") > 0)
-  num_teff <- dollar(si, "num_teff")
-  alpha <- parse_prior_pos(prior, dollar(si, "J"), "alpha")
-  ell <- parse_prior_pos(prior, dollar(si, "num_ell"), "ell")
-  wrp <- parse_prior_pos(prior, dollar(si, "num_wrp"), "wrp")
+parse_prior_common <- function(prior, DIMS) {
+  DIM_BETA <- as.numeric(dollar(DIMS, "num_het") > 0)
+  DIM_XPAR <- as.numeric(dollar(DIMS, "num_unc") > 0)
+  num_xpar <- dollar(DIMS, "num_xpar")
+  alpha <- parse_prior_pos(prior, dollar(DIMS, "J"), "alpha")
+  ell <- parse_prior_pos(prior, dollar(DIMS, "num_ell"), "ell")
+  wrp <- parse_prior_pos(prior, dollar(DIMS, "num_wrp"), "wrp")
   beta <- parse_prior_unit(prior, DIM_BETA, "beta")
-  teff <- parse_prior_teff(prior, DIM_TEFF, num_teff)
-  c(alpha, ell, wrp, beta, teff)
+  xpar <- parse_prior_xpar(prior, DIM_XPAR, num_xpar)
+  c(alpha, ell, wrp, beta, xpar)
 }
 
 # Parse prior of a positive parameter
@@ -391,18 +391,18 @@ parse_prior_unit <- function(prior, DIM, par_name) {
   return(parsed)
 }
 
-# Parse effect time parameter prior
-parse_prior_teff <- function(prior, DIM, num_teff) {
-  effect_time_info <- dollar(prior, "effect_time_info")[[1]]
-  is_backwards <- as.numeric(dollar(effect_time_info, "backwards"))
-  lower <- dollar(effect_time_info, "lower")
-  upper <- dollar(effect_time_info, "upper")
-  zero <- dollar(effect_time_info, "zero")
-  lower <- ensure_len(lower, num_teff)
-  upper <- ensure_len(upper, num_teff)
-  zero <- ensure_len(zero, num_teff)
+# Parse covariate uncertainty prior
+parse_prior_xpar <- function(prior, DIM, num_xpar) {
+  xpar_info <- dollar(prior, "xpar_info")[[1]]
+  is_backwards <- as.numeric(dollar(xpar_info, "backwards"))
+  lower <- dollar(xpar_info, "lower")
+  upper <- dollar(xpar_info, "upper")
+  zero <- dollar(xpar_info, "zero")
+  lower <- ensure_len(lower, num_xpar)
+  upper <- ensure_len(upper, num_xpar)
+  zero <- ensure_len(zero, num_xpar)
 
-  desc <- dollar(prior, "effect_time")[[1]]
+  desc <- dollar(prior, "xpar")[[1]]
   out <- prior_to_num(desc)
   type <- dollar(out, "prior")
   hyper <- dollar(out, "hyper")
@@ -410,11 +410,11 @@ parse_prior_teff <- function(prior, DIM, num_teff) {
 
   # Return
   list(
-    prior_teff = repvec(prior, DIM),
-    hyper_teff = repvec(hyper, DIM),
-    teff_zero = repvec(zero, DIM),
-    teff_lb = repvec(lower, DIM),
-    teff_ub = repvec(upper, DIM)
+    prior_xpar = repvec(prior, DIM),
+    hyper_xpar = repvec(hyper, DIM),
+    xpar_zero = repvec(zero, DIM),
+    xpar_lb = repvec(lower, DIM),
+    xpar_ub = repvec(upper, DIM)
   )
 }
 
@@ -495,8 +495,8 @@ position_hyper_params <- function(desc) {
 
 # Default prior, given parameter name and number of uncertain components
 default_prior <- function(name, num_uncrt = NULL) {
-  if (name == "effect_time_info") {
-    desc <- default_prior_effect_time_info(num_uncrt)
+  if (name == "xpar_info") {
+    desc <- default_prior_xpar_info(num_uncrt)
   } else {
     desc <- list(default_priors_most(name))
   }
@@ -513,7 +513,7 @@ default_priors_most <- function(name) {
     "wrp", # 5
     "beta", # 6
     "gamma", # 7
-    "effect_time" # 8
+    "xpar" # 8
   )
   idx <- check_allowed(name, allowed)
   if (idx == 1) {
@@ -531,18 +531,23 @@ default_priors_most <- function(name) {
   } else if (idx == 7) {
     prior <- bet(a = 1, b = 1) # gamma
   } else {
-    prior <- uniform() # effect_time
+    prior <- uniform() # xpar
   }
   return(prior)
 }
 
-# Default effect time info
-default_prior_effect_time_info <- function(num_uncrt) {
+# Default covariate uncertainty prior info
+default_prior_xpar_info <- function(num_uncrt) {
   check_not_null(num_uncrt)
   if (num_uncrt > 0) {
-    # There is no default prior for effect time
-    # TODO: more informative message?
-    stop("you must specify 'effect_time_info' in <prior>!")
+    # There is no default prior for xpar info
+    msg <- paste0(
+      "you must specify the covariate uncertainty prior",
+      " information by adding a list field called 'xpar_info'",
+      " in <prior>! (same as 'effect_time_info' in lgpr versions",
+      " < 2.0)"
+    )
+    stop(msg)
   } else {
     # Will not be used
     desc <- list(backwards = FALSE, lower = NaN, upper = NaN, zero = NaN)
