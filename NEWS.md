@@ -1,5 +1,8 @@
 # lgpr 1.1
 
+## 1.1.5
+  * Add more imports to NAMESPACE per a **rstan** developer's [recommendation](https://discourse.mc-stan.org/t/r-package-maintainers-using-stan-please-read/24131).
+  
 ## 1.1.4
   * New vignette about mathematical description of models.
   * Prediction and function posterior computation at `P` points where `P` is
