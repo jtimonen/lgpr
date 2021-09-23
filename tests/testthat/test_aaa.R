@@ -19,7 +19,7 @@ test_that("lgpexpr validation works correctly", {
 })
 
 test_that("lgpformula validation works correctly", {
-  a <- create_lgpformula(as.formula("y ~ gp(x) + zs(a)"), NULL)
+  a <- parse_formula(as.formula("y ~ gp(x) + zs(a)"), NULL)
   expect_true(validate_lgpformula(a))
   b <- a
   b@y_name <- "x"

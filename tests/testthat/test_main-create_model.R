@@ -143,7 +143,7 @@ test_that("terms with unc() or het() must have other expressions", {
 
 test_that("covariate doesn't have to be same in unc() and het() expression", {
   dat <- testdata_001
-  my_prior <- list(effect_time_info = example_effect_time_prior_info())
+  my_prior <- list(effect_time_info = example_example_xpar_prior_info())
   m1 <- create_model(y ~ het(id) * unc(sex) * gp(age) + gp(dis_age), dat,
     prior = my_prior
   )
