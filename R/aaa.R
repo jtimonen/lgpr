@@ -71,8 +71,9 @@
 #' @name lgpr-package
 #' @aliases lgpr
 #' @useDynLib lgpr, .registration = TRUE
-#' @import methods rstantools
-#' @importFrom rstan get_stream
+#' @import methods rstantools Rcpp
+#' @importFrom RcppParallel RcppParallelLibs CxxFlags
+#' @importFrom rstan sampling get_stream
 #' @importClassesFrom rstan stanfit
 #'
 #' @references
