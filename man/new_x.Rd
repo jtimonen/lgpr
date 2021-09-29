@@ -2,7 +2,7 @@
 % Please edit documentation in R/main-datautil.R
 \name{new_x}
 \alias{new_x}
-\title{Create prediction points}
+\title{Create test input points for prediction}
 \usage{
 new_x(data, x_values, group_by = "id", x = "age", x_ns = NULL)
 }

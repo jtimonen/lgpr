@@ -6,6 +6,7 @@
 \alias{lgpfit}
 \alias{show,lgpfit-method}
 \alias{component_names,lgpfit-method}
+\alias{num_components,lgpfit-method}
 \alias{postproc,lgpfit-method}
 \alias{contains_postproc,lgpfit-method}
 \alias{clear_postproc,lgpfit-method}
@@ -18,6 +19,8 @@
 \S4method{show}{lgpfit}(object)
 
 \S4method{component_names}{lgpfit}(object)
+
+\S4method{num_components}{lgpfit}(object)
 
 \S4method{postproc}{lgpfit}(object, verbose = TRUE)
 
@@ -50,6 +53,9 @@ An S4 class to represent the output of the \code{lgp} function
 \item \code{show}: Print information and summary about the fit object.
 
 \item \code{component_names}: Get names of model components.
+
+\item \code{num_components}: Get number of model components. Returns a
+positive integer.
 
 \item \code{postproc}: Apply postprocessing. Returns an updated
 \linkS4class{lgpfit} object (copies data).

@@ -34,6 +34,14 @@ setMethod("component_info", "lgpmodel", function(object) {
 })
 
 #' @export
+#' @describeIn lgpmodel Get number of model components. Returns a
+#' positive integer.
+setMethod("num_components", "lgpmodel", function(object) {
+  length(component_names(object))
+})
+
+
+#' @export
 #' @describeIn lgpmodel Get covariate information.
 setMethod("covariate_info", "lgpmodel", function(object) {
   info1 <- covariate_info.cont(object)

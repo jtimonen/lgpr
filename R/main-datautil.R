@@ -53,6 +53,7 @@ add_factor <- function(data, x, id_var = "id") {
 
 #' Add a crossing of two factors to a data frame
 #'
+#' @export
 #' @param data a data frame
 #' @param fac1 name of first factor, must be found in \code{df}
 #' @param fac2 name of second factor, must be found in \code{df}
@@ -123,6 +124,7 @@ add_dis_age <- function(data, t_init, id_var = "id", time_var = "age") {
 #' @family data frame handling functions
 NULL
 
+#' @export
 #' @rdname split
 #' @param test the levels of the factor that will be used as test data
 split_by_factor <- function(data, test, var_name = "id") {
@@ -133,6 +135,7 @@ split_by_factor <- function(data, test, var_name = "id") {
   split_data(data, i_test)
 }
 
+#' @export
 #' @rdname split
 #' @param idx_test indices point indices with the factor
 split_within_factor <- function(data, idx_test, var_name = "id") {
@@ -148,6 +151,7 @@ split_within_factor <- function(data, idx_test, var_name = "id") {
   split_data(data, i_test)
 }
 
+#' @export
 #' @rdname split
 #' @param k_test desired number of test data points per each level of the
 #' factor
@@ -166,6 +170,7 @@ split_within_factor_random <- function(data, k_test = 1, var_name = "id") {
   split_data(data, i_test)
 }
 
+#' @export
 #' @rdname split
 #' @param p_test desired proportion of test data
 #' @param n_test desired number of test data points (if NULL, \code{p_test}
@@ -180,6 +185,7 @@ split_random <- function(data, p_test = 0.2, n_test = NULL) {
   split_data(data, i_test)
 }
 
+#' @export
 #' @rdname split
 #' @param i_test test data row indices
 #' @param sort_ids should the test indices be sorted into increasing order
@@ -198,7 +204,7 @@ split_data <- function(data, i_test, sort_ids = TRUE) {
   )
 }
 
-#' Create prediction points
+#' Create test input points for prediction
 #'
 #' @description Replaces a continuous variable \code{x} in the data frame, and
 #' possibly another continuous variable \code{x_ns} derived from it, with new

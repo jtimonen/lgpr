@@ -7,11 +7,10 @@ citEntry(entry = "article",
                    as.person("Aki Vehtari"),
                    as.person("Harri Lähdesmäki")),
   journal       = "Bioinformatics",
+  volume        = "37",
+  number        = "13",
+  pages         = "1860--1867",
   year          = "2021",
   url           = "https://doi.org/10.1093/bioinformatics/btab021",
-  textVersion  =
-  paste("Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki,",
-        "lgpr: an interpretable non-parametric method for inferring covariate effects from longitudinal data.",
-        "Bioinformatics, 2021;",
-        "https://doi.org/10.1093/bioinformatics/btab021")
+  textVersion  = "Juho Timonen, Henrik Mannerström, Aki Vehtari and Harri Lähdesmäki. lgpr: an interpretable non-parametric method for inferring covariate effects from longitudinal data, Bioinformatics, Volume 37, Issue 13, 1 July 2021, Pages 1860-1867, https://doi.org/10.1093/bioinformatics/btab021"
 )

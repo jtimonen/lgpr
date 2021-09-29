@@ -8,6 +8,7 @@ reference:
 - contents:
   - add_dis_age 
   - add_factor 
+  - add_factor_crossing 
   - adjusted_c_hat 
   - bet 
   - create_model 
@@ -45,6 +46,11 @@ reference:
   - select_freq 
   - select_freq.integrate 
   - simulate_data 
+  - split_by_factor 
+  - split_data 
+  - split_random 
+  - split_within_factor 
+  - split_within_factor_random 
   - student_t 
   - uniform
 

@@ -7,6 +7,7 @@
 \alias{show,lgpmodel-method}
 \alias{parameter_info,lgpmodel-method}
 \alias{component_info,lgpmodel-method}
+\alias{num_components,lgpmodel-method}
 \alias{covariate_info,lgpmodel-method}
 \alias{component_names,lgpmodel-method}
 \alias{is_f_sampled,lgpmodel-method}
@@ -17,6 +18,8 @@
 \S4method{parameter_info}{lgpmodel}(object, digits = 3)
 
 \S4method{component_info}{lgpmodel}(object)
+
+\S4method{num_components}{lgpmodel}(object)
 
 \S4method{covariate_info}{lgpmodel}(object)
 
@@ -42,6 +45,9 @@ priors). Returns a \code{data.frame}.
 
 \item \code{component_info}: Get a data frame with information about each model
 component.
+
+\item \code{num_components}: Get number of model components. Returns a
+positive integer.
 
 \item \code{covariate_info}: Get covariate information.
 
