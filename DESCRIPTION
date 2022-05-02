@@ -42,7 +42,7 @@ LinkingTo:
     rstan (>= 2.21.2),
     StanHeaders (>= 2.21.0-7)
 SystemRequirements: GNU make
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     knitr,
     rmarkdown,
