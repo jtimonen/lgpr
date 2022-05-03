@@ -36,3 +36,60 @@ ExpQuadKernel <- R6::R6Class("ExpQuadKernel",
     }
   )
 )
+
+# Categorical kernel
+CategoricalKernel <- R6::R6Class("CategoricalKernel",
+  inherit = Kernel,
+  public = list(
+    variable = NULL,
+
+    # constructor
+    initialize = function(variable) {
+      checkmate::assert_class(variable, "CategoricalVariable")
+      self$variable <- variable
+    },
+
+    # description
+    desc = function() {
+      paste0("CategoricalKernel(", self$variable$name, ")")
+    }
+  )
+)
+
+# Zero-sum kernel
+ZeroSumKernel <- R6::R6Class("ZeroSumKernel",
+  inherit = Kernel,
+  public = list(
+    variable = NULL,
+
+    # constructor
+    initialize = function(variable) {
+      checkmate::assert_class(variable, "CategoricalVariable")
+      self$variable <- variable
+    },
+
+    # description
+    desc = function() {
+      paste0("ZeroSumKernel(", self$variable$name, ")")
+    }
+  )
+)
+
+# Input-warping kernel
+InputWarpKernel <- R6::R6Class("InputWarpKernel",
+  inherit = Kernel,
+  public = list(
+    variable = NULL,
+
+    # constructor
+    initialize = function(variable) {
+      checkmate::assert_class(variable, "ContinuousVariable")
+      self$variable <- variable
+    },
+
+    # description
+    desc = function() {
+      paste0("InputWarpKernel(", self$variable$name, ")")
+    }
+  )
+)
