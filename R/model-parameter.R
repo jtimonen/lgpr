@@ -50,6 +50,12 @@ IntervalParameter <- R6::R6Class("IntervalParameter",
   )
 )
 
+# Parameter that is restricted to be on unit interval
+UnitIntervalParameter <- R6::R6Class("UnitIntervalParameter",
+  inherit = Parameter,
+  public = list()
+)
+
 # Lengthscale parameter
 LengthscaleParameter <- R6::R6Class("LengthscaleParameter",
   inherit = PositiveParameter,
@@ -69,20 +75,28 @@ MagnitudeParameter <- R6::R6Class("MagnitudeParameter",
 )
 
 # Covariate uncertainty parameter
-CovariateUncertaintyParameter <- R6::R6Class("CovariateUncertaintyParameter",
-  inherit = IntervalParameter,
-  public = list()
-)
-
-# Effect heterogeneity parameter
-EffectHeterogeneityParameter <- R6::R6Class("EffectHeterogeneityParameter",
-  inherit = IntervalParameter,
+ParameterVector <- R6::R6Class("ParameterVector",
   public = list(
+    param = NULL,
+    length = NULL,
     # constructor
-    initialize = function(name) {
-      self$set_name(name)
-      self$lower <- 0
-      self$upper <- 1
+    initialize = function(param, length) {
+      checkmate::assert_class(param, "Parameter")
+      checkmate::assert_integerish(length, lower = 1)
+      self$param <- param
+      self$length <- length
+    },
+
+    # description
+    desc = function() {
+      paste0(
+        "ParameterVector(", self$param$desc(), ", ", self$length, ")"
+      )
+    },
+
+    # print info
+    print = function() {
+      cat(self$desc(), "\n")
     }
   )
 )
