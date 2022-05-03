@@ -6,10 +6,8 @@
 # Create package startup message
 create_startup_message <- function() {
   v_lgpr <- create_desc("lgpr")
-  v_rstan <- create_desc("rstan")
   msg <- paste0(
-    "Attached lgpr", v_lgpr, ", using rstan", v_rstan,
-    ". Type ?lgpr to get started."
+    "Attached lgpr", v_lgpr, ". Type ?lgpr to get started."
   )
   return(msg)
 }
