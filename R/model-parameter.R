@@ -56,31 +56,33 @@ LengthscaleParameter <- R6::R6Class("LengthscaleParameter",
   public = list()
 )
 
+# Warping steepness parameter
+WarpingSteepnessParameter <- R6::R6Class("WarpingSteepnessParameter",
+  inherit = PositiveParameter,
+  public = list()
+)
+
 # Lengthscale parameter
 MagnitudeParameter <- R6::R6Class("MagnitudeParameter",
   inherit = PositiveParameter,
   public = list()
 )
 
-# Continuous variable
-CategoricalVariable <- R6::R6Class("CategoricalVariable",
-  inherit = Variable,
+# Covariate uncertainty parameter
+CovariateUncertaintyParameter <- R6::R6Class("CovariateUncertaintyParameter",
+  inherit = IntervalParameter,
+  public = list()
+)
+
+# Effect heterogeneity parameter
+EffectHeterogeneityParameter <- R6::R6Class("EffectHeterogeneityParameter",
+  inherit = IntervalParameter,
   public = list(
-    categories = NULL,
-    initialize = function(name, categories = "foo") {
+    # constructor
+    initialize = function(name) {
       self$set_name(name)
-      self$set_categories(categories)
-    },
-
-    # set and check number of categories
-    set_categories = function(categories) {
-      checkmate::assert_set_equal(unique(categories), categories)
-      self$categories <- categories
-    },
-
-    # get number of categories
-    num_categories = function() {
-      length(self$categories)
+      self$lower <- 0
+      self$upper <- 1
     }
   )
 )
