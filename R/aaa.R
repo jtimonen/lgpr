@@ -326,7 +326,7 @@ validate_Prediction <- function(object) {
   return(out)
 }
 
-#' An S4 class to represent an additive GP model
+#' An S4 class to represent a model specification
 #'
 #' @slot formula An object of class \linkS4class{lgpformula}
 #' @slot data The original unmodified data.
