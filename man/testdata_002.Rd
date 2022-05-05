@@ -4,7 +4,8 @@
 \name{testdata_002}
 \alias{testdata_002}
 \title{Medium-size artificial test data, used mostly for tutorials}
-\format{A data frame with 96 rows and 6 variables:
+\format{
+A data frame with 96 rows and 6 variables:
 \describe{
   \item{id}{individual id, a factor with levels: 01-12}
   \item{age}{age}
@@ -12,7 +13,8 @@
   \item{sex}{a factor with 2 levels: Male, Female}
   \item{group}{a factor with 2 levels: Case, Control}
   \item{y}{a continuous variable}
-}}
+}
+}
 \usage{
 testdata_002
 }
