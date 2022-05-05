@@ -8,8 +8,6 @@ warp_input(x, a)
 }
 \arguments{
 \item{x}{a vector of length \eqn{n}}
-
-\item{a}{steepness of the warping function rise}
 }
 \value{
 a vector of warped inputs \eqn{w(x)}, length \eqn{n}

@@ -1,4 +1,16 @@
-# Base class for kernels
+#' Kernel description classes
+#'
+#' @section Methods:
+#' \code{$desc()} Get kernel description.
+#'
+#' \code{$print()} Print the kernel description.
+#'
+#' \code{$parameters()} Get all \code{Parameter}s of the kernel as a list.
+#'
+#' \code{$variables()} Get all input \code{Variable}s of the kernel as a list.
+#' @name Kernel-classes
+NULL
+
 Kernel <- R6::R6Class("Kernel",
   public = list(
 
@@ -6,9 +18,9 @@ Kernel <- R6::R6Class("Kernel",
     initialize = function() {
     },
 
-    # description
+    # description, must be overridden by inheriting class
     desc = function() {
-      paste0("Kernel")
+      stop("Desc not implemented!")
     },
 
     # print info
@@ -19,6 +31,11 @@ Kernel <- R6::R6Class("Kernel",
     # get all parameters as a list
     parameters = function() {
       list()
+    },
+
+    # get all input variables as a list
+    variables = function() {
+      list()
     }
   )
 )
@@ -27,25 +44,30 @@ Kernel <- R6::R6Class("Kernel",
 ExpQuadKernel <- R6::R6Class("ExpQuadKernel",
   inherit = Kernel,
   public = list(
-    variable = NULL,
-    lengthscale = NULL,
+    x = NULL, # continuous input
+    ell = NULL, # lengthscale parameter
 
     # constructor
-    initialize = function(variable, lengthscale) {
-      checkmate::assert_class(variable, "ContinuousVariable")
-      checkmate::assert_class(lengthscale, "LengthscaleParameter")
-      self$variable <- variable
-      self$lengthscale <- lengthscale
+    initialize = function(x, ell) {
+      checkmate::assert_class(x, "ContinuousVariable")
+      checkmate::assert_class(ell, "LengthscaleParameter")
+      self$x <- x
+      self$ell <- ell
     },
 
     # get all parameters as a list
     parameters = function() {
-      list(self$lengthscale)
+      list(self$ell)
+    },
+
+    # get all variables as a list
+    variables = function() {
+      list(self$x)
     },
 
     # description
     desc = function() {
-      paste0("ExpQuadKernel(", self$variable$name, ")")
+      paste0("ExpQuadKernel(", self$x, ")")
     }
   )
 )
