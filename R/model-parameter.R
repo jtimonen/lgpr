@@ -1,27 +1,46 @@
 # Base class for parameters
 Parameter <- R6::R6Class("Parameter",
+  inherit = Printable,
+  public = list(),
+  private = list(
+    # long notation
+    notation_long = function() {
+      paste0(
+        "Parameter(", private$name_string(), ")"
+      )
+    }
+  )
+)
+
+# Base class for vector parameters
+VectorParameter <- R6::R6Class("VectorParameter",
+  inherit = Parameter,
   public = list(
-    name = NULL,
-
-    # constructor
-    initialize = function(name) {
-      self$set_name(name)
+    initialize = function(name, length) {
+      private$set_name(name)
+      private$set_length(length)
     },
 
-    # set and check name
-    set_name = function(name) {
-      checkmate::assert_string(name, min.chars = 1)
-      self$name <- name
+    # get length
+    get_length = function() {
+      private$length
+    }
+  ),
+  private = list(
+    length = NULL,
+
+    # set length
+    set_length = function(length) {
+      checkmate::assert_integerish(length, lower = 1)
+      private$length <- length
     },
 
-    # description
-    desc = function() {
-      paste0("Parameter(", self$name, ")")
-    },
-
-    # print info
-    print = function() {
-      cat(self$desc(), "\n")
+    # long notation
+    notation_long = function() {
+      paste0(
+        "VectorParameter(", private$name_string(),
+        ", length = ", number_string(self$get_length()), ")"
+      )
     }
   )
 )
