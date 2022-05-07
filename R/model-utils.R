@@ -17,3 +17,8 @@ variable_string <- function(x) {
   col <- "\u001b[33m" # orange
   colorize_string(x, col)
 }
+
+# A small number
+small_number <- function() {
+  1e-15
+}

@@ -93,7 +93,7 @@ ContinuousVariable <- R6::R6Class("ContinuousVariable",
     # set and check scaling mean and standard deviation
     set_scale = function(mean, sd) {
       checkmate::assert_numeric(mean)
-      checkmate::assert_numeric(sd, lower = 1e-12)
+      checkmate::assert_numeric(sd, lower = small_number())
       private$mean <- mean
       private$sd <- sd
     },

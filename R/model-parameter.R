@@ -1,13 +1,28 @@
 # Base class for parameters
 Parameter <- R6::R6Class("Parameter",
   inherit = Printable,
-  public = list(),
+  public = list(
+
+    # get prior
+    get_prior = function() {
+      prior <- private$prior
+      stopifnot(!is.null(prior))
+      prior
+    }
+  ),
   private = list(
+    prior = NULL,
+
     # long notation
     notation_long = function() {
       paste0(
         "Parameter(", private$name_string(), ")"
       )
+    },
+
+    # set prior
+    set_prior = function(prior) {
+      private$prior <- prior
     }
   )
 )
