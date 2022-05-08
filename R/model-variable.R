@@ -20,6 +20,14 @@ Printable <- R6::R6Class("Printable",
     # getter for name
     get_name = function() {
       private$name
+    },
+
+    # get notation
+    notation = function(short = FALSE) {
+      if (short) {
+        return(private$notation_short())
+      }
+      private$notation_long()
     }
   ),
   private = list(
@@ -36,8 +44,8 @@ Printable <- R6::R6Class("Printable",
       classes <- setdiff(class(self), c("Printable", "R6"))
       str <- paste(classes, collapse = ", ")
       desc <- paste0("An object of class(es): ", str, "\n")
-      desc <- paste0(desc, "Short notation: ", private$notation_short(), "\n")
-      paste0(desc, "Long notation: ", private$notation_long(), "\n")
+      desc <- paste0(desc, "Short notation: ", self$notation(TRUE), "\n")
+      paste0(desc, "Long notation: ", self$notation(FALSE), "\n")
     },
 
     # formatted name string

@@ -3,11 +3,16 @@ Parameter <- R6::R6Class("Parameter",
   inherit = Printable,
   public = list(
 
+    # constructor
+    initialize = function(name, prior) {
+      private$set_name(name)
+      checkmate::assert_class(prior, "ContinuousDistribution")
+      private$set_prior(prior)
+    },
+
     # get prior
     get_prior = function() {
-      prior <- private$prior
-      stopifnot(!is.null(prior))
-      prior
+      private$prior
     }
   ),
   private = list(
@@ -16,7 +21,14 @@ Parameter <- R6::R6Class("Parameter",
     # long notation
     notation_long = function() {
       paste0(
-        "Parameter(", private$name_string(), ")"
+        private$name_string(), " ~ ", self$get_prior()$notation(FALSE)
+      )
+    },
+
+    # short notation
+    notation_short = function() {
+      paste0(
+        private$name_string(), " ~ ", self$get_prior()$notation(TRUE)
       )
     },
 
