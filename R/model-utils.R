@@ -12,9 +12,15 @@ number_string <- function(x) {
   colorize_string(x, col)
 }
 
-# Stan code string
+# Variable name string
 variable_string <- function(x) {
   col <- "\u001b[33m" # orange
+  colorize_string(x, col)
+}
+
+# Parameter name string
+parameter_string <- function(x) {
+  col <- "\u001b[31m" # red
   colorize_string(x, col)
 }
 

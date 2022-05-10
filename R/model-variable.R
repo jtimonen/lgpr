@@ -28,6 +28,11 @@ Printable <- R6::R6Class("Printable",
         return(private$notation_short())
       }
       private$notation_long()
+    },
+
+    # formatted name string
+    name_string = function() {
+      self$get_name()
     }
   ),
   private = list(
@@ -48,14 +53,9 @@ Printable <- R6::R6Class("Printable",
       paste0(desc, "Long notation: ", self$notation(FALSE), "\n")
     },
 
-    # formatted name string
-    name_string = function() {
-      variable_string(private$name)
-    },
-
     # short notation
     notation_short = function() {
-      private$name_string()
+      self$name_string()
     },
 
     # long notation
@@ -69,12 +69,17 @@ Printable <- R6::R6Class("Printable",
 # Base class for variables
 Variable <- R6::R6Class("Variable",
   inherit = Printable,
-  public = list(),
+  public = list(
+    # formatted name string
+    name_string = function() {
+      variable_string(self$get_name())
+    }
+  ),
   private = list(
 
     # long notation
     notation_long = function() {
-      paste0("Variable(", private$name_string(), ")")
+      paste0("Variable(", self$name_string(), ")")
     }
   )
 )
@@ -109,7 +114,7 @@ ContinuousVariable <- R6::R6Class("ContinuousVariable",
     # long notation
     notation_long = function() {
       paste0(
-        "ContinuousVariable(", private$name_string(),
+        "ContinuousVariable(", self$name_string(),
         ", mean = ", number_string(private$mean), ", sd = ",
         number_string(private$sd), ")"
       )
@@ -148,7 +153,7 @@ CategoricalVariable <- R6::R6Class("CategoricalVariable",
     # long notation
     notation_long = function() {
       paste0(
-        "CategoricalVariable(", private$name_string(),
+        "CategoricalVariable(", self$name_string(),
         ", num_categories = ", number_string(private$num_categories()), ")"
       )
     }

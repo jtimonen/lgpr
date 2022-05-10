@@ -21,6 +21,11 @@ Parameter <- R6::R6Class("Parameter",
         lower = private$lower,
         upper = private$upper
       )
+    },
+
+    # formatted name string
+    name_string = function() {
+      parameter_string(self$get_name())
     }
   ),
   private = list(
@@ -32,7 +37,7 @@ Parameter <- R6::R6Class("Parameter",
     notation_long = function() {
       b <- self$get_bounds()
       paste0(
-        private$name_string(), "<lower = ", number_string(b$lower),
+        self$name_string(), "<lower = ", number_string(b$lower),
         ", upper = ", number_string(b$upper), ">",
         " ~ ", self$get_prior()$notation(FALSE)
       )
@@ -42,7 +47,7 @@ Parameter <- R6::R6Class("Parameter",
     notation_short = function() {
       b <- self$get_bounds()
       paste0(
-        private$name_string(), "<", number_string(b$lower), ", ",
+        self$name_string(), "<", number_string(b$lower), ", ",
         number_string(b$upper), ">",
         " ~ ", self$get_prior()$notation(TRUE)
       )
@@ -126,7 +131,7 @@ VectorParameter <- R6::R6Class("VectorParameter",
         pr <- self$get_prior(idx = j)
         desc <- paste0(
           desc, "\n",
-          private$name_string(), "[", j, "]",
+          self$name_string(), "[", j, "]",
           "<lower = ", number_string(b$lower), ", upper = ",
           number_string(b$upper), ">",
           " ~ ", pr$notation(FALSE)
@@ -144,7 +149,7 @@ VectorParameter <- R6::R6Class("VectorParameter",
         pr <- self$get_prior(idx = j)
         desc <- paste0(
           desc, "\n",
-          private$name_string(), "[", j, "]",
+          self$name_string(), "[", j, "]",
           "<", number_string(b$lower), ", ",
           number_string(b$upper), ">",
           " ~ ", pr$notation(TRUE)
@@ -181,81 +186,6 @@ VectorParameter <- R6::R6Class("VectorParameter",
       }
       private$lower <- lower
       private$upper <- upper
-    }
-  )
-)
-
-# Parameter that is restricted to be positive
-PositiveParameter <- R6::R6Class("PositiveParameter",
-  inherit = Parameter,
-  public = list()
-)
-
-# Parameter that is restricted to be on some interval
-IntervalParameter <- R6::R6Class("IntervalParameter",
-  inherit = Parameter,
-  public = list(
-    upper = NULL,
-    lower = NULL,
-
-    # constructor
-    initialize = function(name, lower = 0, upper = 1) {
-      self$set_name(name)
-      checkmate::assert_numeric(lower)
-      checkmate::assert_numeric(upper)
-      self$lower <- lower
-      self$upper <- upper
-    }
-  )
-)
-
-# Parameter that is restricted to be on unit interval
-UnitIntervalParameter <- R6::R6Class("UnitIntervalParameter",
-  inherit = Parameter,
-  public = list()
-)
-
-# Lengthscale parameter
-LengthscaleParameter <- R6::R6Class("LengthscaleParameter",
-  inherit = PositiveParameter,
-  public = list()
-)
-
-# Warping steepness parameter
-WarpingSteepnessParameter <- R6::R6Class("WarpingSteepnessParameter",
-  inherit = PositiveParameter,
-  public = list()
-)
-
-# Lengthscale parameter
-MagnitudeParameter <- R6::R6Class("MagnitudeParameter",
-  inherit = PositiveParameter,
-  public = list()
-)
-
-# Covariate uncertainty parameter
-ParameterVector <- R6::R6Class("ParameterVector",
-  public = list(
-    param = NULL,
-    length = NULL,
-    # constructor
-    initialize = function(param, length) {
-      checkmate::assert_class(param, "Parameter")
-      checkmate::assert_integerish(length, lower = 1)
-      self$param <- param
-      self$length <- length
-    },
-
-    # description
-    desc = function() {
-      paste0(
-        "ParameterVector(", self$param$desc(), ", ", self$length, ")"
-      )
-    },
-
-    # print info
-    print = function() {
-      cat(self$desc(), "\n")
     }
   )
 )

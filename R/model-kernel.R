@@ -12,30 +12,41 @@
 NULL
 
 Kernel <- R6::R6Class("Kernel",
+  inherit = Printable,
   public = list(
 
-    # constructor
-    initialize = function() {
-    },
-
-    # description, must be overridden by inheriting class
-    desc = function() {
-      stop("Desc not implemented!")
-    },
-
-    # print info
-    print = function() {
-      cat(self$desc(), "\n")
-    },
-
     # get all parameters as a list
-    parameters = function() {
+    get_parameters = function() {
       list()
     },
 
     # get all input variables as a list
-    variables = function() {
+    get_variables = function() {
       list()
+    }
+  ),
+  private = list(
+    # short notation
+    notation_short = function() {
+      s <- lapply(self$get_variables(), function(x) x$name_string())
+      str1 <- paste(s, collapse = ", ")
+      s <- lapply(self$get_parameters(), function(x) x$name_string())
+      str2 <- paste(s, collapse = ", ")
+      paste0(
+        self$name_string(), "(", str1, " | ", str2, ")"
+      )
+    },
+
+    # long notation
+    notation_long = function() {
+      s <- lapply(self$get_variables(), function(x) x$notation(TRUE))
+      str1 <- paste(s, collapse = ", ")
+      s <- lapply(self$get_parameters(), function(x) x$notation(TRUE))
+      str2 <- paste(s, collapse = "\n  ")
+      paste0(
+        "Kernel name: ", self$name_string(), "\nVariables: ", str1,
+        "\nParameters: {\n  ", str2, "\n}"
+      )
     }
   )
 )
@@ -44,31 +55,30 @@ Kernel <- R6::R6Class("Kernel",
 ExpQuadKernel <- R6::R6Class("ExpQuadKernel",
   inherit = Kernel,
   public = list(
-    x = NULL, # continuous input
-    ell = NULL, # lengthscale parameter
 
     # constructor
-    initialize = function(x, ell) {
+    initialize = function(name, x, ell_prior) {
+      private$set_name(paste0("k_", name))
       checkmate::assert_class(x, "ContinuousVariable")
-      checkmate::assert_class(ell, "LengthscaleParameter")
-      self$x <- x
-      self$ell <- ell
+      checkmate::assert_class(ell_prior, "ContinuousDistribution")
+      private$x <- x
+      ell_name <- paste0("ell_", name)
+      private$ell <- Parameter$new(name = ell_name, prior = ell_prior)
     },
 
     # get all parameters as a list
-    parameters = function() {
-      list(self$ell)
+    get_parameters = function() {
+      list(ell = private$ell)
     },
 
     # get all variables as a list
-    variables = function() {
-      list(self$x)
-    },
-
-    # description
-    desc = function() {
-      paste0("ExpQuadKernel(", self$x, ")")
+    get_variables = function() {
+      list(x = private$x)
     }
+  ),
+  private = list(
+    x = NULL, # continuous input
+    ell = NULL # lengthscale parameter
   )
 )
 
