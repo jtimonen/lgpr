@@ -1,5 +1,4 @@
-
-  // Variance masking function
+// Variance masking function
   vector STAN_var_mask(vector x, real a){
     return( inv(1+exp(-a*x)) );
   }
@@ -453,6 +452,3 @@
     }
     return(K_sum);
   }
-
-
-
