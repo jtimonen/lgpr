@@ -20,7 +20,7 @@ License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
 Biarch: true
-Depends: 
+Depends:
     R (>= 3.4.0),
     methods
 Imports:
@@ -34,7 +34,7 @@ Imports:
     stats (>= 3.4),
     ggplot2 (>= 3.1.0),
     gridExtra (>= 0.3.0)
-LinkingTo: 
+LinkingTo:
     BH (>= 1.75.0-0),
     Rcpp (>= 1.0.6),
     RcppEigen (>= 0.3.3.9.1),
@@ -42,8 +42,9 @@ LinkingTo:
     rstan (>= 2.21.2),
     StanHeaders (>= 2.21.0-7)
 SystemRequirements: GNU make
+NeedsCompilation: yes
 RoxygenNote: 7.1.2
-Suggests: 
+Suggests:
     knitr,
     rmarkdown,
     testthat,
