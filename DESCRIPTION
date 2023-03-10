@@ -28,7 +28,7 @@ Imports:
     RcppParallel (>= 5.0.2),
     RCurl (>= 1.98),
     rstan (>= 2.21.2),
-    rstantools (>= 2.1.1),
+    rstantools (>= 2.3.0),
     bayesplot (>= 1.7.0),
     MASS (>= 7.3-50),
     stats (>= 3.4),
