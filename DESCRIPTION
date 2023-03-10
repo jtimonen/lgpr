@@ -1,12 +1,17 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 1.2.0.9000
+Version: 1.2.0
 Authors@R:
     c(person(given = "Juho",
            family = "Timonen",
            role = c("aut", "cre"),
            email = "juho.timonen@iki.fi",
-           comment = c(ORCID = "0000-0003-2341-6765"))
+           comment = c(ORCID = "0000-0003-2341-6765")
+           ),
+      person(given = "Andrew",
+           family = "Johnson",
+           role = c("ctb")
+           )
     )
 Description: Interpretable nonparametric modeling of longitudinal data
     using additive Gaussian process regression. Contains functionality

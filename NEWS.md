@@ -1,3 +1,9 @@
+# lgpr 1.2
+
+## 1.2.0
+  * Update installation process.
+  * Add `@andrjohns` as contributor.
+
 # lgpr 1.1
 
 ## 1.1.5

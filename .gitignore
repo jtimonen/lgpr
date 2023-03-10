@@ -3,12 +3,9 @@
 *.RData
 *.Ruserdata
 *.DS_Store
-src/*.o
-src/*.so
-src/*.dll
-src/*.exe
-src/*.tmp
-src/stan_functions
+src/
+R/RcppExports.R
+R/stanmodels.R
 inst/doc
 *.exe
 *.so
