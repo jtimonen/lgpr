@@ -13,11 +13,9 @@
 - Document each new function with roxygen comments
 - After making changes to `.R` code,
   1. run `devtools::document()` to update the man pages
-  2. run `dev/style.R` to correct most style problems
-  3. run `dev/lint.R` to check for other style problems
+  2. source `dev/style.R` to correct most style problems
+  3. source `dev/lint.R` to check for other style problems
   4. correct remaining problems manually if found
 - After making changes to `.stan` code
-  1. run `dev/cpp.R`
-  2. rebuild the whole package
-- Before making new commits, make sure to also run `R CMD check`
+  1. rebuild the whole package
 
