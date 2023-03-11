@@ -1,5 +1,8 @@
 # lgpr 1.2
 
+## 1.2.1
+  * Edit `DESCRIPTION` and `.Rbuildignore`.
+  
 ## 1.2.0
   * Update installation process.
   * Add `@andrjohns` as contributor.

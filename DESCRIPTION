@@ -1,6 +1,8 @@
 Package: lgpr
 Title: Longitudinal Gaussian Process Regression
-Version: 1.2.0
+Version: 1.2.1
+Author: Juho Timonen
+Maintainer: Juho Timonen <juho.timonen@iki.fi>
 Authors@R:
     c(person(given = "Juho",
            family = "Timonen",
