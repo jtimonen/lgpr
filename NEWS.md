@@ -1,7 +1,7 @@
 # lgpr 1.2
 
 ## 1.2.1
-  * Edit `DESCRIPTION` and `.Rbuildignore`.
+  * Internal non-functional changes.
   
 ## 1.2.0
   * Update installation process.
