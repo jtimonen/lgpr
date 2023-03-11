@@ -80,7 +80,6 @@ prior_type_names <- function(idx = NULL) {
 
 # Convert the Stan input encoding of a prior to a human-readable data frame
 prior_to_df <- function(stan_input, digits = 3) {
-
   # Positive parameters
   check_positive(digits)
   pnames <- c("alpha", "ell", "wrp", "sigma", "phi")
@@ -318,7 +317,6 @@ parse_prior_single <- function(desc, num) {
       stop(err_msg)
     }
   } else {
-
     # The parameter type has possibly different prior in different components
     prior <- repvec(c(0, 0), L)
     hyper <- repvec(c(0, 0, 0), L)

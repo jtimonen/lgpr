@@ -6,7 +6,6 @@ create_kernel_computer <- function(model,
                                    draws,
                                    full_covariance,
                                    STREAM) {
-
   # Settings
   if (!is.null(draws)) reduce <- NULL
   input <- kernelcomp.create_input(model, stan_fit, x, reduce, draws)
@@ -64,7 +63,6 @@ kernel_const_all <- function(input, is_out1, is_out2, STREAM) {
 # between output points
 # Input is a list returned by fp_input
 kernel_const_all_diag <- function(input, STREAM) {
-
   # Get input
   x_cat <- matrix_to_list(dollar(input, "x_cat_OUT"))
   x_cont_mask <- matrix_to_list(dollar(input, "x_cont_mask_OUT"))
@@ -143,7 +141,6 @@ kernel_all_diag <- function(init, input, idx, STREAM) {
 
 # Initialize kernel matrix computations
 kernelcomp.init <- function(input, is_out1, is_out2, STREAM, diag) {
-
   # Compute constant kernel matrices
   if (diag) {
     K_const <- kernel_const_all_diag(input, STREAM)
@@ -234,7 +231,6 @@ kernelcomp.input_x <- function(model, x) {
 
 # parameter draws input (common fields)
 kernelcomp.input_draws <- function(model, stan_fit, reduce, draws) {
-
   # Get dimensions
   S <- determine_num_paramsets(stan_fit, draws, reduce)
   si <- get_stan_input(model)

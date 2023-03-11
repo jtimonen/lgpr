@@ -82,35 +82,35 @@ S4 generics for lgpfit, lgpmodel, and other objects
 }
 \section{Functions}{
 \itemize{
-\item \code{parameter_info}: Get parameter information (priors etc.).
+\item \code{parameter_info()}: Get parameter information (priors etc.).
 
-\item \code{component_info}: Get component information.
+\item \code{component_info()}: Get component information.
 
-\item \code{covariate_info}: Get covariate information.
+\item \code{covariate_info()}: Get covariate information.
 
-\item \code{component_names}: Get component names.
+\item \code{component_names()}: Get component names.
 
-\item \code{get_model}: Get \linkS4class{lgpmodel} object.
+\item \code{get_model()}: Get \linkS4class{lgpmodel} object.
 
-\item \code{is_f_sampled}: Determine if signal f is sampled or marginalized.
+\item \code{is_f_sampled()}: Determine if signal f is sampled or marginalized.
 
-\item \code{get_stanfit}: Extract stanfit object.
+\item \code{get_stanfit()}: Extract stanfit object.
 
-\item \code{postproc}: Perform postprocessing.
+\item \code{postproc()}: Perform postprocessing.
 
-\item \code{contains_postproc}: Determine if object contains postprocessing
+\item \code{contains_postproc()}: Determine if object contains postprocessing
 information.
 
-\item \code{clear_postproc}: Clear postprocessing information (to reduce
+\item \code{clear_postproc()}: Clear postprocessing information (to reduce
 size of object).
 
-\item \code{num_paramsets}: Get number of parameter sets.
+\item \code{num_paramsets()}: Get number of parameter sets.
 
-\item \code{num_evalpoints}: Get number of points where posterior is evaluated.
+\item \code{num_evalpoints()}: Get number of points where posterior is evaluated.
 
-\item \code{num_components}: Get number of model components.
+\item \code{num_components()}: Get number of model components.
+
 }}
-
 \seealso{
 To find out which methods have been implemented for which classes,
 see \linkS4class{lgpfit}, \linkS4class{lgpmodel},

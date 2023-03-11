@@ -13,7 +13,6 @@
 #' @family internal model creation functions
 create_model.covs_and_comps <- function(data, model_formula,
                                         x_cont_scl, verbose) {
-
   # Check that data is a data.frame and that all covariates exist in it
   x_names <- unique(rhs_variables(model_formula@terms))
   log_progress("Parsing covariates and components...", verbose)
@@ -75,7 +74,6 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
   for (name in x_names) {
     X_RAW <- data[[name]]
     if (is(X_RAW, "factor")) {
-
       # A categorical covariate
       num_cat <- num_cat + 1
       n_na <- sum(is.na(X_RAW))
@@ -88,7 +86,6 @@ stan_data_covariates <- function(data, x_names, x_cont_scl) {
       x_cat_levels[[num_cat]] <- levels(X_RAW)
       x_cat_names[num_cat] <- name
     } else {
-
       # Continuous covariate, Masking
       num_cont <- num_cont + 1
       is_na <- is.na(X_RAW)
@@ -306,7 +303,6 @@ check_term_covariates <- function(covariates, pf) {
 
 # Helper for converting an lgpterm to numeric representation for Stan
 check_term_factors <- function(term) {
-
   # Check for het() expressions
   facs <- term@factors
   reduced <- reduce_factors_expr(facs, "het")

@@ -1,4 +1,3 @@
-
 #' Density and quantile functions of the inverse gamma distribution
 #'
 #' @description Using the same parametrization as Stan. More info
@@ -55,7 +54,6 @@ plot_invgamma <- function(alpha, beta, by = 0.01,
                           return_quantiles = FALSE,
                           linecolor = colorset("red", "dark"),
                           fillcolor = colorset("red", "mid")) {
-
   # Compute inter-quantile range
   check_interval(IQR, 0, 1)
   delta <- (1 - IQR) / 2

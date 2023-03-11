@@ -37,26 +37,26 @@ An S4 class to represent an additive GP model
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print information and summary about the object.
+\item \code{show(lgpmodel)}: Print information and summary about the object.
 Returns \code{object} invisibly.
 
-\item \code{parameter_info}: Get a parameter summary (bounds and
+\item \code{parameter_info(lgpmodel)}: Get a parameter summary (bounds and
 priors). Returns a \code{data.frame}.
 
-\item \code{component_info}: Get a data frame with information about each model
+\item \code{component_info(lgpmodel)}: Get a data frame with information about each model
 component.
 
-\item \code{num_components}: Get number of model components. Returns a
+\item \code{num_components(lgpmodel)}: Get number of model components. Returns a
 positive integer.
 
-\item \code{covariate_info}: Get covariate information.
+\item \code{covariate_info(lgpmodel)}: Get covariate information.
 
-\item \code{component_names}: Get names of model components.
+\item \code{component_names(lgpmodel)}: Get names of model components.
 
-\item \code{is_f_sampled}: Determine if inference of the model requires sampling
+\item \code{is_f_sampled(lgpmodel)}: Determine if inference of the model requires sampling
 the latent signal \code{f} (and its components).
-}}
 
+}}
 \section{Slots}{
 
 \describe{

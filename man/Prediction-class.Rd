@@ -32,19 +32,19 @@ draws from an additive function distribution.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print a summary about the object.
+\item \code{show(Prediction)}: Print a summary about the object.
 
-\item \code{component_names}: Get names of components.
+\item \code{component_names(Prediction)}: Get names of components.
 
-\item \code{num_components}: Get number of components.
+\item \code{num_components(Prediction)}: Get number of components.
 
-\item \code{num_paramsets}: Get number of parameter combinations
+\item \code{num_paramsets(Prediction)}: Get number of parameter combinations
 (different parameter vectors) using which predictions were computed.
 
-\item \code{num_evalpoints}: Get number of points where
+\item \code{num_evalpoints(Prediction)}: Get number of points where
 predictions were computed.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

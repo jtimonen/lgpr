@@ -17,8 +17,8 @@ kernel_eq <- function(x1, x2, alpha = 1.0, ell) {
   check_non_negative(alpha)
   n1 <- length(x1)
   n2 <- length(x2)
-  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
-  X2 <- matrix(rep(x2, n1), n1, n2, byrow = T)
+  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = TRUE)
+  X2 <- matrix(rep(x2, n1), n1, n2, byrow = TRUE)
   K <- alpha^2 * exp(-0.5 * (X1 - X2)^2 / ell^2)
   return(K)
 }
@@ -63,8 +63,8 @@ kernel_zerosum <- function(x1, x2, M) {
 kernel_bin <- function(x1, x2, pos_class = 0) {
   n1 <- length(x1)
   n2 <- length(x2)
-  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
-  X2 <- matrix(rep(x2, n1), n1, n2, byrow = T)
+  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = TRUE)
+  X2 <- matrix(rep(x2, n1), n1, n2, byrow = TRUE)
   K1 <- matrix(as.numeric(X1 == pos_class), n1, n2)
   K2 <- matrix(as.numeric(X2 == pos_class), n1, n2)
   return(K1 * K2)
@@ -76,8 +76,8 @@ kernel_bin <- function(x1, x2, pos_class = 0) {
 kernel_cat <- function(x1, x2) {
   n1 <- length(x1)
   n2 <- length(x2)
-  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = T)
-  X2 <- matrix(rep(x2, n1), n1, n2, byrow = T)
+  X1 <- matrix(rep(x1, each = n2), n1, n2, byrow = TRUE)
+  X2 <- matrix(rep(x2, n1), n1, n2, byrow = TRUE)
   K <- 1.0 * (X1 == X2)
   return(K)
 }

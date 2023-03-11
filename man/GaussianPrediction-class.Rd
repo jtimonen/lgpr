@@ -32,19 +32,19 @@ An S4 class to represent analytically computed predictive distributions
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print a summary about the object.
+\item \code{show(GaussianPrediction)}: Print a summary about the object.
 
-\item \code{component_names}: Get names of components.
+\item \code{component_names(GaussianPrediction)}: Get names of components.
 
-\item \code{num_components}: Get number of components.
+\item \code{num_components(GaussianPrediction)}: Get number of components.
 
-\item \code{num_paramsets}: Get number of parameter combinations
+\item \code{num_paramsets(GaussianPrediction)}: Get number of parameter combinations
 (different parameter vectors) using which predictions were computed.
 
-\item \code{num_evalpoints}: Get number of points where
+\item \code{num_evalpoints(GaussianPrediction)}: Get number of points where
 predictions were computed.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

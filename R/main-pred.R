@@ -125,7 +125,6 @@ pred_extrapolated_draws <- function(fit, fp, c_hat_pred, verbose) {
 
 # Set c_hat_pred
 set_c_hat_pred <- function(model, f, c_hat_pred, verbose) {
-
   # helper function
   is_constant <- function(x) {
     s <- sum(x == x[1])

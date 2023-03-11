@@ -39,7 +39,7 @@ plot_pred(fit, p1, t_name = "age", group_by = "id", alpha = alpha)
 x_pred <- new_x(fit, x_values = seq(0, 200, by = 2), group_by = "id",
                 x = "age", x_ns = "diseaseAge")
 p2 <- pred(fit, x_pred, reduce = mean, verbose = verbose)
-plot_components(fit, p2, t_name = "age", group_by = "id", 
+plot_components(fit, p2, t_name = "age", group_by = "id",
                 color_by = c(NA, NA, "group", "sex", "group", NA))
 plot_pred(fit, p2, t_name = "age", group_by = "id")
 ```

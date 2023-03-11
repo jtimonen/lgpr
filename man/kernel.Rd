@@ -59,30 +59,30 @@ used when generating simulated data, and not during model inference.
 }
 \section{Functions}{
 \itemize{
-\item \code{kernel_eq}: Uses the exponentiated quadratic kernel.
+\item \code{kernel_eq()}: Uses the exponentiated quadratic kernel.
 
-\item \code{kernel_ns}: Uses the non-stationary kernel (input warping + squared
+\item \code{kernel_ns()}: Uses the non-stationary kernel (input warping + squared
 exponential).
 
-\item \code{kernel_zerosum}: Uses the zero-sum kernel. Here, \code{x1} and
+\item \code{kernel_zerosum()}: Uses the zero-sum kernel. Here, \code{x1} and
 \code{x2} must be integer vectors (integers denoting different categories).
 Returns a binary matrix.
 
-\item \code{kernel_bin}: Uses the binary (mask) kernel. Here, \code{x1} and
+\item \code{kernel_bin()}: Uses the binary (mask) kernel. Here, \code{x1} and
 \code{x2} must be integer vectors (integers denoting different categories).
 Returns a binary matrix.
 
-\item \code{kernel_cat}: Uses the categorical kernel. Here, \code{x1} and
+\item \code{kernel_cat()}: Uses the categorical kernel. Here, \code{x1} and
 \code{x2} must be integer vectors (integers denoting different categories).
 Returns a binary matrix.
 
-\item \code{kernel_varmask}: Computes variance mask multiplier matrix. \code{NaN}'s
+\item \code{kernel_varmask()}: Computes variance mask multiplier matrix. \code{NaN}'s
 in \code{x1} and \code{x2} will be replaced by 0.
 
-\item \code{kernel_beta}: Computes the heterogeneity multiplier matrix.
+\item \code{kernel_beta()}: Computes the heterogeneity multiplier matrix.
 \emph{NOTE:} \code{idx_expand} needs to be given so that
 \code{idx_expand[j]-1} tells the index of the beta parameter that should be
 used for the \eqn{j}th observation. If observation \eqn{j} doesn't
 correspond to any beta parameter, then \code{idx_expand[j]} should be 1.
-}}
 
+}}

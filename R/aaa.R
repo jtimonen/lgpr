@@ -58,7 +58,8 @@
 #' See \url{https://jtimonen.github.io/lgpr-usage/index.html}. The
 #' tutorials focus on code and use cases, whereas the
 #' \href{https://jtimonen.github.io/lgpr-usage/articles/math.html}{Mathematical description of lgpr models}
-#' vignette describes the statistical models and how they can be customized in 'lgpr'.
+#' vignette describes the statistical models and how they can be customized in
+#' 'lgpr'.
 #'
 #' @section Citation:
 #' Run \code{citation("lgpr")} to get citation information.

@@ -305,7 +305,6 @@ check_unique <- function(arg) {
 # throws an error if argument is not valid.
 # @family argument checks
 check_allowed <- function(arg, allowed) {
-
   # Get names of given arguments and caller function
   arg_name <- deparse(substitute(arg))
   allowed_name <- deparse(substitute(allowed))

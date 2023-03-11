@@ -57,7 +57,6 @@ link_inv <- function(x, likelihood) {
 
 # Map distribution of f to predictive distribution
 map_f_to_y <- function(f_mean, f_std, sigma2, y_scl) {
-
   # Compute y_mean and y_std on normalized scale
   y_mean <- f_mean
   y_var <- add_to_columns(f_std^2, sigma2)
@@ -72,7 +71,6 @@ map_f_to_y <- function(f_mean, f_std, sigma2, y_scl) {
 
 # Map draws of f to prediction scale
 map_f_to_h <- function(model, f, c_hat, reduce) {
-
   # Add c_hat
   num_draws <- dim(f)[1]
   f <- f + repvec(c_hat, num_draws)

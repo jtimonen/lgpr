@@ -50,37 +50,37 @@ An S4 class to represent the output of the \code{lgp} function
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print information and summary about the fit object.
+\item \code{show(lgpfit)}: Print information and summary about the fit object.
 
-\item \code{component_names}: Get names of model components.
+\item \code{component_names(lgpfit)}: Get names of model components.
 
-\item \code{num_components}: Get number of model components. Returns a
+\item \code{num_components(lgpfit)}: Get number of model components. Returns a
 positive integer.
 
-\item \code{postproc}: Apply postprocessing. Returns an updated
+\item \code{postproc(lgpfit)}: Apply postprocessing. Returns an updated
 \linkS4class{lgpfit} object (copies data).
 
-\item \code{contains_postproc}: Check if object contains postprocessing information.
+\item \code{contains_postproc(lgpfit)}: Check if object contains postprocessing information.
 
-\item \code{clear_postproc}: Returns an updated (copies data)
+\item \code{clear_postproc(lgpfit)}: Returns an updated (copies data)
 \linkS4class{lgpfit} object without any postprocessing information.
 
-\item \code{get_model}: Get the stored \linkS4class{lgpmodel} object.
+\item \code{get_model(lgpfit)}: Get the stored \linkS4class{lgpmodel} object.
 Various properties of the returned object can be accessed as explained
 in the documentation of \linkS4class{lgpmodel}.
 
-\item \code{get_stanfit}: Get the stored \code{\link[rstan]{stanfit}} object.
+\item \code{get_stanfit(lgpfit)}: Get the stored \code{\link[rstan]{stanfit}} object.
 Various properties of the returned object can be accessed or plotted
 as explained
 \href{https://CRAN.R-project.org/package=rstan/vignettes/stanfit-objects.html}{here}
 or in the documentation of \code{\link[rstan]{stanfit}}.
 
-\item \code{is_f_sampled}: Determine if inference was done by sampling
+\item \code{is_f_sampled(lgpfit)}: Determine if inference was done by sampling
 the latent signal \code{f} (and its components).
 
-\item \code{plot}: Visualize parameter draws using \code{\link{plot_draws}}.
-}}
+\item \code{plot(x = lgpfit, y = missing)}: Visualize parameter draws using \code{\link{plot_draws}}.
 
+}}
 \section{Slots}{
 
 \describe{

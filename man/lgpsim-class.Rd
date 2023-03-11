@@ -28,12 +28,12 @@ formalism
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Show summary of object.
+\item \code{show(lgpsim)}: Show summary of object.
 
-\item \code{plot}: Plot the data and generating process. For more
+\item \code{plot(x = lgpsim, y = missing)}: Plot the data and generating process. For more
 information see \code{\link{plot_sim}}.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

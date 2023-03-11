@@ -41,7 +41,6 @@ plot_pred <- function(fit,
                       # deprecated
                       x = NULL,
                       ...) {
-
   # Process arguments, pred can't be NULL after this
   df_data <- create_plot_df(fit, t_name, group_by)
   pred <- plot_pred.process_args(fit, pred, x, draws, reduce, verbose)
@@ -93,7 +92,6 @@ plot_f <- function(fit,
                    # deprecated
                    x = NULL,
                    ...) {
-
   # Process arguments, pred can't be NULL after this
   pred <- plot_pred.process_args(fit, pred, x, draws, reduce, verbose)
   x <- pred@x
@@ -159,7 +157,6 @@ plot_components <- function(fit,
                             # deprecated
                             x = NULL,
                             ...) {
-
   # Process args, pred can't be NULL after this
   pred <- plot_pred.process_args(fit, pred, x, draws, reduce, verbose)
 

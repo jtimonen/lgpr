@@ -93,7 +93,6 @@ select_freq.integrate <- function(fit,
 
 # Helper function for component selection
 select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
-
   # Get relevances
   check_type(reduce, "function")
   check_type(fit, "lgpfit")
@@ -130,7 +129,6 @@ select.all_thresholds <- function(fit, reduce, p, h, verbose, ...) {
 
 # Helper function for component selection
 select_freq.all_thresholds <- function(fit, p, h, verbose, ...) {
-
   # Get relevances
   check_type(fit, "lgpfit")
   check_type(p, "function")

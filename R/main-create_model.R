@@ -28,7 +28,6 @@ create_model <- function(formula,
                          prior_only = FALSE,
                          verbose = FALSE,
                          sample_f = !(likelihood == "gaussian")) {
-
   # Parse common parts (formula, covariates, components, options)
   data <- convert_to_data_frame(data)
   lgp_formula <- create_model.formula(formula, data, verbose)
@@ -100,7 +99,6 @@ create_model <- function(formula,
 #' \code{options = list(delta = 1e-8,  vm_params = c(0.025, 1))}.
 #' @return a named list of parsed options
 create_model.options <- function(options, verbose) {
-
   # Default options
   log_progress("Parsing options...", verbose)
   input <- options

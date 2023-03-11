@@ -17,6 +17,4 @@ tutorials/
 src/
 .DS_Store
 .Rhistory
-.github/
 .gitignore
-.github

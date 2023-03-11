@@ -27,7 +27,6 @@ posterior_f <- function(fit,
                         force = FALSE,
                         full_covariance = FALSE,
                         debug_kc = FALSE) {
-
   # Settings
   if (!is.null(draws)) reduce <- NULL
 
@@ -64,7 +63,6 @@ posterior_f <- function(fit,
 
 # Analytic function posteriors
 fp_gaussian <- function(kc, sigma2, y, verbose) {
-
   # Extract info
   input <- kc@input # shared input
   S <- num_paramsets(kc) # number of parameter sets
@@ -89,7 +87,6 @@ fp_gaussian <- function(kc, sigma2, y, verbose) {
 
   # Loop through parameter sets
   for (idx in seq_len(S)) {
-
     # Compute full kernel matrices for one parameter set
     K_i <- kernel_all(kc@K_input, kc@input, idx, kc@STREAM)
     if (kc@no_separate_output_points) {
@@ -128,7 +125,6 @@ fp_gaussian <- function(kc, sigma2, y, verbose) {
 
 # Compute componentwise and total function posteriors
 fp_gaussian.compute <- function(K, Ks, Kss_diag, sigma2, delta, y) {
-
   # Helper function for linear algebra
   # See e.g. http://www.gaussianprocess.org/gpml/chapters/RW.pdf Algorithm 2.1
   gp_posterior_helper <- function(Ly, Ks, Kss_diag, v) {
@@ -180,7 +176,6 @@ fp_gaussian.compute <- function(K, Ks, Kss_diag, sigma2, delta, y) {
 
 # Extrapolate function posterior draws using kernel regression
 fp_extrapolate <- function(kc, fp_at_data, verbose) {
-
   # Extract info
   input <- kc@input # shared input
   S <- num_paramsets(kc) # number of parameter sets
@@ -205,7 +200,6 @@ fp_extrapolate <- function(kc, fp_at_data, verbose) {
 
   # Loop through parameter sets
   for (idx in seq_len(S)) {
-
     # Perform computations for one parameter set
     K_i <- kernel_all(kc@K_input, kc@input, idx, kc@STREAM)
     if (kc@no_separate_output_points) {

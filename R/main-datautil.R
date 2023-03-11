@@ -1,4 +1,3 @@
-
 #' Set the GP mean vector, taking TMM or other normalization
 #' into account
 #'

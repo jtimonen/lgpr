@@ -80,7 +80,6 @@ sample_param_prior <- function(model, verbose = TRUE, quiet = FALSE, ...) {
 # Draw from prior predictive distribution given prior draws of parameters
 # and functions
 draw_prior_pred <- function(model, stan_fit, f_draws, verbose) {
-
   # Create h, with shape num_draws x num_points
   f_sum_draws <- dollar(f_draws, "f_draws")
   c_hat <- get_chat(model)
@@ -135,7 +134,6 @@ draw_f_prior <- function(model, stan_fit, verbose, STREAM) {
 
   # Loop through parameter sets
   for (idx in seq_len(S)) {
-
     # Compute full kernel matrices for one parameter set
     K_prior <- kernel_all(K_input, input, idx, kc@STREAM)
 

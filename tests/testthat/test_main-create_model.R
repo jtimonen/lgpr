@@ -398,7 +398,6 @@ test_that("cannot have negative or non-integer response with NB etc.", {
 })
 
 test_that("a data variable that will be normalized can't have zero variance", {
-
   # Response
   dat <- testdata_001
   dat$y <- rep(10.3, nrow(dat))

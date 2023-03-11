@@ -56,20 +56,20 @@ Visualize the distribution of parameter draws
 }
 \section{Functions}{
 \itemize{
-\item \code{plot_draws}: visualizes the distribution of any set of
+\item \code{plot_draws()}: visualizes the distribution of any set of
 model parameters (defaults to kernel hyperparameters and possible
 observation model parameters)
 
-\item \code{plot_beta}: visualizes the distribution of the
+\item \code{plot_beta()}: visualizes the distribution of the
 individual-specific disease effect magnitude parameter draws
 
-\item \code{plot_warp}: visualizes the input warping function for
+\item \code{plot_warp()}: visualizes the input warping function for
 different draws of the warping steepness parameter
 
-\item \code{plot_effect_times}: visualizes the input warping function for
+\item \code{plot_effect_times()}: visualizes the input warping function for
 different parameter draws
-}}
 
+}}
 \seealso{
 Other main plot functions: 
 \code{\link{plot_components}()},

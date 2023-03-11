@@ -279,7 +279,6 @@ get_num_trials <- function(object) {
 #' @param group_by grouping variable name (use \code{NULL} for no grouping)
 #' @return a data frame
 create_plot_df <- function(object, x = "age", group_by = "id") {
-
   # Get x-axis variable
   dat <- get_data(object)
   x_name <- x

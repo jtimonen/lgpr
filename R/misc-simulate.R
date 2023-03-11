@@ -53,7 +53,6 @@ simulate_data <- function(N,
                           ),
                           N_trials = 1,
                           force_zeromean = TRUE) {
-
   # Input checks
   noise_type <- tolower(noise_type)
   check_length_geq(t_data, 3)
@@ -242,7 +241,6 @@ sim.create_x <- function(N,
                          t_jitter,
                          t_effect_range,
                          continuous_info) {
-
   # Validate input
   D <- sim.create_x_D(covariates)
   checked <- sim.create_x_check(n_categs, D, t_data, t_effect_range)
@@ -462,7 +460,6 @@ sim.kernels <- function(X,
 
 # Input check for the covariate-related arguments of simulate_data
 sim.check_covariates <- function(covariates, relevances, names, n_cat) {
-
   # Validity check
   d0 <- sum(covariates == 0)
   if (d0 > 1) stop("There can be only one diseaseAge component!")
@@ -487,7 +484,6 @@ sim.check_covariates <- function(covariates, relevances, names, n_cat) {
 
 # Generate names for covariates, given vector of covariate types
 sim.generate_names <- function(covariates) {
-
   # Get default names
   names <- c("id", "age")
   def <- c("x", "z", "offset", "group")
@@ -538,7 +534,6 @@ sim.data_to_observed <- function(dat, t_observed) {
       if (is.nan(dag_i[1])) {
         # not a diseased individual
       } else {
-
         # how many points are there after the real onset?
         irem <- which(dag_i > 0)
         rem <- age_i[irem]
@@ -667,7 +662,6 @@ sim.name_components <- function(types, names) {
 # @return a new matrix like FFF
 sim.scale_relevances <- function(FFF, relevances,
                                  force_zeromean, i_skip) {
-
   # Some input checking
   d <- dim(FFF)[2]
   check_non_negative_all(relevances)
@@ -731,7 +725,6 @@ sim.create_x_D <- function(covariates) {
 
 # Input check helper function for sim.create_x (D is covariate type array)
 sim.create_x_check <- function(n_categs, D, t_data, t_effect_range) {
-
   # Check length of n_categs
   L1 <- length(n_categs)
   L2 <- sum(D[3:4])

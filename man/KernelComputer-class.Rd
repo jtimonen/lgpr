@@ -29,17 +29,17 @@ An S4 class to represent input for kernel matrix computations
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print a summary about the object.
+\item \code{show(KernelComputer)}: Print a summary about the object.
 
-\item \code{num_components}: Get number of components.
+\item \code{num_components(KernelComputer)}: Get number of components.
 
-\item \code{num_evalpoints}: Get number of evaluation points.
+\item \code{num_evalpoints(KernelComputer)}: Get number of evaluation points.
 
-\item \code{num_paramsets}: Get number of parameter sets.
+\item \code{num_paramsets(KernelComputer)}: Get number of parameter sets.
 
-\item \code{component_names}: Get component names.
+\item \code{component_names(KernelComputer)}: Get component names.
+
 }}
-
 \section{Slots}{
 
 \describe{

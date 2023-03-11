@@ -72,7 +72,6 @@ get_pred.sampled.f <- function(fit, draws, reduce) {
 # after this transformation.
 # Returns an array of shape \code{num_draws} x \code{num_obs}
 get_pred.sampled.h <- function(fit, draws, reduce) {
-
   # Get f and add c_hat
   f <- get_pred.sampled.f(fit, draws, reduce = NULL)
   c_hat <- get_chat(fit)

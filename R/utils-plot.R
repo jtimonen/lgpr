@@ -117,7 +117,6 @@ plot_api_c <- function(df,
                        alpha_err = 0.2,
                        no_err = FALSE,
                        no_line = FALSE) {
-
   # Create the plot
   group_by <- colnames(df)[1]
   x_name <- colnames(df)[2]
@@ -138,7 +137,6 @@ plot_api_c <- function(df,
 
 # Initialize a grouped plot
 plot_api_g_create <- function(df_data, i_test, nrow, ncol) {
-
   # Create dummy variable for type (train/test)
   show_test <- !is.null(i_test)
   if (show_test) {
