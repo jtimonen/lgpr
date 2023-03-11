@@ -112,7 +112,7 @@ object_to_model <- function(object) {
   if (!is(object, "lgpmodel") && !is(object, "lgpfit")) {
     stop("object must be an lgpmodel or lgpfit object!")
   }
-  if (class(object) == "lgpfit") {
+  if (inherits(object, "lgpfit")) {
     out <- object@model
   } else {
     out <- object
