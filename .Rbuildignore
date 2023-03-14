@@ -14,7 +14,6 @@ pkgdown/
 dev/
 docs/
 tutorials/
-src/
 .DS_Store
 .Rhistory
 .gitignore

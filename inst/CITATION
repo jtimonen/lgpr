@@ -1,8 +1,9 @@
 citHeader("If you use lgpr, please cite the article below.")
 
-citEntry(entry = "article",
+bibentry(
+  bibtype = "Article",
   title        = "lgpr: an interpretable non-parametric method for inferring covariate effects from longitudinal data",
-  author       = personList(as.person("Juho Timonen"),
+  author       = c(as.person("Juho Timonen"),
                    as.person("Henrik Mannerström"),
                    as.person("Aki Vehtari"),
                    as.person("Harri Lähdesmäki")),
