@@ -1,7 +1,8 @@
 # lgpr 1.2
 
-## 1.2.1
+## 1.2.1-1.2.3
   * Internal non-functional changes.
+  * Use `rstantools >= 2.3.1` which is needed for CRAN.
   
 ## 1.2.0
   * Update installation process.
