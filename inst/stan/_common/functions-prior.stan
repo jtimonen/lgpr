@@ -1,11 +1,11 @@
   // Log prior density to be added to target
-  real STAN_log_prior(real x, data int[] types, data real[] p) {
+  real STAN_log_prior(real x, data array[] int types, data array[] real p) {
     real log_prior = 0;
     real t = x;
   
     // Possible transform and log of its absolute derivative
     if (types[2]==1){
-      log_prior += log(fabs(2*x));
+      log_prior += log(abs(2*x));
       t = square(x);
     }
     

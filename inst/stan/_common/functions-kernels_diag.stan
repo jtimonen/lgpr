@@ -2,7 +2,7 @@
 // prediction computations.
 
   // Compute one constant kernel matrix diagonal.
-  vector STAN_kernel_const_diag(data int[] x, data int kernel_type) 
+  vector STAN_kernel_const_diag(data array[] int x, data int kernel_type) 
   {
     int n = num_elements(x);
     vector[n] K_diag = rep_vector(1.0, n);
@@ -17,17 +17,17 @@
   }
   
   // Compute all constant kernel matrices' diagonals.
-  vector[] STAN_kernel_const_all_diag(
+  array[] vector STAN_kernel_const_all_diag(
     data int n,
-    data int[,] x,
-    data int[,] x_mask,  
-    data int[,] components)
+    data array[,] int x,
+    data array[,] int x_mask,  
+    data array[,] int components)
   {
     int num_comps = size(components);
-    vector[n] K_const_diag[num_comps];
+    array[num_comps] vector[n] K_const_diag;
     for (j in 1:num_comps) {
       vector[n] K_diag;
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int ktype = opts[2];
       int idx_cat = opts[8];
@@ -56,7 +56,7 @@
   
   // Multiplier matrix to enable variance masking
   vector STAN_kernel_varmask_diag(vector x, real steepness,
-    data real[] vm_params)
+    data array[] real vm_params)
   {
     real a = steepness * vm_params[2];
     real r = inv(a)*logit(vm_params[1]);
@@ -66,31 +66,31 @@
   }
   
   // Multiplier matrix to enable heterogeneous effects
-  vector STAN_kernel_beta_diag(vector beta, int[] idx_expand) {
+  vector STAN_kernel_beta_diag(vector beta, array[] int idx_expand) {
     return(STAN_expand(beta, idx_expand));
   }
   
   /* 
     Compute diagonals of all kernel matrices.
   */
-  vector[] STAN_kernel_all_diag(
+  array[] vector STAN_kernel_all_diag(
     data int n,
-    data vector[] K_const_diag,
-    data int[,] components,
-    data vector[] x,
-    data vector[] x_unnorm,
-    real[] alpha,
-    real[] wrp,
-    vector[] beta,
-    vector[] teff,
-    data real[] vm_params,
-    data int[] idx_expand,
-    data vector[] teff_zero)
+    data array[] vector K_const_diag,
+    data array[,] int components,
+    data array[] vector x,
+    data array[] vector x_unnorm,
+    array[] real alpha,
+    array[] real wrp,
+    array[] vector beta,
+    array[] vector teff,
+    data array[] real vm_params,
+    data array[] int idx_expand,
+    data array[] vector teff_zero)
   {
     int idx_wrp = 0;
     int idx_alpha = 0;
     int num_comps = size(components);
-    vector[n] KX_diag[num_comps];
+    array[num_comps] vector[n] KX_diag;
   
     // Loop through components
     for(j in 1:num_comps){
@@ -100,7 +100,7 @@
       vector[n] X;
   
       // 2. Get component properties
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int idx_cont = opts[9];
       int is_heter = opts[4];

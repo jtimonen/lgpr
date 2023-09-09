@@ -88,11 +88,11 @@
   
   // Compute num_comps basis function matrices Phi, which each have shape
   // [num_obs, num_basisfun]
-  matrix[] STAN_phi_matrix(data vector[] x, data int M, data real L, 
-      data int[,] components){
+  array[] matrix STAN_phi_matrix(data array[] vector x, data int M, data real L, 
+      data array[,] int components){
     int n = num_elements(x[1]);
     int J = size(components);
-    matrix[n, M] PHI[J];
+    array[J] matrix[n, M] PHI;
     for(j in 1:J) {
       matrix[n, M] PHI_j = rep_matrix(1.0, n, M); //
       if(components[j,1] > 0) {
@@ -108,10 +108,10 @@
   }
   
   // Compute diagonals of diagonal matrices Lambda
-  vector[] STAN_lambda_matrix(real[] ell, data int M, data real L,
-      data int[,] components){
+  array[] vector STAN_lambda_matrix(array[] real ell, data int M, data real L,
+      data array[,] int components){
     int J = size(components);
-    vector[M] Lambda[J];
+    array[J] vector[M] Lambda;
     int j_ell = 0;
     for(j in 1:J) {
       if (components[j,1] > 0) {
@@ -127,9 +127,9 @@
   }
   
   // Get ranks of the constant kernel matrices
-  int[] STAN_ranks(data int[,] components, data int[] x_cat_num_levels){
+  array[] int STAN_ranks(data array[,] int components, data array[] int x_cat_num_levels){
     int J = size(components);
-    int ranks[J] = rep_array(1, J);
+    array[J] int ranks = rep_array(1, J);
     for (j in 1:J) {
       int idx_cat = components[j,8];
       if (idx_cat > 0) {
@@ -140,8 +140,8 @@
   }
   
   // Compute diagonals of Delta
-  vector STAN_delta_matrix(data matrix[] K_const, data int[] ranks, 
-      data int[,] components){
+  vector STAN_delta_matrix(data array[] matrix K_const, data array[] int ranks, 
+      data array[,] int components){
     int J = size(ranks);
     int n = cols(K_const[1]);
     int R = sum(ranks);
@@ -161,8 +161,8 @@
   }
   
   // Compute eigenvector matrix Theta
-  matrix STAN_theta_matrix(data matrix[] K_const, data int[] ranks,
-      data int[,] components){
+  matrix STAN_theta_matrix(data array[] matrix K_const, data array[] int ranks,
+      data array[,] int components){
     int J = size(ranks);
     int n = cols(K_const[1]);
     int R = sum(ranks);
@@ -184,8 +184,8 @@
   // Create D, a vector of length num_basisfun*sum(ranks)
   // - bfa_lambda = a an array of num_comps vectors of shape [num_basisfun]
   // - bfa_delta = a vector of shape [R]
-  vector STAN_D_matrix(real[] alpha, vector[] bfa_lambda, 
-      vector bfa_delta, int[] ranks) {
+  vector STAN_D_matrix(array[] real alpha, array[] vector bfa_lambda, 
+      vector bfa_delta, array[] int ranks) {
     int M = num_elements(bfa_lambda[1]);
     int RM = sum(ranks)*M;
     int J = size(ranks);
@@ -208,7 +208,7 @@
   // - bfa_phi = array of matrices with shape [num_obs, num_basisfun], length 
   //     num_comps
   // - bfa_theta = matrix of shape [num_obs, R]
-  matrix STAN_V_matrix(matrix[] bfa_phi, matrix bfa_theta, int[] ranks) {
+  matrix STAN_V_matrix(array[] matrix bfa_phi, matrix bfa_theta, array[] int ranks) {
     int J = size(bfa_phi);
     int n = rows(bfa_phi[1]);
     int M = cols(bfa_phi[1]);

@@ -1,5 +1,5 @@
   // Precompute fixed kernel matrices
-  matrix[num_obs, num_obs] K_const[num_comps] = STAN_kernel_const_all(
+  array[num_comps] matrix[num_obs, num_obs] K_const = STAN_kernel_const_all(
     num_obs, num_obs, x_cat, x_cat, x_cont_mask, x_cont_mask, 
     x_cat_num_levels, components
   );
