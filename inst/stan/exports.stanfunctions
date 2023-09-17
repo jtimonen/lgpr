@@ -5,7 +5,7 @@ functions {
   }
 
   // Expand a vector
-  vector STAN_expand(vector v, data int[] idx_expand){
+  vector STAN_expand(vector v, data array[] int idx_expand){
     int L = num_elements(v);
     vector[L+1] v_add0 = rep_vector(0.0, L+1);
     v_add0[2:(L+1)] = v;
@@ -20,7 +20,7 @@ functions {
     // Edit a continuous covariate according to sampled uncertainty
   vector STAN_edit_x_cont(
     vector x_cont,
-    data int[] idx_expand,
+    data array[] int idx_expand,
     data vector teff_obs,
     vector teff)
   {
@@ -31,7 +31,7 @@ functions {
   }
 
   // Compute one constant kernel matrix diagonal.
-  vector STAN_kernel_const_diag(data int[] x, data int kernel_type)
+  vector STAN_kernel_const_diag(data array[] int x, data int kernel_type)
   {
     int n = num_elements(x);
     vector[n] K_diag = rep_vector(1.0, n);
@@ -46,17 +46,17 @@ functions {
   }
 
   // Compute all constant kernel matrices' diagonals.
-  vector[] STAN_kernel_const_all_diag(
+  array[] vector STAN_kernel_const_all_diag(
     data int n,
-    data int[,] x,
-    data int[,] x_mask,
-    data int[,] components)
+    data array[,] int x,
+    data array[,] int x_mask,
+    data array[,] int components)
   {
     int num_comps = size(components);
-    vector[n] K_const_diag[num_comps];
+    array[num_comps] vector[n] K_const_diag;
     for (j in 1:num_comps) {
       vector[n] K_diag;
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int ktype = opts[2];
       int idx_cat = opts[8];
@@ -85,7 +85,7 @@ functions {
 
   // Multiplier matrix to enable variance masking
   vector STAN_kernel_varmask_diag(vector x, real steepness,
-    data real[] vm_params)
+    data array[] real vm_params)
   {
     real a = steepness * vm_params[2];
     real r = inv(a)*logit(vm_params[1]);
@@ -95,31 +95,31 @@ functions {
   }
 
   // Multiplier matrix to enable heterogeneous effects
-  vector STAN_kernel_beta_diag(vector beta, int[] idx_expand) {
+  vector STAN_kernel_beta_diag(vector beta, array[] int idx_expand) {
     return(STAN_expand(beta, idx_expand));
   }
 
   /*
     Compute diagonals of all kernel matrices.
   */
-  vector[] STAN_kernel_all_diag(
+  array[] vector STAN_kernel_all_diag(
     data int n,
-    data vector[] K_const_diag,
-    data int[,] components,
-    data vector[] x,
-    data vector[] x_unnorm,
-    real[] alpha,
-    real[] wrp,
-    vector[] beta,
-    vector[] teff,
-    data real[] vm_params,
-    data int[] idx_expand,
-    data vector[] teff_zero)
+    data array[] vector K_const_diag,
+    data array[,] int components,
+    data array[] vector x,
+    data array[] vector x_unnorm,
+    array[] real alpha,
+    array[] real wrp,
+    array[] vector beta,
+    array[] vector teff,
+    data array[] real vm_params,
+    data array[] int idx_expand,
+    data array[] vector teff_zero)
   {
     int idx_wrp = 0;
     int idx_alpha = 0;
     int num_comps = size(components);
-    vector[n] KX_diag[num_comps];
+    array[num_comps] vector[n] KX_diag;
 
     // Loop through components
     for(j in 1:num_comps){
@@ -129,7 +129,7 @@ functions {
       vector[n] X;
 
       // 2. Get component properties
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int idx_cont = opts[9];
       int is_heter = opts[4];
@@ -186,7 +186,7 @@ functions {
   }
 
   // Categorical zero-sum kernel
-  matrix STAN_kernel_zerosum(data int[] x1, data int[] x2, data int num_cat) {
+  matrix STAN_kernel_zerosum(data array[] int x1, data array[] int x2, data int num_cat) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1, n2] K;
@@ -203,7 +203,7 @@ functions {
   }
 
   // Categorical kernel
-  matrix STAN_kernel_cat(data int[] x1, data int[] x2) {
+  matrix STAN_kernel_cat(data array[] int x1, data array[] int x2) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1,n2] K;
@@ -216,7 +216,7 @@ functions {
   }
 
   // Binary mask kernel
-  matrix STAN_kernel_bin(data int[] x1, data int[] x2) {
+  matrix STAN_kernel_bin(data array[] int x1, data array[] int x2) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1,n2] K;
@@ -230,7 +230,7 @@ functions {
 
   // Compute one constant kernel matrix. Does not depend on parameters and
   // therefore this function never needs to be evaluated during sampling.
-  matrix STAN_kernel_const(data int[] x1, data int[] x2,
+  matrix STAN_kernel_const(data array[] int x1, data array[] int x2,
     data int kernel_type,  data int ncat)
   {
     int n1 = num_elements(x1);
@@ -249,17 +249,17 @@ functions {
 
   // Compute all constant kernel matrices. These do not depend on parameters and
   // therefore this function never needs to be evaluated during sampling.
-  matrix[] STAN_kernel_const_all(
+  array[] matrix STAN_kernel_const_all(
     data int n1,           data int n2,
-    data int[,] x1,        data int[,] x2,
-    data int[,] x1_mask,   data int[,] x2_mask,
-    data int[] num_levels, data int[,] components)
+    data array[,] int x1,        data array[,] int x2,
+    data array[,] int x1_mask,   data array[,] int x2_mask,
+    data array[] int num_levels, data array[,] int components)
   {
     int num_comps = size(components);
-    matrix[n1, n2] K_const[num_comps];
+    array[num_comps] matrix[n1, n2] K_const;
     for (j in 1:num_comps) {
       matrix[n1, n2] K;
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int ktype = opts[2];
       int idx_cat = opts[8];
@@ -284,12 +284,12 @@ functions {
 
   // Exponentiated quadratic kernel (with vector inputs)
   matrix STAN_kernel_eq(vector x1, vector x2, real alpha, real ell) {
-    return(cov_exp_quad(to_array_1d(x1), to_array_1d(x2), alpha, ell));
+    return(gp_exp_quad_cov(to_array_1d(x1), to_array_1d(x2), alpha, ell));
   }
 
   // Multiplier matrix to enable variance masking
   matrix STAN_kernel_varmask(vector x1, vector x2,
-    real steepness, data real[] vm_params)
+    real steepness, data array[] real vm_params)
   {
     real a = steepness * vm_params[2];
     real r = inv(a)*logit(vm_params[1]);
@@ -300,7 +300,7 @@ functions {
   }
 
   // Multiplier matrix to enable heterogeneous effects
-  matrix STAN_kernel_beta(vector beta, int[] idx1_expand, int[] idx2_expand) {
+  matrix STAN_kernel_beta(vector beta, array[] int idx1_expand, array[] int idx2_expand) {
     return(
       to_matrix(STAN_expand(sqrt(beta), idx1_expand)) *
       transpose(to_matrix(STAN_expand(sqrt(beta), idx2_expand)))
@@ -311,30 +311,30 @@ functions {
     Compute all kernel matrices. These depend on parameters and
     therefore this function needs to be evaluated repeatedly during sampling.
   */
-  matrix[] STAN_kernel_all(
+  array[] matrix STAN_kernel_all(
     data int n1,
     data int n2,
-    data matrix[] K_const,
-    data int[,] components,
-    data vector[] x1,
-    data vector[] x2,
-    data vector[] x1_unnorm,
-    data vector[] x2_unnorm,
-    real[] alpha,
-    real[] ell,
-    real[] wrp,
-    vector[] beta,
-    vector[] teff,
-    data real[] vm_params,
-    data int[] idx1_expand,
-    data int[] idx2_expand,
-    data vector[] teff_zero)
+    data array[] matrix K_const,
+    data array[,] int components,
+    data array[] vector x1,
+    data array[] vector x2,
+    data array[] vector x1_unnorm,
+    data array[] vector x2_unnorm,
+    array[] real alpha,
+    array[] real ell,
+    array[] real wrp,
+    array[] vector beta,
+    array[] vector teff,
+    data array[] real vm_params,
+    data array[] int idx1_expand,
+    data array[] int idx2_expand,
+    data array[] vector teff_zero)
   {
     int idx_ell = 0;
     int idx_wrp = 0;
     int idx_alpha = 0;
     int num_comps = size(components);
-    matrix[n1, n2] KX[num_comps];
+    array[num_comps] matrix[n1, n2] KX;
 
     // Loop through components
     for(j in 1:num_comps){
@@ -345,7 +345,7 @@ functions {
       vector[n2] X2;
 
       // 2. Get component properties
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int idx_cont = opts[9];
       int is_heter = opts[4];
@@ -407,13 +407,13 @@ functions {
   }
 
   // Log prior density to be added to target
-  real STAN_log_prior(real x, data int[] types, data real[] p) {
+  real STAN_log_prior(real x, data array[] int types, data array[] real p) {
     real log_prior = 0;
     real t = x;
 
     // Possible transform and log of its absolute derivative
     if (types[2]==1){
-      log_prior += log(fabs(2*x));
+      log_prior += log(abs(2*x));
       t = square(x);
     }
 
@@ -434,7 +434,7 @@ functions {
   }
 
   // Compute total signal by summing components
-  vector STAN_vectorsum(vector[] vecs, data int L){
+  vector STAN_vectorsum(array[] vector vecs, data int L){
     int num_vecs = size(vecs);
     vector[L] s = rep_vector(0, L);
     for (j in 1:num_vecs){
@@ -444,7 +444,7 @@ functions {
   }
 
   // Sum an array of matrices
-  matrix STAN_matrix_array_sum(matrix[] K){
+  matrix STAN_matrix_array_sum(array[] matrix K){
     int n1 = rows(K[1]);
     int n2 = cols(K[1]);
     matrix[n1, n2] K_sum = K[1];

@@ -1,5 +1,5 @@
   // Categorical zero-sum kernel
-  matrix STAN_kernel_zerosum(data int[] x1, data int[] x2, data int num_cat) {
+  matrix STAN_kernel_zerosum(data array[] int x1, data array[] int x2, data int num_cat) {
     int n1 = size(x1); 
     int n2 = size(x2);
     matrix[n1, n2] K;
@@ -16,7 +16,7 @@
   }
   
   // Categorical kernel
-  matrix STAN_kernel_cat(data int[] x1, data int[] x2) {
+  matrix STAN_kernel_cat(data array[] int x1, data array[] int x2) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1,n2] K;
@@ -29,7 +29,7 @@
   }
   
   // Binary mask kernel
-  matrix STAN_kernel_bin(data int[] x1, data int[] x2) {
+  matrix STAN_kernel_bin(data array[] int x1, data array[] int x2) {
     int n1 = size(x1);
     int n2 = size(x2);
     matrix[n1,n2] K;
@@ -43,7 +43,7 @@
   
   // Compute one constant kernel matrix. Does not depend on parameters and
   // therefore this function never needs to be evaluated during sampling.
-  matrix STAN_kernel_const(data int[] x1, data int[] x2, 
+  matrix STAN_kernel_const(data array[] int x1, data array[] int x2, 
     data int kernel_type,  data int ncat) 
   {
     int n1 = num_elements(x1);
@@ -62,17 +62,17 @@
   
   // Compute all constant kernel matrices. These do not depend on parameters and
   // therefore this function never needs to be evaluated during sampling.
-  matrix[] STAN_kernel_const_all(
+  array[] matrix STAN_kernel_const_all(
     data int n1,           data int n2,
-    data int[,] x1,        data int[,] x2,
-    data int[,] x1_mask,   data int[,] x2_mask,
-    data int[] num_levels, data int[,] components)
+    data array[,] int x1,        data array[,] int x2,
+    data array[,] int x1_mask,   data array[,] int x2_mask,
+    data array[] int num_levels, data array[,] int components)
   {
     int num_comps = size(components);
-    matrix[n1, n2] K_const[num_comps];
+    array[num_comps] matrix[n1, n2] K_const;
     for (j in 1:num_comps) {
       matrix[n1, n2] K;
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int ktype = opts[2];
       int idx_cat = opts[8];
@@ -97,12 +97,12 @@
   
   // Exponentiated quadratic kernel (with vector inputs)
   matrix STAN_kernel_eq(vector x1, vector x2, real alpha, real ell) {
-    return(cov_exp_quad(to_array_1d(x1), to_array_1d(x2), alpha, ell));
+    return(gp_exp_quad_cov(to_array_1d(x1), to_array_1d(x2), alpha, ell));
   }
   
   // Multiplier matrix to enable variance masking
   matrix STAN_kernel_varmask(vector x1, vector x2, 
-    real steepness, data real[] vm_params) 
+    real steepness, data array[] real vm_params) 
   {
     real a = steepness * vm_params[2];
     real r = inv(a)*logit(vm_params[1]);
@@ -113,7 +113,7 @@
   }
   
   // Multiplier matrix to enable heterogeneous effects
-  matrix STAN_kernel_beta(vector beta, int[] idx1_expand, int[] idx2_expand) {
+  matrix STAN_kernel_beta(vector beta, array[] int idx1_expand, array[] int idx2_expand) {
     return(
       to_matrix(STAN_expand(sqrt(beta), idx1_expand)) *
       transpose(to_matrix(STAN_expand(sqrt(beta), idx2_expand)))
@@ -124,30 +124,30 @@
     Compute all kernel matrices. These depend on parameters and
     therefore this function needs to be evaluated repeatedly during sampling.
   */
-  matrix[] STAN_kernel_all(
+  array[] matrix STAN_kernel_all(
     data int n1,
     data int n2,
-    data matrix[] K_const,
-    data int[,] components,
-    data vector[] x1,
-    data vector[] x2,
-    data vector[] x1_unnorm,
-    data vector[] x2_unnorm,
-    real[] alpha,
-    real[] ell,
-    real[] wrp,
-    vector[] beta,
-    vector[] teff,
-    data real[] vm_params,
-    data int[] idx1_expand,
-    data int[] idx2_expand,
-    data vector[] teff_zero)
+    data array[] matrix K_const,
+    data array[,] int components,
+    data array[] vector x1,
+    data array[] vector x2,
+    data array[] vector x1_unnorm,
+    data array[] vector x2_unnorm,
+    array[] real alpha,
+    array[] real ell,
+    array[] real wrp,
+    array[] vector beta,
+    array[] vector teff,
+    data array[] real vm_params,
+    data array[] int idx1_expand,
+    data array[] int idx2_expand,
+    data array[] vector teff_zero)
   {
     int idx_ell = 0;
     int idx_wrp = 0;
     int idx_alpha = 0;
     int num_comps = size(components);
-    matrix[n1, n2] KX[num_comps];
+    array[num_comps] matrix[n1, n2] KX;
   
     // Loop through components
     for(j in 1:num_comps){
@@ -158,7 +158,7 @@
       vector[n2] X2;
   
       // 2. Get component properties
-      int opts[9] = components[j];
+      array[9] int opts = components[j];
       int ctype = opts[1];
       int idx_cont = opts[9];
       int is_heter = opts[4];

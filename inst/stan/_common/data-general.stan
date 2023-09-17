@@ -38,14 +38,14 @@
       * kernel 0 = zero-sum kernel * [exp. quadratic]
       * kernel 1 = categorical kernel * [exp. quadratic]
   */
-  int<lower=0> components[num_comps, 9];
+  array[num_comps, 9] int<lower=0> components;
 
   // Observed effect times and uncertainty bounds for each case subject
-  vector[num_bt] teff_zero[num_uncrt>0];
-  vector[num_bt] teff_lb[num_uncrt>0];
-  vector[num_bt] teff_ub[num_uncrt>0];
+  array[num_uncrt>0] vector[num_bt] teff_zero;
+  array[num_uncrt>0] vector[num_bt] teff_lb;
+  array[num_uncrt>0] vector[num_bt] teff_ub;
 
   // Misc
-  int<lower=0> x_cat_num_levels[num_cov_cat];
+  array[num_cov_cat] int<lower=0> x_cat_num_levels;
   real delta; // jitter to ensure pos. def. kernel matrices
-  real vm_params[2]; // variance mask parameters (nonstat comps)
+  array[2] real vm_params; // variance mask parameters (nonstat comps)

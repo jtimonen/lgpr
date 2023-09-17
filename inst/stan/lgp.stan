@@ -11,8 +11,8 @@ data {
 #include _common/data-covariates.stan
 #include _common/data-priors.stan
   vector[num_obs] y_norm;
-  int<lower=0> prior_sigma[1, 2];
-  real hyper_sigma[1, 3];
+  array[1, 2] int<lower=0> prior_sigma;
+  array[1, 3] real hyper_sigma;
 }
 
 transformed data{
@@ -22,7 +22,7 @@ transformed data{
 
 parameters {
 #include _common/params.stan
-  real<lower=1e-12> sigma[1];
+  array[1] real<lower=1e-12> sigma;
 }
 
 transformed parameters {
@@ -37,7 +37,7 @@ model {
   // Likelihood
   if (is_likelihood_skipped == 0) {
     matrix[num_obs, num_obs] Ky = diag_matrix(delta_vec);
-    matrix[num_obs, num_obs] KX[num_comps] = STAN_kernel_all(num_obs, num_obs,
+    array[num_comps] matrix[num_obs, num_obs] KX = STAN_kernel_all(num_obs, num_obs,
       K_const, components, x_cont, x_cont, x_cont_unnorm, x_cont_unnorm,
       alpha, ell, wrp, beta, teff,
       vm_params, idx_expand, idx_expand, teff_zero
