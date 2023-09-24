@@ -1,5 +1,8 @@
 # lgpr 1.2
 
+## 1.2.4
+* Start using `rstan (>= 2.26.0)` and the new array syntax.
+
 ## 1.2.1-1.2.3
   * Internal non-functional changes.
   * Use `rstantools >= 2.3.1` which is needed for CRAN.
