@@ -13,7 +13,7 @@ See overview, tutorials, vignettes and documentation at https://jtimonen.github.
 
 ## Requirements
 * The package should work on all major operating systems. 
-* R 3.4 or later is required, R 4.0.2 or later is recommended
+* R 3.4 or later is required, R 4.2 or later is recommended
 
 ## Installing from CRAN
 * The latest released version that is available from CRAN can be installed simply via
@@ -40,6 +40,20 @@ See the instructions for:
   - [Linux](https://github.com/stan-dev/rstan/wiki/Configuring-C-Toolchain-for-Linux)
   - [Windows](https://github.com/stan-dev/rstan/wiki/Configuring-C---Toolchain-for-Windows)
   - [Mac](https://github.com/stan-dev/rstan/wiki/Configuring-C---Toolchain-for-Mac)
+
+## Using R < 4.2
+
+If you are using `R` version 4.1 or earlier, you can get an error 
+```
+cc1plus.exe: out of memory allocating 65536 bytes
+make: *** [C:/PROGRA~1/R/R-40~1.2/etc/i386/Makeconf:227: stanExports_lgp_latent.o] Error 1
+```
+because both 64-bit and 32-bit versions of the package are getting installed. To disable this and resolve error,
+ugrade to latest R or install the version that has `Biarch: false` by
+
+```r
+devtools::install_github('jtimonen/lgpr', ref = "no-biarch")
+``` 
 
 ## Real data and reproducing the experiments
 For code to reproduce the experiments of our manuscript see https://github.com/jtimonen/lgpr-usage. Preprocessed longitudinal proteomics
