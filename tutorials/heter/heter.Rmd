@@ -33,18 +33,20 @@ only 4 of the 8 case individuals are affected.
 
 ```{r simulate, fig.width = 7, fig.height=5}
 set.seed(1213)
-simData   <- simulate_data(N            = 16,
-                           t_data       = seq(12, 72, by = 12),
-                           covariates   = c(    0, 2,2,2),
-                           relevances   = c(1,1,1, 1,0,0),
-                           lengthscales = c(18,24, 1, 18,18,18),
-                           t_effect_range  = c(46,48),
-                           snr          = 5,
-                           N_affected   = 4,
-                           t_jitter     = 0)
+simData <- simulate_data(
+  N = 16,
+  t_data = seq(12, 72, by = 12),
+  covariates = c(0, 2, 2, 2),
+  relevances = c(1, 1, 1, 1, 0, 0),
+  lengthscales = c(18, 24, 1, 18, 18, 18),
+  t_effect_range = c(46, 48),
+  snr = 5,
+  N_affected = 4,
+  t_jitter = 0
+)
 
 plot_sim(simData)
-#plot_sim.component(simData,3)
+# plot_sim.component(simData,3)
 ```
 Above, the blue line represents the data-generating signal and black dots are
 noisy observations of the response variable.
@@ -61,7 +63,7 @@ We will define a formula where the term `het(id)*gp_vm(diseaseAge)`
 declares that the `gp_vm` term is heterogeneous and one level-specific magnitude parameter is needed for each level of `id`.
 
 ```{r formula}
-formula <- y ~ zs(id)*gp(age) + gp(age) + het(id)*gp_vm(diseaseAge) + zs(z1)*gp(age) + zs(z2)*gp(age) + zs(z3)*gp(age)
+formula <- y ~ zs(id) * gp(age) + gp(age) + het(id) * gp_vm(diseaseAge) + zs(z1) * gp(age) + zs(z2) * gp(age) + zs(z3) * gp(age)
 ```
 
 Because `diseaseAge` is `NaN` for the control individuals, it is automatically taken into account that an individual-specific magnitude parameter is actually needed just for each case individual.
@@ -69,12 +71,14 @@ Because `diseaseAge` is `NaN` for the control individuals, it is automatically t
 # Fitting the model
 
 ```{r fit, fig.width=7.2, fig.height=5.4, cache = TRUE}
-fit <- lgp(formula       = formula,
-            data         = dat,
-            prior        = list(wrp = igam(14,5)),
-            iter         = 2000,
-            chains       = 4,
-            cores        = 4)
+fit <- lgp(
+  formula = formula,
+  data = dat,
+  prior = list(wrp = igam(14, 5)),
+  iter = 2000,
+  chains = 4,
+  cores = 4
+)
 ```
 
 Printing the fit object summarizes the posterior
@@ -103,7 +107,7 @@ hyperparameters, and see that the inferred effects have the same shape for all i
 t <- seq(0, 100, by = 1)
 x_pred <- new_x(dat, t, x_ns = "diseaseAge")
 p <- pred(fit, x_pred, verbose = FALSE, reduce = stats::median)
-plot_f(fit, pred = p, comp_idx = 3, color_by = 'diseaseAge')
+plot_f(fit, pred = p, comp_idx = 3, color_by = "diseaseAge")
 ```
 
 # Computing environment

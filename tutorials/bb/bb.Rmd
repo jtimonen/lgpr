@@ -33,14 +33,16 @@ In this tutorial we simulate and analyse count data.
 We first show how to generate binomial data
 ```{r sim1, fig.width = 7, fig.height=5}
 set.seed(131)
-simData   <- simulate_data(N            = 12,
-                           t_data       = seq(12, 72, by = 12),
-                           covariates   = c(    2),
-                           noise_type   = "binomial",
-                           relevances   = c(0,1,1),
-                           lengthscales = c(18,24,18),
-                           N_trials     = 100,
-                           t_jitter     = 1)
+simData <- simulate_data(
+  N = 12,
+  t_data = seq(12, 72, by = 12),
+  covariates = c(2),
+  noise_type = "binomial",
+  relevances = c(0, 1, 1),
+  lengthscales = c(18, 24, 18),
+  N_trials = 100,
+  t_jitter = 1
+)
 
 plot_sim(simData)
 ```
@@ -53,15 +55,17 @@ so that $\gamma \rightarrow 0$ would be equivalent to binomial noise (no overdis
 
 ```{r sim2, fig.width = 7, fig.height=5}
 set.seed(131)
-simData   <- simulate_data(N            = 12,
-                           t_data       = seq(12, 72, by = 12),
-                           covariates   = c(    2),
-                           noise_type   = "bb",
-                           gamma        = 0.3,
-                           relevances   = c(0,1,1),
-                           lengthscales = c(18,24,18),
-                           N_trials     = 100,
-                           t_jitter     = 1)
+simData <- simulate_data(
+  N = 12,
+  t_data = seq(12, 72, by = 12),
+  covariates = c(2),
+  noise_type = "bb",
+  gamma = 0.3,
+  relevances = c(0, 1, 1),
+  lengthscales = c(18, 24, 18),
+  N_trials = 100,
+  t_jitter = 1
+)
 
 plot_sim(simData)
 ```
@@ -87,16 +91,17 @@ my_prior <- list(
 
 We fit a model using the generated beta-binomial data.
 ```{r fit, cache = TRUE}
-fit <- lgp(y ~ age + age|id + age|z,
-           data = dat,
-           likelihood = "bb",
-           num_trials = 100,
-           prior = my_prior,
-           refresh = 300,
-           chains = 3,
-           cores = 3,
-           control = list(adapt_delta = 0.95),
-           iter = 3000)
+fit <- lgp(y ~ age + age | id + age | z,
+  data = dat,
+  likelihood = "bb",
+  num_trials = 100,
+  prior = my_prior,
+  refresh = 300,
+  chains = 3,
+  cores = 3,
+  control = list(adapt_delta = 0.95),
+  iter = 3000
+)
 ```
 
 ```{r post1, cache = TRUE}

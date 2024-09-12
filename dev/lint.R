@@ -4,7 +4,7 @@ require(lintr)
 linters <- lintr::with_defaults(
   object_name_linter = NULL,
   open_curly_linter = NULL
-  )
+)
 
 # Files that are not linted
 exclusions <- list("R/RcppExports.R", "R/stanmodels.R")

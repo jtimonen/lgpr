@@ -68,7 +68,6 @@
 #' Bug reports, PRs, enhancement ideas or user experiences in general are
 #' welcome and appreciated. Create an issue in Github or email the author.
 #'
-#' @docType package
 #' @name lgpr-package
 #' @aliases lgpr
 #' @useDynLib lgpr, .registration = TRUE
@@ -88,7 +87,7 @@
 #'    Software 76(1).
 #' }
 #'
-NULL
+"_PACKAGE"
 
 
 # DATASETS ----------------------------------------------------------------

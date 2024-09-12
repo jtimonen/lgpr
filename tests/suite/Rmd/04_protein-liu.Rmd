@@ -29,18 +29,24 @@ plot(fit)
 # Compute and plot predictions at data points (reduce = NULL)
 alpha <- 0.3
 p1 <- pred(fit, reduce = NULL, draws = DRAW_INDS, verbose = verbose)
-plot_components(fit, p1,  t_name = "age", group_by = "id", alpha = alpha,
-                color_by = c(NA, NA, "group", "sex", "group", NA))
+plot_components(fit, p1,
+  t_name = "age", group_by = "id", alpha = alpha,
+  color_by = c(NA, NA, "group", "sex", "group", NA)
+)
 plot_pred(fit, p1, t_name = "age", group_by = "id", alpha = alpha)
 ```
 
 ```{r plots_2}
 # Compute and plot out-of-sample predictions (reduce = mean)
-x_pred <- new_x(fit, x_values = seq(0, 200, by = 2), group_by = "id",
-                x = "age", x_ns = "diseaseAge")
+x_pred <- new_x(fit,
+  x_values = seq(0, 200, by = 2), group_by = "id",
+  x = "age", x_ns = "diseaseAge"
+)
 p2 <- pred(fit, x_pred, reduce = mean, verbose = verbose)
-plot_components(fit, p2, t_name = "age", group_by = "id",
-                color_by = c(NA, NA, "group", "sex", "group", NA))
+plot_components(fit, p2,
+  t_name = "age", group_by = "id",
+  color_by = c(NA, NA, "group", "sex", "group", NA)
+)
 plot_pred(fit, p2, t_name = "age", group_by = "id")
 ```
 

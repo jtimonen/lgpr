@@ -38,21 +38,27 @@ $t_q∼\text{Exponential}(0.05)$ .
 
 ```{r simulate, fig.width = 7, fig.height=5}
 set.seed(121)
-relev           <- c(0,1,1,1,0,0)
-effect_time_fun <- function(){rnorm(n = 1, mean = 36, sd = 4)}
-obs_fun         <- function(t){min(t + stats::rexp(n = 1, rate = 0.05), 96 - 1e-5)}
-  
-simData <- simulate_data(N            = 12,
-                         t_data       = seq(12, 96, by = 12),
-                         covariates   = c(    0,2,2,2),
-                         relevances   = relev,
-                         lengthscales = c(18,24, 1.1, 18,18,18),
-                         t_effect_range = effect_time_fun,
-                         t_observed   = obs_fun,
-                         snr          = 3)
+relev <- c(0, 1, 1, 1, 0, 0)
+effect_time_fun <- function() {
+  rnorm(n = 1, mean = 36, sd = 4)
+}
+obs_fun <- function(t) {
+  min(t + stats::rexp(n = 1, rate = 0.05), 96 - 1e-5)
+}
 
-plot_sim(simData) + xlab('Age (months)')
-#plot_sim(simData, comp_idx = 3) # to visualize one generated component
+simData <- simulate_data(
+  N = 12,
+  t_data = seq(12, 96, by = 12),
+  covariates = c(0, 2, 2, 2),
+  relevances = relev,
+  lengthscales = c(18, 24, 1.1, 18, 18, 18),
+  t_effect_range = effect_time_fun,
+  t_observed = obs_fun,
+  snr = 3
+)
+
+plot_sim(simData) + xlab("Age (months)")
+# plot_sim(simData, comp_idx = 3) # to visualize one generated component
 ```
 Above, the blue line represents the data-generating signal and black dots are
 noisy observations of the response variable.
@@ -70,7 +76,7 @@ declares that the effect time for the nonstationary `gp_vm` term is uncertain
 and that one uncertainty parameter is needed for each level of `id`.
 
 ```{r formula}
-formula <- y ~ zs(id)*gp(age) + gp(age) + unc(id)*gp_vm(diseaseAge) + zs(z1)*gp(age) + zs(z2)*gp(age) + zs(z3)*gp(age)
+formula <- y ~ zs(id) * gp(age) + gp(age) + unc(id) * gp_vm(diseaseAge) + zs(z1) * gp(age) + zs(z2) * gp(age) + zs(z3) * gp(age)
 ```
 
 Because `diseaseAge` is `NaN` for the control individuals, it is automatically
@@ -111,7 +117,7 @@ of the disease, but not before age $18$ months, we could set the prior like
 here.
 
 ```{r prior0}
-obs_onset <- c(48,72,96,36,48,60)
+obs_onset <- c(48, 72, 96, 36, 48, 60)
 lb <- 18
 ub <- obs_onset
 effect_time_info <- list(zero = 0, backwards = FALSE, lower = lb, upper = ub)
@@ -134,7 +140,7 @@ lb <- 18
 ub <- obs_onset
 effect_time_info <- list(zero = ub, backwards = TRUE, lower = lb, upper = ub)
 my_prior <- list(
-  wrp = igam(14,5),
+  wrp = igam(14, 5),
   effect_time_info = effect_time_info,
   effect_time = gam(shape = 1, inv_scale = 0.05) # = Exponential(rate=0.05)
 )
@@ -149,13 +155,15 @@ equal to the Exponential distribution with `rate= lambda`.
 # Fitting the model
 
 ```{r fit, fig.width=7.2, fig.height=4.8, cache = TRUE}
-fit <- lgp(formula   = formula,
-            data     = dat,
-            prior    = my_prior,
-            iter     = 3000,
-            chains   = 4,
-            cores    = 4,
-            verbose  = TRUE)
+fit <- lgp(
+  formula = formula,
+  data = dat,
+  prior = my_prior,
+  iter = 3000,
+  chains = 4,
+  cores = 4,
+  verbose = TRUE
+)
 ```
 
 Printing the fit object summarizes the posterior
@@ -173,15 +181,15 @@ rstan::get_elapsed_time(fit@stan_fit)
 We can visualize the inferred effect times for each case individual. We see
 that for individuals 2 and 3 the inferred effect time is much earlier than the observed one.
 ```{r plt1, fig.width=7.2, fig.height=5.2}
-plot_effect_times(fit) + xlab('Age (months)')
+plot_effect_times(fit) + xlab("Age (months)")
 ```
 
 Finally we plot the inferred disease component
 ```{r plt2, fig.width=7.2, fig.height=4.2}
 t <- seq(0, 100, by = 1)
-x_pred <- new_x(dat, t, x_ns = 'diseaseAge')
+x_pred <- new_x(dat, t, x_ns = "diseaseAge")
 p <- pred(fit, x_pred, verbose = FALSE)
-plot_f(fit, pred = p, comp_idx = 3, color_by = 'diseaseAge')  + xlab('Age (months)')
+plot_f(fit, pred = p, comp_idx = 3, color_by = "diseaseAge") + xlab("Age (months)")
 ```
 
 # Computing environment

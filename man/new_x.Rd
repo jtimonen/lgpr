@@ -38,8 +38,8 @@ values, for each level of a grouping factor (usually id)
 \seealso{
 Other data frame handling functions: 
 \code{\link{add_dis_age}()},
-\code{\link{add_factor_crossing}()},
 \code{\link{add_factor}()},
+\code{\link{add_factor_crossing}()},
 \code{\link{adjusted_c_hat}()},
 \code{\link{split}()}
 }

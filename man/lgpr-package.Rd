@@ -92,6 +92,14 @@ welcome and appreciated. Create an issue in Github or email the author.
    Software 76(1).
 }
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/jtimonen/lgpr}
+  \item Report bugs at \url{https://github.com/jtimonen/lgpr/issues}
+}
+
+}
 \author{
 Juho Timonen (first.last at iki.fi)
 }

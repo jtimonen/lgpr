@@ -33,16 +33,18 @@ require("ggplot2")
 
 ```{r simulate, include = FALSE, eval = FALSE}
 set.seed(1932)
-sim <- simulate_data(N            = 12,                     
-                     t_data       = seq(12, 96, by = 12),
-                     covariates   = c(    0,2), # covariate types (2 = cat)
-                     lengthscales = c(16,24,1,16), # true effect lengthscales
-                     relevances   = c(0,1,1,1), # true covariate relevances
-                     names        = c("diseaseAge", "sex"),
-                     t_jitter     = 0,  # jitter in time points
-                     snr          = 3)    # signal-to-noise ratio
+sim <- simulate_data(
+  N = 12,
+  t_data = seq(12, 96, by = 12),
+  covariates = c(0, 2), # covariate types (2 = cat)
+  lengthscales = c(16, 24, 1, 16), # true effect lengthscales
+  relevances = c(0, 1, 1, 1), # true covariate relevances
+  names = c("diseaseAge", "sex"),
+  t_jitter = 0, # jitter in time points
+  snr = 3
+) # signal-to-noise ratio
 dat <- sim@data
-dat$y <- 100*(dat$y + 5)
+dat$y <- 100 * (dat$y + 5)
 a <- as.numeric(dat$id)
 dat$id <- as.factor(formatC(a, width = 2, flag = "0"))
 dat$group <- as.factor(as.numeric(!is.nan(dat$diseaseAge)))
@@ -59,7 +61,7 @@ In this tutorial we use simulated `testdata_002`, which is included in the
 `plot_data()` function can be used to visualize the data in many ways.
 
 ``````{r pd1, fig.width=7.2, fig.height=4.8}
-plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab('Age (months)')
+plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab("Age (months)")
 ```
 
 Coloring according to the disease-related age (`diseaseAge`) shows that
@@ -67,7 +69,7 @@ individuals 01-06 are cases and 07-12 are controls. The observed disease onset
 is at around 60 months for each case individual.
 
 ``````{r pd2, fig.width=7.2, fig.height=4.8}
-plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") + scale_color_gradient2() + xlab('Age (months)')
+plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") + scale_color_gradient2() + xlab("Age (months)")
 ```
 
 
@@ -114,7 +116,7 @@ Here we create a model with the continuous variable `age` and categorical
 variables `sex` and subject `id` as predictors for `y`.
 
 ```{r data3, fig.width=6.1, fig.height=4.3}
-model <- create_model(y ~ age + age|sex + age|id, testdata_002, verbose = FALSE)
+model <- create_model(y ~ age + age | sex + age | id, testdata_002, verbose = FALSE)
 print(model)
 ```
 
@@ -156,8 +158,10 @@ are automatically multiplied by a mask for the missing values.
 
 Here we define the formula using the advanced syntax.
 ```{r model_advanced}
-model <- create_model(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
-                      testdata_002)
+model <- create_model(
+  y ~ gp(age) + zs(id) * gp(age) + zs(sex) * gp(age) + gp_vm(diseaseAge) + zs(group),
+  testdata_002
+)
 ```
 
 We received a warning because we used `gp_vm()` without specifying a prior.
@@ -195,9 +199,10 @@ prior <- list(
   ell = igam(shape = 5, scale = 5) # inverse gamma for lengthscales <ell>
 )
 
-model <- create_model(y ~ age + age|sex + age|id,
-                      data = testdata_002, 
-                      prior = prior)
+model <- create_model(y ~ age + age | sex + age | id,
+  data = testdata_002,
+  prior = prior
+)
 param_summary(model)
 ```
 Specifying the `prior` argument as a named list gave the same prior for
@@ -206,17 +211,18 @@ for each lengthscale parameter, we could specify `ell` itself as a list
 with length 3.
 
 ```{r prior_sample, eval=FALSE, include=FALSE}
-#To check whether a given prior makes sense, we can sample from the prior
-#predictive distribution
-prior_fit <- lgp(distance ~ age + age|Sex + age|Subject, dat,
-           sample_f = TRUE,
-           prior_only = TRUE,
-           iter = 1000,
-           refresh = 200,
-           chains = 1)
+# To check whether a given prior makes sense, we can sample from the prior
+# predictive distribution
+prior_fit <- lgp(distance ~ age + age | Sex + age | Subject, dat,
+  sample_f = TRUE,
+  prior_only = TRUE,
+  iter = 1000,
+  refresh = 200,
+  chains = 1
+)
 
-#and compare the distribution of drawn "data" to the real data
-#See more about predictive checks [here](https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html).
+# and compare the distribution of drawn "data" to the real data
+# See more about predictive checks [here](https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html).
 print(prior_fit)
 ppc(prior_fit, dat)
 ```
@@ -288,12 +294,13 @@ is a shared age effect, `zs(sex)*gp(age)` is a sex-specific deviation from it,
 `zs(group)` is a static offset component between the two groups (Case/Control).
 
 ```{r fit, cache=TRUE}
-fit <- lgp(y ~ gp(age) + zs(id)*gp(age) + zs(sex)*gp(age) + gp_vm(diseaseAge) + zs(group),
-           data     = testdata_002,
-           prior    = my_prior, # defined earlier
-           iter     = 2000,
-           chains   = 4,
-           refresh  = 500)
+fit <- lgp(y ~ gp(age) + zs(id) * gp(age) + zs(sex) * gp(age) + gp_vm(diseaseAge) + zs(group),
+  data     = testdata_002,
+  prior    = my_prior, # defined earlier
+  iter     = 2000,
+  chains   = 4,
+  refresh  = 500
+)
 ```
 
 The `lgp()` function can be given any arguments that should be passed to
@@ -313,7 +320,7 @@ print(fit)
 Distribution of the parameter draws can be visualized.
 
 ```{r study3, fig.width = 6, fig.height = 3.5}
-plot_draws(fit, type = 'dens')
+plot_draws(fit, type = "dens")
 ```
 
 The slot `fit@stan_fit` is a `stanfit` object and can therefore be studied more
@@ -349,7 +356,9 @@ probabilistic selection. Here we define the density to be
 `stats::dbeta(x, 20, 2)`, which has most mass between $0.9$ and $1.0$.
 
 ```{r study6, fig.width = 6, fig.height = 3.5}
-threshold_density <- function(x) {stats::dbeta(x, 20, 2)}
+threshold_density <- function(x) {
+  stats::dbeta(x, 20, 2)
+}
 s <- select.integrate(fit, p = threshold_density)
 print(s$expected)
 ```
@@ -378,10 +387,11 @@ Also the posterior distribution of each component can be visualized
 
 ```{r vis4, fig.width=7, fig.height=7}
 plot_components(fit,
-                pred = p,
-                color_by = c(NA, NA, "sex", "group", "group", "group"),
-                ylim = c(-3,2),
-                ncol = 2)
+  pred = p,
+  color_by = c(NA, NA, "sex", "group", "group", "group"),
+  ylim = c(-3, 2),
+  ncol = 2
+)
 ```
 
 # Additional notes
@@ -396,10 +406,11 @@ posteriors are then shown only at the data points.
 
 ```{r vis5, fig.width=7, fig.height=4}
 plot_pred(fit)
-plot_components(fit,                 
-                color_by = c(NA, NA, "sex", "group", "group", "group"),
-                ylim = c(-3,2),
-                ncol = 2)
+plot_components(fit,
+  color_by = c(NA, NA, "sex", "group", "group", "group"),
+  ylim = c(-3, 2),
+  ncol = 2
+)
 ```
 
 # Computing environment
