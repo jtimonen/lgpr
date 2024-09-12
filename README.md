@@ -1,5 +1,8 @@
 # lgpr
 
+
+
+
 [![travis](https://app.travis-ci.com/jtimonen/lgpr.svg?branch=master)](https://app.travis-ci.com/github/jtimonen/lgpr)
 [![coverage](https://codecov.io/gh/jtimonen/lgpr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jtimonen/lgpr)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/lgpr)](https://cran.r-project.org/package=lgpr)
@@ -7,6 +10,9 @@
 [![license](https://img.shields.io/badge/license-GPL>=3-lightgrey.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 R-package for interpretable nonparametric modeling of longitudinal data using additive Gaussian processes. Contains functionality for inferring covariate effects and assessing covariate relevances. Various models can be specified using a convenient formula syntax.
+
+**NOTE:** [lgpr2](https://github.com/jtimonen/lgpr2) has been released! It allows scaling to larger data as it uses approximate Gaussian processes. Unfortunately it doesn't have all the special modeling features included in this package.
+
 
 ## Getting started
 See overview, tutorials, vignettes and documentation at https://jtimonen.github.io/lgpr-usage/index.html. 
