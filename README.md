@@ -11,7 +11,8 @@
 
 R-package for interpretable nonparametric modeling of longitudinal data using additive Gaussian processes. Contains functionality for inferring covariate effects and assessing covariate relevances. Various models can be specified using a convenient formula syntax.
 
-**NOTE:** [lgpr2](https://github.com/jtimonen/lgpr2) has been released! It allows scaling to larger data as it uses approximate Gaussian processes. Unfortunately it doesn't have all the special modeling features included in this package.
+> [!NOTE]
+> Using this package is computationally viable if your data set has maybe less than 300 observations. But the much more scalable [lgpr2](https://github.com/jtimonen/lgpr2) package has been released! It is much faster but unfortunately doesn't have all the special modeling features included in this package.
 
 
 ## Getting started
