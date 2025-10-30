@@ -29,9 +29,7 @@ test_that("plotting the inverse gamma distribution works", {
   b <- 3
   p1 <- plot_invgamma(a, b)
   p2 <- plot_invgamma(a, b, return_quantiles = TRUE)
-  c1 <- as.character(class(p1))
-  c2 <- as.character(class(p2$plot))
-  expect_true(ggplot2::is_ggplot(c1))
-  expect_true(ggplot2::is_ggplot(c2))
+  expect_true(ggplot2::is_ggplot(p1))
+  expect_true(ggplot2::is_ggplot(p2$plot))
   expect_error(plot_invgamma(a, b, IQR = 1.5))
 })
