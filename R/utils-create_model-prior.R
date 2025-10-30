@@ -340,7 +340,7 @@ parse_prior_single <- function(desc, num) {
 #' @param desc Prior description as a named list, containing fields
 #' \itemize{
 #'   \item \code{dist} - Distribution name. Must be one of
-#'   {'uniform', 'normal', 'student-t', 'gamma', 'inv-gamma', 'log-normal'}
+#'   'uniform', 'normal', 'student-t', 'gamma', 'inv-gamma', or 'log-normal'
 #'   (case-insensitive)
 #'   \item \code{square} - Is the prior for a square-transformed parameter.
 #' }
