@@ -10,7 +10,7 @@ prior_to_num(desc)
 \item{desc}{Prior description as a named list, containing fields
 \itemize{
   \item \code{dist} - Distribution name. Must be one of
-  {'uniform', 'normal', 'student-t', 'gamma', 'inv-gamma', 'log-normal'}
+  'uniform', 'normal', 'student-t', 'gamma', 'inv-gamma', or 'log-normal'
   (case-insensitive)
   \item \code{square} - Is the prior for a square-transformed parameter.
 }
