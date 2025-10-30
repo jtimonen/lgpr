@@ -1,5 +1,9 @@
 # lgpr 1.2
 
+## 1.2.5
+
+* Fix tests so that they work with `ggplot 4.0.0`
+
 ## 1.2.4
 * Start using `rstan (>= 2.26.0)` and the new array syntax.
 

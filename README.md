@@ -1,8 +1,5 @@
 # lgpr
 
-
-
-
 [![travis](https://app.travis-ci.com/jtimonen/lgpr.svg?branch=master)](https://app.travis-ci.com/github/jtimonen/lgpr)
 [![coverage](https://codecov.io/gh/jtimonen/lgpr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jtimonen/lgpr)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/lgpr)](https://cran.r-project.org/package=lgpr)
@@ -24,6 +21,7 @@ See overview, tutorials, vignettes and documentation at https://jtimonen.github.
 
 ## Installing from CRAN
 * The latest released version that is available from CRAN can be installed simply via
+
 ```r
 install.packages("lgpr")
 ```
@@ -31,11 +29,14 @@ Installing from CRAN is probably the easiest option since they might have binari
 
 ## Installing from source
 * The latest released version (which might not be in CRAN yet) can be installed via
+
 ```r
 install.packages('devtools') # if you don't have devtools already
 devtools::install_github('jtimonen/lgpr', build_vignettes = TRUE)
 ```
+
 * The latest development version can be installed via
+
 ```r
 devtools::install_github('jtimonen/lgpr', ref = "develop")
 ``` 
