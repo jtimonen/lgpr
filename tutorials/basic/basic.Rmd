@@ -16,7 +16,6 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#")
-knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```
 
 This tutorial demonstrates the core functionality of the `lgpr` package. We
@@ -60,7 +59,7 @@ In this tutorial we use simulated `testdata_002`, which is included in the
 `lgpr` package. It consists of 12 individuals and 8 time points for each. The
 `plot_data()` function can be used to visualize the data in many ways.
 
-``````{r pd1, fig.width=7.2, fig.height=4.8}
+```{r pd1, fig.width=7.2, fig.height=4.8}
 plot_data(testdata_002, facet_by = "id", color_by = "sex") + xlab("Age (months)")
 ```
 
@@ -68,7 +67,7 @@ Coloring according to the disease-related age (`diseaseAge`) shows that
 individuals 01-06 are cases and 07-12 are controls. The observed disease onset
 is at around 60 months for each case individual.
 
-``````{r pd2, fig.width=7.2, fig.height=4.8}
+```{r pd2, fig.width=7.2, fig.height=4.8}
 plot_data(testdata_002, facet_by = "id", color_by = "diseaseAge") + scale_color_gradient2() + xlab("Age (months)")
 ```
 
@@ -97,7 +96,7 @@ The `data` argument to `lgp()` or `create_model()` should be a `data.frame`
 where continuous variables have a numeric type and categorical variables
 are factors. Our test data is already in this format.
 
-``````{r data_str}
+```{r data_str}
 str(testdata_002)
 ```
 
